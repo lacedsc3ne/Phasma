@@ -28,6 +28,7 @@ namespace PhasmaStrap.Models.Persistable
         // channel management
         public string RobloxChannel { get; set; } = "";
         public ChannelChangeMode ChannelChangeMode { get; set; } = ChannelChangeMode.Automatic;
+        public string PreferredMirror { get; set; } = "";
 
         // performance tweaks
         public int CpuCoreLimit { get; set; } = 0;

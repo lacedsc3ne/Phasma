@@ -14,6 +14,8 @@
         
         public static string BaseUrl { get; private set; } = null!;
 
+        public static IReadOnlyList<string> Mirrors => BaseUrls.OrderBy(entry => entry.Value).Select(entry => entry.Key).ToList();
+
         public static readonly List<HttpStatusCode?> BadChannelCodes = new()
         {
             HttpStatusCode.Unauthorized,
@@ -81,7 +83,16 @@
             var tokenSource = new CancellationTokenSource();
 
             var exceptions = new List<Exception>();
-            var tasks = (from entry in BaseUrls select TestConnection(entry.Key, entry.Value, tokenSource.Token)).ToList();
+
+            string preferred = App.Settings.Prop.PreferredMirror;
+            var candidates = !String.IsNullOrEmpty(preferred) && BaseUrls.ContainsKey(preferred)
+                ? new Dictionary<string, int> { { preferred, 0 } }
+                : BaseUrls;
+
+            if (!String.IsNullOrEmpty(preferred) && !BaseUrls.ContainsKey(preferred))
+                App.Logger.WriteLine(LOG_IDENT, $"Preferred mirror {preferred} is no longer a known mirror, falling back to auto");
+
+            var tasks = (from entry in candidates select TestConnection(entry.Key, entry.Value, tokenSource.Token)).ToList();
 
             App.Logger.WriteLine(LOG_IDENT, "Testing connectivity...");
 
