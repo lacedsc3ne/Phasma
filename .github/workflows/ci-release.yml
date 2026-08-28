@@ -24,14 +24,14 @@ jobs:
       run: dotnet build -c Release --no-restore
 
     - name: Publish
-      run: dotnet publish -p:PublishSingleFile=true -p:CommitHash=${{ github.sha }} -p:CommitRef=${{ github.ref_type }}/${{ github.ref_name }} -r win-x64 -c Release --self-contained false .\Bloxstrap\Bloxstrap.csproj
+      run: dotnet publish -p:PublishSingleFile=true -p:CommitHash=${{ github.sha }} -p:CommitRef=${{ github.ref_type }}/${{ github.ref_name }} -r win-x64 -c Release --self-contained false .\PhasmaStrap\PhasmaStrap.csproj
 
     - name: Upload Artifact
       id: upload-artifact
       uses: actions/upload-artifact@v7
       with:
-        name: Bloxstrap (Release) (${{ github.sha }})
-        path: .\Bloxstrap\bin\Release\net6.0-windows\win-x64\publish\*
+        name: PhasmaStrap (Release) (${{ github.sha }})
+        path: .\PhasmaStrap\bin\Release\net6.0-windows\win-x64\publish\*
 
   release:
     needs: build
@@ -52,14 +52,14 @@ jobs:
           output-artifact-directory: 'release'
 
       - name: Rename binaries
-        run: mv release/Bloxstrap.exe Bloxstrap-${{ github.ref_name }}.exe
+        run: mv release/PhasmaStrap.exe PhasmaStrap-${{ github.ref_name }}.exe
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          files: Bloxstrap-${{ github.ref_name }}.exe
-          name: Bloxstrap ${{ github.ref_name }}
+          files: PhasmaStrap-${{ github.ref_name }}.exe
+          name: PhasmaStrap ${{ github.ref_name }}
 
   release-test:
     needs: build
@@ -80,11 +80,11 @@ jobs:
           output-artifact-directory: 'release'
 
       - name: Rename binaries
-        run: mv release/Bloxstrap.exe Bloxstrap-${{ github.ref_name }}.exe
+        run: mv release/PhasmaStrap.exe PhasmaStrap-${{ github.ref_name }}.exe
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          files: Bloxstrap-${{ github.ref_name }}.exe
-          name: Bloxstrap ${{ github.ref_name }}
+          files: PhasmaStrap-${{ github.ref_name }}.exe
+          name: PhasmaStrap ${{ github.ref_name }}
