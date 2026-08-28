@@ -49,6 +49,9 @@ namespace Bloxstrap.UI.Elements.Installer
 
         public bool Finished => _currentPage == _pages.Last();
 
+        private void MainWindow_MistLoaded(object sender, RoutedEventArgs e) =>
+            ((Storyboard)Resources["MistDrift"]).Begin(this);
+
         public MainWindow()
         {
             _viewModel.CloseWindowRequest += (_, _) => CloseWindow();

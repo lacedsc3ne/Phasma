@@ -13,16 +13,81 @@
         d:DataContext="{d:DesignInstance dmodels:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="{x:Static resources:Strings.Installer_Title}"
         Height="540" Width="840" MinWidth="840"
-        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
-        WindowBackdropType="Mica"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Loaded="MainWindow_MistLoaded">
+
+    <Window.Resources>
+        <BlurEffect x:Key="MistBlurLarge" Radius="70" />
+
+        <Storyboard x:Key="MistDrift" RepeatBehavior="Forever">
+            <DoubleAnimation
+                Storyboard.TargetName="MistTranslate1"
+                Storyboard.TargetProperty="X"
+                From="-80" To="100" Duration="0:0:14" AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="MistTranslate1"
+                Storyboard.TargetProperty="Y"
+                From="30" To="-40" Duration="0:0:11" AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="MistTranslate2"
+                Storyboard.TargetProperty="X"
+                From="90" To="-110" Duration="0:0:16" AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="MistTranslate2"
+                Storyboard.TargetProperty="Y"
+                From="-40" To="35" Duration="0:0:12.5" AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <!--  drifting red mist behind the glass, matches the bootstrapper splash's style  -->
+        <Canvas Grid.RowSpan="3" ClipToBounds="True" IsHitTestVisible="False">
+            <Ellipse x:Name="Mist1" Width="480" Height="480" Canvas.Left="-160" Canvas.Top="-200" Opacity="0.12" Effect="{StaticResource MistBlurLarge}">
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="MistTranslate1" X="-80" Y="30" />
+                </Ellipse.RenderTransform>
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#8FF4554B" Offset="0" />
+                        <GradientStop Color="#00F4554B" Offset="1" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+            <Ellipse x:Name="Mist2" Width="420" Height="420" Canvas.Left="620" Canvas.Top="120" Opacity="0.15" Effect="{StaticResource MistBlurLarge}">
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="MistTranslate2" X="90" Y="-40" />
+                </Ellipse.RenderTransform>
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#80CF3B32" Offset="0" />
+                        <GradientStop Color="#00CF3B32" Offset="1" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Canvas>
 
         <ui:TitleBar Padding="8" x:Name="RootTitleBar" Grid.Row="0" ForceShutdown="False" MinimizeToTray="False" UseSnapLayout="True" Title="{x:Static resources:Strings.Installer_Title}" Icon="pack://application:,,,/Bloxstrap.ico" />
 

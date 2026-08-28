@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 
 using Wpf.Ui.Controls.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
@@ -78,6 +79,9 @@ namespace Bloxstrap.UI.Elements.Settings
         public void CloseWindow() => Close();
 
         #endregion INavigationWindow methods
+
+        private void MainWindow_MistLoaded(object sender, RoutedEventArgs e) =>
+            ((Storyboard)Resources["MistDrift"]).Begin(this);
 
         private void WpfUiWindow_Closing(object sender, CancelEventArgs e)
         {
