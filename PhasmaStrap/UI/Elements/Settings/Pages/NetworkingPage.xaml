@@ -40,5 +40,11 @@
         <controls:OptionControl Header="Display name override">
             <ui:TextBox Width="200" PlaceholderText="Real name" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
+
+        <TextBlock Text="Telemetry" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Blackholes Roblox's own telemetry and crash-upload domains at the hosts-file level. Separate from the local proxy above." />
+        <controls:OptionControl Header="Block Roblox telemetry" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding BlockRobloxTelemetry, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

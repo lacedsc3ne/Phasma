@@ -64,6 +64,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(CertificateStatusText));
         });
 
+        public bool BlockRobloxTelemetry
+        {
+            get => App.Settings.Prop.BlockRobloxTelemetry;
+            set
+            {
+                bool ok = value ? Integrations.TelemetryBlocker.RequestApply() : Integrations.TelemetryBlocker.RequestRemove();
+
+                if (ok)
+                    App.Settings.Prop.BlockRobloxTelemetry = value;
+
+                OnPropertyChanged(nameof(BlockRobloxTelemetry));
+                OnPropertyChanged(nameof(TelemetryBlockerStatusText));
+            }
+        }
+
+        public string TelemetryBlockerStatusText => Integrations.TelemetryBlocker.IsApplied()
+            ? $"Blocking {Integrations.TelemetryBlocker.Domains.Length} telemetry domains"
+            : "Off";
+
         public ICommand RemoveCertificateCommand => new RelayCommand(() =>
         {
             AssetProxyCA.RemoveFromTrustStore();

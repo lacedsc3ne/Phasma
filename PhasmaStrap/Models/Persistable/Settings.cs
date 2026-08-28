@@ -59,5 +59,8 @@ namespace PhasmaStrap.Models.Persistable
         // cleaner
         public CleanerOptions CleanerOptions { get; set; } = CleanerOptions.Never;
         public List<string> CleanerDirectories { get; set; } = new();
+
+        // telemetry blocker
+        public bool BlockRobloxTelemetry { get; set; } = false;
     }
 }

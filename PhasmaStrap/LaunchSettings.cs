@@ -44,6 +44,10 @@ namespace PhasmaStrap
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");
 
+        public LaunchFlag WriteTelemetryBlockFlag   { get; } = new("writetelemetryblock");
+
+        public LaunchFlag RemoveTelemetryBlockFlag  { get; } = new("removetelemetryblock");
+
 #if DEBUG
         public bool BypassUpdateCheck => true;
 #else
