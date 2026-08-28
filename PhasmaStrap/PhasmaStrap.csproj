@@ -16,6 +16,7 @@
     
   <ItemGroup>
     <Resource Include="PhasmaStrap.ico" />
+    <Resource Include="Resources\PhasmaStrapLogo.png" />
     <Resource Include="Resources\Fonts\NotoSansThai-VariableFont_wdth,wght.ttf" />
     <Resource Include="Resources\Fonts\Rubik-VariableFont_wght.ttf" />
     <Resource Include="Resources\Fonts\DMSans-Regular.ttf" />
