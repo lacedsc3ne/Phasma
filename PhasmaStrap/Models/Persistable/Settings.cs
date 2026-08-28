@@ -32,6 +32,7 @@ namespace PhasmaStrap.Models.Persistable
 
         // performance tweaks
         public int CpuCoreLimit { get; set; } = 0;
+        public bool FakeExclusiveFullscreen { get; set; } = false;
 
         // extension manager: extension id -> saved executable path
         public Dictionary<string, string> ExtensionPaths { get; set; } = new();

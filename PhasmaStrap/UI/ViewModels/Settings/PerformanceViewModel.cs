@@ -19,6 +19,17 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public string CpuCoreLimitDisplay => CpuCoreLimit == 0 ? "All cores" : $"{CpuCoreLimit} core(s)";
 
+        public bool FakeExclusiveFullscreen
+        {
+            get => App.Settings.Prop.FakeExclusiveFullscreen;
+            set
+            {
+                App.Settings.Prop.FakeExclusiveFullscreen = value;
+                if (!value)
+                    PhasmaStrap.Integrations.FakeExclusiveFullscreen.Restore();
+            }
+        }
+
         public bool SettingsFileReadOnly
         {
             get => _gbs.GetReadOnly();

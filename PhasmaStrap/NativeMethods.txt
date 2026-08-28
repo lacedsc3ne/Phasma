@@ -3,3 +3,9 @@ FlashWindow
 GetWindowLong
 SetWindowLong
 SHObjectProperties
+SetWindowPos
+MonitorFromWindow
+GetMonitorInfo
+GetWindowRect
+GetForegroundWindow
+IsWindow
