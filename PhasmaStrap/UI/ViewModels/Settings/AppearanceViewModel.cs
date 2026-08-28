@@ -76,6 +76,22 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool ControllerNavigationEnabled
+        {
+            get => App.Settings.Prop.ControllerNavigationEnabled;
+            set
+            {
+                App.Settings.Prop.ControllerNavigationEnabled = value;
+
+                // take effect immediately for the currently open settings window, rather
+                // than requiring a restart
+                if (value)
+                    ControllerService.Initialize();
+                else
+                    ControllerService.Shutdown();
+            }
+        }
+
         public static List<string> Languages => Locale.GetLanguages();
 
         public string SelectedLanguage 
