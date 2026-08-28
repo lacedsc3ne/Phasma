@@ -299,6 +299,18 @@ namespace PhasmaStrap
                 return;
             }
 
+            if (LaunchSettings.WriteTelemetryBlockFlag.Active)
+            {
+                Shutdown(Integrations.TelemetryBlocker.ApplyElevated() ? 0 : 1);
+                return;
+            }
+
+            if (LaunchSettings.RemoveTelemetryBlockFlag.Active)
+            {
+                Shutdown(Integrations.TelemetryBlocker.RemoveElevated() ? 0 : 1);
+                return;
+            }
+
             // installation check begins here
             using var uninstallKey = Registry.CurrentUser.OpenSubKey(UninstallKey);
             string? installLocation = null;
@@ -432,6 +444,15 @@ namespace PhasmaStrap
                 catch (Exception ex)
                 {
                     Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
+                }
+
+                try
+                {
+                    Integrations.TelemetryBlocker.ReconcileOnStartup();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Telemetry blocker reconciliation failed: {ex.Message}");
                 }
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))
