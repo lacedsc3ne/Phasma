@@ -15,6 +15,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand BrowseIntegrationLocationCommand => new RelayCommand(BrowseIntegrationLocation);
 
+        public ICommand AddRPCTemplateCommand => new RelayCommand(AddRPCTemplate);
+
+        public ICommand DeleteRPCTemplateCommand => new RelayCommand(DeleteRPCTemplate);
+
         private void AddIntegration()
         {
             CustomIntegrations.Add(new CustomIntegration()
@@ -133,5 +137,43 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public CustomIntegration? SelectedCustomIntegration { get; set; }
         public int SelectedCustomIntegrationIndex { get; set; }
         public bool IsCustomIntegrationSelected => SelectedCustomIntegration is not null;
+
+        // user-authored Discord Rich Presence templates (per-game), ported/scoped-down from Voidstrap's
+        // RPCCustomizer feature - see Models/RPCTemplate.cs and Integrations/DiscordRichPresence.cs
+        public ObservableCollection<RPCTemplate> RPCTemplates
+        {
+            get => App.Settings.Prop.RPCTemplates;
+            set => App.Settings.Prop.RPCTemplates = value;
+        }
+
+        public RPCTemplate? SelectedRPCTemplate { get; set; }
+        public int SelectedRPCTemplateIndex { get; set; }
+        public bool IsRPCTemplateSelected => SelectedRPCTemplate is not null;
+
+        private void AddRPCTemplate()
+        {
+            RPCTemplates.Add(new RPCTemplate());
+
+            SelectedRPCTemplateIndex = RPCTemplates.Count - 1;
+
+            OnPropertyChanged(nameof(SelectedRPCTemplateIndex));
+            OnPropertyChanged(nameof(IsRPCTemplateSelected));
+        }
+
+        private void DeleteRPCTemplate()
+        {
+            if (SelectedRPCTemplate is null)
+                return;
+
+            RPCTemplates.Remove(SelectedRPCTemplate);
+
+            if (RPCTemplates.Count > 0)
+            {
+                SelectedRPCTemplateIndex = RPCTemplates.Count - 1;
+                OnPropertyChanged(nameof(SelectedRPCTemplateIndex));
+            }
+
+            OnPropertyChanged(nameof(IsRPCTemplateSelected));
+        }
     }
 }
