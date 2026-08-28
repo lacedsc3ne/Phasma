@@ -8,6 +8,32 @@
       Title="ExtensionsPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Rojo" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Syncs external files into Roblox Studio for development. Unlike the tools below, PhasmaStrap downloads and manages Rojo itself." />
+
+        <Border Margin="0,12,0,0" Padding="14" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlElevationBorderBrush}" BorderThickness="1" DataContext="{Binding Rojo}">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding InstalledVersionText}" FontSize="16" FontWeight="Medium" />
+                        <TextBlock Text="{Binding ProjectPathText}" FontSize="11" FontFamily="Consolas" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:Button Content="{Binding InstallOrUpdateButtonText}" Icon="ArrowDownload24" Margin="0,0,8,0" IsEnabled="{Binding CanInstallOrUpdate}" Command="{Binding InstallOrUpdateCommand}" />
+                        <ui:Button Content="Browse project" Icon="Folder24" Margin="0,0,8,0" IsEnabled="{Binding CanInstallOrUpdate}" Command="{Binding BrowseProjectCommand}" />
+                        <ui:Button Content="{Binding ServeButtonText}" Icon="Play24" Margin="0,0,8,0" IsEnabled="{Binding CanToggleServe}" Command="{Binding ToggleServeCommand}" />
+                        <ui:Button Content="Uninstall" Icon="Delete24" Appearance="Secondary" IsEnabled="{Binding CanUninstall}" Command="{Binding UninstallCommand}" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Margin="0,8,0,0" Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Other Extensions" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock Text="Locate and launch third-party tools alongside Roblox. PhasmaStrap doesn't bundle or download these - point it at an existing install." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <ItemsControl Margin="0,16,0,0" ItemsSource="{Binding Extensions}">
