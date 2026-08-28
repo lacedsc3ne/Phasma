@@ -71,6 +71,12 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.CustomIntegrations.Count > 0)
                     IntegrationWatcher = new(ActivityWatcher);
+
+                if (App.Settings.Prop.FakeExclusiveFullscreen)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => FakeExclusiveFullscreen.OnGameJoin();
+                    ActivityWatcher.OnGameLeave += (_, _) => FakeExclusiveFullscreen.OnGameLeave();
+                }
             }
 
             _notifyIcon = new(this);
@@ -133,6 +139,7 @@ namespace PhasmaStrap
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
             IntegrationWatcher?.Dispose();
+            FakeExclusiveFullscreen.Shutdown();
 
             GC.SuppressFinalize(this);
         }
