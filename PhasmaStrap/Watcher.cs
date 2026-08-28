@@ -18,6 +18,8 @@ namespace PhasmaStrap
 
         public readonly IntegrationWatcher? IntegrationWatcher;
 
+        public readonly PlayTimeWatcher? PlayTimeWatcher;
+
         public Watcher()
         {
             const string LOG_IDENT = "Watcher";
@@ -71,6 +73,8 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.CustomIntegrations.Count > 0)
                     IntegrationWatcher = new(ActivityWatcher);
+
+                PlayTimeWatcher = new(ActivityWatcher);
 
                 if (App.Settings.Prop.FakeExclusiveFullscreen)
                 {
@@ -151,6 +155,8 @@ namespace PhasmaStrap
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
             IntegrationWatcher?.Dispose();
+            PlayTimeWatcher?.Dispose();
+            PlayTimeStore.Shutdown();
             FakeExclusiveFullscreen.Shutdown();
             AudioDucker.Shutdown();
             HeadsetAudio.Shutdown();
