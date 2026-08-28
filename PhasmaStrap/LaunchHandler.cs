@@ -298,6 +298,9 @@ namespace PhasmaStrap
                         App.FinalizeExceptionHandling(t.Exception);
                 }
 
+                if (App.Settings.Prop.CleanerOptions != Enums.CleanerOptions.Never)
+                    Cleaner.DoCleaning();
+
                 App.Terminate();
             });
         }

@@ -37,6 +37,7 @@ namespace PhasmaStrap.Models.Persistable
 
         // roblox studio companion plugin
         public bool StudioPluginEnabled { get; set; } = false;
+        public bool StudioRichPresenceEnabled { get; set; } = false;
 
         // networking / local asset proxy
         public bool NetworkingProxyEnabled { get; set; } = false;
@@ -54,5 +55,9 @@ namespace PhasmaStrap.Models.Persistable
 
         // mod preset configuration
         public bool UseDisableAppPatch { get; set; } = false;
+
+        // cleaner
+        public CleanerOptions CleanerOptions { get; set; } = CleanerOptions.Never;
+        public List<string> CleanerDirectories { get; set; } = new();
     }
 }

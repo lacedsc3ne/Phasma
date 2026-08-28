@@ -86,5 +86,9 @@
                 <ui:ToggleSwitch IsChecked="{Binding StudioPluginEnabled, Mode=TwoWay}" />
             </StackPanel>
         </controls:OptionControl>
+
+        <controls:OptionControl Header="Studio Rich Presence" Description="Shows a separate Discord status while Roblox Studio is open.">
+            <ui:ToggleSwitch IsChecked="{Binding StudioRichPresenceEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

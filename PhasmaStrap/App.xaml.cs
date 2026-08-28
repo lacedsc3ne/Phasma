@@ -50,6 +50,8 @@ namespace PhasmaStrap
 
         public static readonly Logger Logger = new();
 
+        public static StudioRichPresence? StudioRichPresence;
+
         public static readonly Dictionary<string, BaseTask> PendingSettingTasks = new();
 
         public static readonly JsonManager<Settings> Settings = new();
@@ -411,6 +413,16 @@ namespace PhasmaStrap
                 catch (Exception ex)
                 {
                     Logger.WriteLine(LOG_IDENT, $"Studio companion startup failed: {ex.Message}");
+                }
+
+                try
+                {
+                    if (Settings.Prop.StudioRichPresenceEnabled)
+                        StudioRichPresence = new StudioRichPresence();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Studio Rich Presence startup failed: {ex.Message}");
                 }
 
                 try
