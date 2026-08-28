@@ -41,5 +41,36 @@
         <controls:OptionControl Header="Preferred mirror">
             <ComboBox Width="260" ItemsSource="{Binding MirrorChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Url" SelectedValue="{Binding PreferredMirror, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="Update heatmap" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Looks at an experience's public update timestamp and badge-award history to show which days of the week it typically ships updates on. Uses Roblox's own public APIs - no login required." />
+
+        <controls:OptionControl Header="Place ID" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal">
+                <ui:TextBox Width="200" PlaceholderText="e.g. 13700835620" Text="{Binding HeatmapPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button Margin="8,0,0,0" Content="Load" Icon="ArrowClockwise24" Command="{Binding LoadHeatmapCommand, Mode=OneTime}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding HeatmapStatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding HeatmapDays, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Width="48" Margin="0,0,4,0">
+                        <Grid Height="80" VerticalAlignment="Bottom">
+                            <Border VerticalAlignment="Bottom" Width="28" Height="{Binding BarHeight}" Background="{DynamicResource AccentFillColorDefaultBrush}" CornerRadius="3" />
+                        </Grid>
+                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" Margin="0,4,0,0" FontSize="12" />
+                        <TextBlock Text="{Binding Count}" HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </StackPanel>
 </ui:UiPage>
