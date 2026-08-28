@@ -76,5 +76,15 @@
                 <ui:ToggleSwitch IsChecked="{Binding SettingsIconTask.NewState, Mode=TwoWay}" />
             </controls:OptionControl>
         </Grid>
+
+        <TextBlock Text="Studio companion" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="Installs a Roblox Studio plugin that reports what you're working on back to PhasmaStrap." Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Enable Studio companion" Description="{Binding StudioPluginStatus, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Content="Reinstall" Icon="ArrowClockwise24" Margin="0,0,8,0" IsEnabled="{Binding StudioPluginEnabled}" Command="{Binding ReinstallStudioPluginCommand, Mode=OneTime}" />
+                <ui:ToggleSwitch IsChecked="{Binding StudioPluginEnabled, Mode=TwoWay}" />
+            </StackPanel>
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

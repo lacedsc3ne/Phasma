@@ -350,6 +350,13 @@ namespace PhasmaStrap
                 App.Logger.WriteLine(LOG_IDENT, "Skipping registry check, unknown launch");
             }
 
+            if (App.Settings.Prop.ChannelChangeMode != Enums.ChannelChangeMode.Ignore
+                && !String.IsNullOrEmpty(App.Settings.Prop.RobloxChannel))
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Got from saved channel setting");
+                return App.Settings.Prop.RobloxChannel.ToLowerInvariant();
+            }
+
             App.Logger.WriteLine(LOG_IDENT, "Could not find channel");
             return null;
         }

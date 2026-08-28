@@ -1,0 +1,60 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.PerformancePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      mc:Ignorable="d"
+      Title="PerformancePage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="System-level tweaks and direct Roblox game settings." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <TextBlock Text="System" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="CPU core limit" Description="Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Roblox game settings" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="These edit Roblox's own GlobalBasicSettings file directly, rather than going through FastFlags." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Lock settings file" Description="Marks the file read-only so Roblox can't silently overwrite these changes on its own.">
+            <ui:ToggleSwitch IsChecked="{Binding SettingsFileReadOnly, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Framerate cap" Description="0 leaves it uncapped.">
+            <ui:NumberBox Width="140" Min="0" Max="10000" Value="{Binding FramerateCap, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Graphics quality level" Description="0 to 10, where 10 is Roblox's highest preset. Only takes effect when graphics mode isn't set to Automatic in-game.">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SavedQualityLevel, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SavedQualityLevel, Mode=OneWay}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Mouse sensitivity">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0.01" Maximum="10" TickFrequency="0.01" Value="{Binding MouseSensitivity, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MouseSensitivity, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Reduced motion" Description="Cuts down on in-game UI animation.">
+            <ui:ToggleSwitch IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="VR enabled">
+            <ui:ToggleSwitch IsChecked="{Binding VREnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Show performance stats" Description="Roblox's built-in FPS/ping/memory overlay.">
+            <ui:ToggleSwitch IsChecked="{Binding PerformanceStatsVisible, Mode=TwoWay}" />
+        </controls:OptionControl>
+    </StackPanel>
+</ui:UiPage>

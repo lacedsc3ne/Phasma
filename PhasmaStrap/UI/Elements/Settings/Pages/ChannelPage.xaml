@@ -1,0 +1,38 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.ChannelPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      mc:Ignorable="d"
+      Title="ChannelPage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Choose which Roblox deployment channel PhasmaStrap installs and launches." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <TextBlock Text="Channel" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl
+            Header="Currently active channel"
+            Description="{Binding CurrentActiveChannel, Mode=OneWay, StringFormat='Roblox is currently running on the {0} channel.'}">
+            <TextBlock Text="{Binding CurrentActiveChannel, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontFamily="Consolas" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="Roblox channel"
+            Description="Leave blank to use Roblox's default (production) channel. Pick a known channel below, or type a custom one.">
+            <ui:AutoSuggestBox
+                Width="240"
+                PlaceholderText="production"
+                Text="{Binding RobloxChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding KnownChannels, Mode=OneTime}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="If Roblox's channel changes"
+            Description="Automatic keeps your saved channel every launch. Prompt asks before switching. Ignore never overrides whatever channel Roblox itself reports.">
+            <ComboBox Width="160" ItemsSource="{Binding ChannelChangeModes, Mode=OneTime}" SelectedItem="{Binding SelectedChannelChangeMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+    </StackPanel>
+</ui:UiPage>
