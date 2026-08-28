@@ -23,6 +23,19 @@ namespace PhasmaStrap.Models.Persistable
         public string? SelectedCustomTheme { get; set; } = null;
         public WebEnvironment WebEnvironment { get; set; } = WebEnvironment.Production;
 
+        // channel management
+        public string RobloxChannel { get; set; } = "";
+        public ChannelChangeMode ChannelChangeMode { get; set; } = ChannelChangeMode.Automatic;
+
+        // performance tweaks
+        public int CpuCoreLimit { get; set; } = 0;
+
+        // extension manager: extension id -> saved executable path
+        public Dictionary<string, string> ExtensionPaths { get; set; } = new();
+
+        // roblox studio companion plugin
+        public bool StudioPluginEnabled { get; set; } = false;
+
         // integration configuration
         public bool EnableActivityTracking { get; set; } = true;
         public bool UseDiscordRichPresence { get; set; } = true;

@@ -377,6 +377,28 @@ namespace PhasmaStrap
                 State.Load();
                 FastFlags.Load();
 
+                try
+                {
+                    CpuCoreLimiter.ApplyConfiguredLimit();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"CPU core limiter startup failed: {ex.Message}");
+                }
+
+                try
+                {
+                    if (Settings.Prop.StudioPluginEnabled)
+                    {
+                        StudioBridge.Start();
+                        StudioPluginInstaller.EnsureInstalled();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Studio companion startup failed: {ex.Message}");
+                }
+
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))
                 {
                     Settings.Prop.Locale = "nil";
