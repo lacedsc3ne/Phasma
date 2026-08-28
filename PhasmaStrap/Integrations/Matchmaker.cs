@@ -454,7 +454,7 @@ namespace PhasmaStrap.Integrations
             List<MatchmakerCandidate> probed;
             try
             {
-                probed = await ProbeAsync(probeList, cookie, geo, preferred, blocked, preferEmpty, floorMs, token);
+                probed = await ProbeAsync(placeId, probeList, cookie, geo, preferred, blocked, preferEmpty, floorMs, token);
             }
             catch (OperationCanceledException) when (!outerToken.IsCancellationRequested)
             {
@@ -593,7 +593,7 @@ namespace PhasmaStrap.Integrations
             return open switch { <= 1 => 120.0, 2 => 35.0, _ => 0.0 };
         }
 
-        private static async Task<List<MatchmakerCandidate>> ProbeAsync(List<ServerListItem> servers, string cookie, UserGeo geo, string preferred, HashSet<string> blocked, bool preferEmpty, double floorMs, CancellationToken token)
+        private static async Task<List<MatchmakerCandidate>> ProbeAsync(long placeId, List<ServerListItem> servers, string cookie, UserGeo geo, string preferred, HashSet<string> blocked, bool preferEmpty, double floorMs, CancellationToken token)
         {
             var results = new List<MatchmakerCandidate>();
             var resultsLock = new object();
@@ -611,7 +611,7 @@ namespace PhasmaStrap.Integrations
                     (string Ip, int Port)? resolved;
                     try
                     {
-                        resolved = await ResolveServerAsync(sv, cookie, localToken);
+                        resolved = await ResolveServerAsync(placeId, sv, cookie, localToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -760,7 +760,7 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        private static async Task<(string Ip, int Port)?> ResolveServerAsync(ServerListItem server, string cookie, CancellationToken token)
+        private static async Task<(string Ip, int Port)?> ResolveServerAsync(long placeId, ServerListItem server, string cookie, CancellationToken token)
         {
             string cacheKey = server.JobId;
 
@@ -775,7 +775,7 @@ namespace PhasmaStrap.Integrations
                 try
                 {
                     await WaitForJoinBackoffAsync(token);
-                    using HttpRequestMessage req = BuildJoinRequest(0, server.JobId, cookie, _csrfToken);
+                    using HttpRequestMessage req = BuildJoinRequest(placeId, server.JobId, cookie, _csrfToken);
                     using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(token);
                     timeoutCts.CancelAfter(JoinTimeoutMs);
                     using HttpResponseMessage res = await _joinClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, timeoutCts.Token);
@@ -788,24 +788,37 @@ namespace PhasmaStrap.Integrations
 
                     if (res.StatusCode == HttpStatusCode.TooManyRequests)
                     {
+                        LogProbeFailure(server.JobId, "429 too many requests, backing off");
                         SetJoinBackoff(res.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(1.5));
                         return null;
                     }
 
                     if (!res.IsSuccessStatusCode)
+                    {
+                        LogProbeFailure(server.JobId, $"HTTP {(int)res.StatusCode}");
                         return null;
+                    }
 
                     string payload = await ReadBoundedAsync(res.Content, MaxJoinResponseBytes, timeoutCts.Token);
                     if (string.IsNullOrWhiteSpace(payload))
+                    {
+                        LogProbeFailure(server.JobId, "empty response body");
                         return null;
+                    }
 
                     using JsonDocument doc = JsonDocument.Parse(payload);
                     if (!HasJoinScript(doc.RootElement))
+                    {
+                        LogProbeFailure(server.JobId, $"no joinScript in response: {Truncate(payload, 300)}");
                         return null;
+                    }
 
                     (string ip, int port) = ParseJoinResponse(doc.RootElement);
                     if (string.IsNullOrEmpty(ip) || IsPrivateIp(ip))
+                    {
+                        LogProbeFailure(server.JobId, $"missing/private IP in response (got \"{ip}\")");
                         return null;
+                    }
 
                     lock (_resolvedServerCache)
                         _resolvedServerCache[cacheKey] = (ip, port, DateTime.UtcNow);
@@ -833,6 +846,22 @@ namespace PhasmaStrap.Integrations
 
             return null;
         }
+
+        private static long _lastProbeFailureLogTicks;
+
+        private static void LogProbeFailure(string jobId, string reason)
+        {
+            long now = DateTime.UtcNow.Ticks;
+            long last = Interlocked.Read(ref _lastProbeFailureLogTicks);
+            if (now - last < TimeSpan.TicksPerSecond * 3)
+                return;
+            if (Interlocked.CompareExchange(ref _lastProbeFailureLogTicks, now, last) != last)
+                return;
+
+            App.Logger.WriteLine(LOG_IDENT, $"Probe of {jobId} failed: {reason}");
+        }
+
+        private static string Truncate(string value, int maxLength) => value.Length <= maxLength ? value : value[..maxLength];
 
         private static bool HasJoinScript(JsonElement root)
         {
