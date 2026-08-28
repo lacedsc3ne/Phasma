@@ -62,8 +62,21 @@
             </ComboBox>
         </controls:OptionControl>
 
-        <controls:OptionControl 
-            Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}" 
+        <controls:OptionControl
+            Header="Custom Cursor Set"
+            Description="Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.">
+            <StackPanel>
+                <TextBlock Margin="0,0,0,6" FontSize="12" Text="{Binding CustomCursorSetFolderDisplay, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" TextAlignment="Right" MaxWidth="260" HorizontalAlignment="Right" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ui:Button Margin="0,0,4,0" Icon="Eye16" Content="Preview" Command="{Binding PreviewCustomCursorSetCommand}" Visibility="{Binding PreviewCustomCursorSetVisibility, Mode=OneWay}" />
+                    <ui:Button Icon="FolderAdd16" Content="Browse" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding ChooseCustomCursorSetVisibility, Mode=OneWay}" />
+                    <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding DeleteCustomCursorSetVisibility, Mode=OneWay}" />
+                </StackPanel>
+            </StackPanel>
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}"
             Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">
             <ui:ToggleSwitch IsChecked="{Binding OldAvatarBackgroundTask.NewState, Mode=TwoWay}" />
         </controls:OptionControl>

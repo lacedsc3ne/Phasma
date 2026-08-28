@@ -1,0 +1,38 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.CursorPreviewDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Dialogs"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+        mc:Ignorable="d"
+        Title="Cursor Preview"
+        Width="360"
+        MinHeight="0"
+        Height="460"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="Cursor Preview" ShowMinimize="False" ShowMaximize="False" CanMaximize="False" KeyboardNavigation.TabNavigation="None" />
+
+        <ScrollViewer Grid.Row="1" Margin="16" VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="CursorStackPanel" />
+        </ScrollViewer>
+
+        <Border Grid.Row="2" Padding="14,10" Background="{ui:ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderThickness="0,1,0,0">
+            <StackPanel HorizontalAlignment="Right" FlowDirection="LeftToRight" Orientation="Horizontal">
+                <Button MinWidth="100" Content="{x:Static resources:Strings.Common_OK}" Click="CloseButton_Click" IsCancel="True" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</base:WpfUiWindow>

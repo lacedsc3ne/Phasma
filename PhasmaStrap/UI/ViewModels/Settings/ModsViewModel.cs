@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using PhasmaStrap.Models.SettingTasks;
 using PhasmaStrap.AppData;
+using PhasmaStrap.UI.Elements.Dialogs;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
@@ -101,6 +102,69 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         });
 
         public FontModPresetTask TextFontTask { get; } = new();
+
+        public CustomCursorModPresetTask CustomCursorSetTask { get; } = new();
+
+        public string CustomCursorSetFolderDisplay => String.IsNullOrEmpty(CustomCursorSetTask.NewState) ? "No folder selected." : CustomCursorSetTask.NewState;
+
+        public Visibility ChooseCustomCursorSetVisibility => String.IsNullOrEmpty(CustomCursorSetTask.NewState) ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility DeleteCustomCursorSetVisibility => String.IsNullOrEmpty(CustomCursorSetTask.NewState) ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility PreviewCustomCursorSetVisibility => DeleteCustomCursorSetVisibility;
+
+        private void ManageCustomCursorSet()
+        {
+            if (!String.IsNullOrEmpty(CustomCursorSetTask.NewState))
+            {
+                CustomCursorSetTask.NewState = "";
+            }
+            else
+            {
+                using var dialog = new System.Windows.Forms.FolderBrowserDialog
+                {
+                    Description = "Select a folder containing your custom cursor images (ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png)."
+                };
+
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+
+                bool foundAny = CustomCursorModPresetTask.RecognizedFileNames
+                    .Any(fileName => File.Exists(Path.Combine(dialog.SelectedPath, fileName)));
+
+                if (!foundAny)
+                {
+                    Frontend.ShowMessageBox(
+                        "The selected folder doesn't contain any recognized cursor images (ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png).",
+                        MessageBoxImage.Error);
+                    return;
+                }
+
+                CustomCursorSetTask.NewState = dialog.SelectedPath;
+
+                // a custom folder and the bundled preset both write the same target files -
+                // applying one should take precedence over the other, so clear the bundled pick
+                if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))
+                    CursorTypeTask.NewState = default;
+            }
+
+            OnPropertyChanged(nameof(CustomCursorSetFolderDisplay));
+            OnPropertyChanged(nameof(ChooseCustomCursorSetVisibility));
+            OnPropertyChanged(nameof(DeleteCustomCursorSetVisibility));
+            OnPropertyChanged(nameof(PreviewCustomCursorSetVisibility));
+        }
+
+        private void PreviewCustomCursorSet()
+        {
+            if (String.IsNullOrEmpty(CustomCursorSetTask.NewState))
+                return;
+
+            new CursorPreviewDialog(CustomCursorSetTask.NewState).ShowDialog();
+        }
+
+        public ICommand ManageCustomCursorSetCommand => new RelayCommand(ManageCustomCursorSet);
+
+        public ICommand PreviewCustomCursorSetCommand => new RelayCommand(PreviewCustomCursorSet);
 
         private void OpenCompatSettings()
         {
