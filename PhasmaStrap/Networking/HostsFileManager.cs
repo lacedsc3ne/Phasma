@@ -15,7 +15,9 @@ namespace PhasmaStrap.Networking
         private const string BlockStart = "# PhasmaStrap proxy - do not edit this block by hand";
         private const string BlockEnd = "# PhasmaStrap proxy end";
 
-        public static readonly string[] InterceptedHostnames = { PresenceSpoofPolicy.Host, RobuxSpoofer.Host, UsernameSpoofer.Host };
+        public static readonly string[] InterceptedHostnames = new[] { PresenceSpoofPolicy.Host, RobuxSpoofer.Host, UsernameSpoofer.Host }
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         private static string HostsFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "drivers", "etc", "hosts");
 

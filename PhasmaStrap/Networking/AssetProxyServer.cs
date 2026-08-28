@@ -17,7 +17,11 @@ namespace PhasmaStrap.Networking
     {
         private const string LOG_IDENT = "AssetProxyServer";
 
-        public const int Port = 39900;
+        // must be 443: the hosts-file block only redirects the IP for the intercepted
+        // hostnames, not the port, so this has to be where a real HTTPS client actually
+        // connects. Windows (unlike Linux) doesn't require elevation to bind low ports, and
+        // this only ever binds to loopback, so it can't be reached from outside this machine.
+        public const int Port = 443;
 
         // hostname -> optional request transform, optional response transform
         public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform)> InterceptedHosts
