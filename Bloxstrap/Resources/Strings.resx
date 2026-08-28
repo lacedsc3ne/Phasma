@@ -157,7 +157,7 @@
   <data name="Bootstrapper.Status.Upgrading" xml:space="preserve">
     <value>Upgrading {product}...</value>
   </data>
-  <data name="Bootstrapper.Status.UpgradingPhasmaStrap" xml:space="preserve">
+  <data name="Bootstrapper.Status.UpgradingBloxstrap" xml:space="preserve">
     <value>Getting the latest PhasmaStrap...</value>
   </data>
   <data name="Bootstrapper.Status.WaitingOtherInstances" xml:space="preserve">
@@ -1074,13 +1074,13 @@ Please manually delete PhasmaStrap.exe from the install location or try restarti
   <data name="About.Supporters.OneOff" xml:space="preserve">
     <value>One-off</value>
   </data>
-  <data name="Menu.PhasmaStrap.Description" xml:space="preserve">
+  <data name="Menu.Bloxstrap.Description" xml:space="preserve">
     <value>Configure options related to PhasmaStrap's behaviour itself.</value>
   </data>
-  <data name="Menu.PhasmaStrap.Analytics.Title" xml:space="preserve">
+  <data name="Menu.Bloxstrap.Analytics.Title" xml:space="preserve">
     <value>Enable sending of analytics</value>
   </data>
-  <data name="Menu.PhasmaStrap.Analytics.Description" xml:space="preserve">
+  <data name="Menu.Bloxstrap.Analytics.Description" xml:space="preserve">
     <value>It's anonymous and nothing evil, promise. For insight on what we collect and why, see our [privacy policy]({0}).</value>
   </data>
   <data name="Common.Analytics" xml:space="preserve">
@@ -1137,17 +1137,17 @@ Please close any applications that may be using Roblox's files, and relaunch.</v
     <value>Export</value>
     <comment>Currently used under the "PhasmaStrap" settings tab for the button to export diagnostic data</comment>
   </data>
-  <data name="Menu.PhasmaStrap.ExportData.Title" xml:space="preserve">
+  <data name="Menu.Bloxstrap.ExportData.Title" xml:space="preserve">
     <value>Export diagnostic data</value>
   </data>
-  <data name="Menu.PhasmaStrap.ExportData.Description" xml:space="preserve">
+  <data name="Menu.Bloxstrap.ExportData.Description" xml:space="preserve">
     <value>Gather information that can be uploaded online to troubleshoot a problem you're having.</value>
   </data>
-  <data name="Menu.PhasmaStrap.ExportData.ExportConfig" xml:space="preserve">
+  <data name="Menu.Bloxstrap.ExportData.ExportConfig" xml:space="preserve">
     <value>PhasmaStrap configuration</value>
     <comment>Label that appears next to a checkbox</comment>
   </data>
-  <data name="Menu.PhasmaStrap.ExportData.ExportLogs" xml:space="preserve">
+  <data name="Menu.Bloxstrap.ExportData.ExportLogs" xml:space="preserve">
     <value>All PhasmaStrap logs</value>
     <comment>Label that appears next to a checkbox</comment>
   </data>
@@ -1377,7 +1377,7 @@ Defaulting to {1}.</value>
   <data name="Bootstrapper.Status.ShuttingDown" xml:space="preserve">
     <value>Shutting down {product}</value>
   </data>
-  <data name="LaunchMenu.PhasmaStrapWiki" xml:space="preserve">
+  <data name="LaunchMenu.BloxstrapWiki" xml:space="preserve">
     <value>PhasmaStrap Wiki</value>
   </data>
   <data name="LaunchMenu.RobloxCommunity" xml:space="preserve">

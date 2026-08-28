@@ -18,6 +18,11 @@ namespace Bloxstrap.UI.Elements.Base
         public WpfUiWindow()
         {
             ApplyTheme();
+
+            // FontFamily is an inherited DP, so setting it here cascades to every
+            // child control that doesn't set its own FontFamily explicitly (e.g. icon glyphs)
+            if (Application.Current.Resources["PhasmaBody"] is System.Windows.Media.FontFamily phasmaBody)
+                FontFamily = phasmaBody;
         }
 
         public void ApplyTheme()

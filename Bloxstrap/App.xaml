@@ -17,6 +17,11 @@
 
             <FontFamily x:Key="Rubik">pack://application:,,,/Resources/Fonts/#Rubik Light</FontFamily>
 
+            <!--  Phasma typography, matches PhasmaMacro's body, display, and mono font tokens  -->
+            <FontFamily x:Key="PhasmaBody">pack://application:,,,/Resources/Fonts/#DM Sans 14pt</FontFamily>
+            <FontFamily x:Key="PhasmaMono">pack://application:,,,/Resources/Fonts/#JetBrains Mono</FontFamily>
+            <FontFamily x:Key="PhasmaDisplay">pack://application:,,,/Resources/Fonts/#Zilla Slab</FontFamily>
+
             <Style TargetType="Hyperlink">
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
