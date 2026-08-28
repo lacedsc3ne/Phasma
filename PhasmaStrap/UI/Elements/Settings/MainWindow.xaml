@@ -125,6 +125,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Title}" PageType="{x:Type pages:FastFlagsPage}" Icon="Flag24" Tag="fastflags" />
                     <ui:NavigationItem Content="Channel" PageType="{x:Type pages:ChannelPage}" Icon="ArrowRepeatAll24" Tag="channel" />
                     <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" Tag="performance" />
+                    <ui:NavigationItem Content="NVIDIA" PageType="{x:Type pages:NvidiaPage}" Icon="TopSpeed24" Tag="nvidia" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" Tag="networking" />
                     <ui:NavigationItem Content="Servers" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" Tag="serverbrowser" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Appearance_Title}" PageType="{x:Type pages:AppearancePage}" Icon="PaintBrush24" Tag="appearance" />
