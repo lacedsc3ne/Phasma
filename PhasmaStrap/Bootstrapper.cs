@@ -13,7 +13,9 @@
 
 using System.ComponentModel;
 using System.Data;
+using System.Web;
 using System.Windows;
+using PhasmaStrap.Integrations;
 using System.Windows.Forms;
 using System.Windows.Shell;
 
@@ -304,6 +306,9 @@ namespace PhasmaStrap
                         Frontend.ShowBalloonTip(Strings.Bootstrapper_ModificationsFailed_Title, Strings.Bootstrapper_ModificationsFailed_Message, ToolTipIcon.Warning);
                 }
 
+                if (_launchMode == LaunchMode.Player && App.Settings.Prop.MatchmakerEnabled)
+                    await TryApplyMatchmakingAsync();
+
                 StartRoblox();
             }
 
@@ -558,6 +563,53 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Not eligible: Major version diff is {diff}");
                 return false;
+            }
+        }
+
+        // rewrites the launch URI to target a specific, better server, when the matchmaker
+        // is enabled. Only handles the "roblox://experiences/start?placeId=X" deep link
+        // format (what the modern web Play button, and PhasmaStrap's own Server Browser,
+        // both use) - the legacy ticket-based "roblox-player:...+placelauncherurl:..." format
+        // resolves its server assignment inside Roblox's own client and isn't rewritten here.
+        private async Task TryApplyMatchmakingAsync()
+        {
+            const string LOG_IDENT = "Bootstrapper::TryApplyMatchmakingAsync";
+
+            try
+            {
+                Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
+                if (!uriMatch.Success)
+                    return;
+
+                string query = uriMatch.Groups[1].Value;
+                var queryParams = HttpUtility.ParseQueryString(query);
+
+                if (!string.IsNullOrEmpty(queryParams["gameInstanceId"]))
+                    return;
+
+                if (!long.TryParse(queryParams["placeId"], out long placeId) || placeId <= 0)
+                    return;
+
+                App.Logger.WriteLine(LOG_IDENT, $"Matchmaker is on, looking for a better server for place {placeId}");
+
+                int maxCandidates = Matchmaker.ResolveEffectiveCandidateCount();
+                MatchmakerCandidate? winner = await Matchmaker.PickBestJobIdAsync(placeId, maxCandidates: maxCandidates);
+
+                if (winner is null)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "No better server found, letting Roblox assign one normally");
+                    return;
+                }
+
+                queryParams["gameInstanceId"] = winner.JobId;
+                string newQuery = queryParams.ToString() ?? query;
+                _launchCommandLine = _launchCommandLine[..uriMatch.Groups[1].Index] + newQuery + _launchCommandLine[(uriMatch.Groups[1].Index + uriMatch.Groups[1].Length)..];
+
+                App.Logger.WriteLine(LOG_IDENT, $"Redirecting to {winner.DatacenterName} (about {winner.EstimatedPingMs}ms), JobId {winner.JobId}");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Matchmaking failed, launching normally: {ex.Message}");
             }
         }
 

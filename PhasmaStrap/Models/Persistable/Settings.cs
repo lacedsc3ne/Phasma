@@ -61,6 +61,14 @@ namespace PhasmaStrap.Models.Persistable
         public CleanerOptions CleanerOptions { get; set; } = CleanerOptions.Never;
         public List<string> CleanerDirectories { get; set; } = new();
 
+        // server matchmaker
+        public bool MatchmakerEnabled { get; set; } = false;
+        public bool MatchmakerAutoCandidates { get; set; } = true;
+        public int MatchmakerMaxCandidates { get; set; } = 40;
+        public bool MatchmakerPreferEmpty { get; set; } = false;
+        public string MatchmakerPreferredDatacenter { get; set; } = "";
+        public List<string> MatchmakerDisabledDatacenters { get; set; } = new();
+
         // telemetry blocker
         public bool BlockRobloxTelemetry { get; set; } = false;
     }

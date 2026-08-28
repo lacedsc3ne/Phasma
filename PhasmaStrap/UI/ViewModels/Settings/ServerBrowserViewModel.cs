@@ -32,6 +32,33 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<ServerListItem> Servers { get; } = new();
 
+        public bool MatchmakerEnabled
+        {
+            get => App.Settings.Prop.MatchmakerEnabled;
+            set { App.Settings.Prop.MatchmakerEnabled = value; OnPropertyChanged(nameof(MatchmakerEnabled)); }
+        }
+
+        public bool MatchmakerPreferEmpty
+        {
+            get => App.Settings.Prop.MatchmakerPreferEmpty;
+            set => App.Settings.Prop.MatchmakerPreferEmpty = value;
+        }
+
+        public sealed record DatacenterChoice(string Display, string Key);
+
+        // "" represents no preference (closest available)
+        public IEnumerable<DatacenterChoice> DatacenterChoices { get; } =
+            new[] { new DatacenterChoice("Closest available", "") }
+                .Concat(RobloxDatacenterMap.AllDatacenters()
+                    .OrderBy(dc => dc.City)
+                    .Select(dc => new DatacenterChoice($"{dc.City}, {dc.Country}", Matchmaker.DatacenterKey(dc))));
+
+        public string PreferredDatacenter
+        {
+            get => App.Settings.Prop.MatchmakerPreferredDatacenter;
+            set => App.Settings.Prop.MatchmakerPreferredDatacenter = value ?? "";
+        }
+
         public ICommand SearchCommand => new AsyncRelayCommand(SearchAsync);
 
         public ICommand JoinCommand => new RelayCommand<ServerListItem>(server =>

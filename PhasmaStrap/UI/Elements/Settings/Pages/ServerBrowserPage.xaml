@@ -11,6 +11,22 @@
       Title="ServerBrowserPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Matchmaker" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Before joining a game, probes a batch of its public servers using your real Roblox session and picks the one estimated to have the lowest ping, instead of letting Roblox assign one at random. This reads your Roblox login session from disk and makes real join-attempt calls to Roblox's servers to do that." />
+
+        <controls:OptionControl Header="Enable matchmaker" Margin="0,8,0,0">
+            <ui:ToggleSwitch IsChecked="{Binding MatchmakerEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Prefer empty servers" Description="Off prefers active, reasonably full servers instead.">
+            <ui:ToggleSwitch IsChecked="{Binding MatchmakerPreferEmpty, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Preferred datacenter" Description="Sticks to this location when it has servers available, instead of always picking the closest.">
+            <ComboBox Width="220" ItemsSource="{Binding DatacenterChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Key" SelectedValue="{Binding PreferredDatacenter, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Server Browser" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Lists a game's public servers using Roblox's own public server list - this doesn't sign in, read your Roblox session, or measure real ping to any server." />
 
         <controls:OptionControl Header="Place ID" Margin="0,16,0,0">
