@@ -34,5 +34,12 @@
             Description="Automatic keeps your saved channel every launch. Prompt asks before switching. Ignore never overrides whatever channel Roblox itself reports.">
             <ComboBox Width="160" ItemsSource="{Binding ChannelChangeModes, Mode=OneTime}" SelectedItem="{Binding SelectedChannelChangeMode, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="Download mirror" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="Which Roblox CDN mirror to download from. Auto picks whichever responds fastest." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Preferred mirror">
+            <ComboBox Width="260" ItemsSource="{Binding MirrorChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Url" SelectedValue="{Binding PreferredMirror, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

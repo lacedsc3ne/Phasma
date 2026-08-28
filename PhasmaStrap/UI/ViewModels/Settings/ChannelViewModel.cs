@@ -29,5 +29,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         public string CurrentActiveChannel => Deployment.Channel;
+
+        public record MirrorChoice(string Display, string Url);
+
+        // "" represents auto-selecting the fastest responding mirror
+        public IEnumerable<MirrorChoice> MirrorChoices { get; } =
+            new[] { "" }.Concat(Deployment.Mirrors).Select(url => new MirrorChoice(Describe(url), url));
+
+        public string PreferredMirror
+        {
+            get => App.Settings.Prop.PreferredMirror;
+            set => App.Settings.Prop.PreferredMirror = value ?? "";
+        }
+
+        private static string Describe(string url) =>
+            String.IsNullOrEmpty(url) ? "Auto (fastest responding server)" : new Uri(url).Host;
     }
 }
