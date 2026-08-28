@@ -55,7 +55,449 @@
             </ComboBox>
         </controls:OptionControl>
 
-        <controls:OptionControl 
+        <TextBlock Text="Telemetry" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="Disable telemetry" Description="Disables a large batch of client analytics and telemetry endpoints.">
+            <ui:ToggleSwitch IsChecked="{Binding DisableTelemetry, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable Webview2 telemetry" Description="Disables telemetry sent by the embedded Webview2 browser component.">
+            <ui:ToggleSwitch IsChecked="{Binding DisableWebview2Telemetry, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable voice chat telemetry" Description="Disables analytics and telemetry sent by the voice chat system.">
+            <ui:ToggleSwitch IsChecked="{Binding DisableVoiceChatTelemetry, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Block Tencent" Description="Redirects and disables Tencent-related endpoints and policy checks.">
+            <ui:ToggleSwitch IsChecked="{Binding BlockTencent, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Ping breakdown" Description="Shows a breakdown of ping contributors in the debug stats.">
+            <ui:ToggleSwitch IsChecked="{Binding PingBreakdown, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Show chunks" Description="Shows lighting chunk boundaries for debugging.">
+            <ui:ToggleSwitch IsChecked="{Binding ShowChunks, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Flag state" Description="Sets the FStringDebugShowFlagState flag to the given value.">
+            <ui:TextBox Width="220" Text="{Binding FlagState, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Voice / Chat" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="Chat bubbles" Description="Toggles legacy chat bubbles above characters.">
+            <ui:ToggleSwitch IsChecked="{Binding ChatBubble, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Chat translation" Description="Toggles the in-experience chat translation setting.">
+            <ui:ToggleSwitch IsChecked="{Binding ChatTranslation, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Rendering" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="Light culling" Description="Enables GPU and CPU light culling.">
+            <ui:ToggleSwitch IsChecked="{Binding LightCulling, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Rainbow theme" Description="Renders unthemed UI instances with a rainbow debug color.">
+            <ui:ToggleSwitch IsChecked="{Binding RainbowTheme, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="FRM quality override">
+            <ui:ToggleSwitch IsChecked="{Binding FRMQualityOverrideEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="FRM quality override level" Visibility="{Binding FRMQualityOverrideEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ui:NumberBox Width="140" Min="0" Max="21" Value="{Binding FRMQualityOverride, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Mesh quality">
+            <ui:ToggleSwitch IsChecked="{Binding MeshQualityEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Mesh quality level" Visibility="{Binding MeshQualityEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ui:NumberBox Width="140" Min="0" Max="3" Value="{Binding MeshQuality, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Unlimited camera zoom" Description="Removes the maximum camera zoom distance.">
+            <ui:ToggleSwitch IsChecked="{Binding UnlimitedCameraZoom, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="BGRA texture support" Description="Enables Direct3D 11 BGRA texture support.">
+            <ui:ToggleSwitch IsChecked="{Binding BGRA, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="New FPS system" Description="Enables the newer FPS and frame time tracking system.">
+            <ui:ToggleSwitch IsChecked="{Binding NewFpsSystem, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Worser particles" Description="Reduces particle fidelity fixes for a performance boost.">
+            <ui:ToggleSwitch IsChecked="{Binding WorserParticles, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Low poly meshes" Description="Forces the lowest level of detail for meshes.">
+            <ui:ToggleSwitch IsChecked="{Binding LowPolyMeshes, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Rendering mode">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding RenderingModes.Keys, Mode=OneTime}" Text="{Binding SelectedRenderingMode, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="More lighting" Description="Brightens rendering by fixing fog contribution.">
+            <ui:ToggleSwitch IsChecked="{Binding MoreLighting, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Minimum grass distance">
+            <ui:NumberBox Width="140" Min="0" Max="5000" Value="{Binding MinGrassDistance, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Maximum grass distance">
+            <ui:NumberBox Width="140" Min="0" Max="5000" Value="{Binding MaxGrassDistance, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Grass movement factor">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding GrassMovementOptions}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedGrassMovementFactor, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="In-game menu version">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding IGMenuVersions.Keys, Mode=OneTime}" Text="{Binding SelectedIGMenuVersion, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Lighting mode">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding LightingModes.Keys, Mode=OneTime}" Text="{Binding SelectedLightingMode, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable fullscreen title bar delay" Description="Removes the delay before the title bar hides in fullscreen.">
+            <ui:ToggleSwitch IsChecked="{Binding FullscreenTitlebarDisabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Texture skipping">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding TextureSkippings.Keys, Mode=OneTime}" Text="{Binding SelectedTextureSkipping, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Distance rendering">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding DistanceRenderings.Keys, Mode=OneTime}" Text="{Binding SelectedDistanceRendering, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Dynamic resolution">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding DynamicResolutions.Keys, Mode=OneTime}" Text="{Binding SelectedDynamicResolution, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Romark start graphic">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding RomarkStartMappings.Keys, Mode=OneTime}" Text="{Binding SelectedRomarkStart, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="FRM quality level">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable post processing effects">
+            <ui:ToggleSwitch IsChecked="{Binding DisablePostFX, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Avoid task scheduler sleep" Description="Prevents the task scheduler from sleeping, at the cost of higher CPU usage.">
+            <ui:ToggleSwitch IsChecked="{Binding TaskSchedulerAvoidingSleep, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable player shadows">
+            <ui:ToggleSwitch IsChecked="{Binding DisablePlayerShadows, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Render occlusion checks" Description="Enables visibility bug checks used for render occlusion.">
+            <ui:ToggleSwitch IsChecked="{Binding RenderOcclusion, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Gray sky">
+            <ui:ToggleSwitch IsChecked="{Binding EnableGraySky, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="White sky">
+            <ui:ToggleSwitch IsChecked="{Binding WhiteSky, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Red font debug highlight">
+            <ui:ToggleSwitch IsChecked="{Binding RedFont, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable layered clothing">
+            <ui:ToggleSwitch IsChecked="{Binding LayeredClothing, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable terrain textures">
+            <ui:ToggleSwitch IsChecked="{Binding DisableTerrainTextures, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Prerender" Description="Enables the prerender pipeline and its V2 variant.">
+            <ui:ToggleSwitch IsChecked="{Binding Prerender, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Force buggy Vulkan renderpass list" Description="Overrides the renderpass allowlist used to force Vulkan on buggy GPUs. Type 'Automatic' to disable.">
+            <ui:TextBox Width="220" Text="{Binding ForceBuggyVulkan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Bypass Vulkan buggy GPU list" Description="Overrides the renderpass allowlist used to bypass Vulkan blacklisting. Type 'Automatic' to disable.">
+            <ui:TextBox Width="220" Text="{Binding BypassVulkan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Chrome in-game menu UI">
+            <ui:ToggleSwitch IsChecked="{Binding ChromeUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Old Chrome UI" Description="Reverts several in-game menu Chrome UI elements to their older versions.">
+            <ui:ToggleSwitch IsChecked="{Binding OldChromeUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Shader glint level">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding Shaders.Keys, Mode=OneTime}" Text="{Binding SelectedShaderLevel, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Shaders enabled">
+            <ui:ToggleSwitch IsChecked="{Binding ShadersEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Shaders roughness clamp">
+            <ui:NumberBox Width="160" Min="-64000000" Max="0" Value="{Binding ShadersLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Target refresh rate">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding RefreshRates.Keys, Mode=OneTime}" Text="{Binding SelectedRefreshRate, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Minimal rendering" Description="Forces deterministic, minimal rendering for debugging.">
+            <ui:ToggleSwitch IsChecked="{Binding MinimalRendering, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable sky bloom">
+            <ui:ToggleSwitch IsChecked="{Binding DisableSky, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Framerate buffer percentage">
+            <ui:NumberBox Width="140" Min="0" Max="100" Value="{Binding FPSBufferPercentage, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Framerate limit (FFlag)" Description="Sets an FFlag-based framerate cap, separate from the performance page's framerate cap.">
+            <ui:NumberBox Width="140" Min="0" Max="2000" Value="{Binding FramerateLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Pseudolocalization" Description="Enables debug pseudolocalization of UI text.">
+            <ui:ToggleSwitch IsChecked="{Binding Pseudolocalization, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Display FPS (FFlag)" Description="Shows the client's built-in FFlag-based FPS counter, separate from the performance page's stats overlay.">
+            <ui:ToggleSwitch IsChecked="{Binding DisplayFps, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Gray avatar thumbnails">
+            <ui:ToggleSwitch IsChecked="{Binding GrayAvatar, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="UI font size padding">
+            <ui:NumberBox Width="140" Min="1" Max="20" Value="{Binding FontSize, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Hide GUI group" Description="Hides the core GUI for the given group ID.">
+            <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding HideGUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Networking" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="Less lag spikes" Description="Increases bandwidth manager throughput targets.">
+            <ui:ToggleSwitch IsChecked="{Binding LessLagSpikes, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Roblox Core (SignalR) tuning">
+            <ui:ToggleSwitch IsChecked="{Binding RobloxCore, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="No payload limit" Description="Raises several networking payload size limits to the maximum.">
+            <ui:ToggleSwitch IsChecked="{Binding NoPayloadLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Enable large replicator">
+            <ui:ToggleSwitch IsChecked="{Binding EnableLargeReplicator, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Faster loading" Description="Raises asset preload limits and speeds up mesh preloading.">
+            <ui:ToggleSwitch IsChecked="{Binding FasterLoading, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Better packet sending" Description="Tunes packet batching and processing thresholds.">
+            <ui:ToggleSwitch IsChecked="{Binding BetterPacketSending, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="MTU size">
+            <ui:NumberBox Width="140" Min="0" Max="1500" Value="{Binding MtuSize, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Resend buffer array length">
+            <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding BufferArrayLength, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="UI / Misc" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="More sensitivity numbers" Description="Shows more precise sensitivity values in the settings menu.">
+            <ui:ToggleSwitch IsChecked="{Binding MoreSensetivityNumbers, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="No GUI blur">
+            <ui:ToggleSwitch IsChecked="{Binding NoGuiBlur, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Preferred text size scaling">
+            <ui:ToggleSwitch IsChecked="{Binding TextSizeChanger, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Texture remover" Description="Aggressively compresses/removes textures via the asset content refresh system.">
+            <ui:ToggleSwitch IsChecked="{Binding TextureRemover, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Threading debug check" Description="Enables the render thread checking debug flag.">
+            <ui:ToggleSwitch IsChecked="{Binding Threading, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable ads">
+            <ui:ToggleSwitch IsChecked="{Binding DisableAds, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Enable dark mode">
+            <ui:ToggleSwitch IsChecked="{Binding EnableDarkMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Remove middle details page">
+            <ui:ToggleSwitch IsChecked="{Binding NoMoreMiddle, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Preload assets" Description="Enables mesh, sound, texture, font, item and teleport asset preloading.">
+            <ui:ToggleSwitch IsChecked="{Binding Preload, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Optimize CFrame updates">
+            <ui:ToggleSwitch IsChecked="{Binding OptimizeCFrameUpdates, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Custom disconnect error">
+            <ui:ToggleSwitch IsChecked="{Binding EnableCustomDisconnectError, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Custom disconnect error message" Visibility="{Binding EnableCustomDisconnectError, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ui:TextBox Width="260" Text="{Binding CustomDisconnectError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Fake verify" Description="Sets FStringWhitelistVerifiedUserId to the given user ID.">
+            <ui:TextBox Width="220" Text="{Binding FakeVerify, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="New camera controls" Description="Sets FFlagNewCameraControls to the given value.">
+            <ui:TextBox Width="220" Text="{Binding NewCamera, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Chat UI override" Description="Sets FFlagDebugForceChatDisabled to the given value.">
+            <ui:TextBox Width="220" Text="{Binding ChatUI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Old Roblox Studio core UI" Description="Only applies to Roblox Studio.">
+            <ui:ToggleSwitch IsChecked="{Binding RobloxStudioCoreUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Always show VR toggle">
+            <ui:ToggleSwitch IsChecked="{Binding VRToggle, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Disable feedback soothsayer check">
+            <ui:ToggleSwitch IsChecked="{Binding SoothsayerCheck, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Language selector">
+            <ui:ToggleSwitch IsChecked="{Binding LanguageSelector, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Haptics toggle">
+            <ui:ToggleSwitch IsChecked="{Binding Haptics, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="In-menu framerate cap toggle">
+            <ui:ToggleSwitch IsChecked="{Binding FrameRateCap, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Memory probing" Description="Enables the client's memory probing performance control.">
+            <ui:ToggleSwitch IsChecked="{Binding MemoryProbing, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Cache size improvement" Description="Raises several disk and memory cache size limits.">
+            <ui:ToggleSwitch IsChecked="{Binding CacheSizeImprovement, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="CPU threads used">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="140" ItemsSource="{Binding CpuThreads.Keys, Mode=OneTime}" Text="{Binding SelectedCpuThreads, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Minimum CPU core thread count">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="140" ItemsSource="{Binding CpuCoreMinThreadCount.Keys, Mode=OneTime}" Text="{Binding SelectedCpuCoreMinThreadCount, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
             Margin="0,24,0,0"
             Header="{x:Static resources:Strings.Menu_FastFlags_Reset_Title}">
             <ui:ToggleSwitch IsChecked="{Binding ResetConfiguration, Mode=TwoWay}" />
