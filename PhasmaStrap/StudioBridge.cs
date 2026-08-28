@@ -157,10 +157,12 @@ namespace PhasmaStrap
                     // malformed payload from the plugin - ignore this tick, keep the server alive
                 }
 
+                using JsonDocument paletteDoc = JsonDocument.Parse(Integrations.StudioTheme.GetPaletteJson());
+
                 string response = JsonSerializer.Serialize(new
                 {
                     version = App.Version,
-                    palette = new { accent = "#F4554B" }
+                    palette = paletteDoc.RootElement
                 });
 
                 byte[] bytes = Encoding.UTF8.GetBytes(response);
