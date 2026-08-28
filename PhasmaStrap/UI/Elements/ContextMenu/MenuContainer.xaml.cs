@@ -25,6 +25,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private ServerHistory? _gameHistoryWindow;
 
+        private OutputConsole? _outputConsoleWindow;
+
         public MenuContainer(Watcher watcher)
         {
             InitializeComponent();
@@ -61,8 +63,12 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 _serverInformationWindow.Activate();
         }
 
-        public void ActivityWatcher_OnLogOpen(object? sender, EventArgs e) => 
-            Dispatcher.Invoke(() => LogTracerMenuItem.Visibility = Visibility.Visible);
+        public void ActivityWatcher_OnLogOpen(object? sender, EventArgs e) =>
+            Dispatcher.Invoke(() =>
+            {
+                LogTracerMenuItem.Visibility = Visibility.Visible;
+                OutputConsoleMenuItem.Visibility = Visibility.Visible;
+            });
 
         public void ActivityWatcher_OnGameJoin(object? sender, EventArgs e)
         {
@@ -145,6 +151,23 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 _gameHistoryWindow.ShowDialog();
             else
                 _gameHistoryWindow.Activate();
+        }
+
+        private void OutputConsoleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_activityWatcher is null)
+                throw new ArgumentNullException(nameof(_activityWatcher));
+
+            if (_outputConsoleWindow is null)
+            {
+                _outputConsoleWindow = new(_activityWatcher);
+                _outputConsoleWindow.Closed += (_, _) => _outputConsoleWindow = null;
+            }
+
+            if (!_outputConsoleWindow.IsVisible)
+                _outputConsoleWindow.ShowDialog();
+            else
+                _outputConsoleWindow.Activate();
         }
     }
 }

@@ -1018,6 +1018,27 @@ Every person here is ranked by their overall pledge.</value>
   <data name="ContextMenu.GameHistory.Description" xml:space="preserve">
     <value>Game history is only recorded for your current Roblox session. Games will appear here as you leave them or teleport within them. Not all servers will be rejoinable.</value>
   </data>
+  <data name="ContextMenu.OutputConsole.Title" xml:space="preserve">
+    <value>Output console</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.Description" xml:space="preserve">
+    <value>This is a live view of Roblox's own log output for your current session, useful for diagnosing issues.</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.Placeholder" xml:space="preserve">
+    <value>Waiting for Roblox to produce log output...</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.LineCountSingular" xml:space="preserve">
+    <value>1 line</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.LineCountPlural" xml:space="preserve">
+    <value>{0} lines</value>
+  </data>
+  <data name="ContextMenu.OutputConsole.ExportFailed" xml:space="preserve">
+    <value>The output console log could not be saved:</value>
+  </data>
   <data name="ActivityWatcher.LocationQueryFailed" xml:space="preserve">
     <value>The server location could not be queried. You may be joining games too quickly.</value>
   </data>
