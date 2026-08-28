@@ -20,13 +20,9 @@ namespace PhasmaStrap
                 Description = "An asset injection tool for custom textures/models.",
                 ExecutableName = "Fleasion.exe"
             },
-            new()
-            {
-                Id = "Rojo",
-                DisplayName = "Rojo",
-                Description = "Syncs external files into Roblox Studio for development.",
-                ExecutableName = "Rojo.exe"
-            },
+            // Rojo is not listed here - PhasmaStrap can install and manage it directly
+            // (see RojoManager / the dedicated card on the Extensions page), so it doesn't
+            // need the generic "browse to an existing install" flow the others use.
             new()
             {
                 Id = "RobloxApiDumpTool",

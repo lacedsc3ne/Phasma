@@ -78,5 +78,9 @@ namespace PhasmaStrap.Models.Persistable
 
         // headset audio compressor
         public bool HeadsetAudioEnabled { get; set; } = false;
+
+        // rojo integration: auto-installed CLI, remembers the last project file used for
+        // "rojo serve" so re-launching doesn't require rebrowsing every time
+        public string RojoLastProjectPath { get; set; } = "";
     }
 }
