@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 
@@ -8,6 +9,15 @@ namespace Bloxstrap.Extensions
     public static class IconEx
     {
         public static Icon GetSized(this Icon icon, int width, int height) => new(icon, new Size(width, height));
+
+        // multi-resolution .ico files decode to several frames; BitmapFrame.Create alone returns
+        // whichever one the decoder defaults to (often the smallest), which then renders blurry
+        // when displayed larger, so explicitly pick the highest-resolution frame available
+        private static ImageSource GetLargestFrame(Stream stream)
+        {
+            var decoder = new IconBitmapDecoder(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            return decoder.Frames.OrderByDescending(f => f.PixelWidth).First();
+        }
 
         public static ImageSource GetImageSource(this Icon icon, bool handleException = true)
         {
@@ -19,7 +29,7 @@ namespace Bloxstrap.Extensions
             {
                 try
                 {
-                    return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                    return GetLargestFrame(stream);
                 }
                 catch (Exception ex)
                 {
@@ -30,7 +40,7 @@ namespace Bloxstrap.Extensions
             }
             else
             {
-                return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                return GetLargestFrame(stream);
             }
         }
     }

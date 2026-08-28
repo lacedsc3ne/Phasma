@@ -10,9 +10,10 @@ namespace Bloxstrap.UI.ViewModels.Bootstrapper
 {
     public class FluentDialogViewModel : BootstrapperDialogViewModel
     {
-        public BackgroundType WindowBackdropType { get; set; } = BackgroundType.Mica;
+        public BackgroundType WindowBackdropType { get; set; } = BackgroundType.Acrylic;
 
-        public SolidColorBrush BackgroundColourBrush { get; set; } = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+        // dark, near-opaque tint over the acrylic blur - glassy at the edges, but reads dark overall
+        public SolidColorBrush BackgroundColourBrush { get; set; } = new SolidColorBrush(Color.FromArgb(230, 0x0E, 0x0E, 0x12));
 
         [Obsolete("Do not use this! This is for the designer only.", true)]
         public FluentDialogViewModel() : base()
@@ -22,7 +23,7 @@ namespace Bloxstrap.UI.ViewModels.Bootstrapper
         {
             const int alpha = 128;
 
-            WindowBackdropType = aero ? BackgroundType.Aero : BackgroundType.Mica;
+            WindowBackdropType = aero ? BackgroundType.Aero : BackgroundType.Acrylic;
 
             if (aero)
             {

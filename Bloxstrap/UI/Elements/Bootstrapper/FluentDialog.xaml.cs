@@ -14,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Shell;
@@ -31,6 +32,9 @@ namespace Bloxstrap.UI.Elements.Bootstrapper
         public Bloxstrap.Bootstrapper? Bootstrapper { get; set; }
 
         private bool _isClosing;
+
+        // this dialog has its own elastic entrance + mist storyboard, defined in FluentDialog.xaml
+        protected override bool UseDefaultEntranceAnimation => false;
 
         #region UI Elements
         public string Message
@@ -124,6 +128,15 @@ namespace Bloxstrap.UI.Elements.Bootstrapper
         {
             if (!_isClosing)
                 Bootstrapper?.Cancel();
+        }
+
+        private void FluentDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            ((Storyboard)Resources["WindowEntrance"]).Begin(this);
+            ((Storyboard)Resources["LogoEntrance"]).Begin(this);
+            ((Storyboard)Resources["LogoBreathe"]).Begin(this);
+            ((Storyboard)Resources["LogoGlowPulse"]).Begin(this);
+            ((Storyboard)Resources["MistDrift"]).Begin(this);
         }
 
         #region IBootstrapperDialog Methods

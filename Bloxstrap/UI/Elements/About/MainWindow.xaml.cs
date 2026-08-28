@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using Wpf.Ui.Controls.Interfaces;
 using Wpf.Ui.Mvvm.Contracts;
 
@@ -18,6 +20,9 @@ namespace Bloxstrap.UI.Elements.About
             if (Locale.CurrentCulture.Name.StartsWith("tr"))
                 TranslatorsText.FontSize = 9;
         }
+
+        private void MainWindow_MistLoaded(object sender, RoutedEventArgs e) =>
+            ((Storyboard)Resources["MistDrift"]).Begin(this);
 
         #region INavigationWindow methods
 
