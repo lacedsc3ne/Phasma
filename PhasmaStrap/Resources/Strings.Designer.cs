@@ -818,7 +818,70 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("ContextMenu.GameHistory.Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Output console.
+        /// </summary>
+        public static string ContextMenu_OutputConsole_Title {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This is a live view of Roblox&apos;s own log output for your current session, useful for diagnosing issues..
+        /// </summary>
+        public static string ContextMenu_OutputConsole_Description {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Roblox to produce log output....
+        /// </summary>
+        public static string ContextMenu_OutputConsole_Placeholder {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.Placeholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        public static string ContextMenu_OutputConsole_Clear {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.Clear", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 1 line.
+        /// </summary>
+        public static string ContextMenu_OutputConsole_LineCountSingular {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.LineCountSingular", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} lines.
+        /// </summary>
+        public static string ContextMenu_OutputConsole_LineCountPlural {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.LineCountPlural", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The output console log could not be saved:.
+        /// </summary>
+        public static string ContextMenu_OutputConsole_ExportFailed {
+            get {
+                return ResourceManager.GetString("ContextMenu.OutputConsole.ExportFailed", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Copy Instance ID.
         /// </summary>
