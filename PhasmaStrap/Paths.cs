@@ -11,6 +11,9 @@
         public static string WindowsStartMenu => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
         public static string System => Environment.GetFolderPath(Environment.SpecialFolder.System);
 
+        public static string RobloxLogs => Path.Combine(LocalAppData, "Roblox", "logs");
+        public static string RobloxCache => Path.Combine(LocalAppData, "Roblox", "rbx-storage");
+
         public static string Process => Environment.ProcessPath!;
 
         public static string TempUpdates => Path.Combine(Temp, "Updates");

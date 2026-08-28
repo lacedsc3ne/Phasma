@@ -34,6 +34,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 ? $"Installed at {StudioPluginInstaller.PluginPath}"
                 : "Not installed. Turning this on writes the plugin to your Roblox Studio plugins folder.";
 
+        public bool StudioRichPresenceEnabled
+        {
+            get => App.Settings.Prop.StudioRichPresenceEnabled;
+            set
+            {
+                App.Settings.Prop.StudioRichPresenceEnabled = value;
+
+                if (value)
+                {
+                    App.StudioRichPresence ??= new StudioRichPresence();
+                }
+                else
+                {
+                    App.StudioRichPresence?.Dispose();
+                    App.StudioRichPresence = null;
+                }
+            }
+        }
+
         public ICommand ReinstallStudioPluginCommand => new RelayCommand(() =>
         {
             StudioPluginInstaller.Reinstall();

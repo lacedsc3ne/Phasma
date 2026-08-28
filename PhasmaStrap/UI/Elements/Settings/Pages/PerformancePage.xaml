@@ -56,5 +56,28 @@
         <controls:OptionControl Header="Show performance stats" Description="Roblox's built-in FPS/ping/memory overlay.">
             <ui:ToggleSwitch IsChecked="{Binding PerformanceStatsVisible, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Schedule">
+            <ComboBox Width="160" ItemsSource="{Binding CleanerScheduleOptions, Mode=OneTime}" SelectedItem="{Binding CleanerSchedule, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="PhasmaStrap logs">
+            <ui:ToggleSwitch IsChecked="{Binding CleanerLogsEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="PhasmaStrap download cache">
+            <ui:ToggleSwitch IsChecked="{Binding CleanerCacheEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Roblox logs">
+            <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxLogsEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Roblox cache">
+            <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

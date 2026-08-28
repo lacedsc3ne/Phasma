@@ -110,6 +110,16 @@
                 <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 <ui:TextBox Margin="0,4,0,0" PlaceholderText="{Binding Source='/k echo {0}', Converter={StaticResource StringFormatConverter}, ConverterParameter={x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs_Placeholder}}" Text="{Binding SelectedCustomIntegration.LaunchArgs}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
                 <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_Custom_AutoClose}" IsChecked="{Binding SelectedCustomIntegration.AutoClose}" />
+
+                <CheckBox Margin="0,8,0,0" Content="Only for a specific game" IsChecked="{Binding SelectedCustomIntegration.SpecifyGame}" />
+                <ui:TextBox Margin="0,4,0,0" PlaceholderText="Place ID" Text="{Binding SelectedCustomIntegration.GameID}" IsEnabled="{Binding SelectedCustomIntegration.SpecifyGame}" />
+
+                <CheckBox Margin="0,8,0,0" Content="Close when leaving this game" IsChecked="{Binding SelectedCustomIntegration.AutoCloseOnGame}" />
+                <CheckBox Margin="0,8,0,0" Content="Run as administrator" IsChecked="{Binding SelectedCustomIntegration.RunAsAdmin}" />
+                <CheckBox Margin="0,8,0,0" Content="Run minimized" IsChecked="{Binding SelectedCustomIntegration.RunMinimized}" />
+
+                <TextBlock Margin="0,8,0,0" Text="Launch delay (ms)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:NumberBox Margin="0,4,0,0" Min="0" Max="30000" Value="{Binding SelectedCustomIntegration.Delay}" />
             </StackPanel>
             <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="{x:Static resources:Strings.Menu_Integrations_Custom_NoneSelected}" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock.Style>

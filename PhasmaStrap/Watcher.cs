@@ -16,6 +16,8 @@ namespace PhasmaStrap
 
         public readonly DiscordRichPresence? RichPresence;
 
+        public readonly IntegrationWatcher? IntegrationWatcher;
+
         public Watcher()
         {
             const string LOG_IDENT = "Watcher";
@@ -66,6 +68,9 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
+
+                if (App.Settings.Prop.CustomIntegrations.Count > 0)
+                    IntegrationWatcher = new(ActivityWatcher);
             }
 
             _notifyIcon = new(this);
@@ -127,6 +132,7 @@ namespace PhasmaStrap
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
+            IntegrationWatcher?.Dispose();
 
             GC.SuppressFinalize(this);
         }
