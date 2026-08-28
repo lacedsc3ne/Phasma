@@ -83,6 +83,12 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameJoin += (_, _) => AudioDucker.Start();
                     ActivityWatcher.OnGameLeave += (_, _) => AudioDucker.Stop();
                 }
+
+                if (App.Settings.Prop.HeadsetAudioEnabled)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => HeadsetAudio.Start();
+                    ActivityWatcher.OnGameLeave += (_, _) => HeadsetAudio.Stop();
+                }
             }
 
             _notifyIcon = new(this);
@@ -147,6 +153,7 @@ namespace PhasmaStrap
             IntegrationWatcher?.Dispose();
             FakeExclusiveFullscreen.Shutdown();
             AudioDucker.Shutdown();
+            HeadsetAudio.Shutdown();
 
             GC.SuppressFinalize(this);
         }
