@@ -30,6 +30,17 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool DuckRobloxAudioOnUnfocus
+        {
+            get => App.Settings.Prop.DuckRobloxAudioOnUnfocus;
+            set
+            {
+                App.Settings.Prop.DuckRobloxAudioOnUnfocus = value;
+                if (!value)
+                    PhasmaStrap.Integrations.AudioDucker.Shutdown();
+            }
+        }
+
         public bool SettingsFileReadOnly
         {
             get => _gbs.GetReadOnly();
