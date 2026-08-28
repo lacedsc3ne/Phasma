@@ -1,0 +1,46 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.ServerBrowserPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance dmodels:ServerBrowserViewModel, IsDesignTimeCreatable=True}"
+      Title="ServerBrowserPage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Lists a game's public servers using Roblox's own public server list - this doesn't sign in, read your Roblox session, or measure real ping to any server." />
+
+        <controls:OptionControl Header="Place ID" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal">
+                <ui:TextBox Width="200" PlaceholderText="e.g. 13700835620" Text="{Binding PlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button Margin="8,0,0,0" Content="Search" Icon="Search24" Command="{Binding SearchCommand, Mode=OneTime}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Margin="0,8,0,0" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Servers, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,0,4" Padding="12,8" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding JobId}" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="8,0" Text="{Binding PlayersText}" />
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="8,0" Text="{Binding PingText}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            <ui:Button Grid.Column="3" Content="Join" Appearance="Primary" Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>
