@@ -41,6 +41,17 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool HeadsetAudioEnabled
+        {
+            get => App.Settings.Prop.HeadsetAudioEnabled;
+            set
+            {
+                App.Settings.Prop.HeadsetAudioEnabled = value;
+                if (!value)
+                    PhasmaStrap.Integrations.HeadsetAudio.Shutdown();
+            }
+        }
+
         public bool SettingsFileReadOnly
         {
             get => _gbs.GetReadOnly();

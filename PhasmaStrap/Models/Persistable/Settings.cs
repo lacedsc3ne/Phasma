@@ -75,5 +75,8 @@ namespace PhasmaStrap.Models.Persistable
 
         // audio ducking
         public bool DuckRobloxAudioOnUnfocus { get; set; } = false;
+
+        // headset audio compressor
+        public bool HeadsetAudioEnabled { get; set; } = false;
     }
 }
