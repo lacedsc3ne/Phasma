@@ -99,5 +99,9 @@ namespace PhasmaStrap.Models.Persistable
 
         // controller navigation: drive the settings window with an XInput gamepad
         public bool ControllerNavigationEnabled { get; set; } = false;
+
+        // settings window nav rail: PageTag values (explicitly set per-item in MainWindow.xaml,
+        // not locale-dependent) pinned to a "Pinned" group at the top of the rail
+        public List<string> PinnedNavItems { get; set; } = new() { "fastflags", "performance", "nvidia" };
     }
 }

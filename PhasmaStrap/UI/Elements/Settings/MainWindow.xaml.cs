@@ -4,10 +4,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 
+using Wpf.Ui.Common;
 using Wpf.Ui.Controls.Interfaces;
+using Wpf.Ui.Controls.Navigation;
 using Wpf.Ui.Mvvm.Contracts;
 
 using PhasmaStrap.UI.ViewModels.Settings;
+
+using NavigationItem = Wpf.Ui.Controls.NavigationItem;
 
 namespace PhasmaStrap.UI.Elements.Settings
 {
@@ -42,6 +46,7 @@ namespace PhasmaStrap.UI.Elements.Settings
                 ControllerService.Initialize();
 
             InitializeSettingsSearch();
+            InitializePinning();
         }
 
         #region Settings search
@@ -128,6 +133,99 @@ namespace PhasmaStrap.UI.Elements.Settings
         }
 
         #endregion Settings search
+
+        #region Pinned nav items
+
+        private readonly List<NavigationItem> _pinnedNavItems = new();
+
+        private void InitializePinning()
+        {
+            // Attach a right-click "pin"/"unpin" menu to every real page item declared in XAML.
+            // The dynamically-created pinned duplicates get the same menu attached as they're built.
+            foreach (var control in RootNavigation.Items)
+            {
+                if (control is not NavigationItem navItem || string.IsNullOrEmpty(navItem.PageTag) || navItem.PageTag == "fastflageditor")
+                    continue;
+
+                AttachPinContextMenu(navItem);
+            }
+
+            RebuildPinnedGroup();
+        }
+
+        private void AttachPinContextMenu(NavigationItem navItem)
+        {
+            var pinMenuItem = new MenuItem();
+            var menu = new System.Windows.Controls.ContextMenu();
+
+            menu.Opened += (_, _) =>
+                pinMenuItem.Header = App.Settings.Prop.PinnedNavItems.Contains(navItem.PageTag) ? "Unpin from top" : "Pin to top";
+
+            pinMenuItem.Click += (_, _) => TogglePinned(navItem.PageTag);
+
+            menu.Items.Add(pinMenuItem);
+            navItem.ContextMenu = menu;
+        }
+
+        private void TogglePinned(string pageTag)
+        {
+            var pinned = App.Settings.Prop.PinnedNavItems;
+
+            if (!pinned.Remove(pageTag))
+                pinned.Add(pageTag);
+
+            App.Settings.Save();
+
+            RebuildPinnedGroup();
+        }
+
+        private void RebuildPinnedGroup()
+        {
+            // Only ever remove the NavigationItem duplicates here, never PinnedHeader itself - see the
+            // comment on PinnedHeader in MainWindow.xaml for why removing a header is unsafe.
+            foreach (var item in _pinnedNavItems)
+                RootNavigation.Items.Remove(item);
+
+            _pinnedNavItems.Clear();
+
+            var pinnedTags = App.Settings.Prop.PinnedNavItems;
+
+            PinnedHeader.Visibility = pinnedTags.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            int insertAt = RootNavigation.Items.IndexOf(PinnedHeader) + 1;
+
+            foreach (string tag in pinnedTags)
+            {
+                NavigationItem? source = null;
+
+                foreach (var control in RootNavigation.Items)
+                {
+                    if (control is NavigationItem candidate && candidate.PageTag == tag && !_pinnedNavItems.Contains(candidate))
+                    {
+                        source = candidate;
+                        break;
+                    }
+                }
+
+                if (source is null)
+                    continue;
+
+                var pinnedItem = new NavigationItem
+                {
+                    Content = source.Content,
+                    Icon = source.Icon,
+                    PageType = source.PageType,
+                    PageTag = source.PageTag,
+                };
+
+                AttachPinContextMenu(pinnedItem);
+
+                RootNavigation.Items.Insert(insertAt++, pinnedItem);
+                _pinnedNavItems.Add(pinnedItem);
+            }
+        }
+
+        #endregion Pinned nav items
 
         public void LoadState()
         {
