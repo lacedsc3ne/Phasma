@@ -21,5 +21,12 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             viewModel.SelectedCustomIntegration = (CustomIntegration)((ListBox)sender).SelectedItem;
             viewModel.OnPropertyChanged(nameof(viewModel.SelectedCustomIntegration));
         }
+
+        public void RPCTemplateSelection(object sender, SelectionChangedEventArgs e)
+        {
+            IntegrationsViewModel viewModel = (IntegrationsViewModel)DataContext;
+            viewModel.SelectedRPCTemplate = (RPCTemplate)((ListBox)sender).SelectedItem;
+            viewModel.OnPropertyChanged(nameof(viewModel.SelectedRPCTemplate));
+        }
     }
 }

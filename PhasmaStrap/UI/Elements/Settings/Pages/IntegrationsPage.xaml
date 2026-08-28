@@ -133,5 +133,70 @@
                 </TextBlock.Style>
             </TextBlock>
         </Grid>
+
+        <TextBlock Text="Custom Rich Presence Templates" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+            Author your own Discord Rich Presence text/images/button for a specific game, applied as the
+            default presence whenever you're in that game. Supported placeholder tokens for the details
+            and state text: {gameName}, {status}, {creator}, {placeId}, {universeId}. If the game itself
+            reports its own rich presence data (via the BloxstrapRPC protocol), that always takes
+            priority over your template while you're playing.
+        </TextBlock>
+        <Grid Margin="0,8,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="RPCTemplatesListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" ItemsSource="{Binding RPCTemplates, Mode=OneWay}" DisplayMemberPath="GameID" SelectionChanged="RPCTemplateSelection" SelectedIndex="{Binding SelectedRPCTemplateIndex, Mode=TwoWay}" />
+            <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ui:Button Grid.Column="0" Margin="0,0,4,0" Icon="Add28" Content="{x:Static resources:Strings.Common_New}" HorizontalAlignment="Stretch" Command="{Binding AddRPCTemplateCommand, Mode=OneTime}" />
+                <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Delete28" Content="{x:Static resources:Strings.Common_Delete}" HorizontalAlignment="Stretch" Appearance="Danger" IsEnabled="{Binding IsRPCTemplateSelected, Mode=OneWay}" Command="{Binding DeleteRPCTemplateCommand, Mode=OneTime}" />
+            </Grid>
+            <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="4,0,0,0">
+                <StackPanel.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="False">
+                                <Setter Property="StackPanel.Visibility" Value="Hidden"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <CheckBox Content="Enabled" IsChecked="{Binding SelectedRPCTemplate.Enabled}" />
+                <TextBlock Margin="0,8,0,0" Text="Place ID" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" PlaceholderText="606849621" Text="{Binding SelectedRPCTemplate.GameID, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="Details text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" PlaceholderText="Playing {gameName}" Text="{Binding SelectedRPCTemplate.DetailsTemplate, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="State text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" PlaceholderText="{}{status}" Text="{Binding SelectedRPCTemplate.StateTemplate, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="Large image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.LargeImageUrl, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="Small image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.SmallImageUrl, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="Extra button label (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonLabel, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Margin="0,8,0,0" Text="Extra button URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonUrl, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="No template selected" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="True">
+                                <Setter Property="TextBlock.Visibility" Value="Hidden"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
     </StackPanel>
 </ui:UiPage>

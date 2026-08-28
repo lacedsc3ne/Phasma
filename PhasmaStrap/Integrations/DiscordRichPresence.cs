@@ -413,6 +413,15 @@ namespace PhasmaStrap.Integrations
                 }
             };
 
+            // apply the user's own rich presence template (if one is configured for this game) as the
+            // new baseline, *before* snapshotting into _originalPresence. this means a game's own
+            // BloxstrapRPC messages (processed below/afterwards via ProcessRPCMessage) still take full
+            // priority and can override any field at runtime same as before, but "<reset>" from a game
+            // now resets back to the user's templated defaults rather than the raw computed ones - the
+            // template only controls the idle/default appearance, never live gameplay data a game
+            // reports about itself.
+            ApplyUserTemplate(placeId, activity.UniverseId, universeDetails.Data.Name, status, universeDetails.Data.Creator.Name);
+
             // this is used for configuration from BloxstrapRPC
             _originalPresence = _currentPresence.Clone();
 
@@ -425,6 +434,65 @@ namespace PhasmaStrap.Integrations
             UpdatePresence();
 
             return true;
+        }
+
+        // fills in the current presence from a matching user-authored RPCTemplate (see Models/RPCTemplate.cs),
+        // substituting {gameName}, {status}, {creator}, {placeId} and {universeId} placeholder tokens.
+        // does nothing if no enabled template is configured for this place ID.
+        private void ApplyUserTemplate(long placeId, long universeId, string gameName, string status, string creatorName)
+        {
+            const string LOG_IDENT = "DiscordRichPresence::ApplyUserTemplate";
+
+            if (_currentPresence is null)
+                return;
+
+            string placeIdString = placeId.ToString();
+
+            RPCTemplate? template = App.Settings.Prop.RPCTemplates
+                .FirstOrDefault(t => t.Enabled && t.GameID == placeIdString);
+
+            if (template is null)
+                return;
+
+            App.Logger.WriteLine(LOG_IDENT, $"Applying user rich presence template for place ID {placeId}");
+
+            string Substitute(string text) => text
+                .Replace("{gameName}", gameName)
+                .Replace("{status}", status)
+                .Replace("{creator}", creatorName)
+                .Replace("{placeId}", placeIdString)
+                .Replace("{universeId}", universeId.ToString());
+
+            if (!String.IsNullOrWhiteSpace(template.DetailsTemplate))
+                _currentPresence.Details = Substitute(template.DetailsTemplate);
+
+            if (!String.IsNullOrWhiteSpace(template.StateTemplate))
+                _currentPresence.State = Substitute(template.StateTemplate);
+
+            if (!String.IsNullOrWhiteSpace(template.LargeImageUrl))
+                _currentPresence.Assets.LargeImageKey = template.LargeImageUrl;
+
+            // only override the small image if account display is disabled, same rule the BloxstrapRPC
+            // handler above already applies, so the two features don't fight over the same slot
+            if (!String.IsNullOrWhiteSpace(template.SmallImageUrl) && !App.Settings.Prop.ShowAccountOnRichPresence)
+                _currentPresence.Assets.SmallImageKey = template.SmallImageUrl;
+
+            if (!String.IsNullOrWhiteSpace(template.ButtonLabel) && !String.IsNullOrWhiteSpace(template.ButtonUrl))
+            {
+                var buttons = new List<Button>
+                {
+                    new Button { Label = template.ButtonLabel, Url = template.ButtonUrl }
+                };
+
+                if (_currentPresence.Buttons is not null)
+                    buttons.AddRange(_currentPresence.Buttons);
+
+                // discord only allows a maximum of 2 buttons
+                if (buttons.Count > 2)
+                    buttons = buttons.Take(2).ToList();
+
+                _currentPresence.Buttons = buttons.ToArray();
+            }
         }
 
         public Button[] GetButtons()
