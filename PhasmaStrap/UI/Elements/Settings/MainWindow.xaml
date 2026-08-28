@@ -116,6 +116,16 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <ui:AutoSuggestBox
+                x:Name="SettingsSearchBox"
+                Grid.Row="0" Grid.Column="0"
+                Margin="0,0,12,10"
+                PlaceholderText="Search settings"
+                Icon="Search24"
+                MaxDropDownHeight="320"
+                SuggestionChosen="SettingsSearchBox_SuggestionChosen"
+                KeyDown="SettingsSearchBox_KeyDown" />
+
             <ui:NavigationFluent x:Name="RootNavigation" Grid.Row="1" Grid.Column="0" Margin="0,0,12,0" Frame="{Binding ElementName=RootFrame}" SelectedPageIndex="0">
                 <ui:NavigationFluent.Items>
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Title}" PageType="{x:Type pages:IntegrationsPage}" Icon="Add28" Tag="integrations" />
