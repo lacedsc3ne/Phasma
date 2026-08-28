@@ -72,5 +72,8 @@ namespace PhasmaStrap.Models.Persistable
 
         // telemetry blocker
         public bool BlockRobloxTelemetry { get; set; } = false;
+
+        // audio ducking
+        public bool DuckRobloxAudioOnUnfocus { get; set; } = false;
     }
 }

@@ -77,6 +77,12 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameJoin += (_, _) => FakeExclusiveFullscreen.OnGameJoin();
                     ActivityWatcher.OnGameLeave += (_, _) => FakeExclusiveFullscreen.OnGameLeave();
                 }
+
+                if (App.Settings.Prop.DuckRobloxAudioOnUnfocus)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => AudioDucker.Start();
+                    ActivityWatcher.OnGameLeave += (_, _) => AudioDucker.Stop();
+                }
             }
 
             _notifyIcon = new(this);
@@ -140,6 +146,7 @@ namespace PhasmaStrap
             RichPresence?.Dispose();
             IntegrationWatcher?.Dispose();
             FakeExclusiveFullscreen.Shutdown();
+            AudioDucker.Shutdown();
 
             GC.SuppressFinalize(this);
         }

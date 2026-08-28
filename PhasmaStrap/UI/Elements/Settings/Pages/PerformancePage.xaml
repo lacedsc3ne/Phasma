@@ -24,6 +24,10 @@
             <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl Header="Duck Roblox audio when unfocused" Description="Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.">
+            <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <TextBlock Text="Roblox game settings" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="These edit Roblox's own GlobalBasicSettings file directly, rather than going through FastFlags." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
