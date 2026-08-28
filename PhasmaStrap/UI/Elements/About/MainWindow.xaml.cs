@@ -16,9 +16,6 @@ namespace PhasmaStrap.UI.Elements.About
             InitializeComponent();
 
             App.Logger.WriteLine("MainWindow", "Initializing about window");
-
-            if (Locale.CurrentCulture.Name.StartsWith("tr"))
-                TranslatorsText.FontSize = 9;
         }
 
         private void MainWindow_MistLoaded(object sender, RoutedEventArgs e) =>

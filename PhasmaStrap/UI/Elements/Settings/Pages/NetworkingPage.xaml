@@ -9,11 +9,6 @@
       Title="NetworkingPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <ui:InfoBar
-            IsClosable="False" IsOpen="True" Severity="Warning" Margin="0,0,0,16"
-            Title="Read before enabling"
-            Message="This intercepts your own Roblox client's traffic to a small, fixed set of Roblox API addresses (presence, currency, profile lookups only - never asset/game traffic) through a local proxy, using a certificate PhasmaStrap generates on this machine. It requires one Windows administrator prompt to redirect those addresses locally, and only works while PhasmaStrap is running - closing it while this is on will make those specific Roblox features fail to load until you reopen PhasmaStrap or turn this off." />
-
         <controls:OptionControl Header="Enable local proxy" Description="{Binding StatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
