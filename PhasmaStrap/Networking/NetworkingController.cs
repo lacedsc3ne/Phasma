@@ -77,6 +77,16 @@ namespace PhasmaStrap.Networking
 
             AssetProxyServer.InterceptedHosts.TryGetValue(UsernameSpoofer.Host, out var existingApis);
             AssetProxyServer.InterceptedHosts[UsernameSpoofer.Host] = (existingApis.RequestTransform, CombineResponseTransforms(existingApis.ResponseTransform, UsernameSpoofer.ProcessResponse));
+
+            RegisterAssetWarpHosts();
+        }
+
+        private static void RegisterAssetWarpHosts()
+        {
+            AssetProxyServer.InterceptedHosts[AssetWarpPolicy.Host] = (AssetWarpPolicy.TransformRequest, null);
+
+            AssetProxyServer.InterceptedHosts.TryGetValue(AssetWarpThumbnailPolicy.Host, out var existingThumbnails);
+            AssetProxyServer.InterceptedHosts[AssetWarpThumbnailPolicy.Host] = (existingThumbnails.RequestTransform, CombineResponseTransforms(existingThumbnails.ResponseTransform, AssetWarpThumbnailPolicy.ProcessResponse));
         }
 
         private static Func<ProxiedRequest, ProxiedResponse, byte[]?> CombineResponseTransforms(

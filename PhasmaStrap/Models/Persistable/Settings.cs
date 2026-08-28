@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 using PhasmaStrap.Networking;
 
@@ -82,5 +82,19 @@ namespace PhasmaStrap.Models.Persistable
         // rojo integration: auto-installed CLI, remembers the last project file used for
         // "rojo serve" so re-launching doesn't require rebrowsing every time
         public string RojoLastProjectPath { get; set; } = "";
+
+        // asset warp: selectively blocks specific asset types (fetched through the local
+        // proxy's assetdelivery.roblox.com batch-resolution request) for a performance boost.
+        // Off by default - see AssetWarpPolicy.cs for the scoping notes.
+        public bool AssetWarpEnabled { get; set; } = false;
+        public bool AssetWarpDisableAllTextures { get; set; } = false;
+        public bool AssetWarpDisableAllDecals { get; set; } = false;
+        public bool AssetWarpDisableAllImages { get; set; } = false;
+        public bool AssetWarpDisableAllAnimations { get; set; } = false;
+        public bool AssetWarpDisableAllMeshes { get; set; } = false;
+
+        // user-authored per-game Discord Rich Presence templates, applied as the baseline
+        // presence when not overridden by a game's own BloxstrapRPC messages
+        public ObservableCollection<RPCTemplate> RPCTemplates { get; set; } = new();
     }
 }

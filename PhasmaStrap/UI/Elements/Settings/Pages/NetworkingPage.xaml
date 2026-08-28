@@ -46,5 +46,26 @@
         <controls:OptionControl Header="Block Roblox telemetry" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding BlockRobloxTelemetry, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="AssetWarp" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Blocks whole categories of asset from loading in-game, for a performance boost. Works by removing blocked asset types from the batch resolution request Roblox's client sends through the local proxy above, before it ever learns a CDN URL to fetch them from - it does not intercept or substitute the actual asset content servers. Requires the local proxy above to be enabled." />
+        <controls:OptionControl Header="Enable AssetWarp" Description="{Binding AssetWarpStatusText, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Block textures">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllTextures, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Block decals">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllDecals, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Block images">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllImages, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Block animations">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllAnimations, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Block meshes">
+            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllMeshes, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>
