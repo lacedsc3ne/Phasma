@@ -838,7 +838,7 @@ Selecting 'No' will ignore this warning and continue installation.</value>
   <data name="Installer.Welcome.MainText" xml:space="preserve">
     <value>Thank you for downloading PhasmaStrap. 
 
-The only official websites to download PhasmaStrap from are {0} and {1}, so please verify that you got it from an official source.
+The only official website to download PhasmaStrap from is {0}, so please verify that you got it from an official source.
 
 This installation process will be quick and simple, and you will be able to configure any of PhasmaStrap's settings after installation.</value>
     <comment>{0} and {1} are URLs</comment>
