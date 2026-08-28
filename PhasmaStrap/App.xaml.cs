@@ -283,6 +283,20 @@ namespace PhasmaStrap
 
             LaunchSettings = new LaunchSettings(e.Args);
 
+            // these only ever run as a short-lived elevated relaunch triggered by
+            // Networking.HostsFileManager, never as part of the normal app flow
+            if (LaunchSettings.WriteProxyHostsFlag.Active)
+            {
+                Shutdown(Networking.HostsFileManager.WriteBlockElevated() ? 0 : 1);
+                return;
+            }
+
+            if (LaunchSettings.RemoveProxyHostsFlag.Active)
+            {
+                Shutdown(Networking.HostsFileManager.RemoveBlockElevated() ? 0 : 1);
+                return;
+            }
+
             // installation check begins here
             using var uninstallKey = Registry.CurrentUser.OpenSubKey(UninstallKey);
             string? installLocation = null;
@@ -397,6 +411,15 @@ namespace PhasmaStrap
                 catch (Exception ex)
                 {
                     Logger.WriteLine(LOG_IDENT, $"Studio companion startup failed: {ex.Message}");
+                }
+
+                try
+                {
+                    Networking.NetworkingController.ReconcileOnStartup();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
                 }
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))

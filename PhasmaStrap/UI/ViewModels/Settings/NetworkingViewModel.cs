@@ -1,0 +1,74 @@
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
+using PhasmaStrap.Networking;
+
+namespace PhasmaStrap.UI.ViewModels.Settings
+{
+    public class NetworkingViewModel : NotifyPropertyChangedViewModel
+    {
+        public bool ProxyEnabled
+        {
+            get => App.Settings.Prop.NetworkingProxyEnabled;
+            set
+            {
+                if (value)
+                {
+                    bool ok = NetworkingController.Enable();
+                    if (!ok)
+                        App.Logger.WriteLine("NetworkingViewModel", "Enabling the proxy failed or the elevation prompt was declined");
+                }
+                else
+                {
+                    NetworkingController.Disable();
+                }
+
+                OnPropertyChanged(nameof(ProxyEnabled));
+                OnPropertyChanged(nameof(StatusText));
+            }
+        }
+
+        public string StatusText => App.Settings.Prop.NetworkingProxyEnabled
+            ? (NetworkingController.IsActive ? "Running" : "Enabled, but not confirmed running - check the log")
+            : "Off";
+
+        public bool IsCertificateInstalled => AssetProxyCA.IsInstalledInTrustStore();
+
+        public string CertificateStatusText => IsCertificateInstalled
+            ? "Installed to your Windows certificate store (current user only)"
+            : "Not installed - the proxy can run without this, but Roblox will show TLS certificate warnings/errors until it's installed";
+
+        public IEnumerable<PresenceSpoofMode> PresenceSpoofModes { get; } = Enum.GetValues(typeof(PresenceSpoofMode)).Cast<PresenceSpoofMode>();
+
+        public PresenceSpoofMode SelectedPresenceSpoofMode
+        {
+            get => App.Settings.Prop.PresenceSpoofMode;
+            set => App.Settings.Prop.PresenceSpoofMode = value;
+        }
+
+        public string RobuxSpoofAmount
+        {
+            get => App.Settings.Prop.RobuxSpoofAmount;
+            set => App.Settings.Prop.RobuxSpoofAmount = value;
+        }
+
+        public string UsernameSpoofName
+        {
+            get => App.Settings.Prop.UsernameSpoofName;
+            set => App.Settings.Prop.UsernameSpoofName = value;
+        }
+
+        public ICommand InstallCertificateCommand => new RelayCommand(() =>
+        {
+            AssetProxyCA.InstallToTrustStore();
+            OnPropertyChanged(nameof(IsCertificateInstalled));
+            OnPropertyChanged(nameof(CertificateStatusText));
+        });
+
+        public ICommand RemoveCertificateCommand => new RelayCommand(() =>
+        {
+            AssetProxyCA.RemoveFromTrustStore();
+            OnPropertyChanged(nameof(IsCertificateInstalled));
+            OnPropertyChanged(nameof(CertificateStatusText));
+        });
+    }
+}
