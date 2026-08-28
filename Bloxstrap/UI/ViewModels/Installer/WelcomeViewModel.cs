@@ -5,11 +5,12 @@
         // formatting is done here instead of in xaml, it's just a bit easier
         public string MainText => String.Format(
             Strings.Installer_Welcome_MainText,
-            "[github.com/bloxstraplabs/bloxstrap](https://github.com/bloxstraplabs/bloxstrap)",
-            "[bloxstraplabs.com](https://bloxstraplabs.com)"
+            $"[github.com/{App.ProjectRepository}](https://github.com/{App.ProjectRepository})"
         );
 
         public string VersionNotice { get; private set; } = "";
+
+        public string LatestReleaseUrl => $"https://github.com/{App.ProjectRepository}/releases/latest";
 
         public bool CanContinue { get; set; } = false;
 
