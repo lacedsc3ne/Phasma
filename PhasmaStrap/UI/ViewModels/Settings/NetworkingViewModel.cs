@@ -89,5 +89,75 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(IsCertificateInstalled));
             OnPropertyChanged(nameof(CertificateStatusText));
         });
+
+        public bool AssetWarpEnabled
+        {
+            get => App.Settings.Prop.AssetWarpEnabled;
+            set
+            {
+                App.Settings.Prop.AssetWarpEnabled = value;
+                OnPropertyChanged(nameof(AssetWarpEnabled));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public bool AssetWarpDisableAllTextures
+        {
+            get => App.Settings.Prop.AssetWarpDisableAllTextures;
+            set
+            {
+                App.Settings.Prop.AssetWarpDisableAllTextures = value;
+                OnPropertyChanged(nameof(AssetWarpDisableAllTextures));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public bool AssetWarpDisableAllDecals
+        {
+            get => App.Settings.Prop.AssetWarpDisableAllDecals;
+            set
+            {
+                App.Settings.Prop.AssetWarpDisableAllDecals = value;
+                OnPropertyChanged(nameof(AssetWarpDisableAllDecals));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public bool AssetWarpDisableAllImages
+        {
+            get => App.Settings.Prop.AssetWarpDisableAllImages;
+            set
+            {
+                App.Settings.Prop.AssetWarpDisableAllImages = value;
+                OnPropertyChanged(nameof(AssetWarpDisableAllImages));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public bool AssetWarpDisableAllAnimations
+        {
+            get => App.Settings.Prop.AssetWarpDisableAllAnimations;
+            set
+            {
+                App.Settings.Prop.AssetWarpDisableAllAnimations = value;
+                OnPropertyChanged(nameof(AssetWarpDisableAllAnimations));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public bool AssetWarpDisableAllMeshes
+        {
+            get => App.Settings.Prop.AssetWarpDisableAllMeshes;
+            set
+            {
+                App.Settings.Prop.AssetWarpDisableAllMeshes = value;
+                OnPropertyChanged(nameof(AssetWarpDisableAllMeshes));
+                OnPropertyChanged(nameof(AssetWarpStatusText));
+            }
+        }
+
+        public string AssetWarpStatusText => AssetWarpPolicy.IsEnabled
+            ? "Blocking selected asset type(s) through the local proxy"
+            : (App.Settings.Prop.AssetWarpEnabled ? "On, but no asset types selected below - nothing is blocked yet" : "Off");
     }
 }
