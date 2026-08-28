@@ -1,5 +1,36 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <SolidColorBrush x:Key="NewTextEditorBackground" Color="#2D2D2D" />
-    <SolidColorBrush x:Key="NewTextEditorForeground" Color="White" />
-    <SolidColorBrush x:Key="NewTextEditorLink" Color="#3A9CEA" />
+    <SolidColorBrush x:Key="NewTextEditorBackground" Color="#16161B" />
+    <SolidColorBrush x:Key="NewTextEditorForeground" Color="#F2F2F5" />
+    <SolidColorBrush x:Key="NewTextEditorLink" Color="#F4554B" />
+
+    <!--  Phasma warm-dark palette overrides (mirrors PhasmaMacro's index.html design tokens)  -->
+    <Color x:Key="ApplicationBackgroundColor">#0E0E12</Color>
+    <SolidColorBrush x:Key="ApplicationBackgroundBrush" Color="#0E0E12" />
+
+    <Color x:Key="SolidBackgroundFillColorBase">#16161B</Color>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#16161B" />
+
+    <Color x:Key="SolidBackgroundFillColorSecondary">#121216</Color>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#121216" />
+
+    <Color x:Key="SolidBackgroundFillColorTertiary">#1D1D23</Color>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorTertiaryBrush" Color="#1D1D23" />
+
+    <Color x:Key="SolidBackgroundFillColorQuarternary">#25252C</Color>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#25252C" />
+
+    <Color x:Key="SolidBackgroundFillColorBaseAlt">#0A0A0D</Color>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorBaseAltBrush" Color="#0A0A0D" />
+
+    <Color x:Key="CardBackgroundFillColorDefault">#16161B</Color>
+    <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#16161B" />
+
+    <Color x:Key="CardBackgroundFillColorSecondary">#1D1D23</Color>
+    <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#1D1D23" />
+
+    <Color x:Key="CardStrokeColorDefaultSolid">#2A2A30</Color>
+    <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#2A2A30" />
+
+    <Color x:Key="ControlSolidFillColorDefault">#1D1D23</Color>
+    <SolidColorBrush x:Key="ControlSolidFillColorDefaultBrush" Color="#1D1D23" />
 </ResourceDictionary>
