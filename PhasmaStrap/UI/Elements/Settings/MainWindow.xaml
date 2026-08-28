@@ -138,6 +138,7 @@
                     <ui:NavigationItem Content="NVIDIA" PageType="{x:Type pages:NvidiaPage}" Icon="TopSpeed24" Tag="nvidia" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" Tag="networking" />
                     <ui:NavigationItem Content="Servers" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" Tag="serverbrowser" />
+                    <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" Tag="history" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Appearance_Title}" PageType="{x:Type pages:AppearancePage}" Icon="PaintBrush24" Tag="appearance" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Common_Shortcuts}" PageType="{x:Type pages:ShortcutsPage}" Icon="Apps28" Tag="shortcuts" />
 
