@@ -13,6 +13,7 @@
 
         public static string RobloxLogs => Path.Combine(LocalAppData, "Roblox", "logs");
         public static string RobloxCache => Path.Combine(LocalAppData, "Roblox", "rbx-storage");
+        public static string ServerFetch => Path.Combine(LocalAppData, "PhasmaStrap", "ServerFetch");
 
         public static string Process => Environment.ProcessPath!;
 
