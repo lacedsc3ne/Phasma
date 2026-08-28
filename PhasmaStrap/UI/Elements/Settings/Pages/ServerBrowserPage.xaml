@@ -26,6 +26,29 @@
             <ComboBox Width="220" ItemsSource="{Binding DatacenterChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Key" SelectedValue="{Binding PreferredDatacenter, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl Header="Auto candidate count" Description="Off lets you set a fixed number of servers to probe per search instead of scaling it automatically.">
+            <ui:ToggleSwitch IsChecked="{Binding MatchmakerAutoCandidates, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Max candidates" Description="Only used when auto candidate count is off.">
+            <ui:NumberBox Width="120" Min="8" Max="64" Value="{Binding MatchmakerMaxCandidates, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Excluded datacenters" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="The matchmaker will never pick a server in a checked datacenter." />
+        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding DatacenterExclusions, Mode=OneTime}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Margin="0,0,16,6" Content="{Binding Display}" IsChecked="{Binding IsBlocked, Mode=TwoWay}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
         <TextBlock Text="Server Browser" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Lists a game's public servers using Roblox's own public server list - this doesn't sign in, read your Roblox session, or measure real ping to any server." />
 

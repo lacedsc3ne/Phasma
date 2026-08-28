@@ -59,6 +59,44 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.MatchmakerPreferredDatacenter = value ?? "";
         }
 
+        public bool MatchmakerAutoCandidates
+        {
+            get => App.Settings.Prop.MatchmakerAutoCandidates;
+            set { App.Settings.Prop.MatchmakerAutoCandidates = value; OnPropertyChanged(nameof(MatchmakerAutoCandidates)); }
+        }
+
+        public int MatchmakerMaxCandidates
+        {
+            get => App.Settings.Prop.MatchmakerMaxCandidates;
+            set => App.Settings.Prop.MatchmakerMaxCandidates = Math.Clamp(value, Matchmaker.MinCandidateCount, Matchmaker.MaxCandidateCount);
+        }
+
+        public sealed class DatacenterExclusion : NotifyPropertyChangedViewModel
+        {
+            public string Display { get; init; } = "";
+            public string Key { get; init; } = "";
+
+            public bool IsBlocked
+            {
+                get => App.Settings.Prop.MatchmakerDisabledDatacenters.Contains(Key);
+                set
+                {
+                    var blocked = App.Settings.Prop.MatchmakerDisabledDatacenters;
+                    if (value && !blocked.Contains(Key))
+                        blocked.Add(Key);
+                    else if (!value)
+                        blocked.Remove(Key);
+
+                    OnPropertyChanged(nameof(IsBlocked));
+                }
+            }
+        }
+
+        public IEnumerable<DatacenterExclusion> DatacenterExclusions { get; } =
+            RobloxDatacenterMap.AllDatacenters()
+                .OrderBy(dc => dc.City)
+                .Select(dc => new DatacenterExclusion { Display = $"{dc.City}, {dc.Country}", Key = Matchmaker.DatacenterKey(dc) });
+
         public ICommand SearchCommand => new AsyncRelayCommand(SearchAsync);
 
         public ICommand JoinCommand => new RelayCommand<ServerListItem>(server =>
