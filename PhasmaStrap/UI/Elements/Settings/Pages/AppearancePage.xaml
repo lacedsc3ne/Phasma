@@ -31,6 +31,12 @@
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding Languages, Mode=OneTime}" Text="{Binding SelectedLanguage, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="Controller navigation"
+            Description="Navigate this settings window with an Xbox/generic gamepad - move a virtual cursor with the left stick, click with A/B, move focus with the D-pad, and switch tabs with the bumpers.">
+            <ui:ToggleSwitch IsChecked="{Binding ControllerNavigationEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

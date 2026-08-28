@@ -34,6 +34,11 @@ namespace PhasmaStrap.UI.Elements.Settings
                 ShowAlreadyRunningSnackbar();
 
             LoadState();
+
+            // gamepad navigation only makes sense while this window is open, so it's
+            // started/stopped here rather than from App::OnStartup
+            if (App.Settings.Prop.ControllerNavigationEnabled)
+                ControllerService.Initialize();
         }
 
         public void LoadState()
@@ -104,6 +109,8 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void WpfUiWindow_Closed(object sender, EventArgs e)
         {
+            ControllerService.Shutdown();
+
             if (App.LaunchSettings.TestModeFlag.Active)
                 LaunchHandler.LaunchRoblox(LaunchMode.Player);
             else

@@ -96,5 +96,8 @@ namespace PhasmaStrap.Models.Persistable
         // user-authored per-game Discord Rich Presence templates, applied as the baseline
         // presence when not overridden by a game's own BloxstrapRPC messages
         public ObservableCollection<RPCTemplate> RPCTemplates { get; set; } = new();
+
+        // controller navigation: drive the settings window with an XInput gamepad
+        public bool ControllerNavigationEnabled { get; set; } = false;
     }
 }
