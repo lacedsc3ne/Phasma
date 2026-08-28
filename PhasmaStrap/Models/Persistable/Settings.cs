@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
+using PhasmaStrap.Networking;
+
 namespace PhasmaStrap.Models.Persistable
 {
     public class Settings
@@ -35,6 +37,12 @@ namespace PhasmaStrap.Models.Persistable
 
         // roblox studio companion plugin
         public bool StudioPluginEnabled { get; set; } = false;
+
+        // networking / local asset proxy
+        public bool NetworkingProxyEnabled { get; set; } = false;
+        public PresenceSpoofMode PresenceSpoofMode { get; set; } = PresenceSpoofMode.Off;
+        public string RobuxSpoofAmount { get; set; } = "";
+        public string UsernameSpoofName { get; set; } = "";
 
         // integration configuration
         public bool EnableActivityTracking { get; set; } = true;

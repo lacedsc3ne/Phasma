@@ -40,6 +40,10 @@ namespace PhasmaStrap
 
         public LaunchFlag ForceFlag                 { get; } = new("force");
 
+        public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
+
+        public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");
+
 #if DEBUG
         public bool BypassUpdateCheck => true;
 #else

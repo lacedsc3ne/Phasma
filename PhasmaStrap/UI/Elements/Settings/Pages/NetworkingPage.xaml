@@ -1,0 +1,49 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.NetworkingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      mc:Ignorable="d"
+      Title="NetworkingPage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <ui:InfoBar
+            IsClosable="False" IsOpen="True" Severity="Warning" Margin="0,0,0,16"
+            Title="Read before enabling"
+            Message="This intercepts your own Roblox client's traffic to a small, fixed set of Roblox API addresses (presence, currency, profile lookups only - never asset/game traffic) through a local proxy, using a certificate PhasmaStrap generates on this machine. It requires one Windows administrator prompt to redirect those addresses locally, and only works while PhasmaStrap is running - closing it while this is on will make those specific Roblox features fail to load until you reopen PhasmaStrap or turn this off." />
+
+        <controls:OptionControl Header="Enable local proxy" Description="{Binding StatusText, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Certificate" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="The proxy needs a certificate trusted by your account to avoid TLS errors when it terminates Roblox's HTTPS connections. This installs only to your Windows user account's certificate store, not the whole machine, and only affects apps that use the Windows certificate store (Chrome/Edge do, Firefox doesn't)." />
+
+        <controls:OptionControl Header="Local proxy certificate" Description="{Binding CertificateStatusText, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Content="Install" Icon="ShieldCheckmark24" Margin="0,0,8,0" Command="{Binding InstallCertificateCommand, Mode=OneTime}" />
+                <ui:Button Content="Remove" Icon="Delete24" Appearance="Secondary" Command="{Binding RemoveCertificateCommand, Mode=OneTime}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Presence" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Changes what session type Roblox's own servers think you're connecting from." />
+        <controls:OptionControl Header="Presence mode">
+            <ComboBox Width="160" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Robux balance" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Shows a different balance on your own screen only - your real balance on Roblox's servers is never touched. Leave blank to disable." />
+        <controls:OptionControl Header="Displayed balance">
+            <ui:TextBox Width="160" PlaceholderText="Real balance" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Display name" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Overrides the name shown in-game for any profile PhasmaStrap looks up while this is set. Leave blank to disable." />
+        <controls:OptionControl Header="Display name override">
+            <ui:TextBox Width="200" PlaceholderText="Real name" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+    </StackPanel>
+</ui:UiPage>
