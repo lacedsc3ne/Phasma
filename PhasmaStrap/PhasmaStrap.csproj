@@ -77,6 +77,20 @@
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
+
+    <!-- Overlays: D3D11/DXGI/DirectComposition compositor. Voidstrap pins these at 3.8.3,
+         but that version's lib/ folder only ships net8.0/net9.0/net10.0 targets - restoring
+         it against net6.0-windows resolves an EMPTY compile-time asset set (no reference
+         assembly), so it silently fails to compile the moment any Vortice type is actually
+         used, even though restore itself reports success. Verified against nuget.org's
+         nuspecs that 2.1.0 is the newest release still multi-targeting net5.0/net6.0/
+         netstandard2.0, and confirmed with a real scratch build (a project that actually
+         references Vortice.Direct3D11 types, not just restores the package) that 2.1.0
+         compiles cleanly on net6.0-windows. -->
+    <PackageReference Include="Vortice.Direct3D11" Version="2.1.0" />
+    <PackageReference Include="Vortice.DXGI" Version="2.1.0" />
+    <PackageReference Include="Vortice.DirectComposition" Version="2.1.0" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -110,7 +124,7 @@
 
   <Target Name="FixMds" BeforeTargets="CoreCompile" Condition="'@(ProjectionMetadataWinmd)'==''">
     <ItemGroup>
-      <ProjectionMetadataWinmd Include="$(UserProfile)\.nuget\packages\microsoft.windows.sdk.win32metadata\55.0.45-preview\Windows.Win32.winmd" />
+      <ProjectionMetadataWinmd Include="$(UserProfile)\.nuget\packages\microsoft.windows.sdk.win32metadata\61.0.15-preview\Windows.Win32.winmd" />
     </ItemGroup>
   </Target>
 

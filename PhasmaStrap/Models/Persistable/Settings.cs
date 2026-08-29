@@ -121,5 +121,17 @@ namespace PhasmaStrap.Models.Persistable
         public int GameChatOffsetY { get; set; } = 9;
         public string GameChatFilterPreference { get; set; } = "default";
         public long GameChatRobloxUserId { get; set; } = 0;
+
+        // overlays: GPU compositor (HUD, crosshair) drawn on top of the Roblox window
+        public bool OverlayHudEnabled { get; set; } = false;
+        public bool OverlayDiagnosticsEnabled { get; set; } = true;
+        public bool Crosshair { get; set; } = false;
+        public int CrosshairShapeIndex { get; set; } = 0;
+        public int CrosshairSize { get; set; } = 10;
+        public int CrosshairLineThickness { get; set; } = 2;
+        public int CrosshairGap { get; set; } = 4;
+        public double CrosshairOpacity { get; set; } = 1.0;
+        public string CrosshairColorHex { get; set; } = "#00FF00";
+        public string CrosshairOutlineColorHex { get; set; } = "#000000";
     }
 }
