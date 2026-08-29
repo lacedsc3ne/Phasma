@@ -1950,4 +1950,199 @@ Defaulting to {1}.</value>
   <data name="Menu.GameChat.MessageFilter.Description" xml:space="preserve">
     <value>How aggressively to hide messages flagged by the chat server's moderation scores, if it reports any.</value>
   </data>
+  <data name="Menu.RiShade.Description" xml:space="preserve">
+    <value>GPU shader post-processing (RiShade) applied over the Roblox window as a desktop-duplication overlay. Intended for screenshots, not sustained gameplay - it costs extra GPU time every frame.</value>
+  </data>
+  <data name="Menu.RiShade.Enable.Title" xml:space="preserve">
+    <value>Enable RiShade</value>
+  </data>
+  <data name="Menu.RiShade.Enable.Description" xml:space="preserve">
+    <value>Master toggle. Off by default - only takes effect the next time you join a game.</value>
+  </data>
+  <data name="Menu.RiShade.Preset.Title" xml:space="preserve">
+    <value>Preset</value>
+  </data>
+  <data name="Menu.RiShade.Preset.Description" xml:space="preserve">
+    <value>Applies a bundle of effect settings below. Pick Vanilla to reset everything off.</value>
+  </data>
+  <data name="Menu.RiShade.RenderScale.Title" xml:space="preserve">
+    <value>Render scale</value>
+  </data>
+  <data name="Menu.RiShade.RenderScale.Description" xml:space="preserve">
+    <value>Renders effects at a lower resolution and upscales, for extra headroom.</value>
+  </data>
+  <data name="Menu.RiShade.ColorGrade" xml:space="preserve">
+    <value>Color grade</value>
+  </data>
+  <data name="Menu.RiShade.Common.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="Menu.RiShade.Common.Strength" xml:space="preserve">
+    <value>Strength</value>
+  </data>
+  <data name="Menu.RiShade.Brightness" xml:space="preserve">
+    <value>Brightness</value>
+  </data>
+  <data name="Menu.RiShade.Gamma" xml:space="preserve">
+    <value>Gamma</value>
+  </data>
+  <data name="Menu.RiShade.HueShift" xml:space="preserve">
+    <value>Hue shift (degrees)</value>
+  </data>
+  <data name="Menu.RiShade.Tonemap" xml:space="preserve">
+    <value>Tonemap</value>
+  </data>
+  <data name="Menu.RiShade.TonemapOperator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="Menu.RiShade.TonemapExposure" xml:space="preserve">
+    <value>Exposure</value>
+  </data>
+  <data name="Menu.RiShade.Vignette" xml:space="preserve">
+    <value>Vignette</value>
+  </data>
+  <data name="Menu.RiShade.Sharpen" xml:space="preserve">
+    <value>Sharpen</value>
+  </data>
+  <data name="Menu.RiShade.Bloom" xml:space="preserve">
+    <value>Bloom</value>
+  </data>
+  <data name="Menu.RiShade.BloomThreshold" xml:space="preserve">
+    <value>Threshold</value>
+  </data>
+  <data name="Menu.RiShade.ChromaticAberration" xml:space="preserve">
+    <value>Chromatic aberration</value>
+  </data>
+  <data name="Menu.RiShade.FilmGrain" xml:space="preserve">
+    <value>Film grain</value>
+  </data>
+  <data name="Menu.RiShade.DetailAndGlow" xml:space="preserve">
+    <value>Detail and glow</value>
+  </data>
+  <data name="Menu.RiShade.Clarity" xml:space="preserve">
+    <value>Clarity (local contrast)</value>
+  </data>
+  <data name="Menu.RiShade.Debanding" xml:space="preserve">
+    <value>Debanding</value>
+  </data>
+  <data name="Menu.RiShade.AmbientGlow" xml:space="preserve">
+    <value>Ambient glow</value>
+  </data>
+  <data name="Menu.RiShade.CustomEffects" xml:space="preserve">
+    <value>Custom effects: drop raw HLSL pixel shaders (entry point PSCustom, scene texture on t0) into the Integrations\RiShade\Effects folder and they'll be compiled and chained in automatically.</value>
+  </data>
+  <data name="Menu.RiShade.NotPorted" xml:space="preserve">
+    <value>Not ported from Voidstrap: depth of field, screen space reflections, ambient occlusion, global illumination, fog, eye adaptation, ReShade .fx preset importing, and the in-game F8 tweak panel. Capture uses desktop duplication rather than per-window Windows.Graphics.Capture, since that needs a CsWinRT projection toolchain this project doesn't have wired up.</value>
+  </data>
+  <data name="Menu.Nvidia.Description" xml:space="preserve">
+    <value>Driver-level NVIDIA tweaks applied to a dedicated Roblox profile via NVAPI, separate from Roblox's own FastFlags or in-game settings. NVIDIA GPU required.</value>
+  </data>
+  <data name="Menu.Nvidia.Unavailable.Title" xml:space="preserve">
+    <value>NVIDIA GPU or driver not detected</value>
+  </data>
+  <data name="Menu.Nvidia.LatencyFramerate" xml:space="preserve">
+    <value>Latency &amp; framerate</value>
+  </data>
+  <data name="Menu.Nvidia.LowLatencyMode.Title" xml:space="preserve">
+    <value>Low Latency Mode</value>
+  </data>
+  <data name="Menu.Nvidia.LowLatencyMode.Description" xml:space="preserve">
+    <value>NVIDIA Reflex-style control panel setting that reduces input latency by limiting how far ahead the CPU can queue rendered frames.</value>
+  </data>
+  <data name="Menu.Nvidia.FrlLowLatencyMode.Title" xml:space="preserve">
+    <value>FRL Low Latency Mode</value>
+  </data>
+  <data name="Menu.Nvidia.FrlLowLatencyMode.Description" xml:space="preserve">
+    <value>Couples the frame rate limiter below to the driver's low-latency frame pacing path.</value>
+  </data>
+  <data name="Menu.Nvidia.FrameRateLimit.Title" xml:space="preserve">
+    <value>Frame rate limiter</value>
+  </data>
+  <data name="Menu.Nvidia.FrameRateLimit.Description" xml:space="preserve">
+    <value>Driver-level frame cap for Roblox, in FPS. 0 leaves it uncapped.</value>
+  </data>
+  <data name="Menu.Nvidia.BackgroundFrameRateLimit.Title" xml:space="preserve">
+    <value>Background frame rate limit</value>
+  </data>
+  <data name="Menu.Nvidia.BackgroundFrameRateLimit.Description" xml:space="preserve">
+    <value>Separate driver-level FPS cap applied only while Roblox is unfocused/minimized. 0 leaves it uncapped.</value>
+  </data>
+  <data name="Menu.Nvidia.ResizableBar.Title" xml:space="preserve">
+    <value>Resizable BAR</value>
+  </data>
+  <data name="Menu.Nvidia.ResizableBar.Description" xml:space="preserve">
+    <value>Lets the CPU access the entire GPU memory range at once instead of in small windows, if your system supports it.</value>
+  </data>
+  <data name="Menu.Nvidia.ImageQuality" xml:space="preserve">
+    <value>Image quality</value>
+  </data>
+  <data name="Menu.Nvidia.DlssSuperResolution.Title" xml:space="preserve">
+    <value>DLSS Super Resolution override</value>
+  </data>
+  <data name="Menu.Nvidia.DlssSuperResolution.Description" xml:space="preserve">
+    <value>Forces the driver-level DLSS Super Resolution override on, independent of Roblox's own graphics settings.</value>
+  </data>
+  <data name="Menu.Nvidia.DlssFrameGeneration.Title" xml:space="preserve">
+    <value>DLSS Frame Generation override</value>
+  </data>
+  <data name="Menu.Nvidia.DlssFrameGeneration.Description" xml:space="preserve">
+    <value>Forces the driver-level DLSS Frame Generation override on.</value>
+  </data>
+  <data name="Menu.Nvidia.Mfaa.Title" xml:space="preserve">
+    <value>MFAA</value>
+  </data>
+  <data name="Menu.Nvidia.Mfaa.Description" xml:space="preserve">
+    <value>Multi-Frame sampled Anti-Aliasing, a driver-level AA technique layered on top of whatever AA Roblox itself applies.</value>
+  </data>
+  <data name="Menu.Nvidia.Fxaa.Title" xml:space="preserve">
+    <value>FXAA</value>
+  </data>
+  <data name="Menu.Nvidia.Fxaa.Description" xml:space="preserve">
+    <value>Driver-level Fast Approximate Anti-Aliasing, applied as a post-process pass regardless of Roblox's in-game AA setting.</value>
+  </data>
+  <data name="Menu.Nvidia.GammaCorrection.Title" xml:space="preserve">
+    <value>Gamma correction</value>
+  </data>
+  <data name="Menu.Nvidia.GammaCorrection.Description" xml:space="preserve">
+    <value>Applies gamma-correct antialiasing/blending at the driver level for more accurate colors during AA.</value>
+  </data>
+  <data name="Menu.Nvidia.SilkSmoothness.Title" xml:space="preserve">
+    <value>SILK smoothness</value>
+  </data>
+  <data name="Menu.Nvidia.SilkSmoothness.Description" xml:space="preserve">
+    <value>NVIDIA's driver-level frame smoothing/pacing filter.</value>
+  </data>
+  <data name="Menu.Nvidia.TextureLodBias.Title" xml:space="preserve">
+    <value>Texture filtering LOD bias</value>
+  </data>
+  <data name="Menu.Nvidia.ApplyButton" xml:space="preserve">
+    <value>Apply to driver</value>
+  </data>
+  <data name="Menu.Nvidia.ReloadButton" xml:space="preserve">
+    <value>Reload from driver</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="Menu.Nvidia.Mode.Ultra" xml:space="preserve">
+    <value>Ultra</value>
+  </data>
+  <data name="Menu.Nvidia.LodBiasLabel.Default" xml:space="preserve">
+    <value>Default (driver controlled)</value>
+  </data>
+  <data name="Menu.Nvidia.LodBiasLabel.Override" xml:space="preserve">
+    <value>LOD bias override: {0:0.###}</value>
+  </data>
 </root>

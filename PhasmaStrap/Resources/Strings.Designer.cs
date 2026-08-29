@@ -5302,5 +5302,591 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.GameChat.MessageFilter.Description", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to GPU shader post-processing (RiShade) applied over the Roblox window as a desktop-duplication overlay. Intended for screenshots, not sustained gameplay - it costs extra GPU time every frame..
+        /// </summary>
+        public static string Menu_RiShade_Description {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable RiShade.
+        /// </summary>
+        public static string Menu_RiShade_Enable_Title {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Enable.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master toggle. Off by default - only takes effect the next time you join a game..
+        /// </summary>
+        public static string Menu_RiShade_Enable_Description {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Enable.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        public static string Menu_RiShade_Preset_Title {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Preset.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies a bundle of effect settings below. Pick Vanilla to reset everything off..
+        /// </summary>
+        public static string Menu_RiShade_Preset_Description {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Preset.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Render scale.
+        /// </summary>
+        public static string Menu_RiShade_RenderScale_Title {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.RenderScale.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Renders effects at a lower resolution and upscales, for extra headroom..
+        /// </summary>
+        public static string Menu_RiShade_RenderScale_Description {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.RenderScale.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Color grade.
+        /// </summary>
+        public static string Menu_RiShade_ColorGrade {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.ColorGrade", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        public static string Menu_RiShade_Common_Enabled {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Common.Enabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Strength.
+        /// </summary>
+        public static string Menu_RiShade_Common_Strength {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Common.Strength", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness.
+        /// </summary>
+        public static string Menu_RiShade_Brightness {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Brightness", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gamma.
+        /// </summary>
+        public static string Menu_RiShade_Gamma {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Gamma", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hue shift (degrees).
+        /// </summary>
+        public static string Menu_RiShade_HueShift {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.HueShift", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Tonemap.
+        /// </summary>
+        public static string Menu_RiShade_Tonemap {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Tonemap", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Operator.
+        /// </summary>
+        public static string Menu_RiShade_TonemapOperator {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.TonemapOperator", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exposure.
+        /// </summary>
+        public static string Menu_RiShade_TonemapExposure {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.TonemapExposure", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vignette.
+        /// </summary>
+        public static string Menu_RiShade_Vignette {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Vignette", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sharpen.
+        /// </summary>
+        public static string Menu_RiShade_Sharpen {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Sharpen", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bloom.
+        /// </summary>
+        public static string Menu_RiShade_Bloom {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Bloom", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Threshold.
+        /// </summary>
+        public static string Menu_RiShade_BloomThreshold {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.BloomThreshold", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Chromatic aberration.
+        /// </summary>
+        public static string Menu_RiShade_ChromaticAberration {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.ChromaticAberration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Film grain.
+        /// </summary>
+        public static string Menu_RiShade_FilmGrain {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.FilmGrain", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Detail and glow.
+        /// </summary>
+        public static string Menu_RiShade_DetailAndGlow {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.DetailAndGlow", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clarity (local contrast).
+        /// </summary>
+        public static string Menu_RiShade_Clarity {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Clarity", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Debanding.
+        /// </summary>
+        public static string Menu_RiShade_Debanding {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Debanding", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ambient glow.
+        /// </summary>
+        public static string Menu_RiShade_AmbientGlow {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.AmbientGlow", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom effects: drop raw HLSL pixel shaders (entry point PSCustom, scene texture on t0) into the Integrations\RiShade\Effects folder and they'll be compiled and chained in automatically..
+        /// </summary>
+        public static string Menu_RiShade_CustomEffects {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.CustomEffects", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not ported from Voidstrap: depth of field, screen space reflections, ambient occlusion, global illumination, fog, eye adaptation, ReShade .fx preset importing, and the in-game F8 tweak panel. Capture uses desktop duplication rather than per-window Windows.Graphics.Capture, since that needs a CsWinRT projection toolchain this project doesn't have wired up..
+        /// </summary>
+        public static string Menu_RiShade_NotPorted {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.NotPorted", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Driver-level NVIDIA tweaks applied to a dedicated Roblox profile via NVAPI, separate from Roblox's own FastFlags or in-game settings. NVIDIA GPU required..
+        /// </summary>
+        public static string Menu_Nvidia_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA GPU or driver not detected.
+        /// </summary>
+        public static string Menu_Nvidia_Unavailable_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Unavailable.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Latency &amp; framerate.
+        /// </summary>
+        public static string Menu_Nvidia_LatencyFramerate {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LatencyFramerate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Low Latency Mode.
+        /// </summary>
+        public static string Menu_Nvidia_LowLatencyMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LowLatencyMode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA Reflex-style control panel setting that reduces input latency by limiting how far ahead the CPU can queue rendered frames..
+        /// </summary>
+        public static string Menu_Nvidia_LowLatencyMode_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LowLatencyMode.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FRL Low Latency Mode.
+        /// </summary>
+        public static string Menu_Nvidia_FrlLowLatencyMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.FrlLowLatencyMode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Couples the frame rate limiter below to the driver's low-latency frame pacing path..
+        /// </summary>
+        public static string Menu_Nvidia_FrlLowLatencyMode_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.FrlLowLatencyMode.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Frame rate limiter.
+        /// </summary>
+        public static string Menu_Nvidia_FrameRateLimit_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.FrameRateLimit.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Driver-level frame cap for Roblox, in FPS. 0 leaves it uncapped..
+        /// </summary>
+        public static string Menu_Nvidia_FrameRateLimit_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.FrameRateLimit.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Background frame rate limit.
+        /// </summary>
+        public static string Menu_Nvidia_BackgroundFrameRateLimit_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BackgroundFrameRateLimit.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Separate driver-level FPS cap applied only while Roblox is unfocused/minimized. 0 leaves it uncapped..
+        /// </summary>
+        public static string Menu_Nvidia_BackgroundFrameRateLimit_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BackgroundFrameRateLimit.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Resizable BAR.
+        /// </summary>
+        public static string Menu_Nvidia_ResizableBar_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ResizableBar.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lets the CPU access the entire GPU memory range at once instead of in small windows, if your system supports it..
+        /// </summary>
+        public static string Menu_Nvidia_ResizableBar_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ResizableBar.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Image quality.
+        /// </summary>
+        public static string Menu_Nvidia_ImageQuality {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ImageQuality", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to DLSS Super Resolution override.
+        /// </summary>
+        public static string Menu_Nvidia_DlssSuperResolution_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.DlssSuperResolution.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Forces the driver-level DLSS Super Resolution override on, independent of Roblox's own graphics settings..
+        /// </summary>
+        public static string Menu_Nvidia_DlssSuperResolution_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.DlssSuperResolution.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to DLSS Frame Generation override.
+        /// </summary>
+        public static string Menu_Nvidia_DlssFrameGeneration_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.DlssFrameGeneration.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Forces the driver-level DLSS Frame Generation override on..
+        /// </summary>
+        public static string Menu_Nvidia_DlssFrameGeneration_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.DlssFrameGeneration.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to MFAA.
+        /// </summary>
+        public static string Menu_Nvidia_Mfaa_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mfaa.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Multi-Frame sampled Anti-Aliasing, a driver-level AA technique layered on top of whatever AA Roblox itself applies..
+        /// </summary>
+        public static string Menu_Nvidia_Mfaa_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mfaa.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FXAA.
+        /// </summary>
+        public static string Menu_Nvidia_Fxaa_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Fxaa.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Driver-level Fast Approximate Anti-Aliasing, applied as a post-process pass regardless of Roblox's in-game AA setting..
+        /// </summary>
+        public static string Menu_Nvidia_Fxaa_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Fxaa.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gamma correction.
+        /// </summary>
+        public static string Menu_Nvidia_GammaCorrection_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.GammaCorrection.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies gamma-correct antialiasing/blending at the driver level for more accurate colors during AA..
+        /// </summary>
+        public static string Menu_Nvidia_GammaCorrection_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.GammaCorrection.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to SILK smoothness.
+        /// </summary>
+        public static string Menu_Nvidia_SilkSmoothness_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.SilkSmoothness.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA's driver-level frame smoothing/pacing filter..
+        /// </summary>
+        public static string Menu_Nvidia_SilkSmoothness_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.SilkSmoothness.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Texture filtering LOD bias.
+        /// </summary>
+        public static string Menu_Nvidia_TextureLodBias_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.TextureLodBias.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Apply to driver.
+        /// </summary>
+        public static string Menu_Nvidia_ApplyButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ApplyButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reload from driver.
+        /// </summary>
+        public static string Menu_Nvidia_ReloadButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ReloadButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_Off {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.Off", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to On.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_On {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.On", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_Low {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.Low", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_Medium {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.Medium", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_High {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.High", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ultra.
+        /// </summary>
+        public static string Menu_Nvidia_Mode_Ultra {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Mode.Ultra", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Default (driver controlled).
+        /// </summary>
+        public static string Menu_Nvidia_LodBiasLabel_Default {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LodBiasLabel.Default", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to LOD bias override: {0:0.###}.
+        /// </summary>
+        public static string Menu_Nvidia_LodBiasLabel_Override {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LodBiasLabel.Override", resourceCulture);
+            }
+        }
     }
 }

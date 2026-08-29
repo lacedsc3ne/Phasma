@@ -5,69 +5,70 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="NvidiaPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Driver-level NVIDIA tweaks applied to a dedicated Roblox profile via NVAPI, separate from Roblox's own FastFlags or in-game settings. NVIDIA GPU required." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <Border Visibility="{Binding UnavailableVisibility}" Margin="0,16,0,0" Padding="14" CornerRadius="6" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <StackPanel>
-                <TextBlock Text="NVIDIA GPU or driver not detected" FontSize="16" FontWeight="Medium" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_Unavailable_Title}" FontSize="16" FontWeight="Medium" />
                 <TextBlock Text="{Binding UnavailableReason}" TextWrapping="Wrap" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
             </StackPanel>
         </Border>
 
         <StackPanel Visibility="{Binding AvailableVisibility}">
-            <TextBlock Text="Latency &amp; framerate" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_LatencyFramerate}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-            <controls:OptionControl Header="Low Latency Mode" Description="NVIDIA Reflex-style control panel setting that reduces input latency by limiting how far ahead the CPU can queue rendered frames.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Description}">
                 <ComboBox Width="140" ItemsSource="{Binding LowLatencyModes, Mode=OneTime}" SelectedItem="{Binding LowLatencyMode, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="FRL Low Latency Mode" Description="Couples the frame rate limiter below to the driver's low-latency frame pacing path.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Description}">
                 <ComboBox Width="140" ItemsSource="{Binding FrlLowLatencyModes, Mode=OneTime}" SelectedItem="{Binding FrlLowLatencyMode, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="Frame rate limiter" Description="Driver-level frame cap for Roblox, in FPS. 0 leaves it uncapped.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Description}">
                 <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding FrameRateLimit, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="Background frame rate limit" Description="Separate driver-level FPS cap applied only while Roblox is unfocused/minimized. 0 leaves it uncapped.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Description}">
                 <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="Resizable BAR" Description="Lets the CPU access the entire GPU memory range at once instead of in small windows, if your system supports it.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding ResizableBar, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <TextBlock Text="Image quality" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_ImageQuality}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-            <controls:OptionControl Header="DLSS Super Resolution override" Description="Forces the driver-level DLSS Super Resolution override on, independent of Roblox's own graphics settings.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding DlssSuperResolution, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="DLSS Frame Generation override" Description="Forces the driver-level DLSS Frame Generation override on.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding DlssFrameGeneration, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="MFAA" Description="Multi-Frame sampled Anti-Aliasing, a driver-level AA technique layered on top of whatever AA Roblox itself applies.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding Mfaa, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="FXAA" Description="Driver-level Fast Approximate Anti-Aliasing, applied as a post-process pass regardless of Roblox's in-game AA setting.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding Fxaa, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="Gamma correction" Description="Applies gamma-correct antialiasing/blending at the driver level for more accurate colors during AA.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding GammaCorrection, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="SILK smoothness" Description="NVIDIA's driver-level frame smoothing/pacing filter.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Description}">
                 <ComboBox Width="140" ItemsSource="{Binding SilkSmoothnessModes, Mode=OneTime}" SelectedItem="{Binding SilkSmoothness, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="Texture filtering LOD bias" Description="{Binding TextureLodBiasLabel}">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_TextureLodBias_Title}" Description="{Binding TextureLodBiasLabel}">
                 <StackPanel Orientation="Horizontal">
                     <Slider Width="200" Minimum="-32" Maximum="120" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding TextureLodBias, Mode=TwoWay}" />
                     <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TextureLodBias, Mode=OneWay}" />
@@ -75,8 +76,8 @@
             </controls:OptionControl>
 
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                <ui:Button Content="Apply to driver" Appearance="Primary" Click="Apply_Click" x:Name="ApplyButton" />
-                <ui:Button Content="Reload from driver" Margin="8,0,0,0" Click="Reload_Click" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ApplyButton}" Appearance="Primary" Click="Apply_Click" x:Name="ApplyButton" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ReloadButton}" Margin="8,0,0,0" Click="Reload_Click" />
             </StackPanel>
 
             <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
