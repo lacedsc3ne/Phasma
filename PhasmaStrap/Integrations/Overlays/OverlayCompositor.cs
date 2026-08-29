@@ -20,15 +20,16 @@ namespace PhasmaStrap.Integrations.Overlays
     /// crosshair) on top of the live Roblox window, using a click-through, topmost,
     /// DirectComposition-backed window plus a D3D11 device/DXGI swapchain-for-composition.
     ///
-    /// This is a heavily trimmed port of Voidstrap's OverlayCompositor.cs (~3.5k lines).
-    /// That file interleaved core compositor plumbing (window/device/swapchain/DirectComposition
-    /// setup, capture, resize, present, cleanup) with three additional subsystems that are
-    /// out of scope for this port and don't exist in PhasmaStrap yet: RiShade (a
+    /// This is a heavily trimmed port of Voidstrap's OverlayCompositor.cs (~3.5k lines), which
+    /// interleaved core compositor plumbing (window/device/swapchain/DirectComposition setup,
+    /// capture, resize, present, cleanup) with three additional subsystems: RiShade (a
     /// post-processing shader pipeline), Anti Aliasing (a second shader pass), and Frame
-    /// Generation (NVIDIA-hybrid frame interpolation with elaborate presentation pacing,
-    /// quality auto-tuning, split-screen comparison, and its own status HUD). All of that
-    /// was cut - see the TODO markers below for exactly where a future RiShade/AntiAliasing/
-    /// FrameGeneration port would hook back in.
+    /// Generation (frame interpolation). Those three now run as stages inside RenderFrame below
+    /// (RiShadeStage, AntiAliasingStage, FrameGenPipeline), lazily created and sized on first use
+    /// and chained through two ping-pong buffers - none of them own a device, window, or capture
+    /// of their own; this compositor is the only place any of that exists. Frame Generation's
+    /// presentation pacing/quality-auto-tuning/split-screen-compare and its own status HUD were
+    /// not ported (see FrameGenManager.cs's doc comments for the reasoning).
     ///
     /// Additional simplifications made for this port (documented in the porting agent's
     /// final report, not just here):
@@ -106,6 +107,24 @@ namespace PhasmaStrap.Integrations.Overlays
         private int _rawWidth, _rawHeight;
         private Vector4 _dims;
 
+        // Ping-pong chain buffers RiShade/AntiAliasing/FrameGen render through in sequence -
+        // see the "RiShade/FrameGen/AntiAliasing integration point" in RenderFrame below.
+        private ID3D11Texture2D? _chainTexA;
+        private ID3D11ShaderResourceView? _chainSrvA;
+        private ID3D11RenderTargetView? _chainRtvA;
+        private ID3D11Texture2D? _chainTexB;
+        private ID3D11ShaderResourceView? _chainSrvB;
+        private ID3D11RenderTargetView? _chainRtvB;
+
+        private RiShade.RiShadeStage? _riShadeStage;
+        private AntiAliasing.AntiAliasingStage? _antiAliasingStage;
+        private FrameGeneration.FrameGenPipeline? _frameGenPipeline;
+        private readonly ID3D11Texture2D?[] _fgColorTex = new ID3D11Texture2D?[2];
+        private readonly ID3D11ShaderResourceView?[] _fgColorSrv = new ID3D11ShaderResourceView?[2];
+        private int _fgCurSet;
+        private int _fgCapturedFrames;
+        private double _fgPrevCaptureMs, _fgCurrCaptureMs, _fgIntervalMs;
+
         private int _width;
         private int _height;
         private int _rectLeft;
@@ -126,12 +145,9 @@ namespace PhasmaStrap.Integrations.Overlays
 
         private IDisposable? _trackerLease;
 
-        // TODO: RiShade/FrameGen/AntiAliasing integration point.
-        // Voidstrap ran three additional GPU passes here (RiShadeOverlay, AntiAliasingOverlay,
-        // FrameGenPipeline) between capture and present, each attached lazily and torn down on
-        // error. This compositor only ever draws the raw captured frame through a pass-through
-        // blit (see RenderFrame/DrawBlit below); a future port of those subsystems would insert
-        // their render stages there, in front of the final DrawHud/DrawCrosshair/Present calls.
+        // RiShade (RiShadeStage), Anti-Aliasing (AntiAliasingStage), and Frame Generation
+        // (FrameGenPipeline) each run as a stage here, lazily created and sized on first use -
+        // see RenderFrame below for how they're chained between capture and the final blit.
 
         public void Run(CancellationToken token)
         {
@@ -477,6 +493,26 @@ namespace PhasmaStrap.Integrations.Overlays
             _rawWidth = _width;
             _rawHeight = _height;
             _dims = new Vector4(_width, _height, 1f / Math.Max(_width, 1), 1f / Math.Max(_height, 1));
+
+            _chainTexA = CreateTex();
+            _chainSrvA = _device!.CreateShaderResourceView(_chainTexA);
+            _chainRtvA = _device!.CreateRenderTargetView(_chainTexA);
+            _chainTexB = CreateTex();
+            _chainSrvB = _device!.CreateShaderResourceView(_chainTexB);
+            _chainRtvB = _device!.CreateRenderTargetView(_chainTexB);
+
+            for (int i = 0; i < 2; i++)
+            {
+                _fgColorSrv[i]?.Dispose();
+                _fgColorTex[i]?.Dispose();
+                _fgColorTex[i] = CreateTex();
+                _fgColorSrv[i] = _device!.CreateShaderResourceView(_fgColorTex[i]);
+            }
+            _fgCapturedFrames = 0;
+
+            _riShadeStage?.EnsureSize(_width, _height);
+            _antiAliasingStage?.EnsureSize(_width, _height);
+            _frameGenPipeline?.EnsureSize(_width, _height);
         }
 
         private ID3D11Texture2D CreateTex()
@@ -503,6 +539,27 @@ namespace PhasmaStrap.Integrations.Overlays
             _rawRtv = null;
             _rawSrv = null;
             _rawTex = null;
+
+            _chainRtvA?.Dispose();
+            _chainSrvA?.Dispose();
+            _chainTexA?.Dispose();
+            _chainRtvA = null;
+            _chainSrvA = null;
+            _chainTexA = null;
+            _chainRtvB?.Dispose();
+            _chainSrvB?.Dispose();
+            _chainTexB?.Dispose();
+            _chainRtvB = null;
+            _chainSrvB = null;
+            _chainTexB = null;
+
+            for (int i = 0; i < 2; i++)
+            {
+                _fgColorSrv[i]?.Dispose();
+                _fgColorTex[i]?.Dispose();
+                _fgColorSrv[i] = null;
+                _fgColorTex[i] = null;
+            }
         }
 
         private bool CreateDuplicationForRect(int left, int top)
@@ -842,12 +899,25 @@ namespace PhasmaStrap.Integrations.Overlays
         private void RenderFrame(CancellationToken token)
         {
             bool fresh = CaptureFrame();
-            if (!fresh)
+            if (fresh)
+                _rawValid = true;
+
+            bool frameGenOn = FrameGeneration.FrameGenSettings.ModeIndex > 0;
+
+            if (!_rawValid)
             {
+                // nothing captured yet at all - nothing to show
                 token.WaitHandle.WaitOne(4);
                 return;
             }
-            _rawValid = true;
+
+            if (!fresh && !frameGenOn)
+            {
+                // nothing changed since last frame and we're not interpolating between
+                // captures, so there's no point redrawing/presenting again
+                token.WaitHandle.WaitOne(4);
+                return;
+            }
 
             if (!_firstCaptureLogged)
             {
@@ -855,12 +925,36 @@ namespace PhasmaStrap.Integrations.Overlays
                 App.Logger.WriteLine(LOG_IDENT, $"First frame captured at {_width}x{_height} via desktop duplication, compositor is live");
             }
 
-            // TODO: RiShade/FrameGen/AntiAliasing integration point.
-            // A future port would render RiShade/AntiAliasing into an intermediate stage
-            // texture here and hand its SRV to DrawBlit below instead of _rawSrv, then
-            // optionally branch into a Frame Generation present path instead of the single
-            // pass-through present that follows.
-            DrawBlit(_psPass!, _backBufferRtv!, _rawSrv!);
+            // RiShade (RiShadeStage), Anti-Aliasing (AntiAliasingStage), and Frame Generation
+            // (FrameGenPipeline) each run as a stage here, lazily created and sized on first
+            // use, chained through the two ping-pong _chain buffers: whichever stage runs last
+            // hands its output SRV to the final pass-through blit onto the back buffer.
+            ID3D11ShaderResourceView finalSrv = _rawSrv!;
+            bool nextIsA = true;
+
+            if (frameGenOn)
+            {
+                var fgOut = RenderFrameGenStage(fresh);
+                if (fgOut != null)
+                {
+                    finalSrv = fgOut;
+                    nextIsA = false;
+                }
+            }
+
+            if (App.Settings.Prop.RiShadeEnabled)
+            {
+                finalSrv = RenderRiShadeStage(finalSrv, nextIsA);
+                nextIsA = !nextIsA;
+            }
+
+            if (App.Settings.Prop.AntiAliasingEnabled && AntiAliasing.AntiAliasingSettings.MethodIndex > 0)
+            {
+                finalSrv = RenderAntiAliasingStage(finalSrv, nextIsA);
+                nextIsA = !nextIsA;
+            }
+
+            DrawBlit(_psPass!, _backBufferRtv!, finalSrv);
 
             DrawHud();
             DrawCrosshair();
@@ -868,6 +962,89 @@ namespace PhasmaStrap.Integrations.Overlays
             if (!Present())
                 return;
             _framesPresented++;
+        }
+
+        private ID3D11ShaderResourceView? RenderFrameGenStage(bool fresh)
+        {
+            if (_frameGenPipeline == null)
+            {
+                _frameGenPipeline = new FrameGeneration.FrameGenPipeline();
+                _frameGenPipeline.Attach(_device!, _context!);
+                _frameGenPipeline.EnsureSize(_width, _height);
+                _fgCapturedFrames = 0;
+            }
+            _frameGenPipeline.SetQuality(FrameGeneration.FrameGenSettings.QualityIndex);
+            if (_frameGenPipeline.EnsureSize(_width, _height))
+                _fgCapturedFrames = 0;
+
+            if (fresh)
+            {
+                int nextSet = _fgCurSet ^ 1;
+                _context!.CopyResource(_fgColorTex[nextSet]!, _rawTex!);
+                _frameGenPipeline.BuildPyramid(nextSet, _fgColorSrv[nextSet]!);
+
+                double now = _clock.Elapsed.TotalMilliseconds;
+                if (_fgCapturedFrames > 0)
+                {
+                    _frameGenPipeline.ComputeFlow(_fgCurSet, nextSet, 12f);
+                    _fgIntervalMs = Math.Max(1.0, now - _fgCurrCaptureMs);
+                }
+                _fgPrevCaptureMs = _fgCurrCaptureMs;
+                _fgCurrCaptureMs = now;
+                _fgCurSet = nextSet;
+                _fgCapturedFrames++;
+            }
+
+            if (_chainRtvA == null || _chainSrvA == null)
+                return null;
+
+            if (_fgCapturedFrames >= 2 && _fgIntervalMs > 0.5)
+            {
+                double now = _clock.Elapsed.TotalMilliseconds;
+                float t = (float)Math.Clamp((now - _fgCurrCaptureMs) / _fgIntervalMs, 0.0, 1.0);
+                int prevSet = _fgCurSet ^ 1;
+                _frameGenPipeline.Warp(_fgColorSrv[prevSet]!, _fgColorSrv[_fgCurSet]!, t, _chainRtvA);
+            }
+            else if (_fgCapturedFrames >= 1)
+            {
+                _frameGenPipeline.Blit(_fgColorSrv[_fgCurSet]!, _chainRtvA);
+            }
+            else
+            {
+                return null;
+            }
+
+            return _chainSrvA;
+        }
+
+        private ID3D11ShaderResourceView RenderRiShadeStage(ID3D11ShaderResourceView input, bool writeToA)
+        {
+            if (_riShadeStage == null)
+            {
+                _riShadeStage = new RiShade.RiShadeStage();
+                _riShadeStage.CreatePipeline(_device!, _context!, _width, _height);
+            }
+            _riShadeStage.EnsureSize(_width, _height);
+
+            var targetRtv = writeToA ? _chainRtvA! : _chainRtvB!;
+            var targetSrv = writeToA ? _chainSrvA! : _chainSrvB!;
+            _riShadeStage.Render(input, targetRtv);
+            return targetSrv;
+        }
+
+        private ID3D11ShaderResourceView RenderAntiAliasingStage(ID3D11ShaderResourceView input, bool writeToA)
+        {
+            if (_antiAliasingStage == null)
+            {
+                _antiAliasingStage = new AntiAliasing.AntiAliasingStage();
+                _antiAliasingStage.CreatePipeline(_device!, _context!, _width, _height);
+            }
+            _antiAliasingStage.EnsureSize(_width, _height);
+
+            var targetRtv = writeToA ? _chainRtvA! : _chainRtvB!;
+            var targetSrv = writeToA ? _chainSrvA! : _chainSrvB!;
+            _antiAliasingStage.Render(AntiAliasing.AntiAliasingSettings.MethodIndex, input, targetRtv);
+            return targetSrv;
         }
 
         private void UpdateHudIfDue()
@@ -1010,6 +1187,12 @@ namespace PhasmaStrap.Integrations.Overlays
             {
                 _duplication?.Dispose();
                 ReleaseSizedResources();
+                _riShadeStage?.Dispose();
+                _riShadeStage = null;
+                _antiAliasingStage?.Dispose();
+                _antiAliasingStage = null;
+                _frameGenPipeline?.Dispose();
+                _frameGenPipeline = null;
                 _hud.Dispose();
                 _crosshair.Dispose();
                 _hudBlend?.Dispose();
