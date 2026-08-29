@@ -1,0 +1,120 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagProfilesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="800"
+      Title="FastFlagProfilesPage"
+      Scrollable="True"
+      Loaded="Page_Loaded">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_Title}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_Description}" />
+
+        <!-- Profiles -->
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_ProfilesHeader}" FontSize="14" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_ProfilesDescription}" />
+
+        <WrapPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <ui:TextBox x:Name="NewProfileNameTextBox" Width="220" Margin="0,0,8,8" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagProfiles_NewProfilePlaceholder}" TextChanged="NewProfileNameTextBox_TextChanged" />
+            <ui:Button Content="{x:Static resources:Strings.Menu_FastFlagProfiles_AddProfile}" Icon="Add28" Click="AddProfileButton_Click" Margin="0,0,8,8" />
+            <ui:Button x:Name="RenameProfileButton" Content="{x:Static resources:Strings.Menu_FastFlagProfiles_RenameProfile}" Click="RenameProfileButton_Click" Margin="0,0,8,8" IsEnabled="False" />
+            <ui:Button x:Name="DeleteProfileButton" Content="{x:Static resources:Strings.Menu_FastFlagProfiles_DeleteProfile}" Icon="Delete48" Appearance="Danger" Click="DeleteProfileButton_Click" Margin="0,0,8,8" IsEnabled="False" />
+        </WrapPanel>
+
+        <ListBox x:Name="ProfilesListBox" MaxHeight="140" Margin="0,4,0,0" SelectionChanged="ProfilesListBox_SelectionChanged" />
+
+        <!-- Flag overrides for selected profile -->
+        <TextBlock x:Name="EditingProfileTextBlock" FontSize="14" FontWeight="Medium" Margin="0,16,0,0" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_NoProfileSelectedHint}" />
+
+        <WrapPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <ui:Button x:Name="AddFlagButton" Content="{x:Static resources:Strings.Menu_FastFlagProfiles_AddFlag}" Icon="Add28" Click="AddFlagButton_Click" Margin="0,0,8,8" IsEnabled="False" />
+            <ui:Button x:Name="DeleteFlagsButton" Content="{x:Static resources:Strings.Menu_FastFlagProfiles_DeleteSelectedFlags}" Icon="Delete48" Appearance="Danger" Click="DeleteFlagsButton_Click" Margin="0,0,8,8" IsEnabled="False" />
+        </WrapPanel>
+
+        <DataGrid x:Name="FlagsDataGrid" Height="220" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsEnabled="False" CellEditEnding="FlagsDataGrid_CellEditEnding" SelectionChanged="FlagsDataGrid_SelectionChanged">
+            <DataGrid.Style>
+                <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                </Style>
+            </DataGrid.Style>
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Padding" Value="8,0,8,0" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border Background="{TemplateBinding Background}" Padding="6,0,6,0">
+                                    <ContentPresenter VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.CellStyle>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Place assignments -->
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_PlacesHeader}" FontSize="14" FontWeight="Medium" Margin="0,24,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_PlacesDescription}" />
+
+        <WrapPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <ui:TextBox x:Name="PlaceIdTextBox" Width="160" Margin="0,0,8,8" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagProfiles_PlaceIdPlaceholder}" />
+            <ComboBox x:Name="AssignmentProfileComboBox" Width="180" Margin="0,0,8,8" VerticalAlignment="Center" />
+            <ui:Button Content="{x:Static resources:Strings.Menu_FastFlagProfiles_AddAssignment}" Click="AddAssignmentButton_Click" Margin="0,0,8,8" />
+        </WrapPanel>
+
+        <ItemsControl x:Name="AssignmentsItemsControl" Margin="0,4,0,0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Click="RemoveAssignmentButton_Click" Tag="{Binding}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>

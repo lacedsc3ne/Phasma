@@ -2337,4 +2337,67 @@ Defaulting to {1}.</value>
   <data name="Menu.RiShade.ImportPreset.Failed" xml:space="preserve">
     <value>Failed to import RiShade preset: {0}</value>
   </data>
+  <data name="Menu.FastFlagProfiles.Title" xml:space="preserve">
+    <value>FastFlag Profiles</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.Description" xml:space="preserve">
+    <value>Create named bundles of FastFlag overrides and assign them to specific games. A place's assigned profile is merged in automatically whenever you launch it.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ProfilesHeader" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ProfilesDescription" xml:space="preserve">
+    <value>Create, rename, and delete FastFlag profiles. Select a profile below to edit its overrides.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.NewProfilePlaceholder" xml:space="preserve">
+    <value>New profile name</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.AddProfile" xml:space="preserve">
+    <value>Add profile</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.RenameProfile" xml:space="preserve">
+    <value>Rename selected</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.DeleteProfile" xml:space="preserve">
+    <value>Delete selected</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ProfileNameEmpty" xml:space="preserve">
+    <value>Enter a profile name.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ProfileNameDuplicate" xml:space="preserve">
+    <value>A profile with this name already exists.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.DeleteProfileConfirmMessage" xml:space="preserve">
+    <value>Delete profile '{0}'? Any place assignments using it will also be removed.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.NoProfileSelectedHint" xml:space="preserve">
+    <value>Select or create a profile above to edit its FastFlag overrides.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.EditingProfile" xml:space="preserve">
+    <value>Editing profile: {0}</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.AddFlag" xml:space="preserve">
+    <value>Add flag</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.DeleteSelectedFlags" xml:space="preserve">
+    <value>Delete selected</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.PlacesHeader" xml:space="preserve">
+    <value>Place assignments</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.PlacesDescription" xml:space="preserve">
+    <value>Assign a profile to a place ID. Its overrides are merged in automatically whenever that place is launched, if Engine Settings is enabled.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.PlaceIdPlaceholder" xml:space="preserve">
+    <value>Place ID</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.AddAssignment" xml:space="preserve">
+    <value>Assign</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.InvalidPlaceId" xml:space="preserve">
+    <value>Enter a valid place ID.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.NoProfilesAvailable" xml:space="preserve">
+    <value>Create a profile above before assigning it to a place.</value>
+  </data>
 </root>
