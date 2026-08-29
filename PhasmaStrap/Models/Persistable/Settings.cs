@@ -162,5 +162,13 @@ namespace PhasmaStrap.Models.Persistable
 
         // place IDs the matchmaker should never suggest as a candidate, regardless of MatchmakerAutoCandidates
         public List<string> MatchmakerExcludedPlaces { get; set; } = new();
+
+        // per-game FastFlag profiles: a named bundle of flag overrides (real FFlag name -> value, same shape as
+        // FastFlagManager's own Prop) merged on top of the global ClientAppSettings.json at launch, only for
+        // places listed in FastFlagPlaceProfiles. See Bootstrapper.TryApplyFastFlagProfileAsync.
+        public Dictionary<string, Dictionary<string, object>> FastFlagProfiles { get; set; } = new();
+
+        // place ID (string) -> profile name (key into FastFlagProfiles)
+        public Dictionary<string, string> FastFlagPlaceProfiles { get; set; } = new();
     }
 }
