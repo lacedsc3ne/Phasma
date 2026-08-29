@@ -78,6 +78,8 @@
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                 <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ApplyButton}" Appearance="Primary" Click="Apply_Click" x:Name="ApplyButton" />
                 <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ReloadButton}" Margin="8,0,0,0" Click="Reload_Click" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ExportNipButton}" Margin="8,0,0,0" Click="ExportNip_Click" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_CopySettingsButton}" Margin="8,0,0,0" Click="CopySettings_Click" />
             </StackPanel>
 
             <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

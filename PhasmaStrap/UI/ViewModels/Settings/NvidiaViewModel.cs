@@ -188,9 +188,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             TextureLodBias = live.TryGetValue(IdTextureLodBias, out uint bias) ? unchecked((int)bias) : 0;
         }
 
-        // Runs on a background thread; the caller (NvidiaPage) is responsible for
-        // marshalling any UI feedback back to the dispatcher thread.
-        public NvidiaApplyResult ApplyToDriver()
+        private Dictionary<uint, uint> BuildSettingsDictionary()
         {
             Dictionary<uint, uint> settings = new Dictionary<uint, uint>
             {
@@ -219,9 +217,63 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 settings[IdTransparencySupersampling] = 8u;
             }
 
+            return settings;
+        }
+
+        // Runs on a background thread; the caller (NvidiaPage) is responsible for
+        // marshalling any UI feedback back to the dispatcher thread.
+        public NvidiaApplyResult ApplyToDriver()
+        {
+            Dictionary<uint, uint> settings = BuildSettingsDictionary();
             NvidiaApplyResult result = NvidiaProfileInspector.Apply(settings);
             StatusMessage = result.Message;
             return result;
+        }
+
+        // Friendly names for the tracked setting IDs, used only when exporting/copying the
+        // currently-configured values as a standalone .nip document (NvidiaProfileManager) -
+        // the driver itself is never asked for these, ReadEnum/ReadInt/ReadBool above only
+        // ever deal in raw IDs and values.
+        private static readonly Dictionary<uint, string> SettingNames = new Dictionary<uint, string>
+        {
+            [IdLowLatencyMode] = "Low Latency Mode",
+            [IdFrlLowLatencyMode] = "FRL Low Latency Mode",
+            [IdFrameRateLimit] = "Frame Rate Limiter",
+            [IdBackgroundFrameRateLimit] = "Background Frame Rate Limiter",
+            [IdResizableBar] = "Resizable BAR",
+            [IdDlssSuperResolution] = "DLSS Super Resolution",
+            [IdDlssFrameGeneration] = "DLSS Frame Generation",
+            [IdMfaa] = "MFAA",
+            [IdFxaaEnable] = "FXAA Enable",
+            [IdAntialiasingMode] = "Antialiasing Mode",
+            [IdGammaCorrection] = "Gamma Correction (AA)",
+            [IdLineGamma] = "Gamma Correction (Line)",
+            [IdSilkSmoothness] = "SILK Smoothness",
+            [IdTextureLodBias] = "Texture Filtering LOD Bias",
+            [IdTextureFilteringQuality] = "Texture Filtering Quality",
+            [IdAnisotropicFilteringMode] = "Anisotropic Filtering Mode",
+            [IdTransparencySupersampling] = "Transparency Supersampling",
+        };
+
+        // Snapshot of the currently-configured (not necessarily yet-applied) settings, for
+        // exporting to a .nip file or copying to the clipboard via NvidiaPage.
+        public List<NvidiaSetting> BuildSettingsSnapshot()
+        {
+            Dictionary<uint, uint> settings = BuildSettingsDictionary();
+            List<NvidiaSetting> results = new List<NvidiaSetting>();
+
+            foreach (KeyValuePair<uint, uint> pair in settings)
+            {
+                results.Add(new NvidiaSetting
+                {
+                    Id = pair.Key,
+                    Name = SettingNames.TryGetValue(pair.Key, out string? name) ? name : "Setting " + pair.Key,
+                    Value = pair.Value,
+                    Type = NvSettingType.Dword,
+                });
+            }
+
+            return results;
         }
 
         public void ReloadFromDriver()

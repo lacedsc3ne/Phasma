@@ -1,6 +1,9 @@
 using System.Windows;
 
+using Microsoft.Win32;
+
 using PhasmaStrap.Integrations.Nvidia;
+using PhasmaStrap.UI.Elements.Dialogs;
 using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
@@ -59,6 +62,64 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             {
                 App.Logger.WriteException("NvidiaPage::Reload_Click", ex);
                 Frontend.ShowMessageBox("Failed to read NVIDIA driver settings:\n" + ex.Message, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExportNip_Click(object sender, RoutedEventArgs e)
+        {
+            List<NvidiaSetting> snapshot = _viewModel.BuildSettingsSnapshot();
+
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Filter = $"{Strings.FileTypes_NIPFiles}|*.nip",
+                FileName = "PhasmaStrap.nip",
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                NvidiaProfileManager.SaveToNip(dialog.FileName, snapshot);
+                Frontend.ShowMessageBox(Strings.Menu_Nvidia_NipExported, MessageBoxImage.Asterisk);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("NvidiaPage::ExportNip_Click", ex);
+                Frontend.ShowMessageBox(string.Format(Strings.Menu_Nvidia_NipExportFailed, ex.Message), MessageBoxImage.Error);
+            }
+        }
+
+        private void CopySettings_Click(object sender, RoutedEventArgs e)
+        {
+            List<NvidiaSetting> snapshot = _viewModel.BuildSettingsSnapshot();
+
+            CopyNvidiaSettingsDialog dialog = new CopyNvidiaSettingsDialog(snapshot.Count)
+            {
+                Owner = Window.GetWindow(this),
+            };
+
+            dialog.ShowDialog();
+
+            if (dialog.Result != MessageBoxResult.OK)
+                return;
+
+            string payload = dialog.SelectedFormat switch
+            {
+                CopyNvidiaSettingsFormat.SettingRows => string.Join(Environment.NewLine, snapshot.Select(setting => $"{setting.Name} (0x{setting.Id:X8}) = {setting.Value}")),
+                CopyNvidiaSettingsFormat.Base64Nip => Convert.ToBase64String(Encoding.Unicode.GetBytes(NvidiaProfileManager.BuildNipText(snapshot))),
+                _ => NvidiaProfileManager.BuildNipText(snapshot),
+            };
+
+            try
+            {
+                Clipboard.SetDataObject(payload);
+                Frontend.ShowMessageBox(Strings.Menu_Nvidia_SettingsCopiedToClipboard, MessageBoxImage.Asterisk);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("NvidiaPage::CopySettings_Click", ex);
+                Frontend.ShowMessageBox("Could not access the clipboard: " + ex.Message, MessageBoxImage.Error);
             }
         }
 
