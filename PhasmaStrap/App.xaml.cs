@@ -285,6 +285,24 @@ namespace PhasmaStrap
 
             LaunchSettings = new LaunchSettings(e.Args);
 
+            // internal helper mode: relaunched (elevated) by Integrations.ClassicHostRedirect to apply/remove
+            // the classic client hosts file redirect. Do the one thing and exit immediately - none of the
+            // normal startup below (installation checks, settings load, main window, etc) should run.
+            if (LaunchSettings.ClassicRedirectFlag.Active)
+            {
+                bool enable = string.Equals(LaunchSettings.ClassicRedirectFlag.Data, "on", StringComparison.OrdinalIgnoreCase);
+                Integrations.ClassicHostRedirect.Set(enable);
+                Terminate();
+                return;
+            }
+
+            // guaranteed cleanup of the classic client hosts redirect and server process, even if we crash or
+            // are killed - see Integrations.ClassicServerManager.Stop() and Integrations.ClassicHostRedirect
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => Integrations.ClassicServerManager.Stop();
+
+            // if a previous session left the redirect behind (crash/kill), clear it now if it's safe to do so
+            Integrations.ClassicHostRedirect.CleanStaleRedirect();
+
             // these only ever run as a short-lived elevated relaunch triggered by
             // Networking.HostsFileManager, never as part of the normal app flow
             if (LaunchSettings.WriteProxyHostsFlag.Active)

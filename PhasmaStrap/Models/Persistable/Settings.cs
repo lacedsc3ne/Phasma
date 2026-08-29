@@ -103,5 +103,13 @@ namespace PhasmaStrap.Models.Persistable
         // settings window nav rail: PageTag values (explicitly set per-item in MainWindow.xaml,
         // not locale-dependent) pinned to a "Pinned" group at the top of the rail
         public List<string> PinnedNavItems { get; set; } = new();
+
+        // classic client / private server (ported ClientServer subsystem)
+        // master switch - defaults OFF, this redirects roblox.com/www.roblox.com to 127.0.0.1
+        // via the hosts file whenever a classic client session is active, which is a significant
+        // behaviour change that must require explicit opt-in
+        public bool ClassicClientEnabled { get; set; } = false;
+        public string ClassicClientInstallLocation { get; set; } = "";
+        public string SelectedClassicClient { get; set; } = "";
     }
 }
