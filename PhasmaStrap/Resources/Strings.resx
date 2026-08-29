@@ -2322,4 +2322,19 @@ Defaulting to {1}.</value>
   <data name="Menu.Settings.UnpinFromTop" xml:space="preserve">
     <value>Unpin from top</value>
   </data>
+  <data name="Menu.RiShade.SaveOrLoadPreset.Title" xml:space="preserve">
+    <value>Save or load preset</value>
+  </data>
+  <data name="Menu.RiShade.SaveOrLoadPreset.Description" xml:space="preserve">
+    <value>Export the current effect settings to a JSON file, or import one previously saved.</value>
+  </data>
+  <data name="Menu.RiShade.ExportPreset" xml:space="preserve">
+    <value>Export preset</value>
+  </data>
+  <data name="Menu.RiShade.ImportPreset" xml:space="preserve">
+    <value>Import preset</value>
+  </data>
+  <data name="Menu.RiShade.ImportPreset.Failed" xml:space="preserve">
+    <value>Failed to import RiShade preset: {0}</value>
+  </data>
 </root>

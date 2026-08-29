@@ -1,10 +1,73 @@
+using System;
+using System.IO;
+using System.Text.Json;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using PhasmaStrap.Models.Persistable;
+using PhasmaStrap.Resources;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class RiShadeViewModel : NotifyPropertyChangedViewModel
     {
         private RiShadeSettings Prop => App.Settings.Prop.RiShade;
+
+        public ICommand ExportPresetCommand => new RelayCommand(ExportPreset);
+
+        public ICommand ImportPresetCommand => new RelayCommand(ImportPreset);
+
+        private void ExportPreset()
+        {
+            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'");
+
+            var dialog = new SaveFileDialog
+            {
+                FileName = $"RiShade-preset-{timestamp}.json",
+                Filter = $"{Strings.FileTypes_JSONFiles}|*.json"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            string contents = JsonSerializer.Serialize(Prop, new JsonSerializerOptions { WriteIndented = true });
+
+            File.WriteAllText(dialog.FileName, contents);
+        }
+
+        private void ImportPreset()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = $"{Strings.FileTypes_JSONFiles}|*.json"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                string contents = File.ReadAllText(dialog.FileName);
+
+                RiShadeSettings? settings = JsonSerializer.Deserialize<RiShadeSettings>(contents);
+
+                if (settings is null)
+                    throw new Exception("Deserialization returned null");
+
+                settings.Normalize();
+
+                App.Settings.Prop.RiShade = settings;
+
+                RefreshAll();
+            }
+            catch (Exception ex)
+            {
+                Frontend.ShowMessageBox(
+                    string.Format(Strings.Menu_RiShade_ImportPreset_Failed, ex.Message),
+                    System.Windows.MessageBoxImage.Error
+                );
+            }
+        }
 
         public bool RiShadeEnabled
         {
