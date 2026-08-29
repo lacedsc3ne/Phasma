@@ -8236,5 +8236,114 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.Cancel", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to asset(s).
+        /// </summary>
+        public static string Menu_Releases_Assets {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Assets", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} release(s)..
+        /// </summary>
+        public static string Menu_Releases_Count {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Count", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to What's new in PhasmaStrap - every release published to its GitHub repository, newest first..
+        /// </summary>
+        public static string Menu_Releases_Description {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No releases found..
+        /// </summary>
+        public static string Menu_Releases_Empty {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Empty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load releases. Check your connection and try again..
+        /// </summary>
+        public static string Menu_Releases_Error {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Error", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string Menu_Releases_Installed {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Installed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading releases....
+        /// </summary>
+        public static string Menu_Releases_Loading {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Loading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No release notes provided..
+        /// </summary>
+        public static string Menu_Releases_NoNotes {
+            get {
+                return ResourceManager.GetString("Menu.Releases.NoNotes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string Menu_Releases_Refresh {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Refresh", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search releases....
+        /// </summary>
+        public static string Menu_Releases_SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("Menu.Releases.SearchPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Releases.
+        /// </summary>
+        public static string Menu_Releases_Title {
+            get {
+                return ResourceManager.GetString("Menu.Releases.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to View on GitHub.
+        /// </summary>
+        public static string Menu_Releases_ViewOnGitHub {
+            get {
+                return ResourceManager.GetString("Menu.Releases.ViewOnGitHub", resourceCulture);
+            }
+        }
     }
 }

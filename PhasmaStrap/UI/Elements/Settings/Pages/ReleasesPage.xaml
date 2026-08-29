@@ -1,0 +1,72 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.ReleasesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      xmlns:models="clr-namespace:PhasmaStrap.UI.ViewModels"
+      xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance dmodels:ReleasesViewModel, IsDesignTimeCreatable=True}"
+      Title="ReleasesPage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Releases_Title}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Releases_Description}" />
+
+        <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_Releases_SearchPlaceholder}"
+                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <ui:Button Grid.Column="1" Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Releases_Refresh}" Icon="ArrowClockwise24"
+                       Command="{Binding RefreshCommand, Mode=OneTime}" />
+        </Grid>
+
+        <TextBlock Margin="0,10,0,0" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding Releases, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ui:Card Margin="0,0,0,10">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                                    <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                            VerticalAlignment="Center" Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <TextBlock Text="{x:Static resources:Strings.Menu_Releases_Installed}" FontSize="11" Foreground="White" />
+                                    </Border>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="1" Text="{Binding PublishedText}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
+                            </Grid>
+
+                            <controls:MarkdownTextBlock Margin="0,8,0,0" TextWrapping="Wrap" MarkdownText="{Binding Body}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                                    <Run Text="{Binding AssetCount, Mode=OneWay}" />
+                                    <Run Text="{x:Static resources:Strings.Menu_Releases_Assets}" />
+                                </TextBlock>
+                                <ui:Hyperlink Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Releases_ViewOnGitHub}"
+                                              Command="models:GlobalViewModel.OpenWebpageCommand" CommandParameter="{Binding HtmlUrl}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:Card>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>
