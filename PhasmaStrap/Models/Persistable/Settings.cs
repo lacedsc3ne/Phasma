@@ -195,5 +195,26 @@ namespace PhasmaStrap.Models.Persistable
 
         // decorative animated snow overlay on the settings window (cosmetic, off by default)
         public bool SnowEffectEnabled { get; set; } = false;
+
+        // Roblox process optimizer (ported from Voidstrap RobloxProcessOptimizer): live tuning of
+        // the running Roblox process's priority/affinity/working set, separate from CpuCoreLimit
+        // above which only restricts PhasmaStrap's own process
+        public bool OptimizeRoblox { get; set; } = false;
+        public bool RobloxEfficiencyMode { get; set; } = false;
+        public bool ReduceMemoryOutOfFocus { get; set; } = false;
+        public string SelectedCpuPriority { get; set; } = "Automatic";
+        public string RobloxPriorityLimit { get; set; } = "Normal";
+
+        // launcher memory manager (ported from Voidstrap MemoryManager): tiered memory-pressure
+        // handling for PhasmaStrap's own process while it's backgrounded, not Roblox's
+        public bool LauncherMemoryManagerEnabled { get; set; } = false;
+
+        // forced in-game resolution + multi-monitor targeting (ported from Voidstrap
+        // InGameResolutionApplier/DisplaySystem)
+        public bool ForceInGameResolution { get; set; } = false;
+        public string InGameResolutionMonitor { get; set; } = "";
+        public int InGameResolutionWidth { get; set; } = 1920;
+        public int InGameResolutionHeight { get; set; } = 1080;
+        public int InGameResolutionRefreshRate { get; set; } = 60;
     }
 }

@@ -1,6 +1,10 @@
 using System.Windows;
+using System.Windows.Input;
+
+using CommunityToolkit.Mvvm.Input;
 
 using PhasmaStrap.Integrations.FrameGeneration;
+using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
@@ -211,5 +215,132 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             2 => "Quality",
             _ => "Balanced",
         };
+
+        // --- Roblox process optimizer (ported from Voidstrap RobloxProcessOptimizer) ---
+
+        public bool OptimizeRoblox
+        {
+            get => App.Settings.Prop.OptimizeRoblox;
+            set => App.Settings.Prop.OptimizeRoblox = value;
+        }
+
+        public bool RobloxEfficiencyMode
+        {
+            get => App.Settings.Prop.RobloxEfficiencyMode;
+            set => App.Settings.Prop.RobloxEfficiencyMode = value;
+        }
+
+        public bool ReduceMemoryOutOfFocus
+        {
+            get => App.Settings.Prop.ReduceMemoryOutOfFocus;
+            set => App.Settings.Prop.ReduceMemoryOutOfFocus = value;
+        }
+
+        public IEnumerable<string> CpuPriorityOptions => BuildCpuPriorityOptions();
+
+        public string SelectedCpuPriority
+        {
+            get => App.Settings.Prop.SelectedCpuPriority;
+            set => App.Settings.Prop.SelectedCpuPriority = value;
+        }
+
+        public string[] RobloxPriorityLimitOptions { get; } = { "Idle", "Below Normal", "Normal", "Above Normal", "High" };
+
+        public string RobloxPriorityLimit
+        {
+            get => App.Settings.Prop.RobloxPriorityLimit;
+            set => App.Settings.Prop.RobloxPriorityLimit = value;
+        }
+
+        private static IEnumerable<string> BuildCpuPriorityOptions()
+        {
+            List<string> options = new() { "Automatic" };
+            int processorCount = Environment.ProcessorCount;
+            if (processorCount <= IntPtr.Size * 8)
+            {
+                for (int i = 1; i <= processorCount; i++)
+                    options.Add($"{i} Core{(i > 1 ? "s" : "")}");
+            }
+            return options;
+        }
+
+        // --- launcher memory manager (ported from Voidstrap MemoryManager) ---
+
+        public bool LauncherMemoryManagerEnabled
+        {
+            get => App.Settings.Prop.LauncherMemoryManagerEnabled;
+            set
+            {
+                App.Settings.Prop.LauncherMemoryManagerEnabled = value;
+                if (value)
+                    MemoryManager.Start();
+                else
+                    MemoryManager.Shutdown();
+            }
+        }
+
+        // --- render acceleration (reuses the existing WPFSoftwareRender setting) ---
+
+        public bool SoftwareRenderingEnabled
+        {
+            get => App.Settings.Prop.WPFSoftwareRender;
+            set
+            {
+                App.Settings.Prop.WPFSoftwareRender = value;
+                RenderAcceleration.ApplyProcess();
+            }
+        }
+
+        // --- multi-monitor / forced in-game resolution (ported from Voidstrap DisplaySystem /
+        // InGameResolutionApplier) ---
+
+        public List<DisplayInfo> MonitorOptions => DisplaySystem.GetDisplays();
+
+        public DisplayInfo? SelectedMonitor
+        {
+            get => MonitorOptions.FirstOrDefault(m => m.DeviceName == App.Settings.Prop.InGameResolutionMonitor)
+                ?? MonitorOptions.FirstOrDefault(m => m.IsPrimary)
+                ?? MonitorOptions.FirstOrDefault();
+            set
+            {
+                App.Settings.Prop.InGameResolutionMonitor = value?.DeviceName ?? "";
+                OnPropertyChanged(nameof(SelectedMonitor));
+                OnPropertyChanged(nameof(ModeOptions));
+                OnPropertyChanged(nameof(SelectedMode));
+            }
+        }
+
+        public List<DisplayMode> ModeOptions => DisplaySystem.GetModes(SelectedMonitor?.DeviceName);
+
+        public DisplayMode? SelectedMode
+        {
+            get => ModeOptions.FirstOrDefault(m =>
+                m.Width == App.Settings.Prop.InGameResolutionWidth &&
+                m.Height == App.Settings.Prop.InGameResolutionHeight &&
+                m.RefreshRate == App.Settings.Prop.InGameResolutionRefreshRate);
+            set
+            {
+                if (value == null)
+                    return;
+
+                App.Settings.Prop.InGameResolutionWidth = value.Width;
+                App.Settings.Prop.InGameResolutionHeight = value.Height;
+                App.Settings.Prop.InGameResolutionRefreshRate = value.RefreshRate;
+                OnPropertyChanged(nameof(SelectedMode));
+            }
+        }
+
+        public bool ForceInGameResolution
+        {
+            get => App.Settings.Prop.ForceInGameResolution;
+            set
+            {
+                App.Settings.Prop.ForceInGameResolution = value;
+                if (!value)
+                    Integrations.ForcedResolution.Shutdown();
+            }
+        }
+
+        public ICommand IdentifyDisplaysCommand => new RelayCommand(() => DisplaySystem.IdentifyDisplays());
     }
 }

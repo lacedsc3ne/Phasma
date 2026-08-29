@@ -7201,5 +7201,250 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Nvidia.SettingsCopiedToClipboard", resourceCulture);
             }
         }
+
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox process optimizer.
+        /// </summary>
+        public static string Menu_Performance_RuntimeOptimizer_Header {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RuntimeOptimizer.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Live tuning of the running Roblox process while a game session is active, separate from Roblox's own settings..
+        /// </summary>
+        public static string Menu_Performance_RuntimeOptimizer_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RuntimeOptimizer.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Optimize Roblox process.
+        /// </summary>
+        public static string Menu_Performance_OptimizeRoblox_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.OptimizeRoblox.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Raises Roblox's process priority and enables priority boost while it's running..
+        /// </summary>
+        public static string Menu_Performance_OptimizeRoblox_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.OptimizeRoblox.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Efficiency mode when unfocused.
+        /// </summary>
+        public static string Menu_Performance_RobloxEfficiencyMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RobloxEfficiencyMode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Drops Roblox to idle priority while you're tabbed away from it..
+        /// </summary>
+        public static string Menu_Performance_RobloxEfficiencyMode_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RobloxEfficiencyMode.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reduce memory usage when unfocused.
+        /// </summary>
+        public static string Menu_Performance_ReduceMemoryOutOfFocus_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ReduceMemoryOutOfFocus.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lowers Roblox's priority and periodically trims its working set while you're tabbed away from it..
+        /// </summary>
+        public static string Menu_Performance_ReduceMemoryOutOfFocus_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ReduceMemoryOutOfFocus.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox CPU core limit.
+        /// </summary>
+        public static string Menu_Performance_CpuPriority_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.CpuPriority.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restricts Roblox to a set number of logical processors via CPU affinity. Automatic uses every available processor..
+        /// </summary>
+        public static string Menu_Performance_CpuPriority_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.CpuPriority.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox process priority.
+        /// </summary>
+        public static string Menu_Performance_RobloxPriorityLimit_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RobloxPriorityLimit.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Windows process priority class Roblox should run at..
+        /// </summary>
+        public static string Menu_Performance_RobloxPriorityLimit_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.RobloxPriorityLimit.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reduce PhasmaStrap's own memory usage when idle.
+        /// </summary>
+        public static string Menu_Performance_LauncherMemoryManager_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.LauncherMemoryManager.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Tiered memory-pressure management for PhasmaStrap's own process (not Roblox's) while it's backgrounded, escalating to a deeper trim the longer it stays idle..
+        /// </summary>
+        public static string Menu_Performance_LauncherMemoryManager_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.LauncherMemoryManager.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Force software rendering.
+        /// </summary>
+        public static string Menu_Performance_SoftwareRendering_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.SoftwareRendering.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Disables GPU-accelerated rendering for PhasmaStrap's own windows. Useful if you're seeing rendering glitches or crashes related to your graphics driver..
+        /// </summary>
+        public static string Menu_Performance_SoftwareRendering_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.SoftwareRendering.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Multi-monitor and in-game resolution.
+        /// </summary>
+        public static string Menu_Performance_Display_Header {
+            get {
+                return ResourceManager.GetString("Menu.Performance.Display.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Force Roblox to run at a specific display resolution and refresh rate, and identify your connected monitors..
+        /// </summary>
+        public static string Menu_Performance_Display_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.Display.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Force a specific resolution while in-game.
+        /// </summary>
+        public static string Menu_Performance_ForceInGameResolution_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ForceInGameResolution.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Changes the display's resolution and refresh rate for the duration of the game session, then restores it when you leave..
+        /// </summary>
+        public static string Menu_Performance_ForceInGameResolution_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ForceInGameResolution.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Monitor.
+        /// </summary>
+        public static string Menu_Performance_InGameResolutionMonitor_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.InGameResolutionMonitor.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Which display the forced resolution should apply to..
+        /// </summary>
+        public static string Menu_Performance_InGameResolutionMonitor_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.InGameResolutionMonitor.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Resolution.
+        /// </summary>
+        public static string Menu_Performance_InGameResolutionMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.InGameResolutionMode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The resolution and refresh rate to switch to while in-game..
+        /// </summary>
+        public static string Menu_Performance_InGameResolutionMode_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.InGameResolutionMode.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Identify displays.
+        /// </summary>
+        public static string Menu_Performance_IdentifyDisplays_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.IdentifyDisplays.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Briefly shows a number on each connected monitor so you can tell them apart..
+        /// </summary>
+        public static string Menu_Performance_IdentifyDisplays_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.IdentifyDisplays.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Identify.
+        /// </summary>
+        public static string Menu_Performance_IdentifyDisplays_Button {
+            get {
+                return ResourceManager.GetString("Menu.Performance.IdentifyDisplays.Button", resourceCulture);
+            }
+        }
     }
 }

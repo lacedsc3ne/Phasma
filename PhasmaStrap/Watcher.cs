@@ -24,6 +24,8 @@ namespace PhasmaStrap
 
         public readonly GameChatIntegration? GameChat;
 
+        private RobloxProcessOptimizer? _processOptimizer;
+
         public Watcher()
         {
             const string LOG_IDENT = "Watcher";
@@ -108,9 +110,43 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameJoin += (_, _) => HeadsetAudio.Start();
                     ActivityWatcher.OnGameLeave += (_, _) => HeadsetAudio.Stop();
                 }
+
+                if (App.Settings.Prop.ForceInGameResolution)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => ForcedResolution.OnGameJoin();
+                    ActivityWatcher.OnGameLeave += (_, _) => ForcedResolution.OnGameLeave();
+                }
+
+                if (RobloxProcessOptimizer.ShouldRun(App.Settings.Prop))
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => StartProcessOptimizer();
+                    ActivityWatcher.OnGameLeave += (_, _) => StopProcessOptimizer();
+                }
+
+                if (App.Settings.Prop.LauncherMemoryManagerEnabled)
+                {
+                    MemoryManager.Start();
+                    ActivityWatcher.OnGameJoin += (_, _) => MemoryManager.SetGameplayActive(true);
+                    ActivityWatcher.OnGameLeave += (_, _) => MemoryManager.SetGameplayActive(false);
+                }
             }
 
             _notifyIcon = new(this);
+        }
+
+        private void StartProcessOptimizer()
+        {
+            if (_watcherData is null)
+                return;
+
+            _processOptimizer ??= new RobloxProcessOptimizer(_watcherData.ProcessId);
+            _processOptimizer.Start();
+        }
+
+        private void StopProcessOptimizer()
+        {
+            _processOptimizer?.Dispose();
+            _processOptimizer = null;
         }
 
         public void KillRobloxProcess() => CloseProcess(_watcherData!.ProcessId, true);
@@ -178,6 +214,9 @@ namespace PhasmaStrap
             FakeExclusiveFullscreen.Shutdown();
             AudioDucker.Shutdown();
             HeadsetAudio.Shutdown();
+            ForcedResolution.Shutdown();
+            StopProcessOptimizer();
+            MemoryManager.Shutdown();
 
             GC.SuppressFinalize(this);
         }
