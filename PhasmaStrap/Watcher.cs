@@ -1,6 +1,7 @@
 ﻿using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
+using PhasmaStrap.Integrations.Overlays;
 using PhasmaStrap.Models;
 
 namespace PhasmaStrap
@@ -60,6 +61,9 @@ namespace PhasmaStrap
             if (App.Settings.Prop.EnableActivityTracking)
             {
                 ActivityWatcher = new(_watcherData.LogFile);
+
+                ActivityWatcher.OnGameJoin += delegate { OverlayHub.OnGameJoin(); };
+                ActivityWatcher.OnGameLeave += delegate { OverlayHub.OnGameLeave(); };
 
                 if (App.Settings.Prop.UseDisableAppPatch)
                 {
@@ -159,6 +163,8 @@ namespace PhasmaStrap
         public void Dispose()
         {
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
+
+            OverlayHub.Shutdown();
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
