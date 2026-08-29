@@ -1,87 +1,73 @@
-> [!CAUTION]
-> The only official places to download Bloxstrap are this GitHub repository and [bloxstraplabs.com](https://bloxstraplabs.com). Any other websites offering downloads or claiming to be us are not owned by us.
-
-> [!IMPORTANT]
-> Bloxstrap is not under active development anymore. Any issues or pull requests opened may take a while to get a response.
-
 <p align="center">
-    <img src="https://github.com/bloxstraplabs/bloxstrap/raw/main/Images/Bloxstrap-full-dark.png#gh-dark-mode-only" width="380">
-    <img src="https://github.com/bloxstraplabs/bloxstrap/raw/main/Images/Bloxstrap-full-light.png#gh-light-mode-only" width="380">
+    <img src="https://github.com/lacedsc3ne/Phasma/raw/main/Images/PhasmaStrap-full-dark.png#gh-dark-mode-only" width="380">
+    <img src="https://github.com/lacedsc3ne/Phasma/raw/main/Images/PhasmaStrap-full-light.png#gh-light-mode-only" width="380">
 </p>
 
 <div align="center">
 
 [![License][shield-repo-license]][repo-license]
 [![GitHub Workflow Status][shield-repo-workflow]][repo-actions]
-[![Crowdin][shield-crowdin-status]][crowdin-project]
 [![Downloads][shield-repo-releases]][repo-releases]
 [![Version][shield-repo-latest]][repo-latest]
-[![Discord][shield-discord-server]][discord-invite]
-[![lol][shield-tenor-meme]][tenor-gif]
 
 </div>
 
 ----
 
-Bloxstrap is a third-party replacement for the standard Roblox bootstrapper, providing additional useful features and improvements.
+PhasmaStrap is a third-party replacement for the standard Roblox bootstrapper, built as a fork of [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap) with a large number of additional features ported in and built from scratch - server matchmaking, an expanded engine settings panel, NVIDIA driver profile control, GPU overlays (RiShade shader post-processing, anti-aliasing, frame generation), an in-game chat overlay, classic client hosting, and more.
 
-Running into a problem or need help with something? [Check out the Wiki](https://bloxstraplabs.com/wiki). If you can't find anything, or would like to suggest something, please [submit an issue](https://github.com/bloxstraplabs/bloxstrap/issues).
-
-Bloxstrap is only supported for PCs running Windows.
+PhasmaStrap is only supported for PCs running Windows.
 
 ## Frequently Asked Questions
 
 **Q: Is this malware?**
 
-**A:** No. The source code here is viewable to all, and it'd be impossible for us to slip anything malicious into the downloads without anyone noticing. Just be sure you're downloading it from an official source. The only two official sources are this GitHub repository and [bloxstraplabs.com](https://bloxstraplabs.com).
+**A:** No. The source code here is viewable to all. Only download PhasmaStrap from this GitHub repository's [Releases page][repo-releases] - nowhere else.
 
 **Q: Can using this get me banned?**
 
-**A:** No, it shouldn't. Bloxstrap doesn't interact with the Roblox client in the same way that exploits do. [Read more about that here.](https://bloxstraplabs.com/wiki/info/bloxstrap-and-bans)
+**A:** Most of PhasmaStrap's features (Discord Rich Presence, modding, FastFlags, appearance/performance tweaks) work the same way Bloxstrap's do and carry the same low risk. A few features in this fork are more involved - server matchmaking makes real join-attempt calls using your Roblox session, and the classic client / private server feature redirects `roblox.com` itself via your hosts file. Both are off by default and clearly labelled in Settings; read what a feature does before turning it on.
+
 ## Features
 
+Ported/inherited from Bloxstrap:
 - Hassle-free Discord Rich Presence to let your friends know what you're playing at a glance
 - Simple support for modding of content files for customizability (death sound, mouse cursor, etc)
-- See where your server is geographically located (courtesy of [ipinfo.io](https://ipinfo.io))
-- Ability to configure graphics fidelity and UI experience
+- See where your server is geographically located
+- Ability to configure graphics fidelity and UI experience via an expanded FastFlags panel
+
+Built for PhasmaStrap:
+- **Server matchmaker** - probes a game's public servers and joins whichever is estimated to have the lowest ping, with per-datacenter exclusion
+- **NVIDIA panel** - driver-level frame limiting, DLSS/Reflex, anti-aliasing and image-quality controls for Roblox specifically, via NVAPI
+- **GPU overlays** - RiShade (screen-space shader post-processing: color grade, tonemap, bloom, sharpen, and more), Anti-Aliasing (FXAA/SMAA/DLAA/TSAA and others), and Frame Generation (optical-flow frame interpolation), all sharing one compositor
+- **In-game chat overlay** - an optional overlay chat window with local commands, gated behind an explicit opt-in since it uses a system-wide keyboard hook
+- **Classic client hosting** - launches legacy Roblox client builds against a locally-hosted server, off by default
+- **Settings search**, pinnable nav shortcuts, controller navigation for the settings window
+- **Play history**, a live output console, Roblox Studio theme sync, and a Rojo installer/launcher built into Extensions
+- Custom cursor packs, per-game Discord Rich Presence templates, and a Roblox update-day heatmap
 
 ## Installing
-Download the [latest release of Bloxstrap](https://github.com/bloxstraplabs/bloxstrap/releases/latest), and run it. Configure your preferences if needed, and install. That's about it!
 
-Alternatively, you can install Bloxstrap via [Winget](https://winstall.app/apps/pizzaboxer.Bloxstrap) by running this in a Command Prompt window:
-```
-> winget install bloxstrap
-```
+Download the [latest release][repo-latest] and run it. Configure your preferences if needed, and install.
 
-You will also need the [.NET 6 Desktop Runtime](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win11-x64&apphost_version=6.0.36&gui=true). If you don't already have it installed, you'll be prompted to install it anyway. Be sure to install Bloxstrap after you've installed this.
+You will also need the [.NET 6 Desktop Runtime](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win11-x64&apphost_version=6.0.36&gui=true). If you don't already have it installed, you'll be prompted to install it anyway.
 
-It's not unlikely that Windows Smartscreen will show a popup when you run Bloxstrap for the first time. This happens because it's an unknown program, not because it's actually detected as being malicious. To dismiss it, just click on "More info" and then "Run anyway".
+It's not unlikely that Windows SmartScreen will show a popup when you run PhasmaStrap for the first time. This happens because it's an unknown program, not because it's actually detected as being malicious. To dismiss it, click "More info" and then "Run anyway".
 
-Once installed, Bloxstrap is added to your Start Menu, where you can access the menu and reconfigure your preferences if needed.
+Once installed, PhasmaStrap is added to your Start Menu, where you can access the menu and reconfigure your preferences if needed.
 
 ## Code
 
-Bloxstrap uses the [WPF UI](https://github.com/lepoco/wpfui) library for the user interface design. We currently use and maintain our own fork of WPF UI at [bloxstraplabs/wpfui](https://github.com/bloxstraplabs/wpfui).
+PhasmaStrap is built on [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap), and a number of features in this fork are ported from [Voidstrap](https://github.com/void-hq/voidstrap). Credit to both projects and their contributors.
 
+PhasmaStrap uses the [WPF UI](https://github.com/lepoco/wpfui) library for the user interface design.
 
-[shield-repo-license]:  https://img.shields.io/github/license/bloxstraplabs/bloxstrap
-[shield-repo-workflow]: https://img.shields.io/github/actions/workflow/status/bloxstraplabs/bloxstrap/ci-release.yml?branch=main&label=builds
-[shield-repo-releases]: https://img.shields.io/github/downloads/bloxstraplabs/bloxstrap/latest/total?color=981bfe
-[shield-repo-latest]:   https://img.shields.io/github/v/release/bloxstraplabs/bloxstrap?color=7a39fb
+[shield-repo-license]:  https://img.shields.io/github/license/lacedsc3ne/Phasma
+[shield-repo-workflow]: https://img.shields.io/github/actions/workflow/status/lacedsc3ne/Phasma/ci-release.yml?branch=main&label=builds
+[shield-repo-releases]: https://img.shields.io/github/downloads/lacedsc3ne/Phasma/latest/total?color=981bfe
+[shield-repo-latest]:   https://img.shields.io/github/v/release/lacedsc3ne/Phasma?color=7a39fb
 
-[shield-crowdin-status]: https://badges.crowdin.net/bloxstrap/localized.svg
-[shield-discord-server]: https://img.shields.io/discord/1099468797410283540?logo=discord&logoColor=white&label=discord&color=4d3dff
-[shield-tenor-meme]:     https://img.shields.io/badge/mom_made-pizza_rolls-orange
-
-[repo-license]:  https://github.com/bloxstraplabs/bloxstrap/blob/main/LICENSE
-[repo-actions]:  https://github.com/bloxstraplabs/bloxstrap/actions
-[repo-releases]: https://github.com/bloxstraplabs/bloxstrap/releases
-[repo-latest]:   https://github.com/bloxstraplabs/bloxstrap/releases/latest
-
-[crowdin-project]: https://crowdin.com/project/bloxstrap
-[discord-invite]:  https://discord.gg/nKjV3mGq6R
-[tenor-gif]:       https://media.tenor.com/FIkSGbGycmAAAAAd/manly-roblox.gif
-
-## Code signing policy
-
-Thanks to [SignPath.io](https://signpath.io/) for providing a free code signing service, and the [SignPath Foundation](https://signpath.org/) for providing the free code signing certificate.
+[repo-license]:  https://github.com/lacedsc3ne/Phasma/blob/main/LICENSE
+[repo-actions]:  https://github.com/lacedsc3ne/Phasma/actions
+[repo-releases]: https://github.com/lacedsc3ne/Phasma/releases
+[repo-latest]:   https://github.com/lacedsc3ne/Phasma/releases/latest
