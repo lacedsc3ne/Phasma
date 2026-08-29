@@ -91,6 +91,7 @@
     <PackageReference Include="Vortice.DXGI" Version="2.1.0" />
     <PackageReference Include="Vortice.DirectComposition" Version="2.1.0" />
     <PackageReference Include="Vortice.D3DCompiler" Version="2.1.0" />
+    <PackageReference Include="Vortice.Mathematics" Version="1.4.25" />
   </ItemGroup>
 
   <ItemGroup>

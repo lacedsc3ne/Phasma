@@ -138,5 +138,9 @@ namespace PhasmaStrap.Models.Persistable
         // defaults to off: this is GPU shader injection and is a significant perf/behaviour change
         public bool RiShadeEnabled { get; set; } = false;
         public RiShadeSettings RiShade { get; set; } = new();
+
+        // anti-aliasing overlay
+        public bool AntiAliasingEnabled { get; set; } = false;
+        public int AntiAliasingMethodIndex { get; set; } = 0;
     }
 }
