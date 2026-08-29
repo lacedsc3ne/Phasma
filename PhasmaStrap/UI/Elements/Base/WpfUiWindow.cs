@@ -67,10 +67,51 @@ namespace PhasmaStrap.UI.Elements.Base
             var dict = new ResourceDictionary { Source = new Uri($"pack://application:,,,/UI/Style/{Enum.GetName(App.Settings.Prop.Theme.GetFinal())}.xaml") };
             Application.Current.Resources.MergedDictionaries[customThemeIndex] = dict;
 
+            ApplyAppColorTheme();
+
 #if QA_BUILD
             this.BorderBrush = System.Windows.Media.Brushes.Red;
             this.BorderThickness = new Thickness(4);
 #endif
+        }
+
+        // index 0: ui:ThemesDictionary, 1: ui:ControlsDictionary, 2: base Dark/Light skin (see
+        // customThemeIndex above), 3: Default.xaml - this is a 5th slot for the user-editable
+        // AppColorTheme override (Utility/AppColorTheme.cs), merged on top of everything else so
+        // its values win. Kept separate from customThemeIndex so it survives ApplyTheme() being
+        // called repeatedly as the base skin is swapped out.
+        private const int AppColorThemeIndex = 4;
+
+        private void ApplyAppColorTheme()
+        {
+            var dictionaries = Application.Current.Resources.MergedDictionaries;
+
+            if (!App.Settings.Prop.CustomColorThemeEnabled)
+            {
+                if (dictionaries.Count > AppColorThemeIndex)
+                    dictionaries.RemoveAt(AppColorThemeIndex);
+                return;
+            }
+
+            var overrides = PhasmaStrap.Utility.AppColorTheme.LoadForApp();
+
+            if (dictionaries.Count > AppColorThemeIndex)
+                dictionaries[AppColorThemeIndex] = overrides;
+            else
+                dictionaries.Add(overrides);
+        }
+
+        /// <summary>
+        /// Re-applies the theme (including the AppColorTheme override) to every currently open
+        /// WpfUiWindow, so changes made in the colour theme editor show immediately everywhere.
+        /// </summary>
+        public static void ApplyThemeToAllOpenWindows()
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is WpfUiWindow wpfUiWindow)
+                    wpfUiWindow.ApplyTheme();
+            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)
