@@ -163,7 +163,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             var menu = new System.Windows.Controls.ContextMenu();
 
             menu.Opened += (_, _) =>
-                pinMenuItem.Header = App.Settings.Prop.PinnedNavItems.Contains(navItem.PageTag) ? "Unpin from top" : "Pin to top";
+                pinMenuItem.Header = App.Settings.Prop.PinnedNavItems.Contains(navItem.PageTag) ? Strings.Menu_Settings_UnpinFromTop : Strings.Menu_Settings_PinToTop;
 
             pinMenuItem.Click += (_, _) => TogglePinned(navItem.PageTag);
 

@@ -120,7 +120,7 @@
                 x:Name="SettingsSearchBox"
                 Grid.Row="0" Grid.Column="0"
                 Margin="0,0,12,10"
-                PlaceholderText="Search settings"
+                PlaceholderText="{x:Static resources:Strings.Menu_Settings_SearchPlaceholder}"
                 Icon="Search24"
                 MaxDropDownHeight="320"
                 SuggestionChosen="SettingsSearchBox_SuggestionChosen"
@@ -139,18 +139,18 @@
 
                     <ui:NavigationHeader Text="Game &amp; Session" Icon="Games24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Title}" PageType="{x:Type pages:IntegrationsPage}" Icon="Add28" PageTag="integrations" />
-                    <ui:NavigationItem Content="Servers" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" PageTag="serverbrowser" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ServerBrowser_Title}" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" PageTag="serverbrowser" />
                     <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" PageTag="history" />
                     <ui:NavigationItem Content="Channel" PageType="{x:Type pages:ChannelPage}" Icon="ArrowRepeatAll24" PageTag="channel" />
-                    <ui:NavigationItem Content="Classic Client" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
-                    <ui:NavigationItem Content="Game Chat" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ClassicClient_Title}" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GameChat_Title}" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
 
                     <ui:NavigationHeader Text="Performance" Icon="Gauge24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Title}" PageType="{x:Type pages:FastFlagsPage}" Icon="Flag24" PageTag="fastflags" />
                     <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
-                    <ui:NavigationItem Content="NVIDIA" PageType="{x:Type pages:NvidiaPage}" Icon="TopSpeed24" PageTag="nvidia" />
-                    <ui:NavigationItem Content="Overlays" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
-                    <ui:NavigationItem Content="RiShade" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Nvidia_Title}" PageType="{x:Type pages:NvidiaPage}" Icon="TopSpeed24" PageTag="nvidia" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
 
                     <ui:NavigationHeader Text="Network" Icon="Globe24" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
@@ -207,13 +207,13 @@
                 </StackPanel>
             </StatusBarItem>
             <StatusBarItem Grid.Column="2" Padding="0,0,4,0">
-                <ui:Button Content="Save &amp; Launch" Appearance="Primary" Command="{Binding SaveAndLaunchCommand, Mode=OneWay}" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Settings_SaveAndLaunch}" Appearance="Primary" Command="{Binding SaveAndLaunchCommand, Mode=OneWay}" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="3" Padding="4,0,0,0">
                 <ui:Button Content="{x:Static resources:Strings.Menu_Save}" Appearance="Primary" Command="{Binding SaveSettingsCommand, Mode=OneWay}" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="4" Padding="4,0,0,0">
-                <ui:Button Content="Restart" Command="{Binding RestartCommand, Mode=OneWay}" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Settings_Restart}" Command="{Binding RestartCommand, Mode=OneWay}" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="5" Padding="4,0,0,0">
                 <ui:Button Content="{x:Static resources:Strings.Common_Close}" Command="{Binding CloseWindowCommand, Mode=OneWay}" />
