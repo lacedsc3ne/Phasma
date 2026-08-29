@@ -77,5 +77,17 @@
 
             return output.ToArray();
         }
+
+        /// <summary>
+        /// GETs a URL and reads the response as a string, refusing to buffer more than
+        /// <paramref name="maxBytes"/>. Analogous to <see cref="ReadStringBoundedAsync"/> but
+        /// covers the request as well, for callers (e.g. TranslationService) that only have a URL.
+        /// </summary>
+        public static async Task<string> GetStringBoundedAsync(HttpClient client, string url, int maxBytes, CancellationToken token = default)
+        {
+            using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
+            response.EnsureSuccessStatusCode();
+            return await ReadStringBoundedAsync(response.Content, maxBytes, token);
+        }
     }
 }

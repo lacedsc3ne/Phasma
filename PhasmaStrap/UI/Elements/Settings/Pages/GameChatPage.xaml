@@ -26,5 +26,19 @@
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_MessageFilter_Title}" Description="{x:Static resources:Strings.Menu_GameChat_MessageFilter_Description}">
             <ComboBox Width="160" ItemsSource="{Binding FilterPreferenceOptions, Mode=OneTime}" SelectedItem="{Binding GameChatFilterPreference, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_Translation_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_Translation_Enable_Title}" Description="{x:Static resources:Strings.Menu_GameChat_Translation_Enable_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding AutoTranslate, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_Translation_Language_Title}" Description="{x:Static resources:Strings.Menu_GameChat_Translation_Language_Description}">
+            <ComboBox Width="220" ItemsSource="{Binding AutoTranslateLanguages, Mode=OneTime}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding AutoTranslateLanguage, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_Translation_RpcEnable_Title}" Description="{x:Static resources:Strings.Menu_GameChat_Translation_RpcEnable_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding RpcAutoTranslate, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

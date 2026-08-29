@@ -543,7 +543,33 @@ namespace PhasmaStrap.Integrations
             App.Logger.WriteLine(LOG_IDENT, $"Updating presence");
 
             if (_visible)
+            {
                 _rpcClient.SetPresence(_currentPresence);
+
+                // fire-and-forget: send the untranslated presence immediately (above), then swap
+                // in the translated fields once TranslationService resolves them, without ever
+                // blocking this (synchronous) UpdatePresence caller on a network round-trip
+                if (Utility.RpcTranslationService.IsEnabled)
+                    _ = ApplyPresenceTranslationAsync(_currentPresence);
+            }
+        }
+
+        private async Task ApplyPresenceTranslationAsync(DiscordRPC.RichPresence presence)
+        {
+            try
+            {
+                await Utility.RpcTranslationService.ApplyToPresenceAsync(presence).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DiscordRichPresence::ApplyPresenceTranslationAsync", $"Error: {ex.Message}");
+                return;
+            }
+
+            // only re-send if this is still the current presence and we're still visible - avoids
+            // clobbering a newer presence that was set while the translation was in flight
+            if (_visible && ReferenceEquals(_currentPresence, presence))
+                _rpcClient.SetPresence(presence);
         }
 
         public void Dispose()
