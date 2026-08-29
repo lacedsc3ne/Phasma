@@ -306,8 +306,13 @@ namespace PhasmaStrap
                         Frontend.ShowBalloonTip(Strings.Bootstrapper_ModificationsFailed_Title, Strings.Bootstrapper_ModificationsFailed_Message, ToolTipIcon.Warning);
                 }
 
-                if (_launchMode == LaunchMode.Player && App.Settings.Prop.MatchmakerEnabled)
-                    await TryApplyMatchmakingAsync();
+                if (_launchMode == LaunchMode.Player)
+                {
+                    if (App.Settings.Prop.MatchmakerEnabled)
+                        await TryApplyMatchmakingAsync();
+
+                    await TryApplyFastFlagProfileAsync(TryResolveLaunchPlaceId());
+                }
 
                 StartRoblox();
             }
@@ -616,6 +621,69 @@ namespace PhasmaStrap
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Matchmaking failed, launching normally: {ex.Message}");
+            }
+        }
+
+        // shared with TryApplyFastFlagProfileAsync below - both need the placeId from the same
+        // "roblox://experiences/start?placeId=X" deep link format, independent of whether the
+        // matchmaker itself is enabled
+        private long? TryResolveLaunchPlaceId()
+        {
+            Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
+            if (!uriMatch.Success)
+                return null;
+
+            var queryParams = HttpUtility.ParseQueryString(uriMatch.Groups[1].Value);
+
+            if (!long.TryParse(queryParams["placeId"], out long placeId) || placeId <= 0)
+                return null;
+
+            return placeId;
+        }
+
+        // merges a named FastFlag profile's overrides on top of the already-materialized
+        // ClientAppSettings.json in the version folder, if the resolved place has one assigned. Runs after
+        // ApplyModifications() has already copied the global flag set in, and before StartRoblox() - so this
+        // only ever adjusts what's on disk in _latestVersionDirectory, never the user's global mod-folder flags.
+        private async Task TryApplyFastFlagProfileAsync(long? placeId)
+        {
+            const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagProfileAsync";
+
+            if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
+                return;
+
+            try
+            {
+                if (!App.Settings.Prop.FastFlagPlaceProfiles.TryGetValue(placeId.Value.ToString(), out string? profileName) || string.IsNullOrEmpty(profileName))
+                    return;
+
+                if (!App.Settings.Prop.FastFlagProfiles.TryGetValue(profileName, out Dictionary<string, object>? overrides) || overrides.Count == 0)
+                    return;
+
+                string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
+
+                Dictionary<string, object> flags = new();
+
+                if (File.Exists(filePath))
+                {
+                    string existing = await File.ReadAllTextAsync(filePath);
+                    if (!string.IsNullOrWhiteSpace(existing))
+                        flags = JsonSerializer.Deserialize<Dictionary<string, object>>(existing) ?? new();
+                }
+
+                foreach (var (flag, value) in overrides)
+                    flags[flag] = value;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                Filesystem.AssertReadOnly(filePath);
+                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true }));
+                Filesystem.AssertReadOnly(filePath);
+
+                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag profile '{profileName}' ({overrides.Count} override(s)) for place {placeId}");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag profile, launching with the global flag set: {ex.Message}");
             }
         }
 
