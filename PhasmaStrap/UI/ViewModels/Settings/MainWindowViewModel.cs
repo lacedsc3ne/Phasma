@@ -8,14 +8,24 @@ namespace PhasmaStrap.UI.ViewModels.Settings
     public class MainWindowViewModel : NotifyPropertyChangedViewModel
     {
         public ICommand OpenAboutCommand => new RelayCommand(OpenAbout);
-        
+
         public ICommand SaveSettingsCommand => new RelayCommand(SaveSettings);
-        
+
+        public ICommand SaveAndLaunchCommand => new RelayCommand(SaveAndLaunch);
+
+        public ICommand RestartCommand => new RelayCommand(Restart);
+
         public ICommand CloseWindowCommand => new RelayCommand(CloseWindow);
 
         public EventHandler? RequestSaveNoticeEvent;
-        
+
         public EventHandler? RequestCloseWindowEvent;
+
+        // read by MainWindow.xaml.cs's Closed handler to decide what to do once the window has
+        // actually finished closing - set just before RequestCloseWindowEvent fires
+        public bool LaunchAfterClose { get; private set; }
+
+        public bool RestartAfterClose { get; private set; }
 
         public bool TestModeEnabled
         {
@@ -60,6 +70,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.PendingSettingTasks.Clear();
 
             RequestSaveNoticeEvent?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void SaveAndLaunch()
+        {
+            SaveSettings();
+            LaunchAfterClose = true;
+            CloseWindow();
+        }
+
+        private void Restart()
+        {
+            SaveSettings();
+            RestartAfterClose = true;
+            CloseWindow();
         }
     }
 }
