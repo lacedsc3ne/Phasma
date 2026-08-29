@@ -806,7 +806,14 @@ namespace PhasmaStrap.Integrations.GameChat
             var nameLink = new Hyperlink(nameRun) { Foreground = nameBrush, TextDecorations = null };
             nameLink.Click += (_, _) => ShowProfile(msg.SenderId, msg.Sender);
             p.Inlines.Add(nameLink);
-            p.Inlines.Add(new Run(": " + msg.Text) { Foreground = Brushes.WhiteSmoke });
+
+            // non-blocking: returns the original text immediately (and the already-cached
+            // translation on a later message, once the background translate lands) rather than
+            // ever stalling this UI-thread render path - see TranslationService.Translate.
+            string displayText = App.Settings.Prop.AutoTranslate
+                ? TranslationService.Translate(msg.Text, App.Settings.Prop.AutoTranslateLanguage)
+                : msg.Text;
+            p.Inlines.Add(new Run(": " + displayText) { Foreground = Brushes.WhiteSmoke });
 
             p.Tag = msg;
             doc.Blocks.Add(p);

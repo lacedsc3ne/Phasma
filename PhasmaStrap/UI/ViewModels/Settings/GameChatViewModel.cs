@@ -21,5 +21,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         public string[] FilterPreferenceOptions { get; } = new[] { "strict", "default", "relaxed" };
+
+        public bool AutoTranslate
+        {
+            get => App.Settings.Prop.AutoTranslate;
+            set => App.Settings.Prop.AutoTranslate = value;
+        }
+
+        public bool RpcAutoTranslate
+        {
+            get => App.Settings.Prop.RpcAutoTranslate;
+            set => App.Settings.Prop.RpcAutoTranslate = value;
+        }
+
+        public string AutoTranslateLanguage
+        {
+            get => App.Settings.Prop.AutoTranslateLanguage;
+            set => App.Settings.Prop.AutoTranslateLanguage = value;
+        }
+
+        public Dictionary<string, string> AutoTranslateLanguages { get; } = PhasmaStrap.Utility.TranslationService.AvailableLanguages;
     }
 }

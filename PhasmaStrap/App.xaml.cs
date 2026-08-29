@@ -430,6 +430,15 @@ namespace PhasmaStrap
 
                 try
                 {
+                    UI.AppFont.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"App font initialization failed: {ex.Message}");
+                }
+
+                try
+                {
                     CpuCoreLimiter.ApplyConfiguredLimit();
                 }
                 catch (Exception ex)

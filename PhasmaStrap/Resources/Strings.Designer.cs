@@ -8345,5 +8345,179 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Releases.ViewOnGitHub", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Google Fonts.
+        /// </summary>
+        public static string Dialog_GoogleFonts_Title {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse Google Fonts.
+        /// </summary>
+        public static string Dialog_GoogleFonts_Header {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search fonts....
+        /// </summary>
+        public static string Dialog_GoogleFonts_SearchWatermark {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.SearchWatermark", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The quick brown fox jumps over the lazy dog.
+        /// </summary>
+        public static string Dialog_GoogleFonts_Preview {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.Preview", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Also use for the PhasmaStrap app.
+        /// </summary>
+        public static string Dialog_GoogleFonts_ApplyToApp {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.ApplyToApp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Dialog_GoogleFonts_Apply {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.Apply", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading fonts....
+        /// </summary>
+        public static string Dialog_GoogleFonts_Loading {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.Loading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn't download this font. Check your connection and try again..
+        /// </summary>
+        public static string Dialog_GoogleFonts_DownloadFailed {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.DownloadFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No fonts matched your search..
+        /// </summary>
+        public static string Dialog_GoogleFonts_NoResults {
+            get {
+                return ResourceManager.GetString("Dialog.GoogleFonts.NoResults", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Google Fonts.
+        /// </summary>
+        public static string Menu_Mods_Misc_GoogleFonts_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.GoogleFonts.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse and download a font from Google Fonts and apply it as your Roblox client font..
+        /// </summary>
+        public static string Menu_Mods_Misc_GoogleFonts_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.GoogleFonts.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse Google Fonts....
+        /// </summary>
+        public static string Menu_Mods_Misc_GoogleFonts_Browse {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.GoogleFonts.Browse", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto-translate.
+        /// </summary>
+        public static string Menu_GameChat_Translation_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto-translate chat messages.
+        /// </summary>
+        public static string Menu_GameChat_Translation_Enable_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.Enable.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Machine-translates incoming chat messages to your target language, using Google&apos;s public translate endpoint. Off by default - this sends chat text to Google when enabled..
+        /// </summary>
+        public static string Menu_GameChat_Translation_Enable_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.Enable.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Also translate Discord Rich Presence.
+        /// </summary>
+        public static string Menu_GameChat_Translation_RpcEnable_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.RpcEnable.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Translates your Discord Rich Presence status text to the same target language..
+        /// </summary>
+        public static string Menu_GameChat_Translation_RpcEnable_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.RpcEnable.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Target language.
+        /// </summary>
+        public static string Menu_GameChat_Translation_Language_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.Language.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The language chat messages and (optionally) Rich Presence text are translated into..
+        /// </summary>
+        public static string Menu_GameChat_Translation_Language_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Translation.Language.Description", resourceCulture);
+            }
+        }
     }
 }

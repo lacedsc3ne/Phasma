@@ -222,5 +222,20 @@ namespace PhasmaStrap.Models.Persistable
         // Paths.CustomColorThemeXaml. Unrelated to the pre-existing custom *bootstrapper dialog*
         // theme feature (Paths.CustomThemes / SelectedCustomTheme below).
         public bool CustomColorThemeEnabled { get; set; } = false;
+
+        // app UI font override (ported from Voidstrap's AppFont): absolute path to a .ttf/.otf
+        // file applied to PhasmaStrap's own WPF windows, separate from the Roblox client's
+        // custom font mod (Paths.CustomFont). Empty means "use the default app font".
+        public string AppFontPath { get; set; } = "";
+
+        // runtime machine translation (ported from Voidstrap): auto-translates GameChat overlay
+        // messages and, optionally, Discord Rich Presence strings via Google's unofficial
+        // translate endpoint. Off by default - sends chat/presence text to an external Google
+        // endpoint when enabled. AutoTranslateLanguage defaults to "en" (a no-op target language,
+        // matching TranslationService's own short-circuit for "en") so turning AutoTranslate on
+        // without picking a language does nothing rather than translating to an unexpected locale.
+        public bool AutoTranslate { get; set; } = false;
+        public bool RpcAutoTranslate { get; set; } = false;
+        public string AutoTranslateLanguage { get; set; } = "en";
     }
 }

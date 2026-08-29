@@ -58,6 +58,21 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(DeleteCustomFontVisibility));
         }
 
+        private void BrowseGoogleFonts()
+        {
+            var dialog = new UI.Elements.Dialogs.GoogleFontsDialog();
+
+            if (dialog.ShowDialog() != true || string.IsNullOrEmpty(dialog.SelectedFontPath))
+                return;
+
+            TextFontTask.NewState = dialog.SelectedFontPath;
+
+            OnPropertyChanged(nameof(ChooseCustomFontVisibility));
+            OnPropertyChanged(nameof(DeleteCustomFontVisibility));
+        }
+
+        public ICommand BrowseGoogleFontsCommand => new RelayCommand(BrowseGoogleFonts);
+
         public ICommand OpenModsFolderCommand => new RelayCommand(OpenModsFolder);
 
         public Visibility ChooseCustomFontVisibility => !String.IsNullOrEmpty(TextFontTask.NewState) ? Visibility.Collapsed : Visibility.Visible;
