@@ -37,6 +37,20 @@
             <ui:ToggleSwitch IsChecked="{Binding ControllerNavigationEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="128" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_ColorTheme_Title}" FontSize="20" FontWeight="Medium" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_ColorTheme_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+            <ui:ToggleSwitch Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center" IsChecked="{Binding CustomColorThemeEnabled, Mode=TwoWay}" />
+            <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Common_Edit}" HorizontalAlignment="Stretch" Command="{Binding EditColorThemeCommand}" />
+        </Grid>
+
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Title}"
             Description="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Description}">

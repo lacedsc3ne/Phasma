@@ -7446,5 +7446,204 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Performance.IdentifyDisplays.Button", resourceCulture);
             }
         }
+
+
+        public static string Menu_Appearance_ColorTheme_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewHeading {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewHeading", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewPanelSurface {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewPanelSurface", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewSecondaryText {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewSecondaryText", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewButton {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewButton", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewToggleItem {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewToggleItem", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewDropdownItem {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewDropdownItem", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewDropdownItem2 {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewDropdownItem2", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewEditorText {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewEditorText", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PreviewEditorLink {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PreviewEditorLink", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_ColoursTab {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.ColoursTab", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_CodeTab {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.CodeTab", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PickColourTooltip {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PickColourTooltip", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Format {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Format", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_PickColour {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.PickColour", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Copy {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Copy", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Preview {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Preview", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_ResetToDefault {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.ResetToDefault", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Save {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Save", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_Close {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.Close", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_StatusInvalidGeneric {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.StatusInvalidGeneric", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_StatusInvalidLine {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.StatusInvalidLine", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_StatusLooksGood {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.StatusLooksGood", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_StatusFormatFailed {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.StatusFormatFailed", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_CopySuccess {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.CopySuccess", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Editor_StatusSaveFailed {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Editor.StatusSaveFailed", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Changes_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Changes_SummarySingular {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.SummarySingular", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Changes_SummaryFormat {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.SummaryFormat", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Changes_Save {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.Save", resourceCulture);
+            }
+        }
+
+        public static string Menu_Appearance_ColorTheme_Changes_Cancel {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ColorTheme.Changes.Cancel", resourceCulture);
+            }
+        }
     }
 }

@@ -11,6 +11,8 @@ using Microsoft.Win32;
 using PhasmaStrap.UI.Elements.Settings;
 using PhasmaStrap.UI.Elements.Editor;
 using PhasmaStrap.UI.Elements.Dialogs;
+using PhasmaStrap.UI.Elements.ContextMenu;
+using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
@@ -27,6 +29,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand RenameCustomThemeCommand => new RelayCommand(RenameCustomTheme);
         public ICommand EditCustomThemeCommand => new RelayCommand(EditCustomTheme);
         public ICommand ExportCustomThemeCommand => new RelayCommand(ExportCustomTheme);
+
+        public ICommand EditColorThemeCommand => new RelayCommand(EditColorTheme);
 
         private void PreviewBootstrapper()
         {
@@ -428,5 +432,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         #endregion
+
+        // app UI colour theme (AppColorTheme) - distinct from the CustomThemes above, which are
+        // *bootstrapper dialog* themes, not colours for PhasmaStrap's own settings/menu UI
+        public bool CustomColorThemeEnabled
+        {
+            get => App.Settings.Prop.CustomColorThemeEnabled;
+            set
+            {
+                App.Settings.Prop.CustomColorThemeEnabled = value;
+                WpfUiWindow.ApplyThemeToAllOpenWindows();
+            }
+        }
+
+        private void EditColorTheme()
+        {
+            var editor = new AppColorThemeEditor();
+            editor.ShowDialog();
+
+            OnPropertyChanged(nameof(CustomColorThemeEnabled));
+        }
     }
 }

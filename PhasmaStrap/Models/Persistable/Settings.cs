@@ -216,5 +216,11 @@ namespace PhasmaStrap.Models.Persistable
         public int InGameResolutionWidth { get; set; } = 1920;
         public int InGameResolutionHeight { get; set; } = 1080;
         public int InGameResolutionRefreshRate { get; set; } = 60;
+
+        // app UI colour theme (AppColorTheme, ported from Voidstrap's custom theme editor) - a
+        // user-edited colour/brush override merged on top of the active Dark/Light skin, saved to
+        // Paths.CustomColorThemeXaml. Unrelated to the pre-existing custom *bootstrapper dialog*
+        // theme feature (Paths.CustomThemes / SelectedCustomTheme below).
+        public bool CustomColorThemeEnabled { get; set; } = false;
     }
 }

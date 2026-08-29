@@ -33,6 +33,10 @@
 
         public static string CustomFont => Path.Combine(Modifications, "content\\fonts\\CustomFont.ttf");
 
+        // app UI colour theme override (AppColorTheme) - distinct from CustomThemes above, which
+        // holds custom *bootstrapper dialog* definitions, not app colour schemes
+        public static string CustomColorThemeXaml => Path.Combine(Base, "CustomColorTheme.xaml");
+
         public static bool Initialized => !String.IsNullOrEmpty(Base);
 
         public static void Initialize(string baseDirectory)

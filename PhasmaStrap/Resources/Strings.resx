@@ -2667,4 +2667,103 @@ Defaulting to {1}.</value>
   <data name="Menu.Performance.IdentifyDisplays.Button" xml:space="preserve">
     <value>Identify</value>
   </data>
+  <data name="Menu.Appearance.ColorTheme.Title" xml:space="preserve">
+    <value>Custom color theme</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Description" xml:space="preserve">
+    <value>Override the colors used throughout PhasmaStrap's own menus and dialogs. This is separate from the custom bootstrapper themes above, which only affect the loading window.</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Title" xml:space="preserve">
+    <value>Color Theme Editor</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewHeading" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewPanelSurface" xml:space="preserve">
+    <value>Panel surface</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewSecondaryText" xml:space="preserve">
+    <value>Secondary text sits on the panel</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewButton" xml:space="preserve">
+    <value>Accent button</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewToggleItem" xml:space="preserve">
+    <value>A toggle</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewDropdownItem" xml:space="preserve">
+    <value>A dropdown</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewDropdownItem2" xml:space="preserve">
+    <value>Second item</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewEditorText" xml:space="preserve">
+    <value>editor text</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PreviewEditorLink" xml:space="preserve">
+    <value>a link</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.ColoursTab" xml:space="preserve">
+    <value>Colours</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.CodeTab" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PickColourTooltip" xml:space="preserve">
+    <value>Pick a colour</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Format" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.PickColour" xml:space="preserve">
+    <value>Pick colour</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.ResetToDefault" xml:space="preserve">
+    <value>Reset to default</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Save" xml:space="preserve">
+    <value>Save and apply</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.StatusInvalidGeneric" xml:space="preserve">
+    <value>That theme is not valid.</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.StatusInvalidLine" xml:space="preserve">
+    <value>Line {0}: {1}</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.StatusLooksGood" xml:space="preserve">
+    <value>Theme looks good</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.StatusFormatFailed" xml:space="preserve">
+    <value>Cannot format an invalid theme</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.CopySuccess" xml:space="preserve">
+    <value>Copied to the clipboard</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Editor.StatusSaveFailed" xml:space="preserve">
+    <value>Could not save the theme: {0}</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Changes.Title" xml:space="preserve">
+    <value>Review changes</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Changes.SummarySingular" xml:space="preserve">
+    <value>1 colour will change.</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Changes.SummaryFormat" xml:space="preserve">
+    <value>{0} colours will change.</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Changes.Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Menu.Appearance.ColorTheme.Changes.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
 </root>
