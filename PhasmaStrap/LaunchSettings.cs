@@ -40,6 +40,10 @@ namespace PhasmaStrap
 
         public LaunchFlag ForceFlag                 { get; } = new("force");
 
+        // internal use only - launched by ClassicHostRedirect.RunElevated() under UAC elevation to apply/remove
+        // the classic client hosts file redirect; data is "on" or "off"
+        public LaunchFlag ClassicRedirectFlag       { get; } = new("classicredirect");
+
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");
