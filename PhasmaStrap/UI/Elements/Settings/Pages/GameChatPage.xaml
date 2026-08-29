@@ -5,24 +5,25 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="GameChatPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="An in-game chat overlay window that sits on top of Roblox." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
-        <TextBlock Text="This installs a system-wide low-level keyboard hook while a game session is active (needed so the overlay can be toggled/typed into without stealing focus from Roblox), so it is off by default." FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_KeyboardHookNotice}" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
 
-        <TextBlock Text="General" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_General_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <controls:OptionControl Header="Enable game chat overlay" Description="Toggles the chat overlay and its keyboard hook for the current and future Roblox sessions.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_Enabled_Title}" Description="{x:Static resources:Strings.Menu_GameChat_Enabled_Description}">
             <ui:ToggleSwitch IsChecked="{Binding GameChatEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Chat server URL" Description="Optional. Cross-player chat is relayed through a server you (or your server admin) configure here - PhasmaStrap does not run a chat server of its own. Leave blank to use the overlay locally (commands like /help, /clear, /console still work) without connecting anywhere.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_ServerUrl_Title}" Description="{x:Static resources:Strings.Menu_GameChat_ServerUrl_Description}">
             <TextBox Width="320" Text="{Binding GameChatServerUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Message filter" Description="How aggressively to hide messages flagged by the chat server's moderation scores, if it reports any.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_MessageFilter_Title}" Description="{x:Static resources:Strings.Menu_GameChat_MessageFilter_Description}">
             <ComboBox Width="160" ItemsSource="{Binding FilterPreferenceOptions, Mode=OneTime}" SelectedItem="{Binding GameChatFilterPreference, Mode=TwoWay}" />
         </controls:OptionControl>
     </StackPanel>

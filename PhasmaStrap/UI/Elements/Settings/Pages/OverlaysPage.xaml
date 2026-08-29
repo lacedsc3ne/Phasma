@@ -5,60 +5,61 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="OverlaysPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="A small GPU-composited overlay drawn on top of the Roblox window while you're in a game." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <TextBlock Text="Stats HUD" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_StatsHud_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <controls:OptionControl Header="Show FPS overlay" Description="Draws a small FPS readout in the corner of the Roblox window.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_ShowFps_Title}" Description="{x:Static resources:Strings.Menu_Overlays_ShowFps_Description}">
             <ui:ToggleSwitch IsChecked="{Binding HudEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Overlay diagnostics" Description="Keeps track of overlay windows so the compositor doesn't hide itself behind its own UI, and powers the diagnostics report.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_Diagnostics_Title}" Description="{x:Static resources:Strings.Menu_Overlays_Diagnostics_Description}">
             <ui:ToggleSwitch IsChecked="{Binding DiagnosticsEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Crosshair" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_Crosshair_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <controls:OptionControl Header="Show crosshair" Description="Draws a crosshair centered on the Roblox window while you're in a game.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairEnabled_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairEnabled_Description}">
             <ui:ToggleSwitch IsChecked="{Binding CrosshairEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Shape" Description="0 = cross, 1 = filled dot, 2 = ring.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Description}">
             <ComboBox Width="140" SelectedIndex="{Binding CrosshairShapeIndex, Mode=TwoWay}">
-                <ComboBoxItem Content="Cross" />
-                <ComboBoxItem Content="Dot" />
-                <ComboBoxItem Content="Ring" />
+                <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Cross}" />
+                <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Dot}" />
+                <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Ring}" />
             </ComboBox>
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Size">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairSize_Title}">
             <ui:NumberBox Width="140" Min="2" Max="60" Value="{Binding CrosshairSize, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Line thickness">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairLineThickness_Title}">
             <ui:NumberBox Width="140" Min="1" Max="16" Value="{Binding CrosshairLineThickness, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Center gap">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairGap_Title}">
             <ui:NumberBox Width="140" Min="0" Max="40" Value="{Binding CrosshairGap, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Opacity">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairOpacity_Title}">
             <StackPanel Orientation="Horizontal">
                 <Slider Width="200" Minimum="0.05" Maximum="1" TickFrequency="0.05" Value="{Binding CrosshairOpacity, Mode=TwoWay}" />
                 <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CrosshairOpacity, Mode=OneWay, StringFormat={}{0:0.00}}" />
             </StackPanel>
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Color" Description="Hex color, e.g. #00FF00.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairColor_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairColor_Description}">
             <TextBox Width="140" Text="{Binding CrosshairColorHex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Outline color" Description="Hex color, e.g. #000000.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairOutlineColor_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairOutlineColor_Description}">
             <TextBox Width="140" Text="{Binding CrosshairOutlineColorHex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
     </StackPanel>

@@ -3754,5 +3754,284 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.ServerBrowser.ExcludedPlaces.PlaceholderText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A small GPU-composited overlay drawn on top of the Roblox window while you're in a game..
+        /// </summary>
+        public static string Menu_Overlays_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stats HUD.
+        /// </summary>
+        public static string Menu_Overlays_StatsHud_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.StatsHud.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show FPS overlay.
+        /// </summary>
+        public static string Menu_Overlays_ShowFps_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.ShowFps.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Draws a small FPS readout in the corner of the Roblox window..
+        /// </summary>
+        public static string Menu_Overlays_ShowFps_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.ShowFps.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overlay diagnostics.
+        /// </summary>
+        public static string Menu_Overlays_Diagnostics_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.Diagnostics.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Keeps track of overlay windows so the compositor doesn't hide itself behind its own UI, and powers the diagnostics report..
+        /// </summary>
+        public static string Menu_Overlays_Diagnostics_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.Diagnostics.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Crosshair.
+        /// </summary>
+        public static string Menu_Overlays_Crosshair_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.Crosshair.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show crosshair.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairEnabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairEnabled.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Draws a crosshair centered on the Roblox window while you're in a game..
+        /// </summary>
+        public static string Menu_Overlays_CrosshairEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shape.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairShape_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairShape.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 0 = cross, 1 = filled dot, 2 = ring..
+        /// </summary>
+        public static string Menu_Overlays_CrosshairShape_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairShape.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cross.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairShape_Cross {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairShape.Cross", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Dot.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairShape_Dot {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairShape.Dot", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ring.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairShape_Ring {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairShape.Ring", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairSize_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairSize.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Line thickness.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairLineThickness_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairLineThickness.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Center gap.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairGap_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairGap.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Opacity.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairOpacity_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairOpacity.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Color.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairColor_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairColor.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hex color, e.g. #00FF00..
+        /// </summary>
+        public static string Menu_Overlays_CrosshairColor_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairColor.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Outline color.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairOutlineColor_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairOutlineColor.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hex color, e.g. #000000..
+        /// </summary>
+        public static string Menu_Overlays_CrosshairOutlineColor_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairOutlineColor.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to An in-game chat overlay window that sits on top of Roblox..
+        /// </summary>
+        public static string Menu_GameChat_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This installs a system-wide low-level keyboard hook while a game session is active (needed so the overlay can be toggled/typed into without stealing focus from Roblox), so it is off by default..
+        /// </summary>
+        public static string Menu_GameChat_KeyboardHookNotice {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.KeyboardHookNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string Menu_GameChat_General_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.General.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable game chat overlay.
+        /// </summary>
+        public static string Menu_GameChat_Enabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Enabled.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles the chat overlay and its keyboard hook for the current and future Roblox sessions..
+        /// </summary>
+        public static string Menu_GameChat_Enabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Enabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Chat server URL.
+        /// </summary>
+        public static string Menu_GameChat_ServerUrl_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.ServerUrl.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Optional. Cross-player chat is relayed through a server you (or your server admin) configure here - PhasmaStrap does not run a chat server of its own. Leave blank to use the overlay locally (commands like /help, /clear, /console still work) without connecting anywhere..
+        /// </summary>
+        public static string Menu_GameChat_ServerUrl_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.ServerUrl.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Message filter.
+        /// </summary>
+        public static string Menu_GameChat_MessageFilter_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.MessageFilter.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to How aggressively to hide messages flagged by the chat server's moderation scores, if it reports any..
+        /// </summary>
+        public static string Menu_GameChat_MessageFilter_Description {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.MessageFilter.Description", resourceCulture);
+            }
+        }
     }
 }

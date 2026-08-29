@@ -1434,4 +1434,97 @@ Defaulting to {1}.</value>
   <data name="Menu.ServerBrowser.ExcludedPlaces.PlaceholderText" xml:space="preserve">
     <value>Place ID to exclude</value>
   </data>
+  <data name="Menu.Overlays.Description" xml:space="preserve">
+    <value>A small GPU-composited overlay drawn on top of the Roblox window while you're in a game.</value>
+  </data>
+  <data name="Menu.Overlays.StatsHud.Title" xml:space="preserve">
+    <value>Stats HUD</value>
+  </data>
+  <data name="Menu.Overlays.ShowFps.Title" xml:space="preserve">
+    <value>Show FPS overlay</value>
+  </data>
+  <data name="Menu.Overlays.ShowFps.Description" xml:space="preserve">
+    <value>Draws a small FPS readout in the corner of the Roblox window.</value>
+  </data>
+  <data name="Menu.Overlays.Diagnostics.Title" xml:space="preserve">
+    <value>Overlay diagnostics</value>
+  </data>
+  <data name="Menu.Overlays.Diagnostics.Description" xml:space="preserve">
+    <value>Keeps track of overlay windows so the compositor doesn't hide itself behind its own UI, and powers the diagnostics report.</value>
+  </data>
+  <data name="Menu.Overlays.Crosshair.Title" xml:space="preserve">
+    <value>Crosshair</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairEnabled.Title" xml:space="preserve">
+    <value>Show crosshair</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairEnabled.Description" xml:space="preserve">
+    <value>Draws a crosshair centered on the Roblox window while you're in a game.</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairShape.Title" xml:space="preserve">
+    <value>Shape</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairShape.Description" xml:space="preserve">
+    <value>0 = cross, 1 = filled dot, 2 = ring.</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairShape.Cross" xml:space="preserve">
+    <value>Cross</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairShape.Dot" xml:space="preserve">
+    <value>Dot</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairShape.Ring" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairSize.Title" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairLineThickness.Title" xml:space="preserve">
+    <value>Line thickness</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairGap.Title" xml:space="preserve">
+    <value>Center gap</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairOpacity.Title" xml:space="preserve">
+    <value>Opacity</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairColor.Title" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairColor.Description" xml:space="preserve">
+    <value>Hex color, e.g. #00FF00.</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairOutlineColor.Title" xml:space="preserve">
+    <value>Outline color</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairOutlineColor.Description" xml:space="preserve">
+    <value>Hex color, e.g. #000000.</value>
+  </data>
+  <data name="Menu.GameChat.Description" xml:space="preserve">
+    <value>An in-game chat overlay window that sits on top of Roblox.</value>
+  </data>
+  <data name="Menu.GameChat.KeyboardHookNotice" xml:space="preserve">
+    <value>This installs a system-wide low-level keyboard hook while a game session is active (needed so the overlay can be toggled/typed into without stealing focus from Roblox), so it is off by default.</value>
+  </data>
+  <data name="Menu.GameChat.General.Title" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Menu.GameChat.Enabled.Title" xml:space="preserve">
+    <value>Enable game chat overlay</value>
+  </data>
+  <data name="Menu.GameChat.Enabled.Description" xml:space="preserve">
+    <value>Toggles the chat overlay and its keyboard hook for the current and future Roblox sessions.</value>
+  </data>
+  <data name="Menu.GameChat.ServerUrl.Title" xml:space="preserve">
+    <value>Chat server URL</value>
+  </data>
+  <data name="Menu.GameChat.ServerUrl.Description" xml:space="preserve">
+    <value>Optional. Cross-player chat is relayed through a server you (or your server admin) configure here - PhasmaStrap does not run a chat server of its own. Leave blank to use the overlay locally (commands like /help, /clear, /console still work) without connecting anywhere.</value>
+  </data>
+  <data name="Menu.GameChat.MessageFilter.Title" xml:space="preserve">
+    <value>Message filter</value>
+  </data>
+  <data name="Menu.GameChat.MessageFilter.Description" xml:space="preserve">
+    <value>How aggressively to hide messages flagged by the chat server's moderation scores, if it reports any.</value>
+  </data>
 </root>
