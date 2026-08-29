@@ -1,0 +1,180 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.FFlagSearchDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Dialogs"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+        mc:Ignorable="d"
+        Title="{x:Static resources:Strings.Dialog_FFlagSearch_Title}"
+        Width="1000"
+        Height="700"
+        MinWidth="800"
+        MinHeight="600"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <base:WpfUiWindow.Resources>
+        <ResourceDictionary>
+            <Style x:Key="SectionHeaderStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Margin" Value="0,10,0,5" />
+            </Style>
+            <Style x:Key="DescriptionStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+        </ResourceDictionary>
+    </base:WpfUiWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Title="{x:Static resources:Strings.Dialog_FFlagSearch_Title}" Grid.Row="0" Padding="8" CanMaximize="True" ShowMaximize="True" ShowMinimize="True" KeyboardNavigation.TabNavigation="None" />
+
+        <StackPanel Grid.Row="1" Margin="20,10,20,0">
+            <TextBlock Margin="0,0,0,10" FontSize="20" FontWeight="Bold" Text="{x:Static resources:Strings.Dialog_FFlagSearch_Heading}" />
+            <TextBlock Style="{StaticResource DescriptionStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_Description}" />
+            <Border Margin="0,0,0,10" Padding="10" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="5">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Name="StatusText" VerticalAlignment="Center" Text="{x:Static resources:Strings.Dialog_FFlagSearch_StatusReady}" />
+                    <ProgressBar Name="LoadingProgress" Width="200" Height="10" Margin="10,0,0,0" IsIndeterminate="True" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <TabControl Name="MainTabControl" Grid.Row="2" Margin="20,0,20,0">
+            <TabItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_Tab_LiveSearch}">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_LiveSearch_Heading}" />
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Style="{StaticResource DescriptionStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_LiveSearch_Description}" />
+                        <ui:TextBox Name="SearchTextBox" Height="35" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Dialog_FFlagSearch_SearchPlaceholder}" TextChanged="SearchTextBox_TextChanged" />
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <CheckBox Name="TrueFlagsOnlyCheckBox" Margin="0,0,15,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_TrueOnly}" Checked="TrueFlagsOnlyCheckBox_CheckedChanged" Unchecked="TrueFlagsOnlyCheckBox_CheckedChanged" />
+                            <CheckBox Name="FalseFlagsOnlyCheckBox" Margin="0,0,15,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_FalseOnly}" Checked="FalseFlagsOnlyCheckBox_CheckedChanged" Unchecked="FalseFlagsOnlyCheckBox_CheckedChanged" />
+                            <ui:Button Name="AddFromSearchButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_AddToFlags}" Click="AddFromSearchButton_Click" />
+                            <ui:Button Name="ExportSearchResultsButton" Content="{x:Static resources:Strings.Dialog_FFlagSearch_ExportResults}" IsEnabled="False" Click="ExportSearchResultsButton_Click" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <DataGrid Name="SearchResultsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" MouseDoubleClick="SearchResultsDataGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="*" Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnSource}" Binding="{Binding Source}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock Name="SearchResultsCount" Grid.Row="3" Margin="0,5,0,0" HorizontalAlignment="Right" Text="0" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_Tab_BulkValidation}">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_BulkValidation_Heading}" />
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Style="{StaticResource DescriptionStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_BulkValidation_Description}" />
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <ui:Button Name="LoadFileButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_LoadFile}" Click="LoadFileButton_Click" />
+                            <ui:Button Name="ValidateButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_Validate}" Click="ValidateButton_Click" />
+                            <ui:Button Name="ClearValidationButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_Clear}" Click="ClearValidationButton_Click" />
+                            <ui:Button Name="SampleFormatButton" Content="{x:Static resources:Strings.Dialog_FFlagSearch_SampleFormat}" Click="SampleFormatButton_Click" />
+                        </StackPanel>
+                        <ui:TextBox Name="ValidationInputTextBox" Height="200" AcceptsReturn="True" AllowDrop="True" HorizontalScrollBarVisibility="Auto" PlaceholderText="{x:Static resources:Strings.Dialog_FFlagSearch_ValidationPlaceholder}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto">
+                            <FrameworkElement.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_Paste}" InputGestureText="Ctrl+V" Click="PasteMenuItem_Click" />
+                                    <Separator />
+                                    <MenuItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_SelectAll}" InputGestureText="Ctrl+A" Click="SelectAllMenuItem_Click" />
+                                    <MenuItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_Clear}" Click="ClearMenuItem_Click" />
+                                </ContextMenu>
+                            </FrameworkElement.ContextMenu>
+                        </ui:TextBox>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2" Style="{StaticResource SectionHeaderStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_ValidationResultsHeading}" />
+
+                    <DataGrid Name="ValidationResultsDataGrid" Grid.Row="3" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="*" Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnInputValue}" Binding="{Binding InputValue}" />
+                            <DataGridTextColumn Width="100" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnStatus}" Binding="{Binding Status}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnValidValue}" Binding="{Binding ValidValue}" />
+                            <DataGridTextColumn Width="200" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnNotes}" Binding="{Binding Notes}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="4" Margin="0,10,0,0" Orientation="Horizontal">
+                        <ui:Button Name="ExportValidResultsButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_ExportValid}" IsEnabled="False" Click="ExportValidResultsButton_Click" />
+                        <TextBlock Name="ValidationResultsCount" VerticalAlignment="Center" Text="0" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="{x:Static resources:Strings.Dialog_FFlagSearch_Tab_Browse}">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_Browse_Heading}" />
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Style="{StaticResource DescriptionStyle}" Text="{x:Static resources:Strings.Dialog_FFlagSearch_Browse_Description}" />
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Name="FetchSampleButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_FetchSample}" Click="FetchSampleButton_Click" />
+                            <ui:Button Name="AddFromBrowseButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_AddToFlags}" Click="AddFromBrowseButton_Click" />
+                            <ui:Button Name="DownloadAllBrowseButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_DownloadAll}" IsEnabled="False" Click="DownloadAllBrowseButton_Click" />
+                            <ui:Button Name="DownloadTrueBrowseButton" Margin="0,0,10,0" Content="{x:Static resources:Strings.Dialog_FFlagSearch_DownloadTrueOnly}" IsEnabled="False" Click="DownloadTrueBrowseButton_Click" />
+                            <ui:Button Name="DownloadFalseBrowseButton" Content="{x:Static resources:Strings.Dialog_FFlagSearch_DownloadFalseOnly}" IsEnabled="False" Click="DownloadFalseBrowseButton_Click" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <DataGrid Name="BrowseResultsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" MouseDoubleClick="BrowseResultsDataGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="*" Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" />
+                            <DataGridTextColumn Width="150" Header="{x:Static resources:Strings.Dialog_FFlagSearch_ColumnSource}" Binding="{Binding Source}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock Name="BrowseResultsCount" Grid.Row="3" Margin="0,5,0,0" HorizontalAlignment="Right" Text="0" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="3" Margin="20,10,20,20" HorizontalAlignment="Right" Orientation="Horizontal">
+            <ui:Button Name="CloseButton" Width="80" Content="{x:Static resources:Strings.Common_Close}" Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</base:WpfUiWindow>

@@ -1917,7 +1917,16 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("FileTypes.JSONFiles", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Text files.
+        /// </summary>
+        public static string FileTypes_TextFiles {
+            get {
+                return ResourceManager.GetString("FileTypes.TextFiles", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Zip archive.
         /// </summary>
@@ -7135,6 +7144,588 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Dialog.FFlagPresetValues.Title", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Find Fast Flags.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Title {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fast Flag Search &amp; Validation.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Heading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Heading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search, validate, and browse Fast Flags indexed from public community trackers.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Description {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string Dialog_FFlagSearch_StatusReady {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.StatusReady", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading flags....
+        /// </summary>
+        public static string Dialog_FFlagSearch_StatusLoading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.StatusLoading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Done: {0} flags loaded.
+        /// </summary>
+        public static string Dialog_FFlagSearch_StatusLoaded {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.StatusLoaded", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading flag data.
+        /// </summary>
+        public static string Dialog_FFlagSearch_StatusLoadError {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.StatusLoadError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Live Search.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Tab_LiveSearch {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Tab.LiveSearch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bulk Validation.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Tab_BulkValidation {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Tab.BulkValidation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse All.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Tab_Browse {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Tab.Browse", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Live Flag Search.
+        /// </summary>
+        public static string Dialog_FFlagSearch_LiveSearch_Heading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.LiveSearch.Heading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search by full flag name or partial keyword match.
+        /// </summary>
+        public static string Dialog_FFlagSearch_LiveSearch_Description {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.LiveSearch.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter flag name or keyword....
+        /// </summary>
+        public static string Dialog_FFlagSearch_SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.SearchPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to True flags only.
+        /// </summary>
+        public static string Dialog_FFlagSearch_TrueOnly {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.TrueOnly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to False flags only.
+        /// </summary>
+        public static string Dialog_FFlagSearch_FalseOnly {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.FalseOnly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export Results.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportResults {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportResults", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add to Flags.
+        /// </summary>
+        public static string Dialog_FFlagSearch_AddToFlags {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.AddToFlags", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} results.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ResultsCount {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ResultsCount", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Showing first {0} of {1} results. Use export to get all results..
+        /// </summary>
+        public static string Dialog_FFlagSearch_ShowingFirstN {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ShowingFirstN", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ColumnSource {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ColumnSource", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Input Value.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ColumnInputValue {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ColumnInputValue", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ColumnStatus {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ColumnStatus", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Valid Value.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ColumnValidValue {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ColumnValidValue", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notes.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ColumnNotes {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ColumnNotes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bulk Flag Validation.
+        /// </summary>
+        public static string Dialog_FFlagSearch_BulkValidation_Heading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.BulkValidation.Heading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type flags directly or load a file, then check which ones exist in the loaded sources.
+        /// </summary>
+        public static string Dialog_FFlagSearch_BulkValidation_Description {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.BulkValidation.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Load File.
+        /// </summary>
+        public static string Dialog_FFlagSearch_LoadFile {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.LoadFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Validate.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Validate {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Validate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Clear {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Clear", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type or paste flags here in JSON format...
+        ///Example:
+        ///{
+        ///  "FFlagDebugDisplayFPS": "True",
+        ///  "DFIntTaskSchedulerTargetFps": "120"
+        ///}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidationPlaceholder {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidationPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Validation Results.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidationResultsHeading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidationResultsHeading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export Valid Flags.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportValid {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportValid", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Paste {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Paste", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select All.
+        /// </summary>
+        public static string Dialog_FFlagSearch_SelectAll {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.SelectAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sample Format.
+        /// </summary>
+        public static string Dialog_FFlagSearch_SampleFormat {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.SampleFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter flags to validate..
+        /// </summary>
+        public static string Dialog_FFlagSearch_NoInput {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.NoInput", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No Input.
+        /// </summary>
+        public static string Dialog_FFlagSearch_NoInputTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.NoInputTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to That flag input is too large to validate..
+        /// </summary>
+        public static string Dialog_FFlagSearch_InputTooLarge {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.InputTooLarge", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Input Too Large.
+        /// </summary>
+        public static string Dialog_FFlagSearch_InputTooLargeTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.InputTooLargeTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate flags found in input: {0}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_DuplicatesDetected {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.DuplicatesDetected", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicates Detected.
+        /// </summary>
+        public static string Dialog_FFlagSearch_DuplicatesTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.DuplicatesTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error validating flags: {0}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidationError {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidationError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Validation Error.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidationErrorTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidationErrorTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Valid.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidStatus {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidStatus", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid.
+        /// </summary>
+        public static string Dialog_FFlagSearch_InvalidStatus {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.InvalidStatus", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Flag exists in database.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidNotes {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidNotes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Flag not found in any loaded source.
+        /// </summary>
+        public static string Dialog_FFlagSearch_InvalidNotes {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.InvalidNotes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Validated {0} flags. {1} valid, {2} invalid..
+        /// </summary>
+        public static string Dialog_FFlagSearch_ValidatedSummary {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ValidatedSummary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse All Flags.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Browse_Heading {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Browse.Heading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse a sample of flags currently indexed from the loaded sources.
+        /// </summary>
+        public static string Dialog_FFlagSearch_Browse_Description {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.Browse.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fetch Sample.
+        /// </summary>
+        public static string Dialog_FFlagSearch_FetchSample {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.FetchSample", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download All.
+        /// </summary>
+        public static string Dialog_FFlagSearch_DownloadAll {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.DownloadAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download True Only.
+        /// </summary>
+        public static string Dialog_FFlagSearch_DownloadTrueOnly {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.DownloadTrueOnly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download False Only.
+        /// </summary>
+        public static string Dialog_FFlagSearch_DownloadFalseOnly {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.DownloadFalseOnly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} flags shown.
+        /// </summary>
+        public static string Dialog_FFlagSearch_BrowseCount {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.BrowseCount", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading file: {0}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_FileError {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.FileError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to File Error.
+        /// </summary>
+        public static string Dialog_FFlagSearch_FileErrorTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.FileErrorTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error pasting from clipboard: {0}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_PasteError {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.PasteError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Paste Error.
+        /// </summary>
+        public static string Dialog_FFlagSearch_PasteErrorTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.PasteErrorTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exported {0} flags to {1}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportComplete {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportComplete", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export Complete.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportCompleteTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportCompleteTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Error exporting flags: {0}.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportError {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export Error.
+        /// </summary>
+        public static string Dialog_FFlagSearch_ExportErrorTitle {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagSearch.ExportErrorTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search Database.
+        /// </summary>
+        public static string Menu_FastFlagEditor_SearchDatabase {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.SearchDatabase", resourceCulture);
+            }
+        }
+
 
 
         /// <summary>
