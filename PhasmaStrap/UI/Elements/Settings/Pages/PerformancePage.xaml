@@ -121,6 +121,10 @@
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_EnginePreset_Title}" Description="{x:Static resources:Strings.Menu_Performance_EnginePreset_Description}">
+            <ComboBox Padding="10,5,10,5" MinWidth="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Title}" Description="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Description}">
             <ui:ToggleSwitch IsChecked="{Binding OptimizeRoblox, Mode=TwoWay}" />
         </controls:OptionControl>
@@ -148,6 +152,58 @@
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Title}" Description="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Description}">
             <ui:ToggleSwitch IsChecked="{Binding SoftwareRenderingEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Header}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Description}" />
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Title}" FontSize="12" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Description}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_PlaceholderText}" Text="{Binding EngineExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineExcludedPlaceCommand, Mode=OneTime}" />
+        </StackPanel>
+        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineExcludedPlaces, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Title}" FontSize="12" FontWeight="Medium" Margin="0,12,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Description}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineAssignments_PlaceholderText}" Text="{Binding EngineAssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox Width="150" Margin="8,0,0,0" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" SelectedItem="{Binding EngineAssignPresetName, Mode=TwoWay}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineProfileAssignmentCommand, Mode=OneTime}" />
+        </StackPanel>
+        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineProfileAssignments, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineProfileAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

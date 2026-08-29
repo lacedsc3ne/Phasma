@@ -237,5 +237,12 @@ namespace PhasmaStrap.Models.Persistable
         public bool AutoTranslate { get; set; } = false;
         public bool RpcAutoTranslate { get; set; } = false;
         public string AutoTranslateLanguage { get; set; } = "en";
+
+        // per-game overrides for the Roblox process optimizer ("engine" settings on the
+        // Performance page) - see Integrations/EnginePresets.cs. Place ID (string) -> preset name
+        // (one of EnginePresets.Presets' keys); places in EngineExcludedPlaces are never optimized
+        // regardless of the global toggles or any assigned preset.
+        public Dictionary<string, string> EnginePlaceProfiles { get; set; } = new();
+        public List<string> EngineExcludedPlaces { get; set; } = new();
     }
 }

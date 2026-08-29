@@ -25,6 +25,10 @@ namespace PhasmaStrap.Integrations
 
         private readonly int _processId;
 
+        // per-place override resolved once at construction (see EnginePresets.Resolve) - null means
+        // "just read the live global settings every poll", matching the pre-per-game-override behavior
+        private readonly EnginePresetValues? _override;
+
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private Task? _loopTask;
@@ -56,10 +60,13 @@ namespace PhasmaStrap.Integrations
         [DllImport("user32.dll")]
         private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-        public RobloxProcessOptimizer(int processId)
+        public RobloxProcessOptimizer(int processId, EnginePresetValues? presetOverride = null)
         {
             _processId = processId;
+            _override = presetOverride;
         }
+
+        private EnginePresetValues EffectiveValues => _override ?? EnginePresets.FromSettings(App.Settings.Prop);
 
         public static bool ShouldRun(Settings? settings)
         {
@@ -85,7 +92,7 @@ namespace PhasmaStrap.Integrations
             {
                 return;
             }
-            TryApplyPriority(process, ResolvePriority(settings));
+            TryApplyPriority(process, ResolvePriority(EnginePresets.FromSettings(settings)));
         }
 
         public void Start()
@@ -125,7 +132,7 @@ namespace PhasmaStrap.Integrations
 
         private void ApplySettings(Process process)
         {
-            Settings settings = App.Settings.Prop;
+            EnginePresetValues settings = EffectiveValues;
             bool focused = IsProcessFocused();
             ApplySelfPriority(focused);
             ProcessPriorityClass desiredPriority = !focused && settings.RobloxEfficiencyMode ? ProcessPriorityClass.Idle : (!focused && settings.ReduceMemoryOutOfFocus ? ProcessPriorityClass.BelowNormal : ResolvePriority(settings));
@@ -382,7 +389,7 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        private static ProcessPriorityClass ResolvePriority(Settings settings)
+        private static ProcessPriorityClass ResolvePriority(EnginePresetValues settings)
         {
             string priority = settings.RobloxPriorityLimit?.Trim() ?? "Normal";
             if (priority.Equals("Realtime", StringComparison.OrdinalIgnoreCase))
