@@ -2978,4 +2978,40 @@ Example:
   <data name="Menu.Appearance.ColorTheme.Changes.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="Menu.Releases.Assets" xml:space="preserve">
+    <value>asset(s)</value>
+  </data>
+  <data name="Menu.Releases.Count" xml:space="preserve">
+    <value>{0} release(s).</value>
+  </data>
+  <data name="Menu.Releases.Description" xml:space="preserve">
+    <value>What's new in PhasmaStrap - every release published to its GitHub repository, newest first.</value>
+  </data>
+  <data name="Menu.Releases.Empty" xml:space="preserve">
+    <value>No releases found.</value>
+  </data>
+  <data name="Menu.Releases.Error" xml:space="preserve">
+    <value>Failed to load releases. Check your connection and try again.</value>
+  </data>
+  <data name="Menu.Releases.Installed" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Menu.Releases.Loading" xml:space="preserve">
+    <value>Loading releases...</value>
+  </data>
+  <data name="Menu.Releases.NoNotes" xml:space="preserve">
+    <value>No release notes provided.</value>
+  </data>
+  <data name="Menu.Releases.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Menu.Releases.SearchPlaceholder" xml:space="preserve">
+    <value>Search releases...</value>
+  </data>
+  <data name="Menu.Releases.Title" xml:space="preserve">
+    <value>Releases</value>
+  </data>
+  <data name="Menu.Releases.ViewOnGitHub" xml:space="preserve">
+    <value>View on GitHub</value>
+  </data>
 </root>

@@ -80,6 +80,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             string networking = "Networking";
             string servers = "Servers";
             string history = "History";
+            string releases = Strings.Menu_Releases_Title;
             string appearance = Strings.Menu_Appearance_Title;
             string shortcuts = Strings.Common_Shortcuts;
             string phasmaStrap = "PhasmaStrap";
@@ -300,6 +301,9 @@ namespace PhasmaStrap.UI.Elements.Settings
 
                 // History
                 Entry("", "Every game you've played through PhasmaStrap, with playtime and last-played date, kept across restarts.", typeof(HistoryPage), history),
+
+                // Releases
+                Entry("", Strings.Menu_Releases_Description, typeof(ReleasesPage), releases),
 
                 // Appearance
                 Entry(Strings.Menu_Appearance_Global_Theme_Title, "", typeof(AppearancePage), appearance),
