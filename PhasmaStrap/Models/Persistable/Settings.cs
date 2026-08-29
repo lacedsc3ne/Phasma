@@ -244,5 +244,13 @@ namespace PhasmaStrap.Models.Persistable
         // regardless of the global toggles or any assigned preset.
         public Dictionary<string, string> EnginePlaceProfiles { get; set; } = new();
         public List<string> EngineExcludedPlaces { get; set; } = new();
+
+        // scope for FastFlagsPage's curated toggle set ("Engine Settings" - the ~83-toggle panel,
+        // not to be confused with the runtime optimizer above despite the similar name). All (the
+        // default) applies those flags everywhere as before; the other two modes restrict them to
+        // only the listed places, or to every place except the listed ones. See
+        // Bootstrapper.TryApplyEngineSettingsScopeAsync.
+        public EngineSettingsScopeMode EngineSettingsScope { get; set; } = EngineSettingsScopeMode.All;
+        public List<string> EngineSettingsScopedPlaces { get; set; } = new();
     }
 }
