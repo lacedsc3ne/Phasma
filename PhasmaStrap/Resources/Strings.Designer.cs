@@ -5888,5 +5888,537 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Nvidia.LodBiasLabel.Override", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Classic Client.
+        /// </summary>
+        public static string Menu_ClassicClient_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Runs a private Roblox server on your own machine and points classic/legacy Roblox clients at it, by redirecting roblox.com to 127.0.0.1 in the Windows hosts file for the duration of a classic session. This is a significant change to how your machine resolves Roblox's real domain, so it is off by default and the redirect is only ever active while a classic client session is running..
+        /// </summary>
+        public static string Menu_ClassicClient_Description {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable classic client support.
+        /// </summary>
+        public static string Menu_ClassicClient_Enabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Enabled.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master switch for this feature. Must be turned on before a classic client can be launched through PhasmaStrap..
+        /// </summary>
+        public static string Menu_ClassicClient_Enabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Enabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installation.
+        /// </summary>
+        public static string Menu_ClassicClient_Installation_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Installation.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install location.
+        /// </summary>
+        public static string Menu_ClassicClient_InstallLocation_Label {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.InstallLocation.Label", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave blank to use the default location.
+        /// </summary>
+        public static string Menu_ClassicClient_InstallLocation_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.InstallLocation.PlaceholderText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Acquire clients.
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Downloads the engine data pack and classic client archives from a third-party GitHub release (not built or hosted by PhasmaStrap - see the code comment on ClassicClients.DefaultBaseUrl). Every download is verified against that release's own published SHA-256 digest before it is extracted..
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_Description {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install engine data pack.
+        /// </summary>
+        public static string Menu_ClassicClient_InstallEngineDataPack {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.InstallEngineDataPack", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string Menu_ClassicClient_Install {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Install", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Update engine, maps and installed clients.
+        /// </summary>
+        public static string Menu_ClassicClient_UpdateAll {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.UpdateAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installed clients.
+        /// </summary>
+        public static string Menu_ClassicClient_InstalledClients_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.InstalledClients.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string Menu_ClassicClient_Refresh {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Refresh", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch selected client.
+        /// </summary>
+        public static string Menu_ClassicClient_LaunchSelectedClient {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.LaunchSelectedClient", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stop private server.
+        /// </summary>
+        public static string Menu_ClassicClient_StopPrivateServer {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.StopPrivateServer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Starting....
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_Starting {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.Starting", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cancelled..
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_Cancelled {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.Cancelled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed..
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_Failed {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.Failed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Engine data installed..
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_EngineInstalled {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.EngineInstalled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Checking for updates....
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_CheckingUpdates {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.CheckingUpdates", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Up to date..
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_UpToDate {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.UpToDate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} installed..
+        /// </summary>
+        public static string Menu_ClassicClient_Progress_ClientInstalled {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.Progress.ClientInstalled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Servers.
+        /// </summary>
+        public static string Menu_ServerBrowser_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Matchmaker.
+        /// </summary>
+        public static string Menu_ServerBrowser_Matchmaker_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Matchmaker.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Before joining a game, probes a batch of its public servers using your real Roblox session and picks the one estimated to have the lowest ping, instead of letting Roblox assign one at random. This reads your Roblox login session from disk and makes real join-attempt calls to Roblox's servers to do that..
+        /// </summary>
+        public static string Menu_ServerBrowser_Matchmaker_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Matchmaker.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable matchmaker.
+        /// </summary>
+        public static string Menu_ServerBrowser_EnableMatchmaker_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.EnableMatchmaker.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer empty servers.
+        /// </summary>
+        public static string Menu_ServerBrowser_PreferEmptyServers_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PreferEmptyServers.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Off prefers active, reasonably full servers instead..
+        /// </summary>
+        public static string Menu_ServerBrowser_PreferEmptyServers_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PreferEmptyServers.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preferred datacenter.
+        /// </summary>
+        public static string Menu_ServerBrowser_PreferredDatacenter_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PreferredDatacenter.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sticks to this location when it has servers available, instead of always picking the closest..
+        /// </summary>
+        public static string Menu_ServerBrowser_PreferredDatacenter_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PreferredDatacenter.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auto candidate count.
+        /// </summary>
+        public static string Menu_ServerBrowser_AutoCandidateCount_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.AutoCandidateCount.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Off lets you set a fixed number of servers to probe per search instead of scaling it automatically..
+        /// </summary>
+        public static string Menu_ServerBrowser_AutoCandidateCount_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.AutoCandidateCount.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Max candidates.
+        /// </summary>
+        public static string Menu_ServerBrowser_MaxCandidates_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.MaxCandidates.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only used when auto candidate count is off..
+        /// </summary>
+        public static string Menu_ServerBrowser_MaxCandidates_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.MaxCandidates.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Excluded datacenters.
+        /// </summary>
+        public static string Menu_ServerBrowser_ExcludedDatacenters_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ExcludedDatacenters.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The matchmaker will never pick a server in a checked datacenter..
+        /// </summary>
+        public static string Menu_ServerBrowser_ExcludedDatacenters_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ExcludedDatacenters.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Server Browser.
+        /// </summary>
+        public static string Menu_ServerBrowser_Browser_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Browser.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lists a game's public servers using Roblox's own public server list - this doesn't sign in, read your Roblox session, or measure real ping to any server..
+        /// </summary>
+        public static string Menu_ServerBrowser_Browser_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Browser.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID.
+        /// </summary>
+        public static string Menu_ServerBrowser_PlaceId_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PlaceId.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to e.g. 13700835620.
+        /// </summary>
+        public static string Menu_ServerBrowser_PlaceId_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.PlaceId.PlaceholderText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string Menu_ServerBrowser_Search {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Search", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Join.
+        /// </summary>
+        public static string Menu_ServerBrowser_Join {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Join", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Closest available.
+        /// </summary>
+        public static string Menu_ServerBrowser_ClosestAvailable {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ClosestAvailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a place ID and search..
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_EnterPlaceId {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.EnterPlaceId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a valid numeric place ID..
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_InvalidPlaceId {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.InvalidPlaceId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Searching....
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_Searching {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.Searching", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search failed: {0}.
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_SearchFailed {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.SearchFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Found {0} public server(s)..
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_FoundServers {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.FoundServers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No public servers found for this place..
+        /// </summary>
+        public static string Menu_ServerBrowser_Status_NoServersFound {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.Status.NoServersFound", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game Chat.
+        /// </summary>
+        public static string Menu_GameChat_Title {
+            get {
+                return ResourceManager.GetString("Menu.GameChat.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA.
+        /// </summary>
+        public static string Menu_Nvidia_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overlays.
+        /// </summary>
+        public static string Menu_Overlays_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to RiShade.
+        /// </summary>
+        public static string Menu_RiShade_Title {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search settings.
+        /// </summary>
+        public static string Menu_Settings_SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("Menu.Settings.SearchPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save &amp; Launch.
+        /// </summary>
+        public static string Menu_Settings_SaveAndLaunch {
+            get {
+                return ResourceManager.GetString("Menu.Settings.SaveAndLaunch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restart.
+        /// </summary>
+        public static string Menu_Settings_Restart {
+            get {
+                return ResourceManager.GetString("Menu.Settings.Restart", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Pin to top.
+        /// </summary>
+        public static string Menu_Settings_PinToTop {
+            get {
+                return ResourceManager.GetString("Menu.Settings.PinToTop", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unpin from top.
+        /// </summary>
+        public static string Menu_Settings_UnpinFromTop {
+            get {
+                return ResourceManager.GetString("Menu.Settings.UnpinFromTop", resourceCulture);
+            }
+        }
     }
 }

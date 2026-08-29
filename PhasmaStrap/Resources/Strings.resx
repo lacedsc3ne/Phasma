@@ -2145,4 +2145,181 @@ Defaulting to {1}.</value>
   <data name="Menu.Nvidia.LodBiasLabel.Override" xml:space="preserve">
     <value>LOD bias override: {0:0.###}</value>
   </data>
+  <data name="Menu.ClassicClient.Title" xml:space="preserve">
+    <value>Classic Client</value>
+  </data>
+  <data name="Menu.ClassicClient.Description" xml:space="preserve">
+    <value>Runs a private Roblox server on your own machine and points classic/legacy Roblox clients at it, by redirecting roblox.com to 127.0.0.1 in the Windows hosts file for the duration of a classic session. This is a significant change to how your machine resolves Roblox's real domain, so it is off by default and the redirect is only ever active while a classic client session is running.</value>
+  </data>
+  <data name="Menu.ClassicClient.Enabled.Title" xml:space="preserve">
+    <value>Enable classic client support</value>
+  </data>
+  <data name="Menu.ClassicClient.Enabled.Description" xml:space="preserve">
+    <value>Master switch for this feature. Must be turned on before a classic client can be launched through PhasmaStrap.</value>
+  </data>
+  <data name="Menu.ClassicClient.Installation.Title" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="Menu.ClassicClient.InstallLocation.Label" xml:space="preserve">
+    <value>Install location</value>
+  </data>
+  <data name="Menu.ClassicClient.InstallLocation.PlaceholderText" xml:space="preserve">
+    <value>Leave blank to use the default location</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.Title" xml:space="preserve">
+    <value>Acquire clients</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.Description" xml:space="preserve">
+    <value>Downloads the engine data pack and classic client archives from a third-party GitHub release (not built or hosted by PhasmaStrap - see the code comment on ClassicClients.DefaultBaseUrl). Every download is verified against that release's own published SHA-256 digest before it is extracted.</value>
+  </data>
+  <data name="Menu.ClassicClient.InstallEngineDataPack" xml:space="preserve">
+    <value>Install engine data pack</value>
+  </data>
+  <data name="Menu.ClassicClient.Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Menu.ClassicClient.UpdateAll" xml:space="preserve">
+    <value>Update engine, maps and installed clients</value>
+  </data>
+  <data name="Menu.ClassicClient.InstalledClients.Title" xml:space="preserve">
+    <value>Installed clients</value>
+  </data>
+  <data name="Menu.ClassicClient.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Menu.ClassicClient.LaunchSelectedClient" xml:space="preserve">
+    <value>Launch selected client</value>
+  </data>
+  <data name="Menu.ClassicClient.StopPrivateServer" xml:space="preserve">
+    <value>Stop private server</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.Starting" xml:space="preserve">
+    <value>Starting...</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.Cancelled" xml:space="preserve">
+    <value>Cancelled.</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.Failed" xml:space="preserve">
+    <value>Failed.</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.EngineInstalled" xml:space="preserve">
+    <value>Engine data installed.</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.CheckingUpdates" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.UpToDate" xml:space="preserve">
+    <value>Up to date.</value>
+  </data>
+  <data name="Menu.ClassicClient.Progress.ClientInstalled" xml:space="preserve">
+    <value>{0} installed.</value>
+  </data>
+  <data name="Menu.ServerBrowser.Title" xml:space="preserve">
+    <value>Servers</value>
+  </data>
+  <data name="Menu.ServerBrowser.Matchmaker.Title" xml:space="preserve">
+    <value>Matchmaker</value>
+  </data>
+  <data name="Menu.ServerBrowser.Matchmaker.Description" xml:space="preserve">
+    <value>Before joining a game, probes a batch of its public servers using your real Roblox session and picks the one estimated to have the lowest ping, instead of letting Roblox assign one at random. This reads your Roblox login session from disk and makes real join-attempt calls to Roblox's servers to do that.</value>
+  </data>
+  <data name="Menu.ServerBrowser.EnableMatchmaker.Title" xml:space="preserve">
+    <value>Enable matchmaker</value>
+  </data>
+  <data name="Menu.ServerBrowser.PreferEmptyServers.Title" xml:space="preserve">
+    <value>Prefer empty servers</value>
+  </data>
+  <data name="Menu.ServerBrowser.PreferEmptyServers.Description" xml:space="preserve">
+    <value>Off prefers active, reasonably full servers instead.</value>
+  </data>
+  <data name="Menu.ServerBrowser.PreferredDatacenter.Title" xml:space="preserve">
+    <value>Preferred datacenter</value>
+  </data>
+  <data name="Menu.ServerBrowser.PreferredDatacenter.Description" xml:space="preserve">
+    <value>Sticks to this location when it has servers available, instead of always picking the closest.</value>
+  </data>
+  <data name="Menu.ServerBrowser.AutoCandidateCount.Title" xml:space="preserve">
+    <value>Auto candidate count</value>
+  </data>
+  <data name="Menu.ServerBrowser.AutoCandidateCount.Description" xml:space="preserve">
+    <value>Off lets you set a fixed number of servers to probe per search instead of scaling it automatically.</value>
+  </data>
+  <data name="Menu.ServerBrowser.MaxCandidates.Title" xml:space="preserve">
+    <value>Max candidates</value>
+  </data>
+  <data name="Menu.ServerBrowser.MaxCandidates.Description" xml:space="preserve">
+    <value>Only used when auto candidate count is off.</value>
+  </data>
+  <data name="Menu.ServerBrowser.ExcludedDatacenters.Title" xml:space="preserve">
+    <value>Excluded datacenters</value>
+  </data>
+  <data name="Menu.ServerBrowser.ExcludedDatacenters.Description" xml:space="preserve">
+    <value>The matchmaker will never pick a server in a checked datacenter.</value>
+  </data>
+  <data name="Menu.ServerBrowser.Browser.Title" xml:space="preserve">
+    <value>Server Browser</value>
+  </data>
+  <data name="Menu.ServerBrowser.Browser.Description" xml:space="preserve">
+    <value>Lists a game's public servers using Roblox's own public server list - this doesn't sign in, read your Roblox session, or measure real ping to any server.</value>
+  </data>
+  <data name="Menu.ServerBrowser.PlaceId.Title" xml:space="preserve">
+    <value>Place ID</value>
+  </data>
+  <data name="Menu.ServerBrowser.PlaceId.PlaceholderText" xml:space="preserve">
+    <value>e.g. 13700835620</value>
+  </data>
+  <data name="Menu.ServerBrowser.Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Menu.ServerBrowser.Join" xml:space="preserve">
+    <value>Join</value>
+  </data>
+  <data name="Menu.ServerBrowser.ClosestAvailable" xml:space="preserve">
+    <value>Closest available</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.EnterPlaceId" xml:space="preserve">
+    <value>Enter a place ID and search.</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.InvalidPlaceId" xml:space="preserve">
+    <value>Enter a valid numeric place ID.</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.Searching" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.SearchFailed" xml:space="preserve">
+    <value>Search failed: {0}</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.FoundServers" xml:space="preserve">
+    <value>Found {0} public server(s).</value>
+  </data>
+  <data name="Menu.ServerBrowser.Status.NoServersFound" xml:space="preserve">
+    <value>No public servers found for this place.</value>
+  </data>
+  <data name="Menu.GameChat.Title" xml:space="preserve">
+    <value>Game Chat</value>
+  </data>
+  <data name="Menu.Nvidia.Title" xml:space="preserve">
+    <value>NVIDIA</value>
+  </data>
+  <data name="Menu.Overlays.Title" xml:space="preserve">
+    <value>Overlays</value>
+  </data>
+  <data name="Menu.RiShade.Title" xml:space="preserve">
+    <value>RiShade</value>
+  </data>
+  <data name="Menu.Settings.SearchPlaceholder" xml:space="preserve">
+    <value>Search settings</value>
+  </data>
+  <data name="Menu.Settings.SaveAndLaunch" xml:space="preserve">
+    <value>Save &amp; Launch</value>
+  </data>
+  <data name="Menu.Settings.Restart" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="Menu.Settings.PinToTop" xml:space="preserve">
+    <value>Pin to top</value>
+  </data>
+  <data name="Menu.Settings.UnpinFromTop" xml:space="preserve">
+    <value>Unpin from top</value>
+  </data>
 </root>

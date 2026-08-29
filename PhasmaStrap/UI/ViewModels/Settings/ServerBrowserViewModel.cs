@@ -10,7 +10,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
     {
         private string _placeId = "";
         private bool _isSearching;
-        private string _statusText = "Enter a place ID and search.";
+        private string _statusText = Strings.Menu_ServerBrowser_Status_EnterPlaceId;
 
         public string PlaceId
         {
@@ -48,7 +48,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         // "" represents no preference (closest available)
         public IEnumerable<DatacenterChoice> DatacenterChoices { get; } =
-            new[] { new DatacenterChoice("Closest available", "") }
+            new[] { new DatacenterChoice(Strings.Menu_ServerBrowser_ClosestAvailable, "") }
                 .Concat(RobloxDatacenterMap.AllDatacenters()
                     .OrderBy(dc => dc.City)
                     .Select(dc => new DatacenterChoice($"{dc.City}, {dc.Country}", Matchmaker.DatacenterKey(dc))));
@@ -142,12 +142,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             if (!long.TryParse(PlaceId.Trim(), out long placeId) || placeId <= 0)
             {
-                StatusText = "Enter a valid numeric place ID.";
+                StatusText = Strings.Menu_ServerBrowser_Status_InvalidPlaceId;
                 return;
             }
 
             IsSearching = true;
-            StatusText = "Searching...";
+            StatusText = Strings.Menu_ServerBrowser_Status_Searching;
             Servers.Clear();
 
             try
@@ -157,11 +157,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 foreach (ServerListItem server in servers)
                     Servers.Add(server);
 
-                StatusText = servers.Count > 0 ? $"Found {servers.Count} public server(s)." : "No public servers found for this place.";
+                StatusText = servers.Count > 0
+                    ? string.Format(Strings.Menu_ServerBrowser_Status_FoundServers, servers.Count)
+                    : Strings.Menu_ServerBrowser_Status_NoServersFound;
             }
             catch (Exception ex)
             {
-                StatusText = $"Search failed: {ex.Message}";
+                StatusText = string.Format(Strings.Menu_ServerBrowser_Status_SearchFailed, ex.Message);
             }
             finally
             {

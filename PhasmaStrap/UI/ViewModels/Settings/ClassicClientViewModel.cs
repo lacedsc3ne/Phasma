@@ -100,23 +100,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             IsBusy = true;
             ProgressValue = 0;
-            ProgressText = "Starting...";
+            ProgressText = Strings.Menu_ClassicClient_Progress_Starting;
             _operationCts = new CancellationTokenSource();
 
             try
             {
                 await ClassicClients.InstallEngineAsync(ReportProgress, _operationCts.Token);
-                ProgressText = "Engine data installed.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_EngineInstalled;
             }
             catch (OperationCanceledException)
             {
-                ProgressText = "Cancelled.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Cancelled;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteException("ClassicClientViewModel::InstallEngine", ex);
                 Frontend.ShowMessageBox($"Failed to install the classic engine data pack: {ex.Message}", System.Windows.MessageBoxImage.Error);
-                ProgressText = "Failed.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Failed;
             }
             finally
             {
@@ -136,24 +136,24 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             IsBusy = true;
             ProgressValue = 0;
-            ProgressText = "Starting...";
+            ProgressText = Strings.Menu_ClassicClient_Progress_Starting;
             _operationCts = new CancellationTokenSource();
 
             try
             {
                 await ClassicClients.InstallClientAsync(code, ReportProgress, _operationCts.Token);
-                ProgressText = $"{code} installed.";
+                ProgressText = string.Format(Strings.Menu_ClassicClient_Progress_ClientInstalled, code);
                 RefreshClients();
             }
             catch (OperationCanceledException)
             {
-                ProgressText = "Cancelled.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Cancelled;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteException("ClassicClientViewModel::InstallClient", ex);
                 Frontend.ShowMessageBox($"Failed to install classic client {code}: {ex.Message}", System.Windows.MessageBoxImage.Error);
-                ProgressText = "Failed.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Failed;
             }
             finally
             {
@@ -171,7 +171,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             IsBusy = true;
             ProgressValue = 0;
-            ProgressText = "Checking for updates...";
+            ProgressText = Strings.Menu_ClassicClient_Progress_CheckingUpdates;
             _operationCts = new CancellationTokenSource();
 
             try
@@ -181,18 +181,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     text => ReportProgress(ProgressValue, text),
                     ReportProgress,
                     _operationCts.Token);
-                ProgressText = "Up to date.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_UpToDate;
                 RefreshClients();
             }
             catch (OperationCanceledException)
             {
-                ProgressText = "Cancelled.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Cancelled;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteException("ClassicClientViewModel::UpdateAll", ex);
                 Frontend.ShowMessageBox($"Failed to update classic clients: {ex.Message}", System.Windows.MessageBoxImage.Error);
-                ProgressText = "Failed.";
+                ProgressText = Strings.Menu_ClassicClient_Progress_Failed;
             }
             finally
             {
