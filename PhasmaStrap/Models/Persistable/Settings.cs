@@ -170,5 +170,12 @@ namespace PhasmaStrap.Models.Persistable
 
         // place ID (string) -> profile name (key into FastFlagProfiles)
         public Dictionary<string, string> FastFlagPlaceProfiles { get; set; } = new();
+
+        // in-app notification center (NotificationCenter/NotificationToast) - master switch plus
+        // per-event-type toggles for the custom toast popup, independent of NotifyIconWrapper's
+        // Windows balloon-tip alerts, which are unaffected by these settings
+        public bool NotificationsEnabled { get; set; } = true;
+        public bool NotificationsJoinToastEnabled { get; set; } = false;
+        public bool NotificationsLeaveToastEnabled { get; set; } = false;
     }
 }

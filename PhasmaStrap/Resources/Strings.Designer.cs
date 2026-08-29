@@ -6654,5 +6654,150 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlagProfiles.NoProfilesAvailable", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Notifications.
+        /// </summary>
+        public static string Menu_Notifications_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Controls PhasmaStrap&apos;s in-app toast notifications and keeps a short history of what&apos;s been shown. Separate from the Windows tray balloon alerts, which are unaffected by these settings..
+        /// </summary>
+        public static string Menu_Notifications_Description {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string Menu_Notifications_General_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.General.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable notifications.
+        /// </summary>
+        public static string Menu_Notifications_Enabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Enabled.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master switch for every toast notification below. Turning this off also stops new entries being added to the history..
+        /// </summary>
+        public static string Menu_Notifications_Enabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Enabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Server join.
+        /// </summary>
+        public static string Menu_Notifications_JoinToast_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.JoinToast.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows a toast popup whenever you join a Roblox server..
+        /// </summary>
+        public static string Menu_Notifications_JoinToast_Description {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.JoinToast.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Server leave.
+        /// </summary>
+        public static string Menu_Notifications_LeaveToast_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.LeaveToast.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows a toast popup whenever you leave a Roblox server..
+        /// </summary>
+        public static string Menu_Notifications_LeaveToast_Description {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.LeaveToast.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to History.
+        /// </summary>
+        public static string Menu_Notifications_History_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.History.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No notifications yet this session..
+        /// </summary>
+        public static string Menu_Notifications_History_Empty {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.History.Empty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clear history.
+        /// </summary>
+        public static string Menu_Notifications_History_Clear {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.History.Clear", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Joined server.
+        /// </summary>
+        public static string Menu_Notifications_Event_GameJoin_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Event.GameJoin.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;ve joined a Roblox server..
+        /// </summary>
+        public static string Menu_Notifications_Event_GameJoin_Message {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Event.GameJoin.Message", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Left server.
+        /// </summary>
+        public static string Menu_Notifications_Event_GameLeave_Title {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Event.GameLeave.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;ve left the Roblox server..
+        /// </summary>
+        public static string Menu_Notifications_Event_GameLeave_Message {
+            get {
+                return ResourceManager.GetString("Menu.Notifications.Event.GameLeave.Message", resourceCulture);
+            }
+        }
     }
 }

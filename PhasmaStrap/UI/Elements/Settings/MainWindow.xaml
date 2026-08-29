@@ -164,6 +164,7 @@
                     <ui:NavigationHeader Text="System" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Behaviour_Title}" PageType="{x:Type pages:BehaviourPage}" Icon="PlaySettings20" PageTag="bootstrapper" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Common_Shortcuts}" PageType="{x:Type pages:ShortcutsPage}" Icon="Apps28" PageTag="shortcuts" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
 
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagEditor_Title}" PageType="{x:Type pages:FastFlagEditorPage}" PageTag="fastflageditor" Visibility="Collapsed" />
                 </ui:NavigationFluent.Items>

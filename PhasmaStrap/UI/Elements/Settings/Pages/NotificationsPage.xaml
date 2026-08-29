@@ -1,0 +1,78 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.NotificationsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      Title="NotificationsPage"
+      Scrollable="True"
+      Loaded="Page_Loaded"
+      Unloaded="Page_Unloaded">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_General_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Notifications_Enabled_Title}"
+            Description="{x:Static resources:Strings.Menu_Notifications_Enabled_Description}"
+            x:Name="EnabledOption">
+            <ui:ToggleSwitch IsChecked="{Binding NotificationsEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Notifications_JoinToast_Title}"
+            Description="{x:Static resources:Strings.Menu_Notifications_JoinToast_Description}"
+            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding NotificationsJoinToastEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Notifications_LeaveToast_Title}"
+            Description="{x:Static resources:Strings.Menu_Notifications_LeaveToast_Description}"
+            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding NotificationsLeaveToastEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <Grid Margin="0,16,0,0">
+            <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Title}" FontSize="20" FontWeight="Medium" HorizontalAlignment="Left" />
+            <ui:Button Content="{x:Static resources:Strings.Menu_Notifications_History_Clear}" Icon="Delete24" Appearance="Secondary" HorizontalAlignment="Right" Command="{Binding ClearHistoryCommand, Mode=OneTime}" IsEnabled="{Binding HasHistory}" />
+        </Grid>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Empty}" FontSize="13" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,8,0,0">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasHistory}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <ItemsControl ItemsSource="{Binding History}" Margin="0,8,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,0,6" Padding="12,8" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlElevationBorderBrush}" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Message}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" Text="{Binding Timestamp, StringFormat='HH:mm:ss'}" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" Margin="8,0,0,0" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>
