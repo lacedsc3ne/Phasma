@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PhasmaStrap.Server.WebServer.Services;
 
 namespace PhasmaStrap.Server.WebServer.Controllers.Game;
 
@@ -16,8 +17,9 @@ public class GamePassController : ControllerBase
 
 	[HttpGet]
 	[HttpPost]
-	public IActionResult Get()
+	public IActionResult Get([FromQuery(Name = "gpid")] long gamePassId = 0)
 	{
-		return Content("<Value Type=\"boolean\">false</Value>", "text/html");
+		bool owns = gamePassId > 0 && GamePassService.Instance.Owns(gamePassId);
+		return Content($"<Value Type=\"boolean\">{(owns ? "true" : "false")}</Value>", "text/html");
 	}
 }

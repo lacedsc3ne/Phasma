@@ -54,6 +54,10 @@ public static class PathHelper
 
 	private static string? _secureSettings = null;
 
+	private static string? _friends = null;
+
+	private static string? _gamePasses = null;
+
 	private static readonly HashSet<string> _reservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
 	{
 		"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6",
@@ -116,6 +120,10 @@ public static class PathHelper
 	public static string Settings => _settings ?? (_settings = Path.Combine(UserAppData, "UserSettings.json"));
 
 	public static string SecureSettings => _secureSettings ?? (_secureSettings = Path.Combine(UserAppData, "SecureSettings.dat"));
+
+	public static string Friends => _friends ?? (_friends = Path.Combine(UserAppData, "Friends.json"));
+
+	public static string GamePasses => _gamePasses ?? (_gamePasses = Path.Combine(UserAppData, "GamePasses.json"));
 
 	public static bool IsFileNameValid(string fileName)
 	{
