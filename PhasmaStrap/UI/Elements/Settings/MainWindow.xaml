@@ -143,6 +143,7 @@
                     <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" PageTag="history" />
                     <ui:NavigationItem Content="Channel" PageType="{x:Type pages:ChannelPage}" Icon="ArrowRepeatAll24" PageTag="channel" />
                     <ui:NavigationItem Content="Classic Client" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
+                    <ui:NavigationItem Content="Game Chat" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
 
                     <ui:NavigationHeader Text="Performance" Icon="Gauge24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Title}" PageType="{x:Type pages:FastFlagsPage}" Icon="Flag24" PageTag="fastflags" />

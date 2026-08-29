@@ -1,5 +1,6 @@
 ﻿using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
+using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Models;
 
 namespace PhasmaStrap
@@ -19,6 +20,8 @@ namespace PhasmaStrap
         public readonly IntegrationWatcher? IntegrationWatcher;
 
         public readonly PlayTimeWatcher? PlayTimeWatcher;
+
+        public readonly GameChatIntegration? GameChat;
 
         public Watcher()
         {
@@ -70,6 +73,11 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
+
+                // opt-in only: this feature installs a global (system-wide) low-level keyboard hook
+                // while a Roblox session is active, so it defaults to off and requires explicit consent
+                if (App.Settings.Prop.GameChatEnabled)
+                    GameChat = new(ActivityWatcher, _watcherData.ProcessId);
 
                 if (App.Settings.Prop.CustomIntegrations.Count > 0)
                     IntegrationWatcher = new(ActivityWatcher);
@@ -154,6 +162,7 @@ namespace PhasmaStrap
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
+            GameChat?.Dispose();
             IntegrationWatcher?.Dispose();
             PlayTimeWatcher?.Dispose();
             PlayTimeStore.Shutdown();
