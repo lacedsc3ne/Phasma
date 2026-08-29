@@ -2,6 +2,7 @@
 using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
+using PhasmaStrap.Integrations.RiShade;
 using PhasmaStrap.Models;
 
 namespace PhasmaStrap
@@ -23,6 +24,8 @@ namespace PhasmaStrap
         public readonly PlayTimeWatcher? PlayTimeWatcher;
 
         public readonly GameChatIntegration? GameChat;
+
+        public readonly RiShadeManager? RiShade;
 
         public Watcher()
         {
@@ -77,6 +80,13 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
+
+                if (App.Settings.Prop.RiShadeEnabled)
+                {
+                    RiShade = new(_watcherData.ProcessId);
+                    ActivityWatcher.OnGameJoin += (_, _) => RiShade.OnGameJoin();
+                    ActivityWatcher.OnGameLeave += (_, _) => RiShade.OnGameLeave();
+                }
 
                 // opt-in only: this feature installs a global (system-wide) low-level keyboard hook
                 // while a Roblox session is active, so it defaults to off and requires explicit consent
@@ -168,6 +178,7 @@ namespace PhasmaStrap
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
+            RiShade?.Dispose();
             GameChat?.Dispose();
             IntegrationWatcher?.Dispose();
             PlayTimeWatcher?.Dispose();
