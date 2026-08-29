@@ -1104,7 +1104,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // curated bundles across a handful of the toggles above, picked for unambiguous perf/
         // privacy impact - not every one of the ~83 toggles on this page, so presets can't
         // silently flip something niche/situational the user didn't expect
-        public string[] EnginePresetNames { get; } = { "Default", "Balanced", "Performance" };
+        public string[] EnginePresetNames { get; } = { "Default", "Privacy", "Quality", "Balanced", "Performance", "Potato" };
 
         // one-time apply action, not a persisted selection - the individual toggles above are the
         // source of truth, and may not match any named preset once hand-tweaked
@@ -1115,11 +1115,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 switch (value)
                 {
+                    case "Privacy":
+                        ApplyPrivacyPreset();
+                        break;
+                    case "Quality":
+                        ApplyQualityPreset();
+                        break;
                     case "Balanced":
                         ApplyBalancedPreset();
                         break;
                     case "Performance":
                         ApplyPerformancePreset();
+                        break;
+                    case "Potato":
+                        ApplyPotatoPreset();
                         break;
                     default:
                         ApplyDefaultPreset();
@@ -1135,6 +1144,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             DisableTelemetry = false;
             DisableWebview2Telemetry = false;
             DisableVoiceChatTelemetry = false;
+            BlockTencent = false;
             LessLagSpikes = false;
             FasterLoading = false;
             BetterPacketSending = false;
@@ -1149,6 +1159,31 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             LowPolyMeshes = false;
             LightCulling = false;
             DisableSky = false;
+            MoreLighting = false;
+            NoGuiBlur = false;
+            TextureRemover = false;
+            DisableTerrainTextures = false;
+            OldChromeUI = false;
+            Prerender = false;
+        }
+
+        // telemetry/tracking reduction only - no performance or visual tradeoffs
+        private void ApplyPrivacyPreset()
+        {
+            ApplyDefaultPreset();
+
+            DisableTelemetry = true;
+            DisableWebview2Telemetry = true;
+            DisableVoiceChatTelemetry = true;
+            BlockTencent = true;
+        }
+
+        // brighter/clearer rendering, no toggles that reduce visual quality
+        private void ApplyQualityPreset()
+        {
+            ApplyDefaultPreset();
+
+            MoreLighting = true;
         }
 
         private void ApplyBalancedPreset()
@@ -1178,6 +1213,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             LowPolyMeshes = true;
             LightCulling = true;
             DisableSky = true;
+        }
+
+        // most aggressive tier - everything Performance has, plus further UI/texture cuts for
+        // very low-end or integrated-graphics systems
+        private void ApplyPotatoPreset()
+        {
+            ApplyPerformancePreset();
+
+            NoGuiBlur = true;
+            TextureRemover = true;
+            DisableTerrainTextures = true;
+            OldChromeUI = true;
+            Prerender = true;
         }
 
         #endregion
