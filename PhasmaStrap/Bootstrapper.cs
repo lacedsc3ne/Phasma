@@ -815,8 +815,13 @@ namespace PhasmaStrap
 
             var versionComparison = Utilities.CompareVersions(App.Version, releaseInfo.TagName);
 
-            // check if we aren't using a deployed build, so we can update to one if a new version comes out
-            if (App.IsProductionBuild && versionComparison == VersionComparison.Equal || versionComparison == VersionComparison.GreaterThan)
+            // versionComparison already accounts for whether we're on a deployed (production) build -
+            // equal or newer than the latest release always means no update is needed. The previous
+            // condition here was missing parentheses (`A && B || C` instead of `A && (B || C)`), which
+            // made a non-production build treat "equal version" as "needs updating" too, so a locally
+            // built dev exe would re-download and relaunch itself as the latest GitHub release on every
+            // single Roblox launch, even when nothing was actually newer.
+            if (versionComparison == VersionComparison.Equal || versionComparison == VersionComparison.GreaterThan)
             {
                 App.Logger.WriteLine(LOG_IDENT, "No updates found");
                 return false;
