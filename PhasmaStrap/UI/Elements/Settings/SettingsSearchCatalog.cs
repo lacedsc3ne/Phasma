@@ -83,6 +83,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             string appearance = Strings.Menu_Appearance_Title;
             string shortcuts = Strings.Common_Shortcuts;
             string phasmaStrap = "PhasmaStrap";
+            string notifications = Strings.Menu_Notifications_Title;
 
             var entries = new List<SettingsSearchEntry>
             {
@@ -323,6 +324,12 @@ namespace PhasmaStrap.UI.Elements.Settings
                 Entry(Strings.Menu_Behaviour_AutoUpdate_Title, Strings.Menu_Behaviour_AutoUpdate_Description, typeof(PhasmaStrapPage), phasmaStrap),
                 Entry(Strings.Menu_PhasmaStrap_Analytics_Title, Strings.Menu_PhasmaStrap_Analytics_Description, typeof(PhasmaStrapPage), phasmaStrap),
                 Entry(Strings.Menu_PhasmaStrap_ExportData_Title, Strings.Menu_PhasmaStrap_ExportData_Description, typeof(PhasmaStrapPage), phasmaStrap),
+
+                // Notifications
+                Entry(Strings.Menu_Notifications_Enabled_Title, Strings.Menu_Notifications_Enabled_Description, typeof(NotificationsPage), notifications),
+                Entry(Strings.Menu_Notifications_JoinToast_Title, Strings.Menu_Notifications_JoinToast_Description, typeof(NotificationsPage), notifications),
+                Entry(Strings.Menu_Notifications_LeaveToast_Title, Strings.Menu_Notifications_LeaveToast_Description, typeof(NotificationsPage), notifications),
+                Entry(Strings.Menu_Notifications_History_Title, "", typeof(NotificationsPage), notifications),
             };
 
             return entries;

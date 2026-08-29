@@ -2400,4 +2400,52 @@ Defaulting to {1}.</value>
   <data name="Menu.FastFlagProfiles.NoProfilesAvailable" xml:space="preserve">
     <value>Create a profile above before assigning it to a place.</value>
   </data>
+  <data name="Menu.Notifications.Title" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Menu.Notifications.Description" xml:space="preserve">
+    <value>Controls PhasmaStrap's in-app toast notifications and keeps a short history of what's been shown. Separate from the Windows tray balloon alerts, which are unaffected by these settings.</value>
+  </data>
+  <data name="Menu.Notifications.General.Title" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Menu.Notifications.Enabled.Title" xml:space="preserve">
+    <value>Enable notifications</value>
+  </data>
+  <data name="Menu.Notifications.Enabled.Description" xml:space="preserve">
+    <value>Master switch for every toast notification below. Turning this off also stops new entries being added to the history.</value>
+  </data>
+  <data name="Menu.Notifications.JoinToast.Title" xml:space="preserve">
+    <value>Server join</value>
+  </data>
+  <data name="Menu.Notifications.JoinToast.Description" xml:space="preserve">
+    <value>Shows a toast popup whenever you join a Roblox server.</value>
+  </data>
+  <data name="Menu.Notifications.LeaveToast.Title" xml:space="preserve">
+    <value>Server leave</value>
+  </data>
+  <data name="Menu.Notifications.LeaveToast.Description" xml:space="preserve">
+    <value>Shows a toast popup whenever you leave a Roblox server.</value>
+  </data>
+  <data name="Menu.Notifications.History.Title" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Menu.Notifications.History.Empty" xml:space="preserve">
+    <value>No notifications yet this session.</value>
+  </data>
+  <data name="Menu.Notifications.History.Clear" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="Menu.Notifications.Event.GameJoin.Title" xml:space="preserve">
+    <value>Joined server</value>
+  </data>
+  <data name="Menu.Notifications.Event.GameJoin.Message" xml:space="preserve">
+    <value>You've joined a Roblox server.</value>
+  </data>
+  <data name="Menu.Notifications.Event.GameLeave.Title" xml:space="preserve">
+    <value>Left server</value>
+  </data>
+  <data name="Menu.Notifications.Event.GameLeave.Message" xml:space="preserve">
+    <value>You've left the Roblox server.</value>
+  </data>
 </root>

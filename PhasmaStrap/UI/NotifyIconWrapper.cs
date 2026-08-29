@@ -38,6 +38,14 @@ namespace PhasmaStrap.UI
             if (_activityWatcher is not null && App.Settings.Prop.ShowServerDetails)
                 _activityWatcher.OnGameJoin += OnGameJoin;
 
+            // in-app toast notifications (NotificationCenter) are opt-in and independent of the
+            // balloon-tip alert above, gated by their own per-event-type settings
+            if (_activityWatcher is not null)
+            {
+                _activityWatcher.OnGameJoin += OnGameJoinToast;
+                _activityWatcher.OnGameLeave += OnGameLeaveToast;
+            }
+
             _menuContainer = new(_watcher);
             _menuContainer.Show();
         }
@@ -86,6 +94,27 @@ namespace PhasmaStrap.UI
                 String.Format(Strings.ContextMenu_ServerInformation_Notification_Text, serverLocation),
                 10,
                 (_, _) => _menuContainer.ShowServerInformationWindow()
+            );
+        }
+
+        // NotificationCenter's own toast, separate from the balloon-tip alert above - each is gated by
+        // its own setting (NotificationsJoinToastEnabled/NotificationsLeaveToastEnabled) so both can be
+        // off, on, or mixed independently of ShowServerDetails
+        private void OnGameJoinToast(object? sender, EventArgs e)
+        {
+            NotificationCenter.Notify(
+                Strings.Menu_Notifications_Event_GameJoin_Title,
+                Strings.Menu_Notifications_Event_GameJoin_Message,
+                NotificationCategory.GameJoin
+            );
+        }
+
+        private void OnGameLeaveToast(object? sender, EventArgs e)
+        {
+            NotificationCenter.Notify(
+                Strings.Menu_Notifications_Event_GameLeave_Title,
+                Strings.Menu_Notifications_Event_GameLeave_Message,
+                NotificationCategory.GameLeave
             );
         }
         #endregion
