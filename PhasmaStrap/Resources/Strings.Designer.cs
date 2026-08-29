@@ -3004,6 +3004,1275 @@ namespace PhasmaStrap.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable telemetry.
+        /// </summary>
+        public static string Menu_FastFlags_DisableTelemetry_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableTelemetry.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disables a large batch of client analytics and telemetry endpoints..
+        /// </summary>
+        public static string Menu_FastFlags_DisableTelemetry_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableTelemetry.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable Webview2 telemetry.
+        /// </summary>
+        public static string Menu_FastFlags_DisableWebview2Telemetry_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableWebview2Telemetry.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disables telemetry sent by the embedded Webview2 browser component..
+        /// </summary>
+        public static string Menu_FastFlags_DisableWebview2Telemetry_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableWebview2Telemetry.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable voice chat telemetry.
+        /// </summary>
+        public static string Menu_FastFlags_DisableVoiceChatTelemetry_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableVoiceChatTelemetry.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disables analytics and telemetry sent by the voice chat system..
+        /// </summary>
+        public static string Menu_FastFlags_DisableVoiceChatTelemetry_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableVoiceChatTelemetry.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Block Tencent.
+        /// </summary>
+        public static string Menu_FastFlags_BlockTencent_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BlockTencent.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirects and disables Tencent-related endpoints and policy checks..
+        /// </summary>
+        public static string Menu_FastFlags_BlockTencent_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BlockTencent.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ping breakdown.
+        /// </summary>
+        public static string Menu_FastFlags_PingBreakdown_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.PingBreakdown.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows a breakdown of ping contributors in the debug stats..
+        /// </summary>
+        public static string Menu_FastFlags_PingBreakdown_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.PingBreakdown.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show chunks.
+        /// </summary>
+        public static string Menu_FastFlags_ShowChunks_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ShowChunks.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows lighting chunk boundaries for debugging..
+        /// </summary>
+        public static string Menu_FastFlags_ShowChunks_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ShowChunks.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flag state.
+        /// </summary>
+        public static string Menu_FastFlags_FlagState_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FlagState.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets the FStringDebugShowFlagState flag to the given value..
+        /// </summary>
+        public static string Menu_FastFlags_FlagState_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FlagState.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chat bubbles.
+        /// </summary>
+        public static string Menu_FastFlags_ChatBubbles_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatBubbles.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles legacy chat bubbles above characters..
+        /// </summary>
+        public static string Menu_FastFlags_ChatBubbles_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatBubbles.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chat translation.
+        /// </summary>
+        public static string Menu_FastFlags_ChatTranslation_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatTranslation.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles the in-experience chat translation setting..
+        /// </summary>
+        public static string Menu_FastFlags_ChatTranslation_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatTranslation.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light culling.
+        /// </summary>
+        public static string Menu_FastFlags_LightCulling_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LightCulling.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables GPU and CPU light culling..
+        /// </summary>
+        public static string Menu_FastFlags_LightCulling_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LightCulling.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rainbow theme.
+        /// </summary>
+        public static string Menu_FastFlags_RainbowTheme_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RainbowTheme.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Renders unthemed UI instances with a rainbow debug color..
+        /// </summary>
+        public static string Menu_FastFlags_RainbowTheme_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RainbowTheme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FRM quality override.
+        /// </summary>
+        public static string Menu_FastFlags_FRMQualityOverride_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FRMQualityOverride.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FRM quality override level.
+        /// </summary>
+        public static string Menu_FastFlags_FRMQualityOverrideLevel_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FRMQualityOverrideLevel.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mesh quality.
+        /// </summary>
+        public static string Menu_FastFlags_MeshQuality_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MeshQuality.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mesh quality level.
+        /// </summary>
+        public static string Menu_FastFlags_MeshQualityLevel_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MeshQualityLevel.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlimited camera zoom.
+        /// </summary>
+        public static string Menu_FastFlags_UnlimitedCameraZoom_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.UnlimitedCameraZoom.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removes the maximum camera zoom distance..
+        /// </summary>
+        public static string Menu_FastFlags_UnlimitedCameraZoom_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.UnlimitedCameraZoom.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BGRA texture support.
+        /// </summary>
+        public static string Menu_FastFlags_BGRATextureSupport_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BGRATextureSupport.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables Direct3D 11 BGRA texture support..
+        /// </summary>
+        public static string Menu_FastFlags_BGRATextureSupport_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BGRATextureSupport.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New FPS system.
+        /// </summary>
+        public static string Menu_FastFlags_NewFpsSystem_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NewFpsSystem.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables the newer FPS and frame time tracking system..
+        /// </summary>
+        public static string Menu_FastFlags_NewFpsSystem_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NewFpsSystem.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Worser particles.
+        /// </summary>
+        public static string Menu_FastFlags_WorserParticles_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.WorserParticles.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reduces particle fidelity fixes for a performance boost..
+        /// </summary>
+        public static string Menu_FastFlags_WorserParticles_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.WorserParticles.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low poly meshes.
+        /// </summary>
+        public static string Menu_FastFlags_LowPolyMeshes_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LowPolyMeshes.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces the lowest level of detail for meshes..
+        /// </summary>
+        public static string Menu_FastFlags_LowPolyMeshes_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LowPolyMeshes.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rendering mode.
+        /// </summary>
+        public static string Menu_FastFlags_RenderingMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RenderingMode.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More lighting.
+        /// </summary>
+        public static string Menu_FastFlags_MoreLighting_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MoreLighting.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brightens rendering by fixing fog contribution..
+        /// </summary>
+        public static string Menu_FastFlags_MoreLighting_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MoreLighting.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum grass distance.
+        /// </summary>
+        public static string Menu_FastFlags_MinGrassDistance_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MinGrassDistance.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum grass distance.
+        /// </summary>
+        public static string Menu_FastFlags_MaxGrassDistance_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MaxGrassDistance.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grass movement factor.
+        /// </summary>
+        public static string Menu_FastFlags_GrassMovementFactor_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.GrassMovementFactor.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In-game menu version.
+        /// </summary>
+        public static string Menu_FastFlags_IGMenuVersion_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.IGMenuVersion.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lighting mode.
+        /// </summary>
+        public static string Menu_FastFlags_LightingMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LightingMode.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable fullscreen title bar delay.
+        /// </summary>
+        public static string Menu_FastFlags_FullscreenTitlebarDelay_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FullscreenTitlebarDelay.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removes the delay before the title bar hides in fullscreen..
+        /// </summary>
+        public static string Menu_FastFlags_FullscreenTitlebarDelay_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FullscreenTitlebarDelay.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Texture skipping.
+        /// </summary>
+        public static string Menu_FastFlags_TextureSkipping_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.TextureSkipping.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distance rendering.
+        /// </summary>
+        public static string Menu_FastFlags_DistanceRendering_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DistanceRendering.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dynamic resolution.
+        /// </summary>
+        public static string Menu_FastFlags_DynamicResolution_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DynamicResolution.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Romark start graphic.
+        /// </summary>
+        public static string Menu_FastFlags_RomarkStartGraphic_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RomarkStartGraphic.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FRM quality level.
+        /// </summary>
+        public static string Menu_FastFlags_FRMQualityLevel_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FRMQualityLevel.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable post processing effects.
+        /// </summary>
+        public static string Menu_FastFlags_DisablePostFX_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisablePostFX.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Avoid task scheduler sleep.
+        /// </summary>
+        public static string Menu_FastFlags_AvoidTaskSchedulerSleep_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.AvoidTaskSchedulerSleep.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prevents the task scheduler from sleeping, at the cost of higher CPU usage..
+        /// </summary>
+        public static string Menu_FastFlags_AvoidTaskSchedulerSleep_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.AvoidTaskSchedulerSleep.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable player shadows.
+        /// </summary>
+        public static string Menu_FastFlags_DisablePlayerShadows_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisablePlayerShadows.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Render occlusion checks.
+        /// </summary>
+        public static string Menu_FastFlags_RenderOcclusionChecks_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RenderOcclusionChecks.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables visibility bug checks used for render occlusion..
+        /// </summary>
+        public static string Menu_FastFlags_RenderOcclusionChecks_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RenderOcclusionChecks.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gray sky.
+        /// </summary>
+        public static string Menu_FastFlags_GraySky_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.GraySky.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White sky.
+        /// </summary>
+        public static string Menu_FastFlags_WhiteSky_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.WhiteSky.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red font debug highlight.
+        /// </summary>
+        public static string Menu_FastFlags_RedFontDebugHighlight_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RedFontDebugHighlight.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable layered clothing.
+        /// </summary>
+        public static string Menu_FastFlags_DisableLayeredClothing_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableLayeredClothing.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable terrain textures.
+        /// </summary>
+        public static string Menu_FastFlags_DisableTerrainTextures_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableTerrainTextures.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prerender.
+        /// </summary>
+        public static string Menu_FastFlags_Prerender_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Prerender.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables the prerender pipeline and its V2 variant..
+        /// </summary>
+        public static string Menu_FastFlags_Prerender_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Prerender.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force buggy Vulkan renderpass list.
+        /// </summary>
+        public static string Menu_FastFlags_ForceBuggyVulkan_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ForceBuggyVulkan.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overrides the renderpass allowlist used to force Vulkan on buggy GPUs. Type 'Automatic' to disable..
+        /// </summary>
+        public static string Menu_FastFlags_ForceBuggyVulkan_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ForceBuggyVulkan.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bypass Vulkan buggy GPU list.
+        /// </summary>
+        public static string Menu_FastFlags_BypassVulkan_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BypassVulkan.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overrides the renderpass allowlist used to bypass Vulkan blacklisting. Type 'Automatic' to disable..
+        /// </summary>
+        public static string Menu_FastFlags_BypassVulkan_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BypassVulkan.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chrome in-game menu UI.
+        /// </summary>
+        public static string Menu_FastFlags_ChromeUI_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChromeUI.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old Chrome UI.
+        /// </summary>
+        public static string Menu_FastFlags_OldChromeUI_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.OldChromeUI.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverts several in-game menu Chrome UI elements to their older versions..
+        /// </summary>
+        public static string Menu_FastFlags_OldChromeUI_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.OldChromeUI.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shader glint level.
+        /// </summary>
+        public static string Menu_FastFlags_ShaderGlintLevel_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ShaderGlintLevel.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shaders enabled.
+        /// </summary>
+        public static string Menu_FastFlags_ShadersEnabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ShadersEnabled.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shaders roughness clamp.
+        /// </summary>
+        public static string Menu_FastFlags_ShadersRoughnessClamp_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ShadersRoughnessClamp.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target refresh rate.
+        /// </summary>
+        public static string Menu_FastFlags_TargetRefreshRate_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.TargetRefreshRate.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimal rendering.
+        /// </summary>
+        public static string Menu_FastFlags_MinimalRendering_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MinimalRendering.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces deterministic, minimal rendering for debugging..
+        /// </summary>
+        public static string Menu_FastFlags_MinimalRendering_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MinimalRendering.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable sky bloom.
+        /// </summary>
+        public static string Menu_FastFlags_DisableSkyBloom_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableSkyBloom.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Framerate buffer percentage.
+        /// </summary>
+        public static string Menu_FastFlags_FramerateBufferPercentage_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FramerateBufferPercentage.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Framerate limit (FFlag).
+        /// </summary>
+        public static string Menu_FastFlags_FramerateLimitFFlag_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FramerateLimitFFlag.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets an FFlag-based framerate cap, separate from the performance page's framerate cap..
+        /// </summary>
+        public static string Menu_FastFlags_FramerateLimitFFlag_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FramerateLimitFFlag.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pseudolocalization.
+        /// </summary>
+        public static string Menu_FastFlags_Pseudolocalization_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Pseudolocalization.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables debug pseudolocalization of UI text..
+        /// </summary>
+        public static string Menu_FastFlags_Pseudolocalization_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Pseudolocalization.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display FPS (FFlag).
+        /// </summary>
+        public static string Menu_FastFlags_DisplayFpsFFlag_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisplayFpsFFlag.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the client's built-in FFlag-based FPS counter, separate from the performance page's stats overlay..
+        /// </summary>
+        public static string Menu_FastFlags_DisplayFpsFFlag_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisplayFpsFFlag.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gray avatar thumbnails.
+        /// </summary>
+        public static string Menu_FastFlags_GrayAvatarThumbnails_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.GrayAvatarThumbnails.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI font size padding.
+        /// </summary>
+        public static string Menu_FastFlags_UIFontSizePadding_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.UIFontSizePadding.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide GUI group.
+        /// </summary>
+        public static string Menu_FastFlags_HideGUIGroup_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.HideGUIGroup.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hides the core GUI for the given group ID..
+        /// </summary>
+        public static string Menu_FastFlags_HideGUIGroup_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.HideGUIGroup.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Less lag spikes.
+        /// </summary>
+        public static string Menu_FastFlags_LessLagSpikes_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LessLagSpikes.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Increases bandwidth manager throughput targets..
+        /// </summary>
+        public static string Menu_FastFlags_LessLagSpikes_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LessLagSpikes.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox Core (SignalR) tuning.
+        /// </summary>
+        public static string Menu_FastFlags_RobloxCoreTuning_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RobloxCoreTuning.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No payload limit.
+        /// </summary>
+        public static string Menu_FastFlags_NoPayloadLimit_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NoPayloadLimit.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raises several networking payload size limits to the maximum..
+        /// </summary>
+        public static string Menu_FastFlags_NoPayloadLimit_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NoPayloadLimit.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable large replicator.
+        /// </summary>
+        public static string Menu_FastFlags_EnableLargeReplicator_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EnableLargeReplicator.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Faster loading.
+        /// </summary>
+        public static string Menu_FastFlags_FasterLoading_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FasterLoading.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raises asset preload limits and speeds up mesh preloading..
+        /// </summary>
+        public static string Menu_FastFlags_FasterLoading_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FasterLoading.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Better packet sending.
+        /// </summary>
+        public static string Menu_FastFlags_BetterPacketSending_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BetterPacketSending.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tunes packet batching and processing thresholds..
+        /// </summary>
+        public static string Menu_FastFlags_BetterPacketSending_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.BetterPacketSending.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MTU size.
+        /// </summary>
+        public static string Menu_FastFlags_MtuSize_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MtuSize.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resend buffer array length.
+        /// </summary>
+        public static string Menu_FastFlags_ResendBufferArrayLength_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ResendBufferArrayLength.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More sensitivity numbers.
+        /// </summary>
+        public static string Menu_FastFlags_MoreSensitivityNumbers_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MoreSensitivityNumbers.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows more precise sensitivity values in the settings menu..
+        /// </summary>
+        public static string Menu_FastFlags_MoreSensitivityNumbers_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MoreSensitivityNumbers.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No GUI blur.
+        /// </summary>
+        public static string Menu_FastFlags_NoGuiBlur_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NoGuiBlur.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preferred text size scaling.
+        /// </summary>
+        public static string Menu_FastFlags_PreferredTextSizeScaling_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.PreferredTextSizeScaling.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Texture remover.
+        /// </summary>
+        public static string Menu_FastFlags_TextureRemover_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.TextureRemover.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aggressively compresses/removes textures via the asset content refresh system..
+        /// </summary>
+        public static string Menu_FastFlags_TextureRemover_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.TextureRemover.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Threading debug check.
+        /// </summary>
+        public static string Menu_FastFlags_ThreadingDebugCheck_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ThreadingDebugCheck.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables the render thread checking debug flag..
+        /// </summary>
+        public static string Menu_FastFlags_ThreadingDebugCheck_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ThreadingDebugCheck.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable ads.
+        /// </summary>
+        public static string Menu_FastFlags_DisableAds_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableAds.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable dark mode.
+        /// </summary>
+        public static string Menu_FastFlags_EnableDarkMode_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EnableDarkMode.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove middle details page.
+        /// </summary>
+        public static string Menu_FastFlags_RemoveMiddleDetailsPage_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.RemoveMiddleDetailsPage.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preload assets.
+        /// </summary>
+        public static string Menu_FastFlags_PreloadAssets_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.PreloadAssets.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables mesh, sound, texture, font, item and teleport asset preloading..
+        /// </summary>
+        public static string Menu_FastFlags_PreloadAssets_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.PreloadAssets.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optimize CFrame updates.
+        /// </summary>
+        public static string Menu_FastFlags_OptimizeCFrameUpdates_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.OptimizeCFrameUpdates.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom disconnect error.
+        /// </summary>
+        public static string Menu_FastFlags_CustomDisconnectError_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.CustomDisconnectError.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom disconnect error message.
+        /// </summary>
+        public static string Menu_FastFlags_CustomDisconnectErrorMessage_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.CustomDisconnectErrorMessage.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fake verify.
+        /// </summary>
+        public static string Menu_FastFlags_FakeVerify_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FakeVerify.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets FStringWhitelistVerifiedUserId to the given user ID..
+        /// </summary>
+        public static string Menu_FastFlags_FakeVerify_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FakeVerify.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New camera controls.
+        /// </summary>
+        public static string Menu_FastFlags_NewCameraControls_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NewCameraControls.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets FFlagNewCameraControls to the given value..
+        /// </summary>
+        public static string Menu_FastFlags_NewCameraControls_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.NewCameraControls.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chat UI override.
+        /// </summary>
+        public static string Menu_FastFlags_ChatUIOverride_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatUIOverride.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets FFlagDebugForceChatDisabled to the given value..
+        /// </summary>
+        public static string Menu_FastFlags_ChatUIOverride_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.ChatUIOverride.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old Roblox Studio core UI.
+        /// </summary>
+        public static string Menu_FastFlags_OldRobloxStudioCoreUI_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.OldRobloxStudioCoreUI.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only applies to Roblox Studio..
+        /// </summary>
+        public static string Menu_FastFlags_OldRobloxStudioCoreUI_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.OldRobloxStudioCoreUI.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always show VR toggle.
+        /// </summary>
+        public static string Menu_FastFlags_AlwaysShowVRToggle_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.AlwaysShowVRToggle.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable feedback soothsayer check.
+        /// </summary>
+        public static string Menu_FastFlags_DisableFeedbackSoothsayerCheck_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.DisableFeedbackSoothsayerCheck.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language selector.
+        /// </summary>
+        public static string Menu_FastFlags_LanguageSelector_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.LanguageSelector.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Haptics toggle.
+        /// </summary>
+        public static string Menu_FastFlags_HapticsToggle_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.HapticsToggle.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In-menu framerate cap toggle.
+        /// </summary>
+        public static string Menu_FastFlags_InMenuFramerateCapToggle_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.InMenuFramerateCapToggle.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Memory probing.
+        /// </summary>
+        public static string Menu_FastFlags_MemoryProbing_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MemoryProbing.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enables the client's memory probing performance control..
+        /// </summary>
+        public static string Menu_FastFlags_MemoryProbing_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MemoryProbing.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache size improvement.
+        /// </summary>
+        public static string Menu_FastFlags_CacheSizeImprovement_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.CacheSizeImprovement.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raises several disk and memory cache size limits..
+        /// </summary>
+        public static string Menu_FastFlags_CacheSizeImprovement_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.CacheSizeImprovement.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CPU threads used.
+        /// </summary>
+        public static string Menu_FastFlags_CPUThreadsUsed_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.CPUThreadsUsed.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum CPU core thread count.
+        /// </summary>
+        public static string Menu_FastFlags_MinimumCPUCoreThreadCount_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.MinimumCPUCoreThreadCount.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Telemetry.
+        /// </summary>
+        public static string Menu_FastFlags_Section_Telemetry {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Section.Telemetry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Voice / Chat.
+        /// </summary>
+        public static string Menu_FastFlags_Section_VoiceChat {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Section.VoiceChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rendering.
+        /// </summary>
+        public static string Menu_FastFlags_Section_Rendering {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Section.Rendering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Networking.
+        /// </summary>
+        public static string Menu_FastFlags_Section_Networking {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Section.Networking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI / Misc.
+        /// </summary>
+        public static string Menu_FastFlags_Section_UIMisc {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.Section.UIMisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rendering and Graphics.
         /// </summary>
         public static string Menu_FastFlags_Presets_Categories_Rendering {

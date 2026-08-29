@@ -771,6 +771,429 @@ Selecting 'No' will ignore this warning and continue installation.</value>
   <data name="Menu.Appearance.Language.Description" xml:space="preserve">
     <value>A relaunch is required for changes to take effect.</value>
   </data>
+  <data name="Menu.FastFlags.DisableTelemetry.Title" xml:space="preserve">
+    <value>Disable telemetry</value>
+  </data>
+  <data name="Menu.FastFlags.DisableTelemetry.Description" xml:space="preserve">
+    <value>Disables a large batch of client analytics and telemetry endpoints.</value>
+  </data>
+  <data name="Menu.FastFlags.DisableWebview2Telemetry.Title" xml:space="preserve">
+    <value>Disable Webview2 telemetry</value>
+  </data>
+  <data name="Menu.FastFlags.DisableWebview2Telemetry.Description" xml:space="preserve">
+    <value>Disables telemetry sent by the embedded Webview2 browser component.</value>
+  </data>
+  <data name="Menu.FastFlags.DisableVoiceChatTelemetry.Title" xml:space="preserve">
+    <value>Disable voice chat telemetry</value>
+  </data>
+  <data name="Menu.FastFlags.DisableVoiceChatTelemetry.Description" xml:space="preserve">
+    <value>Disables analytics and telemetry sent by the voice chat system.</value>
+  </data>
+  <data name="Menu.FastFlags.BlockTencent.Title" xml:space="preserve">
+    <value>Block Tencent</value>
+  </data>
+  <data name="Menu.FastFlags.BlockTencent.Description" xml:space="preserve">
+    <value>Redirects and disables Tencent-related endpoints and policy checks.</value>
+  </data>
+  <data name="Menu.FastFlags.PingBreakdown.Title" xml:space="preserve">
+    <value>Ping breakdown</value>
+  </data>
+  <data name="Menu.FastFlags.PingBreakdown.Description" xml:space="preserve">
+    <value>Shows a breakdown of ping contributors in the debug stats.</value>
+  </data>
+  <data name="Menu.FastFlags.ShowChunks.Title" xml:space="preserve">
+    <value>Show chunks</value>
+  </data>
+  <data name="Menu.FastFlags.ShowChunks.Description" xml:space="preserve">
+    <value>Shows lighting chunk boundaries for debugging.</value>
+  </data>
+  <data name="Menu.FastFlags.FlagState.Title" xml:space="preserve">
+    <value>Flag state</value>
+  </data>
+  <data name="Menu.FastFlags.FlagState.Description" xml:space="preserve">
+    <value>Sets the FStringDebugShowFlagState flag to the given value.</value>
+  </data>
+  <data name="Menu.FastFlags.ChatBubbles.Title" xml:space="preserve">
+    <value>Chat bubbles</value>
+  </data>
+  <data name="Menu.FastFlags.ChatBubbles.Description" xml:space="preserve">
+    <value>Toggles legacy chat bubbles above characters.</value>
+  </data>
+  <data name="Menu.FastFlags.ChatTranslation.Title" xml:space="preserve">
+    <value>Chat translation</value>
+  </data>
+  <data name="Menu.FastFlags.ChatTranslation.Description" xml:space="preserve">
+    <value>Toggles the in-experience chat translation setting.</value>
+  </data>
+  <data name="Menu.FastFlags.LightCulling.Title" xml:space="preserve">
+    <value>Light culling</value>
+  </data>
+  <data name="Menu.FastFlags.LightCulling.Description" xml:space="preserve">
+    <value>Enables GPU and CPU light culling.</value>
+  </data>
+  <data name="Menu.FastFlags.RainbowTheme.Title" xml:space="preserve">
+    <value>Rainbow theme</value>
+  </data>
+  <data name="Menu.FastFlags.RainbowTheme.Description" xml:space="preserve">
+    <value>Renders unthemed UI instances with a rainbow debug color.</value>
+  </data>
+  <data name="Menu.FastFlags.FRMQualityOverride.Title" xml:space="preserve">
+    <value>FRM quality override</value>
+  </data>
+  <data name="Menu.FastFlags.FRMQualityOverrideLevel.Title" xml:space="preserve">
+    <value>FRM quality override level</value>
+  </data>
+  <data name="Menu.FastFlags.MeshQuality.Title" xml:space="preserve">
+    <value>Mesh quality</value>
+  </data>
+  <data name="Menu.FastFlags.MeshQualityLevel.Title" xml:space="preserve">
+    <value>Mesh quality level</value>
+  </data>
+  <data name="Menu.FastFlags.UnlimitedCameraZoom.Title" xml:space="preserve">
+    <value>Unlimited camera zoom</value>
+  </data>
+  <data name="Menu.FastFlags.UnlimitedCameraZoom.Description" xml:space="preserve">
+    <value>Removes the maximum camera zoom distance.</value>
+  </data>
+  <data name="Menu.FastFlags.BGRATextureSupport.Title" xml:space="preserve">
+    <value>BGRA texture support</value>
+  </data>
+  <data name="Menu.FastFlags.BGRATextureSupport.Description" xml:space="preserve">
+    <value>Enables Direct3D 11 BGRA texture support.</value>
+  </data>
+  <data name="Menu.FastFlags.NewFpsSystem.Title" xml:space="preserve">
+    <value>New FPS system</value>
+  </data>
+  <data name="Menu.FastFlags.NewFpsSystem.Description" xml:space="preserve">
+    <value>Enables the newer FPS and frame time tracking system.</value>
+  </data>
+  <data name="Menu.FastFlags.WorserParticles.Title" xml:space="preserve">
+    <value>Worser particles</value>
+  </data>
+  <data name="Menu.FastFlags.WorserParticles.Description" xml:space="preserve">
+    <value>Reduces particle fidelity fixes for a performance boost.</value>
+  </data>
+  <data name="Menu.FastFlags.LowPolyMeshes.Title" xml:space="preserve">
+    <value>Low poly meshes</value>
+  </data>
+  <data name="Menu.FastFlags.LowPolyMeshes.Description" xml:space="preserve">
+    <value>Forces the lowest level of detail for meshes.</value>
+  </data>
+  <data name="Menu.FastFlags.RenderingMode.Title" xml:space="preserve">
+    <value>Rendering mode</value>
+  </data>
+  <data name="Menu.FastFlags.MoreLighting.Title" xml:space="preserve">
+    <value>More lighting</value>
+  </data>
+  <data name="Menu.FastFlags.MoreLighting.Description" xml:space="preserve">
+    <value>Brightens rendering by fixing fog contribution.</value>
+  </data>
+  <data name="Menu.FastFlags.MinGrassDistance.Title" xml:space="preserve">
+    <value>Minimum grass distance</value>
+  </data>
+  <data name="Menu.FastFlags.MaxGrassDistance.Title" xml:space="preserve">
+    <value>Maximum grass distance</value>
+  </data>
+  <data name="Menu.FastFlags.GrassMovementFactor.Title" xml:space="preserve">
+    <value>Grass movement factor</value>
+  </data>
+  <data name="Menu.FastFlags.IGMenuVersion.Title" xml:space="preserve">
+    <value>In-game menu version</value>
+  </data>
+  <data name="Menu.FastFlags.LightingMode.Title" xml:space="preserve">
+    <value>Lighting mode</value>
+  </data>
+  <data name="Menu.FastFlags.FullscreenTitlebarDelay.Title" xml:space="preserve">
+    <value>Disable fullscreen title bar delay</value>
+  </data>
+  <data name="Menu.FastFlags.FullscreenTitlebarDelay.Description" xml:space="preserve">
+    <value>Removes the delay before the title bar hides in fullscreen.</value>
+  </data>
+  <data name="Menu.FastFlags.TextureSkipping.Title" xml:space="preserve">
+    <value>Texture skipping</value>
+  </data>
+  <data name="Menu.FastFlags.DistanceRendering.Title" xml:space="preserve">
+    <value>Distance rendering</value>
+  </data>
+  <data name="Menu.FastFlags.DynamicResolution.Title" xml:space="preserve">
+    <value>Dynamic resolution</value>
+  </data>
+  <data name="Menu.FastFlags.RomarkStartGraphic.Title" xml:space="preserve">
+    <value>Romark start graphic</value>
+  </data>
+  <data name="Menu.FastFlags.FRMQualityLevel.Title" xml:space="preserve">
+    <value>FRM quality level</value>
+  </data>
+  <data name="Menu.FastFlags.DisablePostFX.Title" xml:space="preserve">
+    <value>Disable post processing effects</value>
+  </data>
+  <data name="Menu.FastFlags.AvoidTaskSchedulerSleep.Title" xml:space="preserve">
+    <value>Avoid task scheduler sleep</value>
+  </data>
+  <data name="Menu.FastFlags.AvoidTaskSchedulerSleep.Description" xml:space="preserve">
+    <value>Prevents the task scheduler from sleeping, at the cost of higher CPU usage.</value>
+  </data>
+  <data name="Menu.FastFlags.DisablePlayerShadows.Title" xml:space="preserve">
+    <value>Disable player shadows</value>
+  </data>
+  <data name="Menu.FastFlags.RenderOcclusionChecks.Title" xml:space="preserve">
+    <value>Render occlusion checks</value>
+  </data>
+  <data name="Menu.FastFlags.RenderOcclusionChecks.Description" xml:space="preserve">
+    <value>Enables visibility bug checks used for render occlusion.</value>
+  </data>
+  <data name="Menu.FastFlags.GraySky.Title" xml:space="preserve">
+    <value>Gray sky</value>
+  </data>
+  <data name="Menu.FastFlags.WhiteSky.Title" xml:space="preserve">
+    <value>White sky</value>
+  </data>
+  <data name="Menu.FastFlags.RedFontDebugHighlight.Title" xml:space="preserve">
+    <value>Red font debug highlight</value>
+  </data>
+  <data name="Menu.FastFlags.DisableLayeredClothing.Title" xml:space="preserve">
+    <value>Disable layered clothing</value>
+  </data>
+  <data name="Menu.FastFlags.DisableTerrainTextures.Title" xml:space="preserve">
+    <value>Disable terrain textures</value>
+  </data>
+  <data name="Menu.FastFlags.Prerender.Title" xml:space="preserve">
+    <value>Prerender</value>
+  </data>
+  <data name="Menu.FastFlags.Prerender.Description" xml:space="preserve">
+    <value>Enables the prerender pipeline and its V2 variant.</value>
+  </data>
+  <data name="Menu.FastFlags.ForceBuggyVulkan.Title" xml:space="preserve">
+    <value>Force buggy Vulkan renderpass list</value>
+  </data>
+  <data name="Menu.FastFlags.ForceBuggyVulkan.Description" xml:space="preserve">
+    <value>Overrides the renderpass allowlist used to force Vulkan on buggy GPUs. Type 'Automatic' to disable.</value>
+  </data>
+  <data name="Menu.FastFlags.BypassVulkan.Title" xml:space="preserve">
+    <value>Bypass Vulkan buggy GPU list</value>
+  </data>
+  <data name="Menu.FastFlags.BypassVulkan.Description" xml:space="preserve">
+    <value>Overrides the renderpass allowlist used to bypass Vulkan blacklisting. Type 'Automatic' to disable.</value>
+  </data>
+  <data name="Menu.FastFlags.ChromeUI.Title" xml:space="preserve">
+    <value>Chrome in-game menu UI</value>
+  </data>
+  <data name="Menu.FastFlags.OldChromeUI.Title" xml:space="preserve">
+    <value>Old Chrome UI</value>
+  </data>
+  <data name="Menu.FastFlags.OldChromeUI.Description" xml:space="preserve">
+    <value>Reverts several in-game menu Chrome UI elements to their older versions.</value>
+  </data>
+  <data name="Menu.FastFlags.ShaderGlintLevel.Title" xml:space="preserve">
+    <value>Shader glint level</value>
+  </data>
+  <data name="Menu.FastFlags.ShadersEnabled.Title" xml:space="preserve">
+    <value>Shaders enabled</value>
+  </data>
+  <data name="Menu.FastFlags.ShadersRoughnessClamp.Title" xml:space="preserve">
+    <value>Shaders roughness clamp</value>
+  </data>
+  <data name="Menu.FastFlags.TargetRefreshRate.Title" xml:space="preserve">
+    <value>Target refresh rate</value>
+  </data>
+  <data name="Menu.FastFlags.MinimalRendering.Title" xml:space="preserve">
+    <value>Minimal rendering</value>
+  </data>
+  <data name="Menu.FastFlags.MinimalRendering.Description" xml:space="preserve">
+    <value>Forces deterministic, minimal rendering for debugging.</value>
+  </data>
+  <data name="Menu.FastFlags.DisableSkyBloom.Title" xml:space="preserve">
+    <value>Disable sky bloom</value>
+  </data>
+  <data name="Menu.FastFlags.FramerateBufferPercentage.Title" xml:space="preserve">
+    <value>Framerate buffer percentage</value>
+  </data>
+  <data name="Menu.FastFlags.FramerateLimitFFlag.Title" xml:space="preserve">
+    <value>Framerate limit (FFlag)</value>
+  </data>
+  <data name="Menu.FastFlags.FramerateLimitFFlag.Description" xml:space="preserve">
+    <value>Sets an FFlag-based framerate cap, separate from the performance page's framerate cap.</value>
+  </data>
+  <data name="Menu.FastFlags.Pseudolocalization.Title" xml:space="preserve">
+    <value>Pseudolocalization</value>
+  </data>
+  <data name="Menu.FastFlags.Pseudolocalization.Description" xml:space="preserve">
+    <value>Enables debug pseudolocalization of UI text.</value>
+  </data>
+  <data name="Menu.FastFlags.DisplayFpsFFlag.Title" xml:space="preserve">
+    <value>Display FPS (FFlag)</value>
+  </data>
+  <data name="Menu.FastFlags.DisplayFpsFFlag.Description" xml:space="preserve">
+    <value>Shows the client's built-in FFlag-based FPS counter, separate from the performance page's stats overlay.</value>
+  </data>
+  <data name="Menu.FastFlags.GrayAvatarThumbnails.Title" xml:space="preserve">
+    <value>Gray avatar thumbnails</value>
+  </data>
+  <data name="Menu.FastFlags.UIFontSizePadding.Title" xml:space="preserve">
+    <value>UI font size padding</value>
+  </data>
+  <data name="Menu.FastFlags.HideGUIGroup.Title" xml:space="preserve">
+    <value>Hide GUI group</value>
+  </data>
+  <data name="Menu.FastFlags.HideGUIGroup.Description" xml:space="preserve">
+    <value>Hides the core GUI for the given group ID.</value>
+  </data>
+  <data name="Menu.FastFlags.LessLagSpikes.Title" xml:space="preserve">
+    <value>Less lag spikes</value>
+  </data>
+  <data name="Menu.FastFlags.LessLagSpikes.Description" xml:space="preserve">
+    <value>Increases bandwidth manager throughput targets.</value>
+  </data>
+  <data name="Menu.FastFlags.RobloxCoreTuning.Title" xml:space="preserve">
+    <value>Roblox Core (SignalR) tuning</value>
+  </data>
+  <data name="Menu.FastFlags.NoPayloadLimit.Title" xml:space="preserve">
+    <value>No payload limit</value>
+  </data>
+  <data name="Menu.FastFlags.NoPayloadLimit.Description" xml:space="preserve">
+    <value>Raises several networking payload size limits to the maximum.</value>
+  </data>
+  <data name="Menu.FastFlags.EnableLargeReplicator.Title" xml:space="preserve">
+    <value>Enable large replicator</value>
+  </data>
+  <data name="Menu.FastFlags.FasterLoading.Title" xml:space="preserve">
+    <value>Faster loading</value>
+  </data>
+  <data name="Menu.FastFlags.FasterLoading.Description" xml:space="preserve">
+    <value>Raises asset preload limits and speeds up mesh preloading.</value>
+  </data>
+  <data name="Menu.FastFlags.BetterPacketSending.Title" xml:space="preserve">
+    <value>Better packet sending</value>
+  </data>
+  <data name="Menu.FastFlags.BetterPacketSending.Description" xml:space="preserve">
+    <value>Tunes packet batching and processing thresholds.</value>
+  </data>
+  <data name="Menu.FastFlags.MtuSize.Title" xml:space="preserve">
+    <value>MTU size</value>
+  </data>
+  <data name="Menu.FastFlags.ResendBufferArrayLength.Title" xml:space="preserve">
+    <value>Resend buffer array length</value>
+  </data>
+  <data name="Menu.FastFlags.MoreSensitivityNumbers.Title" xml:space="preserve">
+    <value>More sensitivity numbers</value>
+  </data>
+  <data name="Menu.FastFlags.MoreSensitivityNumbers.Description" xml:space="preserve">
+    <value>Shows more precise sensitivity values in the settings menu.</value>
+  </data>
+  <data name="Menu.FastFlags.NoGuiBlur.Title" xml:space="preserve">
+    <value>No GUI blur</value>
+  </data>
+  <data name="Menu.FastFlags.PreferredTextSizeScaling.Title" xml:space="preserve">
+    <value>Preferred text size scaling</value>
+  </data>
+  <data name="Menu.FastFlags.TextureRemover.Title" xml:space="preserve">
+    <value>Texture remover</value>
+  </data>
+  <data name="Menu.FastFlags.TextureRemover.Description" xml:space="preserve">
+    <value>Aggressively compresses/removes textures via the asset content refresh system.</value>
+  </data>
+  <data name="Menu.FastFlags.ThreadingDebugCheck.Title" xml:space="preserve">
+    <value>Threading debug check</value>
+  </data>
+  <data name="Menu.FastFlags.ThreadingDebugCheck.Description" xml:space="preserve">
+    <value>Enables the render thread checking debug flag.</value>
+  </data>
+  <data name="Menu.FastFlags.DisableAds.Title" xml:space="preserve">
+    <value>Disable ads</value>
+  </data>
+  <data name="Menu.FastFlags.EnableDarkMode.Title" xml:space="preserve">
+    <value>Enable dark mode</value>
+  </data>
+  <data name="Menu.FastFlags.RemoveMiddleDetailsPage.Title" xml:space="preserve">
+    <value>Remove middle details page</value>
+  </data>
+  <data name="Menu.FastFlags.PreloadAssets.Title" xml:space="preserve">
+    <value>Preload assets</value>
+  </data>
+  <data name="Menu.FastFlags.PreloadAssets.Description" xml:space="preserve">
+    <value>Enables mesh, sound, texture, font, item and teleport asset preloading.</value>
+  </data>
+  <data name="Menu.FastFlags.OptimizeCFrameUpdates.Title" xml:space="preserve">
+    <value>Optimize CFrame updates</value>
+  </data>
+  <data name="Menu.FastFlags.CustomDisconnectError.Title" xml:space="preserve">
+    <value>Custom disconnect error</value>
+  </data>
+  <data name="Menu.FastFlags.CustomDisconnectErrorMessage.Title" xml:space="preserve">
+    <value>Custom disconnect error message</value>
+  </data>
+  <data name="Menu.FastFlags.FakeVerify.Title" xml:space="preserve">
+    <value>Fake verify</value>
+  </data>
+  <data name="Menu.FastFlags.FakeVerify.Description" xml:space="preserve">
+    <value>Sets FStringWhitelistVerifiedUserId to the given user ID.</value>
+  </data>
+  <data name="Menu.FastFlags.NewCameraControls.Title" xml:space="preserve">
+    <value>New camera controls</value>
+  </data>
+  <data name="Menu.FastFlags.NewCameraControls.Description" xml:space="preserve">
+    <value>Sets FFlagNewCameraControls to the given value.</value>
+  </data>
+  <data name="Menu.FastFlags.ChatUIOverride.Title" xml:space="preserve">
+    <value>Chat UI override</value>
+  </data>
+  <data name="Menu.FastFlags.ChatUIOverride.Description" xml:space="preserve">
+    <value>Sets FFlagDebugForceChatDisabled to the given value.</value>
+  </data>
+  <data name="Menu.FastFlags.OldRobloxStudioCoreUI.Title" xml:space="preserve">
+    <value>Old Roblox Studio core UI</value>
+  </data>
+  <data name="Menu.FastFlags.OldRobloxStudioCoreUI.Description" xml:space="preserve">
+    <value>Only applies to Roblox Studio.</value>
+  </data>
+  <data name="Menu.FastFlags.AlwaysShowVRToggle.Title" xml:space="preserve">
+    <value>Always show VR toggle</value>
+  </data>
+  <data name="Menu.FastFlags.DisableFeedbackSoothsayerCheck.Title" xml:space="preserve">
+    <value>Disable feedback soothsayer check</value>
+  </data>
+  <data name="Menu.FastFlags.LanguageSelector.Title" xml:space="preserve">
+    <value>Language selector</value>
+  </data>
+  <data name="Menu.FastFlags.HapticsToggle.Title" xml:space="preserve">
+    <value>Haptics toggle</value>
+  </data>
+  <data name="Menu.FastFlags.InMenuFramerateCapToggle.Title" xml:space="preserve">
+    <value>In-menu framerate cap toggle</value>
+  </data>
+  <data name="Menu.FastFlags.MemoryProbing.Title" xml:space="preserve">
+    <value>Memory probing</value>
+  </data>
+  <data name="Menu.FastFlags.MemoryProbing.Description" xml:space="preserve">
+    <value>Enables the client's memory probing performance control.</value>
+  </data>
+  <data name="Menu.FastFlags.CacheSizeImprovement.Title" xml:space="preserve">
+    <value>Cache size improvement</value>
+  </data>
+  <data name="Menu.FastFlags.CacheSizeImprovement.Description" xml:space="preserve">
+    <value>Raises several disk and memory cache size limits.</value>
+  </data>
+  <data name="Menu.FastFlags.CPUThreadsUsed.Title" xml:space="preserve">
+    <value>CPU threads used</value>
+  </data>
+  <data name="Menu.FastFlags.MinimumCPUCoreThreadCount.Title" xml:space="preserve">
+    <value>Minimum CPU core thread count</value>
+  </data>
+  <data name="Menu.FastFlags.Section.Telemetry" xml:space="preserve">
+    <value>Telemetry</value>
+  </data>
+  <data name="Menu.FastFlags.Section.VoiceChat" xml:space="preserve">
+    <value>Voice / Chat</value>
+  </data>
+  <data name="Menu.FastFlags.Section.Rendering" xml:space="preserve">
+    <value>Rendering</value>
+  </data>
+  <data name="Menu.FastFlags.Section.Networking" xml:space="preserve">
+    <value>Networking</value>
+  </data>
+  <data name="Menu.FastFlags.Section.UIMisc" xml:space="preserve">
+    <value>UI / Misc</value>
+  </data>
   <data name="Menu.FastFlags.Presets.Categories.Rendering" xml:space="preserve">
     <value>Rendering and Graphics</value>
   </data>
