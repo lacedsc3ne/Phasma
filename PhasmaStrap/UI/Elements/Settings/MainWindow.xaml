@@ -12,8 +12,8 @@
              d:DataContext="{d:DesignInstance dmodels:MainWindowViewModel, IsDesignTimeCreatable=True}"
              Title="{x:Static resources:Strings.Menu_Title}"
              MinWidth="1000"
-             Width="1000"
-             Height="580"
+             Width="1116"
+             Height="638"
              ExtendsContentIntoTitleBar="True"
              WindowStartupLocation="CenterScreen"
              Closing="WpfUiWindow_Closing"
@@ -194,6 +194,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -205,9 +207,15 @@
                 </StackPanel>
             </StatusBarItem>
             <StatusBarItem Grid.Column="2" Padding="0,0,4,0">
-                <ui:Button Content="{x:Static resources:Strings.Menu_Save}" Appearance="Primary" Command="{Binding SaveSettingsCommand, Mode=OneWay}" />
+                <ui:Button Content="Save &amp; Launch" Appearance="Primary" Command="{Binding SaveAndLaunchCommand, Mode=OneWay}" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="3" Padding="4,0,0,0">
+                <ui:Button Content="{x:Static resources:Strings.Menu_Save}" Appearance="Primary" Command="{Binding SaveSettingsCommand, Mode=OneWay}" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="4" Padding="4,0,0,0">
+                <ui:Button Content="Restart" Command="{Binding RestartCommand, Mode=OneWay}" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="5" Padding="4,0,0,0">
                 <ui:Button Content="{x:Static resources:Strings.Common_Close}" Command="{Binding CloseWindowCommand, Mode=OneWay}" />
             </StatusBarItem>
         </StatusBar>

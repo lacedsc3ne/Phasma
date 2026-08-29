@@ -297,7 +297,27 @@ namespace PhasmaStrap.UI.Elements.Settings
         {
             ControllerService.Shutdown();
 
-            if (App.LaunchSettings.TestModeFlag.Active)
+            var viewModel = (MainWindowViewModel)DataContext;
+
+            if (viewModel.RestartAfterClose)
+            {
+                // spawn a detached helper that waits a moment before relaunching - LaunchHandler's
+                // "Settings" InterProcessLock is still held by this process until it fully exits,
+                // so starting the new instance immediately would just see the lock taken and back
+                // off instead of opening a fresh window
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c timeout /t 1 /nobreak >nul & start \"\" \"{Paths.Process}\" -settings",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                });
+                App.SoftTerminate();
+                return;
+            }
+
+            if (App.LaunchSettings.TestModeFlag.Active || viewModel.LaunchAfterClose)
                 LaunchHandler.LaunchRoblox(LaunchMode.Player);
             else
                 App.SoftTerminate();
