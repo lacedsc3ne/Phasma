@@ -20,7 +20,13 @@
 
             string directory = useTempDir ? Path.Combine(Paths.TempLogs) : Path.Combine(Paths.Base, "Logs");
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'");
-            string filename = $"{App.ProjectName}_{timestamp}.log";
+
+            // process ID keeps this unique even when two real PhasmaStrap processes start within the same
+            // UTC second (e.g. two near-simultaneous browser Play clicks) - without it, the second process's
+            // File.Exists check below would see the first process's just-created log file at the identical
+            // path, take that as "another instance beat me to it", and silently self-terminate below without
+            // ever processing its own launch request (dropping that Play click with no error, no fallback)
+            string filename = $"{App.ProjectName}_{timestamp}_{Environment.ProcessId}.log";
             string location = Path.Combine(directory, filename);
 
             WriteLine(LOG_IDENT, $"Initializing at {location}");
