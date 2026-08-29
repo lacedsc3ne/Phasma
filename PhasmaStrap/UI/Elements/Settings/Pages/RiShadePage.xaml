@@ -1,0 +1,144 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.RiShadePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      mc:Ignorable="d"
+      Title="RiShadePage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="GPU shader post-processing (RiShade) applied over the Roblox window as a desktop-duplication overlay. Intended for screenshots, not sustained gameplay - it costs extra GPU time every frame." TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Enable RiShade" Description="Master toggle. Off by default - only takes effect the next time you join a game.">
+            <ui:ToggleSwitch IsChecked="{Binding RiShadeEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Preset" Description="Applies a bundle of effect settings below. Pick Vanilla to reset everything off.">
+            <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresetNames, Mode=OneTime}" Text="{Binding SelectedPreset, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Render scale" Description="Renders effects at a lower resolution and upscales, for extra headroom.">
+            <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding RenderScaleNames, Mode=OneTime}" SelectedIndex="{Binding RenderScaleIndex, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="Color grade" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Brightness">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="-0.3" Maximum="0.3" Value="{Binding Brightness, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Brightness, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+        <controls:OptionControl Header="Gamma">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding Gamma, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Gamma, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+        <controls:OptionControl Header="Hue shift (degrees)">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="-180" Maximum="180" Value="{Binding HueShift, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding HueShift, Mode=OneWay, StringFormat={}{0:0}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Tonemap" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Operator">
+            <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding TonemapNames, Mode=OneTime}" SelectedIndex="{Binding TonemapMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Exposure">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0.2" Maximum="3.0" Value="{Binding TonemapExposure, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TonemapExposure, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Vignette" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Strength">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding VignetteStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding VignetteStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Sharpen" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Strength">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding SharpenStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SharpenStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Bloom" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Strength">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding BloomStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+        <controls:OptionControl Header="Threshold">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding BloomThreshold, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomThreshold, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Chromatic aberration" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Strength">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="0.02" Value="{Binding ChromaStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ChromaStrength, Mode=OneWay, StringFormat={}{0:0.000}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Film grain" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Enabled">
+            <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Strength">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="0.3" Value="{Binding GrainStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GrainStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Detail and glow" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <controls:OptionControl Header="Clarity (local contrast)">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding ClarityStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ClarityStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+        <controls:OptionControl Header="Debanding">
+            <ui:ToggleSwitch IsChecked="{Binding DebandEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <controls:OptionControl Header="Ambient glow">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding AmbientStrength, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding AmbientStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock Text="Custom effects: drop raw HLSL pixel shaders (entry point PSCustom, scene texture on t0) into the Integrations\RiShade\Effects folder and they'll be compiled and chained in automatically." TextWrapping="Wrap" Margin="0,16,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="Not ported from Voidstrap: depth of field, screen space reflections, ambient occlusion, global illumination, fog, eye adaptation, ReShade .fx preset importing, and the in-game F8 tweak panel. Capture uses desktop duplication rather than per-window Windows.Graphics.Capture, since that needs a CsWinRT projection toolchain this project doesn't have wired up." TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+    </StackPanel>
+</ui:UiPage>

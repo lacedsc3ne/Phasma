@@ -133,5 +133,10 @@ namespace PhasmaStrap.Models.Persistable
         public double CrosshairOpacity { get; set; } = 1.0;
         public string CrosshairColorHex { get; set; } = "#00FF00";
         public string CrosshairOutlineColorHex { get; set; } = "#000000";
+
+        // RiShade shader post-processing (ported from Voidstrap, screen-space effects only)
+        // defaults to off: this is GPU shader injection and is a significant perf/behaviour change
+        public bool RiShadeEnabled { get; set; } = false;
+        public RiShadeSettings RiShade { get; set; } = new();
     }
 }
