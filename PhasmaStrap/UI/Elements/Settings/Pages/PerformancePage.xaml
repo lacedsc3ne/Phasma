@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="PerformancePage"
       Scrollable="True">
@@ -115,6 +116,56 @@
 
         <controls:OptionControl Header="Roblox cache">
             <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Title}" Description="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding OptimizeRoblox, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding RobloxEfficiencyMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Title}" Description="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding ReduceMemoryOutOfFocus, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CpuPriority_Title}" Description="{x:Static resources:Strings.Menu_Performance_CpuPriority_Description}">
+            <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding CpuPriorityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedCpuPriority, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Description}">
+            <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding RobloxPriorityLimitOptions, Mode=OneTime}" SelectedItem="{Binding RobloxPriorityLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Title}" Description="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding LauncherMemoryManagerEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Title}" Description="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding SoftwareRenderingEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding ForceInGameResolution, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Description}">
+            <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding MonitorOptions, Mode=OneTime}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding SelectedMonitor, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Description}">
+            <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding ModeOptions, Mode=OneWay}" SelectedItem="{Binding SelectedMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Title}" Description="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Description}">
+            <Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Command="{Binding IdentifyDisplaysCommand}" />
         </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

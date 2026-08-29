@@ -2586,4 +2586,85 @@ Defaulting to {1}.</value>
   <data name="Menu.Nvidia.SettingsCopiedToClipboard" xml:space="preserve">
     <value>Copied the NVIDIA settings to the clipboard.</value>
   </data>
+  <data name="Menu.Performance.RuntimeOptimizer.Header" xml:space="preserve">
+    <value>Roblox process optimizer</value>
+  </data>
+  <data name="Menu.Performance.RuntimeOptimizer.Description" xml:space="preserve">
+    <value>Live tuning of the running Roblox process while a game session is active, separate from Roblox's own settings.</value>
+  </data>
+  <data name="Menu.Performance.OptimizeRoblox.Title" xml:space="preserve">
+    <value>Optimize Roblox process</value>
+  </data>
+  <data name="Menu.Performance.OptimizeRoblox.Description" xml:space="preserve">
+    <value>Raises Roblox's process priority and enables priority boost while it's running.</value>
+  </data>
+  <data name="Menu.Performance.RobloxEfficiencyMode.Title" xml:space="preserve">
+    <value>Efficiency mode when unfocused</value>
+  </data>
+  <data name="Menu.Performance.RobloxEfficiencyMode.Description" xml:space="preserve">
+    <value>Drops Roblox to idle priority while you're tabbed away from it.</value>
+  </data>
+  <data name="Menu.Performance.ReduceMemoryOutOfFocus.Title" xml:space="preserve">
+    <value>Reduce memory usage when unfocused</value>
+  </data>
+  <data name="Menu.Performance.ReduceMemoryOutOfFocus.Description" xml:space="preserve">
+    <value>Lowers Roblox's priority and periodically trims its working set while you're tabbed away from it.</value>
+  </data>
+  <data name="Menu.Performance.CpuPriority.Title" xml:space="preserve">
+    <value>Roblox CPU core limit</value>
+  </data>
+  <data name="Menu.Performance.CpuPriority.Description" xml:space="preserve">
+    <value>Restricts Roblox to a set number of logical processors via CPU affinity. Automatic uses every available processor.</value>
+  </data>
+  <data name="Menu.Performance.RobloxPriorityLimit.Title" xml:space="preserve">
+    <value>Roblox process priority</value>
+  </data>
+  <data name="Menu.Performance.RobloxPriorityLimit.Description" xml:space="preserve">
+    <value>The Windows process priority class Roblox should run at.</value>
+  </data>
+  <data name="Menu.Performance.LauncherMemoryManager.Title" xml:space="preserve">
+    <value>Reduce PhasmaStrap's own memory usage when idle</value>
+  </data>
+  <data name="Menu.Performance.LauncherMemoryManager.Description" xml:space="preserve">
+    <value>Tiered memory-pressure management for PhasmaStrap's own process (not Roblox's) while it's backgrounded, escalating to a deeper trim the longer it stays idle.</value>
+  </data>
+  <data name="Menu.Performance.SoftwareRendering.Title" xml:space="preserve">
+    <value>Force software rendering</value>
+  </data>
+  <data name="Menu.Performance.SoftwareRendering.Description" xml:space="preserve">
+    <value>Disables GPU-accelerated rendering for PhasmaStrap's own windows. Useful if you're seeing rendering glitches or crashes related to your graphics driver.</value>
+  </data>
+  <data name="Menu.Performance.Display.Header" xml:space="preserve">
+    <value>Multi-monitor and in-game resolution</value>
+  </data>
+  <data name="Menu.Performance.Display.Description" xml:space="preserve">
+    <value>Force Roblox to run at a specific display resolution and refresh rate, and identify your connected monitors.</value>
+  </data>
+  <data name="Menu.Performance.ForceInGameResolution.Title" xml:space="preserve">
+    <value>Force a specific resolution while in-game</value>
+  </data>
+  <data name="Menu.Performance.ForceInGameResolution.Description" xml:space="preserve">
+    <value>Changes the display's resolution and refresh rate for the duration of the game session, then restores it when you leave.</value>
+  </data>
+  <data name="Menu.Performance.InGameResolutionMonitor.Title" xml:space="preserve">
+    <value>Monitor</value>
+  </data>
+  <data name="Menu.Performance.InGameResolutionMonitor.Description" xml:space="preserve">
+    <value>Which display the forced resolution should apply to.</value>
+  </data>
+  <data name="Menu.Performance.InGameResolutionMode.Title" xml:space="preserve">
+    <value>Resolution</value>
+  </data>
+  <data name="Menu.Performance.InGameResolutionMode.Description" xml:space="preserve">
+    <value>The resolution and refresh rate to switch to while in-game.</value>
+  </data>
+  <data name="Menu.Performance.IdentifyDisplays.Title" xml:space="preserve">
+    <value>Identify displays</value>
+  </data>
+  <data name="Menu.Performance.IdentifyDisplays.Description" xml:space="preserve">
+    <value>Briefly shows a number on each connected monitor so you can tell them apart.</value>
+  </data>
+  <data name="Menu.Performance.IdentifyDisplays.Button" xml:space="preserve">
+    <value>Identify</value>
+  </data>
 </root>
