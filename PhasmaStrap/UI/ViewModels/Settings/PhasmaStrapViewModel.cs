@@ -22,6 +22,33 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.EnableAnalytics = value;
         }
 
+        public bool LaunchAtStartupEnabled
+        {
+            get => App.Settings.Prop.LaunchAtStartup;
+            set
+            {
+                App.Settings.Prop.LaunchAtStartup = value;
+
+                try
+                {
+                    if (value)
+                        WindowsRegistry.RegisterStartup();
+                    else
+                        WindowsRegistry.UnregisterStartup();
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteException("PhasmaStrapViewModel::LaunchAtStartupEnabled", ex);
+                }
+            }
+        }
+
+        public bool MinimizeToTrayOnCloseEnabled
+        {
+            get => App.Settings.Prop.MinimizeToTrayOnClose;
+            set => App.Settings.Prop.MinimizeToTrayOnClose = value;
+        }
+
         public WebEnvironment WebEnvironment
         {
             get => App.Settings.Prop.WebEnvironment;

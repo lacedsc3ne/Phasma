@@ -23,7 +23,19 @@
             <ui:ToggleSwitch IsChecked="{Binding UpdateCheckingEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl 
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Behaviour_LaunchAtStartup_Title}"
+            Description="{x:Static resources:Strings.Menu_Behaviour_LaunchAtStartup_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding LaunchAtStartupEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_Behaviour_MinimizeToTrayOnClose_Title}"
+            Description="{x:Static resources:Strings.Menu_Behaviour_MinimizeToTrayOnClose_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding MinimizeToTrayOnCloseEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_PhasmaStrap_Analytics_Title}"
             Description="{Binding Source={x:Static resources:Strings.Menu_PhasmaStrap_Analytics_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/info/privacy-policy/'}">
             <ui:ToggleSwitch IsChecked="{Binding AnalyticsEnabled, Mode=TwoWay}" />

@@ -494,7 +494,16 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Common.DiscordRichPresence", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Exit.
+        /// </summary>
+        public static string Common_Exit {
+            get {
+                return ResourceManager.GetString("Common.Exit", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Edit.
         /// </summary>
@@ -629,7 +638,16 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Common.No", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string Common_Open {
+            get {
+                return ResourceManager.GetString("Common.Open", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Not available.
         /// </summary>
@@ -2600,6 +2618,42 @@ namespace PhasmaStrap.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Launch PhasmaStrap to the settings window when you sign in to Windows..
+        /// </summary>
+        public static string Menu_Behaviour_LaunchAtStartup_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.LaunchAtStartup.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch at startup.
+        /// </summary>
+        public static string Menu_Behaviour_LaunchAtStartup_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.LaunchAtStartup.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Keep PhasmaStrap running in the background when you close the settings window, instead of exiting..
+        /// </summary>
+        public static string Menu_Behaviour_MinimizeToTrayOnClose_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.MinimizeToTrayOnClose.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Minimize to tray on close.
+        /// </summary>
+        public static string Menu_Behaviour_MinimizeToTrayOnClose_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.MinimizeToTrayOnClose.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Prevent against closures of your existing game from accidentally launching another one..
         /// </summary>
         public static string Menu_Behaviour_ConfirmLaunches_Description {
@@ -3671,6 +3725,33 @@ namespace PhasmaStrap.Resources {
         public static string Uninstaller_Uninstall {
             get {
                 return ResourceManager.GetString("Uninstaller.Uninstall", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Excluded places.
+        /// </summary>
+        public static string Menu_ServerBrowser_ExcludedPlaces_Title {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ExcludedPlaces.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The matchmaker is skipped entirely when launching one of these places, even while enabled globally..
+        /// </summary>
+        public static string Menu_ServerBrowser_ExcludedPlaces_Description {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ExcludedPlaces.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID to exclude.
+        /// </summary>
+        public static string Menu_ServerBrowser_ExcludedPlaces_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.ExcludedPlaces.PlaceholderText", resourceCulture);
             }
         }
     }

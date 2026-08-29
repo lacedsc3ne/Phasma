@@ -198,6 +198,9 @@
   <data name="Common.DiscordRichPresence" xml:space="preserve">
     <value>Discord Rich Presence</value>
   </data>
+  <data name="Common.Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
   <data name="Common.Help" xml:space="preserve">
     <value>Help</value>
   </data>
@@ -218,6 +221,9 @@
   </data>
   <data name="Common.No" xml:space="preserve">
     <value>No</value>
+  </data>
+  <data name="Common.Open" xml:space="preserve">
+    <value>Open</value>
   </data>
   <data name="Common.OK" xml:space="preserve">
     <value>OK</value>
@@ -477,6 +483,18 @@ Would you like to upgrade your currently installed version?</value>
   </data>
   <data name="Menu.Behaviour.AutoUpdate.Title" xml:space="preserve">
     <value>Automatically update PhasmaStrap</value>
+  </data>
+  <data name="Menu.Behaviour.LaunchAtStartup.Description" xml:space="preserve">
+    <value>Launch PhasmaStrap to the settings window when you sign in to Windows.</value>
+  </data>
+  <data name="Menu.Behaviour.LaunchAtStartup.Title" xml:space="preserve">
+    <value>Launch at startup</value>
+  </data>
+  <data name="Menu.Behaviour.MinimizeToTrayOnClose.Description" xml:space="preserve">
+    <value>Keep PhasmaStrap running in the background when you close the settings window, instead of exiting.</value>
+  </data>
+  <data name="Menu.Behaviour.MinimizeToTrayOnClose.Title" xml:space="preserve">
+    <value>Minimize to tray on close</value>
   </data>
   <data name="Menu.Behaviour.ConfirmLaunches.Description" xml:space="preserve">
     <value>Prevent against closures of your existing game from accidentally launching another one.</value>
@@ -1406,5 +1424,14 @@ Defaulting to {1}.</value>
   </data>
   <data name="Menu.FastFlagEditor.AllowlistInformation" xml:space="preserve">
     <value>Due to the [Fast Flag allowlist update]({0}), most custom Fast Flags will have no effect on the Roblox player.</value>
+  </data>
+  <data name="Menu.ServerBrowser.ExcludedPlaces.Title" xml:space="preserve">
+    <value>Excluded places</value>
+  </data>
+  <data name="Menu.ServerBrowser.ExcludedPlaces.Description" xml:space="preserve">
+    <value>The matchmaker is skipped entirely when launching one of these places, even while enabled globally.</value>
+  </data>
+  <data name="Menu.ServerBrowser.ExcludedPlaces.PlaceholderText" xml:space="preserve">
+    <value>Place ID to exclude</value>
   </data>
 </root>
