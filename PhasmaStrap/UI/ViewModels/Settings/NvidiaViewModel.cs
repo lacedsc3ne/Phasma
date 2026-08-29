@@ -45,8 +45,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             IdAnisotropicFilteringMode, IdTransparencySupersampling,
         };
 
-        private string _lowLatencyMode = "Off";
-        private string _frlLowLatencyMode = "Off";
+        private string _lowLatencyMode = Strings.Menu_Nvidia_Mode_Off;
+        private string _frlLowLatencyMode = Strings.Menu_Nvidia_Mode_Off;
         private int _frameRateLimit;
         private int _backgroundFrameRateLimit;
         private bool _resizableBar;
@@ -55,7 +55,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private bool _mfaa;
         private bool _fxaa;
         private bool _gammaCorrection = true;
-        private string _silkSmoothness = "Off";
+        private string _silkSmoothness = Strings.Menu_Nvidia_Mode_Off;
         private int _textureLodBias;
         private string _statusMessage = string.Empty;
 
@@ -76,11 +76,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public Visibility UnavailableVisibility => IsAvailable ? Visibility.Collapsed : Visibility.Visible;
 
-        public ObservableCollection<string> LowLatencyModes { get; } = new ObservableCollection<string> { "Off", "On", "Ultra" };
+        public ObservableCollection<string> LowLatencyModes { get; } = new ObservableCollection<string> { Strings.Menu_Nvidia_Mode_Off, Strings.Menu_Nvidia_Mode_On, Strings.Menu_Nvidia_Mode_Ultra };
 
-        public ObservableCollection<string> FrlLowLatencyModes { get; } = new ObservableCollection<string> { "Off", "On" };
+        public ObservableCollection<string> FrlLowLatencyModes { get; } = new ObservableCollection<string> { Strings.Menu_Nvidia_Mode_Off, Strings.Menu_Nvidia_Mode_On };
 
-        public ObservableCollection<string> SilkSmoothnessModes { get; } = new ObservableCollection<string> { "Off", "Low", "Medium", "High", "Ultra" };
+        public ObservableCollection<string> SilkSmoothnessModes { get; } = new ObservableCollection<string> { Strings.Menu_Nvidia_Mode_Off, Strings.Menu_Nvidia_Mode_Low, Strings.Menu_Nvidia_Mode_Medium, Strings.Menu_Nvidia_Mode_High, Strings.Menu_Nvidia_Mode_Ultra };
 
         public string LowLatencyMode
         {
@@ -161,8 +161,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public string TextureLodBiasLabel =>
             TextureLodBias != 0
-                ? string.Format(CultureInfo.InvariantCulture, "LOD bias override: {0:0.###}", TextureLodBias / 8.0)
-                : "Default (driver controlled)";
+                ? string.Format(CultureInfo.InvariantCulture, Strings.Menu_Nvidia_LodBiasLabel_Override, TextureLodBias / 8.0)
+                : Strings.Menu_Nvidia_LodBiasLabel_Default;
 
         public string StatusMessage
         {
@@ -251,24 +251,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             return value switch
             {
-                1 => "Low",
-                2 => "Medium",
-                3 => "High",
-                4 => "Ultra",
-                _ => "Off",
+                1 => Strings.Menu_Nvidia_Mode_Low,
+                2 => Strings.Menu_Nvidia_Mode_Medium,
+                3 => Strings.Menu_Nvidia_Mode_High,
+                4 => Strings.Menu_Nvidia_Mode_Ultra,
+                _ => Strings.Menu_Nvidia_Mode_Off,
             };
         }
 
         private static int SilkToValue(string mode)
         {
-            return mode switch
-            {
-                "Low" => 1,
-                "Medium" => 2,
-                "High" => 3,
-                "Ultra" => 4,
-                _ => 0,
-            };
+            if (mode == Strings.Menu_Nvidia_Mode_Low)
+                return 1;
+            if (mode == Strings.Menu_Nvidia_Mode_Medium)
+                return 2;
+            if (mode == Strings.Menu_Nvidia_Mode_High)
+                return 3;
+            if (mode == Strings.Menu_Nvidia_Mode_Ultra)
+                return 4;
+            return 0;
         }
     }
 }
