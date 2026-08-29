@@ -365,6 +365,16 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void AddButton_Click(object sender, RoutedEventArgs e) => ShowAddDialog();
 
+        private void SearchDatabaseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new FFlagSearchDialog(AddSingle)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            dialog.ShowDialog();
+        }
+
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             var tempList = new List<FastFlag>();

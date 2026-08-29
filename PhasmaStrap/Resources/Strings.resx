@@ -1235,6 +1235,10 @@ Selecting 'No' will ignore this warning and continue installation.</value>
     <value>JSON files</value>
     <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "JSON files (*.json)"</comment>
   </data>
+  <data name="FileTypes.TextFiles" xml:space="preserve">
+    <value>Text files</value>
+    <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "Text files (*.txt)"</comment>
+  </data>
   <data name="Menu.FastFlagEditor.InvalidBoolValue" xml:space="preserve">
     <value>The entry for '{0}' is not valid as the value must be a boolean (either 'True' or 'False')</value>
     <comment>Do not translate 'True' and 'False', those must stay in English</comment>
@@ -2561,6 +2565,214 @@ Defaulting to {1}.</value>
   </data>
   <data name="Dialog.FFlagPresetValues.Title" xml:space="preserve">
     <value>FFlag preset values</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Title" xml:space="preserve">
+    <value>Find Fast Flags</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Heading" xml:space="preserve">
+    <value>Fast Flag Search &amp; Validation</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Description" xml:space="preserve">
+    <value>Search, validate, and browse Fast Flags indexed from public community trackers</value>
+  </data>
+  <data name="Dialog.FFlagSearch.StatusReady" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Dialog.FFlagSearch.StatusLoading" xml:space="preserve">
+    <value>Loading flags...</value>
+  </data>
+  <data name="Dialog.FFlagSearch.StatusLoaded" xml:space="preserve">
+    <value>Done: {0} flags loaded</value>
+    <comment>{0} is a number</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.StatusLoadError" xml:space="preserve">
+    <value>Error loading flag data</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Tab.LiveSearch" xml:space="preserve">
+    <value>Live Search</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Tab.BulkValidation" xml:space="preserve">
+    <value>Bulk Validation</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Tab.Browse" xml:space="preserve">
+    <value>Browse All</value>
+  </data>
+  <data name="Dialog.FFlagSearch.LiveSearch.Heading" xml:space="preserve">
+    <value>Live Flag Search</value>
+  </data>
+  <data name="Dialog.FFlagSearch.LiveSearch.Description" xml:space="preserve">
+    <value>Search by full flag name or partial keyword match</value>
+  </data>
+  <data name="Dialog.FFlagSearch.SearchPlaceholder" xml:space="preserve">
+    <value>Enter flag name or keyword...</value>
+  </data>
+  <data name="Dialog.FFlagSearch.TrueOnly" xml:space="preserve">
+    <value>True flags only</value>
+  </data>
+  <data name="Dialog.FFlagSearch.FalseOnly" xml:space="preserve">
+    <value>False flags only</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportResults" xml:space="preserve">
+    <value>Export Results</value>
+  </data>
+  <data name="Dialog.FFlagSearch.AddToFlags" xml:space="preserve">
+    <value>Add to Flags</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ResultsCount" xml:space="preserve">
+    <value>{0} results</value>
+    <comment>{0} is a number</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.ShowingFirstN" xml:space="preserve">
+    <value>Showing first {0} of {1} results. Use export to get all results.</value>
+    <comment>{0} and {1} are numbers</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.ColumnSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ColumnInputValue" xml:space="preserve">
+    <value>Input Value</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ColumnStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ColumnValidValue" xml:space="preserve">
+    <value>Valid Value</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ColumnNotes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Dialog.FFlagSearch.BulkValidation.Heading" xml:space="preserve">
+    <value>Bulk Flag Validation</value>
+  </data>
+  <data name="Dialog.FFlagSearch.BulkValidation.Description" xml:space="preserve">
+    <value>Type flags directly or load a file, then check which ones exist in the loaded sources</value>
+  </data>
+  <data name="Dialog.FFlagSearch.LoadFile" xml:space="preserve">
+    <value>Load File</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Validate" xml:space="preserve">
+    <value>Validate</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidationPlaceholder" xml:space="preserve">
+    <value>Type or paste flags here in JSON format...
+Example:
+{
+  "FFlagDebugDisplayFPS": "True",
+  "DFIntTaskSchedulerTargetFps": "120"
+}</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidationResultsHeading" xml:space="preserve">
+    <value>Validation Results</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportValid" xml:space="preserve">
+    <value>Export Valid Flags</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="Dialog.FFlagSearch.SelectAll" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="Dialog.FFlagSearch.SampleFormat" xml:space="preserve">
+    <value>Sample Format</value>
+  </data>
+  <data name="Dialog.FFlagSearch.NoInput" xml:space="preserve">
+    <value>Please enter flags to validate.</value>
+  </data>
+  <data name="Dialog.FFlagSearch.NoInputTitle" xml:space="preserve">
+    <value>No Input</value>
+  </data>
+  <data name="Dialog.FFlagSearch.InputTooLarge" xml:space="preserve">
+    <value>That flag input is too large to validate.</value>
+  </data>
+  <data name="Dialog.FFlagSearch.InputTooLargeTitle" xml:space="preserve">
+    <value>Input Too Large</value>
+  </data>
+  <data name="Dialog.FFlagSearch.DuplicatesDetected" xml:space="preserve">
+    <value>Duplicate flags found in input: {0}</value>
+    <comment>{0} is a comma-separated list of flag names</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.DuplicatesTitle" xml:space="preserve">
+    <value>Duplicates Detected</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidationError" xml:space="preserve">
+    <value>Error validating flags: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidationErrorTitle" xml:space="preserve">
+    <value>Validation Error</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidStatus" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="Dialog.FFlagSearch.InvalidStatus" xml:space="preserve">
+    <value>Invalid</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidNotes" xml:space="preserve">
+    <value>Flag exists in database</value>
+  </data>
+  <data name="Dialog.FFlagSearch.InvalidNotes" xml:space="preserve">
+    <value>Flag not found in any loaded source</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ValidatedSummary" xml:space="preserve">
+    <value>Validated {0} flags. {1} valid, {2} invalid.</value>
+    <comment>{0}, {1} and {2} are numbers</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.Browse.Heading" xml:space="preserve">
+    <value>Browse All Flags</value>
+  </data>
+  <data name="Dialog.FFlagSearch.Browse.Description" xml:space="preserve">
+    <value>Browse a sample of flags currently indexed from the loaded sources</value>
+  </data>
+  <data name="Dialog.FFlagSearch.FetchSample" xml:space="preserve">
+    <value>Fetch Sample</value>
+  </data>
+  <data name="Dialog.FFlagSearch.DownloadAll" xml:space="preserve">
+    <value>Download All</value>
+  </data>
+  <data name="Dialog.FFlagSearch.DownloadTrueOnly" xml:space="preserve">
+    <value>Download True Only</value>
+  </data>
+  <data name="Dialog.FFlagSearch.DownloadFalseOnly" xml:space="preserve">
+    <value>Download False Only</value>
+  </data>
+  <data name="Dialog.FFlagSearch.BrowseCount" xml:space="preserve">
+    <value>{0} flags shown</value>
+    <comment>{0} is a number</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.FileError" xml:space="preserve">
+    <value>Error loading file: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.FileErrorTitle" xml:space="preserve">
+    <value>File Error</value>
+  </data>
+  <data name="Dialog.FFlagSearch.PasteError" xml:space="preserve">
+    <value>Error pasting from clipboard: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.PasteErrorTitle" xml:space="preserve">
+    <value>Paste Error</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportComplete" xml:space="preserve">
+    <value>Exported {0} flags to {1}</value>
+    <comment>{0} is a number, {1} is a file path</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportCompleteTitle" xml:space="preserve">
+    <value>Export Complete</value>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportError" xml:space="preserve">
+    <value>Error exporting flags: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Dialog.FFlagSearch.ExportErrorTitle" xml:space="preserve">
+    <value>Export Error</value>
+  </data>
+  <data name="Menu.FastFlagEditor.SearchDatabase" xml:space="preserve">
+    <value>Search Database</value>
   </data>
   <data name="Menu.FastFlagEditor.NoFlagsToCopy" xml:space="preserve">
     <value>There are no flags to copy.</value>
