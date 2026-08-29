@@ -2448,4 +2448,47 @@ Defaulting to {1}.</value>
   <data name="Menu.Notifications.Event.GameLeave.Message" xml:space="preserve">
     <value>You've left the Roblox server.</value>
   </data>
+  <data name="Menu.Appearance.GlobalBackground.Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Menu.Appearance.GlobalBackground.Description" xml:space="preserve">
+    <value>Show a custom image (or animated GIF) behind the content of this settings window.</value>
+  </data>
+  <data name="Menu.Appearance.GlobalBackground.OpacityDescription" xml:space="preserve">
+    <value>Darkens the background image so the settings content stays readable on top of it.</value>
+  </data>
+  <data name="Menu.Appearance.GlobalBackground.OpacityTitle" xml:space="preserve">
+    <value>Overlay darkness</value>
+  </data>
+  <data name="Menu.Appearance.GlobalBackground.Title" xml:space="preserve">
+    <value>Background image</value>
+  </data>
+  <data name="Menu.Appearance.SmoothProgressBars.Description" xml:space="preserve">
+    <value>Animate progress bars smoothly between values instead of jumping instantly.</value>
+  </data>
+  <data name="Menu.Appearance.SmoothProgressBars.Title" xml:space="preserve">
+    <value>Smooth progress bars</value>
+  </data>
+  <data name="Menu.Appearance.SnowEffect.Description" xml:space="preserve">
+    <value>Show a decorative animated snow overlay on this settings window.</value>
+  </data>
+  <data name="Menu.Appearance.SnowEffect.Title" xml:space="preserve">
+    <value>Snow effect</value>
+  </data>
+  <data name="Menu.Appearance.ThemeTransition.Description" xml:space="preserve">
+    <value>Cross-fade the settings window when switching between light and dark theme, instead of an instant change.</value>
+  </data>
+  <data name="Menu.Appearance.ThemeTransition.Title" xml:space="preserve">
+    <value>Theme transition animation</value>
+  </data>
+  <data name="Menu.Appearance.WindowBackdrop.Description" xml:space="preserve">
+    <value>Choose the background material used behind the settings window and other PhasmaStrap windows.</value>
+  </data>
+  <data name="Menu.Appearance.WindowBackdrop.Title" xml:space="preserve">
+    <value>Window backdrop</value>
+  </data>
+  <data name="FileTypes.ImageFiles" xml:space="preserve">
+    <value>Image files</value>
+    <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "Image files (*.png)"</comment>
+  </data>
 </root>

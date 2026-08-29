@@ -6799,5 +6799,131 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Notifications.Event.GameLeave.Message", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Image files.
+        /// </summary>
+        public static string FileTypes_ImageFiles {
+            get {
+                return ResourceManager.GetString("FileTypes.ImageFiles", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse.
+        /// </summary>
+        public static string Menu_Appearance_GlobalBackground_Browse {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GlobalBackground.Browse", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show a custom image (or animated GIF) behind the content of this settings window..
+        /// </summary>
+        public static string Menu_Appearance_GlobalBackground_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GlobalBackground.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Darkens the background image so the settings content stays readable on top of it..
+        /// </summary>
+        public static string Menu_Appearance_GlobalBackground_OpacityDescription {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GlobalBackground.OpacityDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overlay darkness.
+        /// </summary>
+        public static string Menu_Appearance_GlobalBackground_OpacityTitle {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GlobalBackground.OpacityTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Background image.
+        /// </summary>
+        public static string Menu_Appearance_GlobalBackground_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GlobalBackground.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Animate progress bars smoothly between values instead of jumping instantly..
+        /// </summary>
+        public static string Menu_Appearance_SmoothProgressBars_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.SmoothProgressBars.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Smooth progress bars.
+        /// </summary>
+        public static string Menu_Appearance_SmoothProgressBars_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.SmoothProgressBars.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show a decorative animated snow overlay on this settings window..
+        /// </summary>
+        public static string Menu_Appearance_SnowEffect_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.SnowEffect.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Snow effect.
+        /// </summary>
+        public static string Menu_Appearance_SnowEffect_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.SnowEffect.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cross-fade the settings window when switching between light and dark theme, instead of an instant change..
+        /// </summary>
+        public static string Menu_Appearance_ThemeTransition_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ThemeTransition.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Theme transition animation.
+        /// </summary>
+        public static string Menu_Appearance_ThemeTransition_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ThemeTransition.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the background material used behind the settings window and other PhasmaStrap windows..
+        /// </summary>
+        public static string Menu_Appearance_WindowBackdrop_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.WindowBackdrop.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Window backdrop.
+        /// </summary>
+        public static string Menu_Appearance_WindowBackdrop_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.WindowBackdrop.Title", resourceCulture);
+            }
+        }
     }
 }

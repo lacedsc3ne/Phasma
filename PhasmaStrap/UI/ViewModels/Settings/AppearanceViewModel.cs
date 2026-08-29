@@ -20,6 +20,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand PreviewBootstrapperCommand => new RelayCommand(PreviewBootstrapper);
         public ICommand BrowseCustomIconLocationCommand => new RelayCommand(BrowseCustomIconLocation);
+        public ICommand BrowseGlobalBackgroundFileCommand => new RelayCommand(BrowseGlobalBackgroundFile);
 
         public ICommand AddCustomThemeCommand => new RelayCommand(AddCustomTheme);
         public ICommand DeleteCustomThemeCommand => new RelayCommand(DeleteCustomTheme);
@@ -72,7 +73,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set
             {
                 App.Settings.Prop.Theme = value;
-                ((MainWindow)Window.GetWindow(_page)!).ApplyTheme();
+
+                var window = (MainWindow)Window.GetWindow(_page)!;
+                PhasmaStrap.UI.ThemeTransition.Animate(window, window.ApplyTheme);
             }
         }
 
@@ -363,5 +366,67 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<string> CustomThemes { get; set; } = new();
         public bool IsCustomThemeSelected => SelectedCustomTheme is not null;
+
+        #region UI polish (ported from Voidstrap)
+
+        public IEnumerable<BackdropStyle> BackdropStyles { get; } = Enum.GetValues(typeof(BackdropStyle)).Cast<BackdropStyle>();
+
+        public BackdropStyle WindowBackdropStyle
+        {
+            get => App.Settings.Prop.WindowBackdropStyle;
+            set => App.Settings.Prop.WindowBackdropStyle = value;
+        }
+
+        public bool ThemeTransitionEnabled
+        {
+            get => App.Settings.Prop.ThemeTransitionEnabled;
+            set => App.Settings.Prop.ThemeTransitionEnabled = value;
+        }
+
+        public bool SmoothProgressBarsEnabled
+        {
+            get => App.Settings.Prop.SmoothProgressBarsEnabled;
+            set => App.Settings.Prop.SmoothProgressBarsEnabled = value;
+        }
+
+        public bool GlobalBackgroundEnabled
+        {
+            get => App.Settings.Prop.GlobalBackgroundEnabled;
+            set => App.Settings.Prop.GlobalBackgroundEnabled = value;
+        }
+
+        public string GlobalBackgroundFilePath
+        {
+            get => App.Settings.Prop.GlobalBackgroundFilePath;
+            set => App.Settings.Prop.GlobalBackgroundFilePath = value;
+        }
+
+        public double GlobalBackgroundOverlayOpacity
+        {
+            get => App.Settings.Prop.GlobalBackgroundOverlayOpacity;
+            set => App.Settings.Prop.GlobalBackgroundOverlayOpacity = value;
+        }
+
+        public bool SnowEffectEnabled
+        {
+            get => App.Settings.Prop.SnowEffectEnabled;
+            set => App.Settings.Prop.SnowEffectEnabled = value;
+        }
+
+        private void BrowseGlobalBackgroundFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = $"{Strings.FileTypes_ImageFiles}|*.png;*.jpg;*.jpeg;*.bmp;*.gif"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            GlobalBackgroundFilePath = dialog.FileName;
+            OnPropertyChanged(nameof(GlobalBackgroundFilePath));
+        }
+
+        #endregion
     }
 }

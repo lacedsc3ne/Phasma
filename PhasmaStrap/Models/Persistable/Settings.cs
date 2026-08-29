@@ -177,5 +177,23 @@ namespace PhasmaStrap.Models.Persistable
         public bool NotificationsEnabled { get; set; } = true;
         public bool NotificationsJoinToastEnabled { get; set; } = false;
         public bool NotificationsLeaveToastEnabled { get; set; } = false;
+
+        // UI polish (ported from Voidstrap): window backdrop material for wpfui-based windows.
+        // Default preserves WpfUiWindow's existing hardcoded Acrylic behaviour.
+        public BackdropStyle WindowBackdropStyle { get; set; } = BackdropStyle.Default;
+
+        // cross-fade animation when switching between light/dark theme, instead of an instant cut
+        public bool ThemeTransitionEnabled { get; set; } = true;
+
+        // smooth/eased ProgressBar value transitions instead of instant jumps
+        public bool SmoothProgressBarsEnabled { get; set; } = true;
+
+        // optional background image (static or animated GIF) behind the settings window content
+        public bool GlobalBackgroundEnabled { get; set; } = false;
+        public string GlobalBackgroundFilePath { get; set; } = "";
+        public double GlobalBackgroundOverlayOpacity { get; set; } = 0.55;
+
+        // decorative animated snow overlay on the settings window (cosmetic, off by default)
+        public bool SnowEffectEnabled { get; set; } = false;
     }
 }
