@@ -1,5 +1,6 @@
 ﻿using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
+using PhasmaStrap.Integrations.FrameGeneration;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
 using PhasmaStrap.Integrations.RiShade;
@@ -67,6 +68,10 @@ namespace PhasmaStrap
 
                 ActivityWatcher.OnGameJoin += delegate { OverlayHub.OnGameJoin(); };
                 ActivityWatcher.OnGameLeave += delegate { OverlayHub.OnGameLeave(); };
+
+                FrameGenManager.Install();
+                ActivityWatcher.OnGameJoin += delegate { FrameGenManager.OnGameJoin(); };
+                ActivityWatcher.OnGameLeave += delegate { FrameGenManager.OnGameLeave(); };
 
                 if (App.Settings.Prop.UseDisableAppPatch)
                 {
@@ -179,6 +184,7 @@ namespace PhasmaStrap
 
             OverlayHub.Shutdown();
             Integrations.AntiAliasing.AntiAliasingManager.Shutdown();
+            FrameGenManager.Shutdown();
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();

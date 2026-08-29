@@ -142,5 +142,9 @@ namespace PhasmaStrap.Models.Persistable
         // anti-aliasing overlay
         public bool AntiAliasingEnabled { get; set; } = false;
         public int AntiAliasingMethodIndex { get; set; } = 0;
+
+        // frame generation (shader-based frame interpolation overlay)
+        public int FrameGenModeIndex { get; set; } = 0;
+        public int FrameGenQuality { get; set; } = 1;
     }
 }

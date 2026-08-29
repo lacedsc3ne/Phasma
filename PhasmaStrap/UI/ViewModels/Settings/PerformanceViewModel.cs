@@ -1,3 +1,7 @@
+using System.Windows;
+
+using PhasmaStrap.Integrations.FrameGeneration;
+
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class PerformanceViewModel : NotifyPropertyChangedViewModel
@@ -162,5 +166,50 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(AntiAliasingMethodIndex));
             }
         }
+
+        public bool FrameGenEnabled
+        {
+            get => FrameGenSettings.ModeIndex > 0;
+            set
+            {
+                bool confirmed = !value;
+
+                if (value)
+                {
+                    MessageBoxResult result = Frontend.ShowMessageBox(
+                        "Frame generation does not improve performance or actual FPS. It is intended only to make motion appear smoother on low end PCs. It will not help mid range or high end systems, so never enable it on those systems.\n\nEnable frame generation anyway?",
+                        MessageBoxImage.Warning,
+                        MessageBoxButton.YesNo,
+                        MessageBoxResult.No);
+                    confirmed = result == MessageBoxResult.Yes;
+                }
+
+                if (!FrameGenManager.SetMode(value ? 1 : 0, confirmed))
+                {
+                    OnPropertyChanged(nameof(FrameGenEnabled));
+                    return;
+                }
+
+                OnPropertyChanged(nameof(FrameGenEnabled));
+            }
+        }
+
+        public int FrameGenQuality
+        {
+            get => FrameGenSettings.QualityIndex;
+            set
+            {
+                FrameGenManager.SetQuality(value);
+                OnPropertyChanged(nameof(FrameGenQuality));
+                OnPropertyChanged(nameof(FrameGenQualityDisplay));
+            }
+        }
+
+        public string FrameGenQualityDisplay => FrameGenQuality switch
+        {
+            0 => "Fast",
+            2 => "Quality",
+            _ => "Balanced",
+        };
     }
 }
