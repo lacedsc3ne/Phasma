@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.Input;
@@ -1098,6 +1099,151 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 }
             }
         }
+        #region Engine presets
+
+        // curated bundles across a handful of the toggles above, picked for unambiguous perf/
+        // privacy impact - not every one of the ~83 toggles on this page, so presets can't
+        // silently flip something niche/situational the user didn't expect
+        public string[] EnginePresetNames { get; } = { "Default", "Balanced", "Performance" };
+
+        // one-time apply action, not a persisted selection - the individual toggles above are the
+        // source of truth, and may not match any named preset once hand-tweaked
+        public string SelectedEnginePreset
+        {
+            get => "";
+            set
+            {
+                switch (value)
+                {
+                    case "Balanced":
+                        ApplyBalancedPreset();
+                        break;
+                    case "Performance":
+                        ApplyPerformancePreset();
+                        break;
+                    default:
+                        ApplyDefaultPreset();
+                        break;
+                }
+
+                RequestPageReloadEvent?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void ApplyDefaultPreset()
+        {
+            DisableTelemetry = false;
+            DisableWebview2Telemetry = false;
+            DisableVoiceChatTelemetry = false;
+            LessLagSpikes = false;
+            FasterLoading = false;
+            BetterPacketSending = false;
+            CacheSizeImprovement = false;
+            OptimizeCFrameUpdates = false;
+            Threading = false;
+            Preload = false;
+            DisablePostFX = false;
+            DisablePlayerShadows = false;
+            MinimalRendering = false;
+            WorserParticles = false;
+            LowPolyMeshes = false;
+            LightCulling = false;
+            DisableSky = false;
+        }
+
+        private void ApplyBalancedPreset()
+        {
+            ApplyDefaultPreset();
+
+            DisableTelemetry = true;
+            DisableWebview2Telemetry = true;
+            DisableVoiceChatTelemetry = true;
+            LessLagSpikes = true;
+            FasterLoading = true;
+            BetterPacketSending = true;
+            CacheSizeImprovement = true;
+            OptimizeCFrameUpdates = true;
+            Threading = true;
+            Preload = true;
+        }
+
+        private void ApplyPerformancePreset()
+        {
+            ApplyBalancedPreset();
+
+            DisablePostFX = true;
+            DisablePlayerShadows = true;
+            MinimalRendering = true;
+            WorserParticles = true;
+            LowPolyMeshes = true;
+            LightCulling = true;
+            DisableSky = true;
+        }
+
+        #endregion
+
+        #region Per-game scope
+
+        public string[] EngineScopeModeOptions { get; } =
+        {
+            "Apply everywhere",
+            "Only apply to listed games",
+            "Apply everywhere except listed games",
+        };
+
+        public string SelectedEngineScopeMode
+        {
+            get => App.Settings.Prop.EngineSettingsScope switch
+            {
+                Enums.EngineSettingsScopeMode.OnlyListedPlaces => EngineScopeModeOptions[1],
+                Enums.EngineSettingsScopeMode.AllExceptListedPlaces => EngineScopeModeOptions[2],
+                _ => EngineScopeModeOptions[0],
+            };
+            set
+            {
+                App.Settings.Prop.EngineSettingsScope = value == EngineScopeModeOptions[1]
+                    ? Enums.EngineSettingsScopeMode.OnlyListedPlaces
+                    : value == EngineScopeModeOptions[2]
+                        ? Enums.EngineSettingsScopeMode.AllExceptListedPlaces
+                        : Enums.EngineSettingsScopeMode.All;
+
+                OnPropertyChanged(nameof(SelectedEngineScopeMode));
+            }
+        }
+
+        public ObservableCollection<string> EngineScopedPlaces { get; } = new(App.Settings.Prop.EngineSettingsScopedPlaces);
+
+        private string _engineScopePlaceId = "";
+
+        public string EngineScopePlaceId
+        {
+            get => _engineScopePlaceId;
+            set { _engineScopePlaceId = value; OnPropertyChanged(nameof(EngineScopePlaceId)); }
+        }
+
+        public ICommand AddEngineScopedPlaceCommand => new RelayCommand(() =>
+        {
+            string id = EngineScopePlaceId.Trim();
+
+            if (!long.TryParse(id, out _) || EngineScopedPlaces.Contains(id))
+                return;
+
+            EngineScopedPlaces.Add(id);
+            App.Settings.Prop.EngineSettingsScopedPlaces.Add(id);
+            EngineScopePlaceId = "";
+        });
+
+        public ICommand RemoveEngineScopedPlaceCommand => new RelayCommand<string>(id =>
+        {
+            if (id is null)
+                return;
+
+            EngineScopedPlaces.Remove(id);
+            App.Settings.Prop.EngineSettingsScopedPlaces.Remove(id);
+        });
+
+        #endregion
+
         public bool ResetConfiguration
         {
             get => _preResetFlags is not null;

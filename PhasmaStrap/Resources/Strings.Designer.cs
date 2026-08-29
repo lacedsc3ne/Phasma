@@ -8609,5 +8609,77 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Performance.EngineAssignments.PlaceholderText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        public static string Menu_FastFlags_EnginePreset_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EnginePreset.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies a curated bundle of the toggles below at once. Pick Default to reset them..
+        /// </summary>
+        public static string Menu_FastFlags_EnginePreset_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EnginePreset.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Per-game scope.
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Header {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restrict which games the toggles on this page actually apply to..
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies to.
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Mode_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Mode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Games.
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Places_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Places.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only used when "Applies to" above is set to one of the listed-games modes..
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Places_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Places.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID.
+        /// </summary>
+        public static string Menu_FastFlags_EngineScope_Places_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.EngineScope.Places.PlaceholderText", resourceCulture);
+            }
+        }
     }
 }

@@ -311,7 +311,9 @@ namespace PhasmaStrap
                     if (App.Settings.Prop.MatchmakerEnabled)
                         await TryApplyMatchmakingAsync();
 
-                    await TryApplyFastFlagProfileAsync(TryResolveLaunchPlaceId());
+                    long? launchPlaceId = TryResolveLaunchPlaceId();
+                    await TryApplyFastFlagProfileAsync(launchPlaceId);
+                    await TryApplyEngineSettingsScopeAsync(launchPlaceId);
                 }
 
                 StartRoblox();
@@ -738,6 +740,64 @@ namespace PhasmaStrap
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag profile, launching with the global flag set: {ex.Message}");
+            }
+        }
+
+        // scopes FastFlagsPage's curated "Engine Settings" toggle set to specific places, or excludes
+        // specific places from it, by stripping those flag keys (FastFlagManager.PresetFlags.Values -
+        // every real FFlag name any toggle on that page ever writes) from the already-materialized
+        // ClientAppSettings.json for this launch only. Never touches the user's global flag file, so
+        // the toggles on the settings page still show their real, unscoped state.
+        private async Task TryApplyEngineSettingsScopeAsync(long? placeId)
+        {
+            const string LOG_IDENT = "Bootstrapper::TryApplyEngineSettingsScopeAsync";
+
+            if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
+                return;
+
+            EngineSettingsScopeMode scope = App.Settings.Prop.EngineSettingsScope;
+            if (scope == EngineSettingsScopeMode.All)
+                return;
+
+            bool isListed = App.Settings.Prop.EngineSettingsScopedPlaces.Contains(placeId.Value.ToString());
+            bool shouldStrip = scope == EngineSettingsScopeMode.OnlyListedPlaces ? !isListed : isListed;
+
+            if (!shouldStrip)
+                return;
+
+            try
+            {
+                string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
+                if (!File.Exists(filePath))
+                    return;
+
+                string existing = await File.ReadAllTextAsync(filePath);
+                if (string.IsNullOrWhiteSpace(existing))
+                    return;
+
+                Dictionary<string, object>? flags = JsonSerializer.Deserialize<Dictionary<string, object>>(existing);
+                if (flags is null)
+                    return;
+
+                int removed = 0;
+                foreach (string flagName in FastFlagManager.PresetFlags.Values)
+                {
+                    if (flags.Remove(flagName))
+                        removed++;
+                }
+
+                if (removed == 0)
+                    return;
+
+                Filesystem.AssertReadOnly(filePath);
+                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true }));
+                Filesystem.AssertReadOnly(filePath);
+
+                App.Logger.WriteLine(LOG_IDENT, $"Stripped {removed} Engine Settings flag(s) for place {placeId} (scope: {scope})");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply Engine Settings scope, launching with the global flag set: {ex.Message}");
             }
         }
 

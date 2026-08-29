@@ -3101,4 +3101,28 @@ Example:
   <data name="Menu.Performance.EngineAssignments.PlaceholderText" xml:space="preserve">
     <value>Place ID</value>
   </data>
+  <data name="Menu.FastFlags.EnginePreset.Title" xml:space="preserve">
+    <value>Preset</value>
+  </data>
+  <data name="Menu.FastFlags.EnginePreset.Description" xml:space="preserve">
+    <value>Applies a curated bundle of the toggles below at once. Pick Default to reset them.</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Header" xml:space="preserve">
+    <value>Per-game scope</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Description" xml:space="preserve">
+    <value>Restrict which games the toggles on this page actually apply to.</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Mode.Title" xml:space="preserve">
+    <value>Applies to</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Places.Title" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Places.Description" xml:space="preserve">
+    <value>Only used when "Applies to" above is set to one of the listed-games modes.</value>
+  </data>
+  <data name="Menu.FastFlags.EngineScope.Places.PlaceholderText" xml:space="preserve">
+    <value>Place ID</value>
+  </data>
 </root>

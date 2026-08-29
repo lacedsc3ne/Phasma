@@ -21,6 +21,12 @@
             <ui:ToggleSwitch IsChecked="{Binding UseFastFlagManager, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Title}"
+            Description="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Description}">
+            <ComboBox Padding="10,5,10,5" Width="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <TextBlock Text="{x:Static resources:Strings.Common_Presets}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
         <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Presets_Categories_Rendering}" FontSize="16" FontWeight="Medium" Margin="0,16,0,0" />
@@ -496,6 +502,37 @@
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MinimumCPUCoreThreadCount_Title}">
             <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="140" ItemsSource="{Binding CpuCoreMinThreadCount.Keys, Mode=OneTime}" Text="{Binding SelectedCpuCoreMinThreadCount, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Header}" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Description}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Mode_Title}">
+            <ComboBox Padding="10,5,10,5" MinWidth="220" ItemsSource="{Binding EngineScopeModeOptions, Mode=OneTime}" SelectedItem="{Binding SelectedEngineScopeMode, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Places_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Places_Description}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_FastFlags_EngineScope_Places_PlaceholderText}" Text="{Binding EngineScopePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineScopedPlaceCommand, Mode=OneTime}" />
+        </StackPanel>
+        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineScopedPlaces, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineScopedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <controls:OptionControl
             Margin="0,24,0,0"
