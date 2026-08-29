@@ -80,6 +80,20 @@
             <ComboBox Padding="10,5,10,5" MinWidth="160" IsEnabled="{Binding AntiAliasingEnabled}" ItemsSource="{Binding AntiAliasingMethodNames, Mode=OneTime}" SelectedIndex="{Binding AntiAliasingMethodIndex, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <TextBlock Text="Frame generation" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="Shader-based motion interpolation drawn in a click-through overlay above the game window. This does not improve actual FPS or reduce input lag - it only makes motion look smoother, mainly useful on low end PCs. Leave it off on mid range or high end systems." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Enable frame generation" Description="Interpolates an extra frame between real captured frames while you're in game.">
+            <ui:ToggleSwitch IsChecked="{Binding FrameGenEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Frame generation quality" Description="Higher quality costs more GPU time per interpolated frame. 0 = Fast, 1 = Balanced, 2 = Quality.">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="2" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding FrameGenQuality, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding FrameGenQualityDisplay, Mode=OneWay}" />
+            </StackPanel>
+        </controls:OptionControl>
+
         <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
