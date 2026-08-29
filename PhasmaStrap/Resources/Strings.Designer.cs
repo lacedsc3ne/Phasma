@@ -6420,5 +6420,50 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Settings.UnpinFromTop", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save or load preset.
+        /// </summary>
+        public static string Menu_RiShade_SaveOrLoadPreset_Title {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.SaveOrLoadPreset.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export the current effect settings to a JSON file, or import one previously saved..
+        /// </summary>
+        public static string Menu_RiShade_SaveOrLoadPreset_Description {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.SaveOrLoadPreset.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export preset.
+        /// </summary>
+        public static string Menu_RiShade_ExportPreset {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.ExportPreset", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Import preset.
+        /// </summary>
+        public static string Menu_RiShade_ImportPreset {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.ImportPreset", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to import RiShade preset: {0}.
+        /// </summary>
+        public static string Menu_RiShade_ImportPreset_Failed {
+            get {
+                return ResourceManager.GetString("Menu.RiShade.ImportPreset.Failed", resourceCulture);
+            }
+        }
     }
 }

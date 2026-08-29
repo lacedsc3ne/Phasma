@@ -20,6 +20,13 @@
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresetNames, Mode=OneTime}" Text="{Binding SelectedPreset, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Description}">
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Icon="ArrowExportRtl24" Content="{x:Static resources:Strings.Menu_RiShade_ExportPreset}" Command="{Binding ExportPresetCommand}" Margin="0,0,8,0" />
+                <ui:Button Icon="DocumentArrowUp16" Content="{x:Static resources:Strings.Menu_RiShade_ImportPreset}" Command="{Binding ImportPresetCommand}" />
+            </StackPanel>
+        </controls:OptionControl>
+
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_RenderScale_Title}" Description="{x:Static resources:Strings.Menu_RiShade_RenderScale_Description}">
             <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding RenderScaleNames, Mode=OneTime}" SelectedIndex="{Binding RenderScaleIndex, Mode=TwoWay}" />
         </controls:OptionControl>
