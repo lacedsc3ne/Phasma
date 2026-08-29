@@ -1150,11 +1150,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             BetterPacketSending = false;
             CacheSizeImprovement = false;
             OptimizeCFrameUpdates = false;
-            Threading = false;
             Preload = false;
             DisablePostFX = false;
             DisablePlayerShadows = false;
-            MinimalRendering = false;
             WorserParticles = false;
             LowPolyMeshes = false;
             LightCulling = false;
@@ -1198,7 +1196,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             BetterPacketSending = true;
             CacheSizeImprovement = true;
             OptimizeCFrameUpdates = true;
-            Threading = true;
             Preload = true;
         }
 
@@ -1208,7 +1205,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             DisablePostFX = true;
             DisablePlayerShadows = true;
-            MinimalRendering = true;
             WorserParticles = true;
             LowPolyMeshes = true;
             LightCulling = true;
