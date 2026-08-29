@@ -39,52 +39,23 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Sign and download artifact
-        uses: signpath/github-action-submit-signing-request@v2.0
+      # This fork doesn't have access to Bloxstrap Labs' SignPath organization, so releases here
+      # are unsigned - Windows SmartScreen will flag them on first run. See the release notes
+      # this step writes for the same disclaimer shown on manually-published releases.
+      - name: Download artifact
+        uses: actions/download-artifact@v6
         with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '107b3de5-057b-42fc-a985-3546e4261775'
-          project-slug: 'bloxstrap'
-          signing-policy-slug: 'release-signing'
-          artifact-configuration-slug: 'github-ci'
-          github-artifact-id: '${{ needs.build.outputs.artifact-id }}'
-          wait-for-completion: true
-          output-artifact-directory: 'release'
+          name: PhasmaStrap (Release) (${{ github.sha }})
+          path: release
 
       - name: Rename binaries
-        run: mv release/PhasmaStrap.exe PhasmaStrap-${{ github.ref_name }}.exe
+        run: mv "release/PhasmaStrap.exe" "release/PhasmaStrap-${{ github.ref_name }}.exe"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          files: PhasmaStrap-${{ github.ref_name }}.exe
+          files: release/PhasmaStrap-${{ github.ref_name }}.exe
           name: PhasmaStrap ${{ github.ref_name }}
-
-  release-test:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/release-test')
-
-    steps:
-      - name: Sign and download artifact
-        uses: signpath/github-action-submit-signing-request@v2.0
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '107b3de5-057b-42fc-a985-3546e4261775'
-          project-slug: 'bloxstrap'
-          signing-policy-slug: 'release-signing'
-          artifact-configuration-slug: 'github-ci'
-          github-artifact-id: '${{ needs.build.outputs.artifact-id }}'
-          wait-for-completion: true
-          output-artifact-directory: 'release'
-
-      - name: Rename binaries
-        run: mv release/PhasmaStrap.exe PhasmaStrap-${{ github.ref_name }}.exe
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          files: PhasmaStrap-${{ github.ref_name }}.exe
-          name: PhasmaStrap ${{ github.ref_name }}
+          body: |
+            **Note:** this build is unsigned (this fork does not have access to the SignPath code-signing service the upstream Bloxstrap project uses), so Windows SmartScreen will likely flag it on first run. Click "More info" then "Run anyway" to proceed.
