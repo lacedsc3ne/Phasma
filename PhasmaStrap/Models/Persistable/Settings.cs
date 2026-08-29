@@ -111,5 +111,15 @@ namespace PhasmaStrap.Models.Persistable
         public bool ClassicClientEnabled { get; set; } = false;
         public string ClassicClientInstallLocation { get; set; } = "";
         public string SelectedClassicClient { get; set; } = "";
+
+        // game chat overlay integration
+        public bool GameChatEnabled { get; set; } = false;
+        public string GameChatServerUrl { get; set; } = "";
+        public int GameChatWindowWidth { get; set; } = 500;
+        public int GameChatWindowHeight { get; set; } = 400;
+        public int GameChatOffsetX { get; set; } = 2;
+        public int GameChatOffsetY { get; set; } = 9;
+        public string GameChatFilterPreference { get; set; } = "default";
+        public long GameChatRobloxUserId { get; set; } = 0;
     }
 }
