@@ -439,6 +439,25 @@ namespace PhasmaStrap
 
                 try
                 {
+                    // Bootstrapper.cs already re-claims the roblox/roblox-player URL protocol handlers on
+                    // every actual game launch ("just in case the stock bootstrapper changes it back"), but
+                    // that only fires while an actual Play click is being processed. If another Bloxstrap-
+                    // family fork gets installed in between real launches, it can silently steal that
+                    // registry entry, and PhasmaStrap would never get a chance to win it back - the next
+                    // browser Play click would launch the OTHER strap instead, not this process. Doing the
+                    // same claim here, on every PhasmaStrap start (settings, tray, background updater,
+                    // launch-at-startup - not just an actual Play launch), closes that window: whichever
+                    // strap ran most recently for ANY reason ends up owning the association, not just
+                    // whichever one happened to handle the last real launch.
+                    WindowsRegistry.RegisterPlayer();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Protocol handler registration failed: {ex.Message}");
+                }
+
+                try
+                {
                     CpuCoreLimiter.ApplyConfiguredLimit();
                 }
                 catch (Exception ex)
