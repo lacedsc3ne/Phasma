@@ -686,15 +686,35 @@ namespace PhasmaStrap
         private long? TryResolveLaunchPlaceId()
         {
             Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
-            if (!uriMatch.Success)
+            if (uriMatch.Success)
+            {
+                var queryParams = HttpUtility.ParseQueryString(uriMatch.Groups[1].Value);
+
+                if (long.TryParse(queryParams["placeId"], out long placeId) && placeId > 0)
+                    return placeId;
+
+                return null;
+            }
+
+            // legacy ticket-based launch format - same extraction as TryApplyLegacyTicketMatchmakingAsync,
+            // since a real browser Play click just as often lands here as on the modern deep-link format
+            // above, and FastFlag profiles / Engine Settings scope need to resolve a place ID for either
+            Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
+            if (!ticketMatch.Success)
                 return null;
 
-            var queryParams = HttpUtility.ParseQueryString(uriMatch.Groups[1].Value);
+            string decodedUrl = HttpUtility.UrlDecode(ticketMatch.Groups[1].Value);
 
-            if (!long.TryParse(queryParams["placeId"], out long placeId) || placeId <= 0)
+            int queryIndex = decodedUrl.IndexOf('?');
+            if (queryIndex < 0)
                 return null;
 
-            return placeId;
+            var ticketQueryParams = HttpUtility.ParseQueryString(decodedUrl[(queryIndex + 1)..]);
+
+            if (long.TryParse(ticketQueryParams["placeId"], out long ticketPlaceId) && ticketPlaceId > 0)
+                return ticketPlaceId;
+
+            return null;
         }
 
         // merges a named FastFlag profile's overrides on top of the already-materialized
