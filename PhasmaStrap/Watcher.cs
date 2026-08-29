@@ -1,9 +1,7 @@
 ﻿using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
-using PhasmaStrap.Integrations.FrameGeneration;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
-using PhasmaStrap.Integrations.RiShade;
 using PhasmaStrap.Models;
 
 namespace PhasmaStrap
@@ -25,8 +23,6 @@ namespace PhasmaStrap
         public readonly PlayTimeWatcher? PlayTimeWatcher;
 
         public readonly GameChatIntegration? GameChat;
-
-        public readonly RiShadeManager? RiShade;
 
         public Watcher()
         {
@@ -66,12 +62,11 @@ namespace PhasmaStrap
             {
                 ActivityWatcher = new(_watcherData.LogFile);
 
+                // OverlayHub is the single lifecycle owner for the whole GPU overlay compositor -
+                // RiShade/Anti-Aliasing/Frame Generation all run as stages inside it (see
+                // OverlayCompositor.RenderFrame) rather than having their own game-join/leave wiring.
                 ActivityWatcher.OnGameJoin += delegate { OverlayHub.OnGameJoin(); };
                 ActivityWatcher.OnGameLeave += delegate { OverlayHub.OnGameLeave(); };
-
-                FrameGenManager.Install();
-                ActivityWatcher.OnGameJoin += delegate { FrameGenManager.OnGameJoin(); };
-                ActivityWatcher.OnGameLeave += delegate { FrameGenManager.OnGameLeave(); };
 
                 if (App.Settings.Prop.UseDisableAppPatch)
                 {
@@ -85,16 +80,6 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
-
-                ActivityWatcher.OnGameJoin += (_, _) => Integrations.AntiAliasing.AntiAliasingManager.OnGameJoin();
-                ActivityWatcher.OnGameLeave += (_, _) => Integrations.AntiAliasing.AntiAliasingManager.OnGameLeave();
-
-                if (App.Settings.Prop.RiShadeEnabled)
-                {
-                    RiShade = new(_watcherData.ProcessId);
-                    ActivityWatcher.OnGameJoin += (_, _) => RiShade.OnGameJoin();
-                    ActivityWatcher.OnGameLeave += (_, _) => RiShade.OnGameLeave();
-                }
 
                 // opt-in only: this feature installs a global (system-wide) low-level keyboard hook
                 // while a Roblox session is active, so it defaults to off and requires explicit consent
@@ -183,12 +168,9 @@ namespace PhasmaStrap
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
 
             OverlayHub.Shutdown();
-            Integrations.AntiAliasing.AntiAliasingManager.Shutdown();
-            FrameGenManager.Shutdown();
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();
-            RiShade?.Dispose();
             GameChat?.Dispose();
             IntegrationWatcher?.Dispose();
             PlayTimeWatcher?.Dispose();

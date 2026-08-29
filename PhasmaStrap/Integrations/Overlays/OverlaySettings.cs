@@ -1,17 +1,19 @@
 namespace PhasmaStrap.Integrations.Overlays
 {
     /// <summary>
-    /// Simplified from Voidstrap's OverlaySettings: the original gated the compositor
-    /// on RiShade/Anti Aliasing/Frame Generation being enabled (GameEffectsEnabled) and
-    /// also drove a homepage-background compositor mode. Neither RiShade/AA/FrameGen nor
-    /// the homepage background subsystem are part of this port, so the compositor here
-    /// only needs to run while in a Roblox game and something it draws itself (the stats
-    /// HUD or the crosshair) is turned on.
+    /// Gates whether the compositor should be running at all. RiShade, Anti-Aliasing, and Frame
+    /// Generation each run as a stage inside the compositor's own render loop (see
+    /// OverlayCompositor.RenderFrame) rather than owning a separate pipeline, so the compositor
+    /// needs to start even if the HUD and crosshair are both off but one of those three is on.
     /// </summary>
     public static class OverlaySettings
     {
         public static bool GameEffectsEnabled =>
-            App.Settings.Prop.OverlayHudEnabled || App.Settings.Prop.Crosshair;
+            App.Settings.Prop.OverlayHudEnabled ||
+            App.Settings.Prop.Crosshair ||
+            App.Settings.Prop.RiShadeEnabled ||
+            (App.Settings.Prop.AntiAliasingEnabled && App.Settings.Prop.AntiAliasingMethodIndex > 0) ||
+            FrameGeneration.FrameGenSettings.ModeIndex > 0;
 
         public static bool AnyEnabled => OverlayHub.InGame && GameEffectsEnabled;
     }
