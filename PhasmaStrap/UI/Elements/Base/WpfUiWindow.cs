@@ -81,17 +81,48 @@ namespace PhasmaStrap.UI.Elements.Base
             // (small message-style dialogs) just keep the plain dark background instead of glass.
             if (ExtendsContentIntoTitleBar && WindowBackdropType == Wpf.Ui.Appearance.BackgroundType.None)
             {
-                WindowBackdropType = Wpf.Ui.Appearance.BackgroundType.Acrylic;
+                WindowBackdropType = ResolveBackdropType(App.Settings.Prop.WindowBackdropStyle);
 
                 // Wpf.Ui's Acrylic/Mica implementation forcibly clears Window.Background to enable
                 // the native backdrop, so a tint has to live on a child element instead - insert one
                 // behind everything else in the root Grid, spanning its full size
                 if (Content is Grid rootGrid)
                 {
+                    int rowSpan = Math.Max(1, rootGrid.RowDefinitions.Count);
+                    int columnSpan = Math.Max(1, rootGrid.ColumnDefinitions.Count);
+                    int insertIndex = 0;
+
+                    // optional background image, settings window only (UI polish port from Voidstrap)
+                    bool isSettingsWindow = this is PhasmaStrap.UI.Elements.Settings.MainWindow;
+                    if (isSettingsWindow && App.Settings.Prop.GlobalBackgroundEnabled)
+                    {
+                        var layers = PhasmaStrap.UI.GlobalBackground.TryCreateLayers(App.Settings.Prop.GlobalBackgroundFilePath, App.Settings.Prop.GlobalBackgroundOverlayOpacity);
+                        if (layers != null)
+                        {
+                            Grid.SetRowSpan(layers.Value.Image, rowSpan);
+                            Grid.SetColumnSpan(layers.Value.Image, columnSpan);
+                            rootGrid.Children.Insert(insertIndex++, layers.Value.Image);
+
+                            Grid.SetRowSpan(layers.Value.Overlay, rowSpan);
+                            Grid.SetColumnSpan(layers.Value.Overlay, columnSpan);
+                            rootGrid.Children.Insert(insertIndex++, layers.Value.Overlay);
+                        }
+                    }
+
                     var tint = new Border { Background = GlassTintBrush, IsHitTestVisible = false };
-                    Grid.SetRowSpan(tint, Math.Max(1, rootGrid.RowDefinitions.Count));
-                    Grid.SetColumnSpan(tint, Math.Max(1, rootGrid.ColumnDefinitions.Count));
-                    rootGrid.Children.Insert(0, tint);
+                    Grid.SetRowSpan(tint, rowSpan);
+                    Grid.SetColumnSpan(tint, columnSpan);
+                    rootGrid.Children.Insert(insertIndex, tint);
+
+                    // decorative snow overlay, settings window only, drawn on top of everything else
+                    if (isSettingsWindow && App.Settings.Prop.SnowEffectEnabled)
+                    {
+                        var snow = new PhasmaStrap.UI.SmoothSnowLayer();
+                        Grid.SetRowSpan(snow, rowSpan);
+                        Grid.SetColumnSpan(snow, columnSpan);
+                        rootGrid.Children.Add(snow);
+                        snow.SetActive(true);
+                    }
                 }
             }
 
@@ -112,5 +143,13 @@ namespace PhasmaStrap.UI.Elements.Base
 
             base.OnSourceInitialized(e);
         }
+
+        private static Wpf.Ui.Appearance.BackgroundType ResolveBackdropType(Enums.BackdropStyle style) => style switch
+        {
+            Enums.BackdropStyle.Mica => Wpf.Ui.Appearance.BackgroundType.Mica,
+            Enums.BackdropStyle.Acrylic => Wpf.Ui.Appearance.BackgroundType.Acrylic,
+            Enums.BackdropStyle.None => Wpf.Ui.Appearance.BackgroundType.None,
+            _ => Wpf.Ui.Appearance.BackgroundType.Acrylic // Default - preserves prior hardcoded behaviour
+        };
     }
 }

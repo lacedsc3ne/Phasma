@@ -423,6 +423,11 @@ namespace PhasmaStrap
                 State.Load();
                 FastFlags.Load();
 
+                // UI polish (ported from Voidstrap): smooth ProgressBar value transitions,
+                // installed as a WPF class handler so it applies to every ProgressBar
+                if (Settings.Prop.SmoothProgressBarsEnabled)
+                    UI.SmoothProgress.Install();
+
                 try
                 {
                     CpuCoreLimiter.ApplyConfiguredLimit();
