@@ -62,3 +62,5 @@ jobs:
           name: PhasmaStrap ${{ github.ref_name }}
           body: |
             **Note:** this build is unsigned (this fork does not have access to the SignPath code-signing service the upstream Bloxstrap project uses), so Windows SmartScreen will likely flag it on first run. Click "More info" then "Run anyway" to proceed.
+
+            **Requires the [.NET 6 Desktop Runtime](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win11-x64&apphost_version=6.0.36&gui=true).** If you don't already have it, install it *before* running PhasmaStrap.exe or clicking Play in the browser - if it's missing, launching straight from a browser link can fail silently instead of showing the usual "install the .NET Desktop Runtime?" prompt you'd get from double-clicking the exe directly.
