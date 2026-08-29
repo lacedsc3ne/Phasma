@@ -3071,4 +3071,34 @@ Example:
   <data name="Menu.GameChat.Translation.Language.Description" xml:space="preserve">
     <value>The language chat messages and (optionally) Rich Presence text are translated into.</value>
   </data>
+  <data name="Menu.Performance.EnginePreset.Title" xml:space="preserve">
+    <value>Preset</value>
+  </data>
+  <data name="Menu.Performance.EnginePreset.Description" xml:space="preserve">
+    <value>Applies a bundle of the toggles below at once. Pick Default to reset them.</value>
+  </data>
+  <data name="Menu.Performance.EnginePerGame.Header" xml:space="preserve">
+    <value>Per-game overrides</value>
+  </data>
+  <data name="Menu.Performance.EnginePerGame.Description" xml:space="preserve">
+    <value>Override the runtime optimizer for specific games, regardless of the global toggles above.</value>
+  </data>
+  <data name="Menu.Performance.EngineExcludedPlaces.Title" xml:space="preserve">
+    <value>Excluded games</value>
+  </data>
+  <data name="Menu.Performance.EngineExcludedPlaces.Description" xml:space="preserve">
+    <value>The runtime optimizer is skipped entirely for these places, even while enabled globally.</value>
+  </data>
+  <data name="Menu.Performance.EngineExcludedPlaces.PlaceholderText" xml:space="preserve">
+    <value>Place ID to exclude</value>
+  </data>
+  <data name="Menu.Performance.EngineAssignments.Title" xml:space="preserve">
+    <value>Assigned presets</value>
+  </data>
+  <data name="Menu.Performance.EngineAssignments.Description" xml:space="preserve">
+    <value>Applies a specific preset only for the listed places, instead of the global toggles above.</value>
+  </data>
+  <data name="Menu.Performance.EngineAssignments.PlaceholderText" xml:space="preserve">
+    <value>Place ID</value>
+  </data>
 </root>

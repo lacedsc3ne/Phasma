@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -263,6 +264,110 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
             return options;
         }
+
+        // --- engine presets (bulk-apply the 5 properties above) + per-game overrides ---
+
+        public string[] EnginePresetNames => Integrations.EnginePresets.PresetNames;
+
+        // one-time apply action, like RiShadeViewModel.SelectedPreset - not a persisted selection,
+        // since the individual toggles above may not match any named preset once hand-tweaked
+        public string SelectedEnginePreset
+        {
+            get => "";
+            set
+            {
+                if (string.IsNullOrEmpty(value) || !Integrations.EnginePresets.Presets.TryGetValue(value, out var preset))
+                    return;
+
+                Integrations.EnginePresets.Apply(preset, App.Settings.Prop);
+
+                OnPropertyChanged(nameof(OptimizeRoblox));
+                OnPropertyChanged(nameof(RobloxEfficiencyMode));
+                OnPropertyChanged(nameof(ReduceMemoryOutOfFocus));
+                OnPropertyChanged(nameof(SelectedCpuPriority));
+                OnPropertyChanged(nameof(RobloxPriorityLimit));
+            }
+        }
+
+        public ObservableCollection<string> EngineExcludedPlaces { get; } = new(App.Settings.Prop.EngineExcludedPlaces);
+
+        private string _engineExcludePlaceId = "";
+
+        public string EngineExcludePlaceId
+        {
+            get => _engineExcludePlaceId;
+            set { _engineExcludePlaceId = value; OnPropertyChanged(nameof(EngineExcludePlaceId)); }
+        }
+
+        public ICommand AddEngineExcludedPlaceCommand => new RelayCommand(() =>
+        {
+            string id = EngineExcludePlaceId.Trim();
+
+            if (!long.TryParse(id, out _) || EngineExcludedPlaces.Contains(id))
+                return;
+
+            EngineExcludedPlaces.Add(id);
+            App.Settings.Prop.EngineExcludedPlaces.Add(id);
+            EngineExcludePlaceId = "";
+        });
+
+        public ICommand RemoveEngineExcludedPlaceCommand => new RelayCommand<string>(id =>
+        {
+            if (id is null)
+                return;
+
+            EngineExcludedPlaces.Remove(id);
+            App.Settings.Prop.EngineExcludedPlaces.Remove(id);
+        });
+
+        public sealed record EnginePlaceAssignment(string PlaceId, string PresetName)
+        {
+            public string Display => $"{PlaceId} → {PresetName}";
+        }
+
+        public ObservableCollection<EnginePlaceAssignment> EngineProfileAssignments { get; } = new(
+            App.Settings.Prop.EnginePlaceProfiles.Select(kv => new EnginePlaceAssignment(kv.Key, kv.Value)));
+
+        private string _engineAssignPlaceId = "";
+
+        public string EngineAssignPlaceId
+        {
+            get => _engineAssignPlaceId;
+            set { _engineAssignPlaceId = value; OnPropertyChanged(nameof(EngineAssignPlaceId)); }
+        }
+
+        private string _engineAssignPresetName = Integrations.EnginePresets.PresetNames.FirstOrDefault() ?? "";
+
+        public string EngineAssignPresetName
+        {
+            get => _engineAssignPresetName;
+            set { _engineAssignPresetName = value; OnPropertyChanged(nameof(EngineAssignPresetName)); }
+        }
+
+        public ICommand AddEngineProfileAssignmentCommand => new RelayCommand(() =>
+        {
+            string id = EngineAssignPlaceId.Trim();
+
+            if (!long.TryParse(id, out _) || string.IsNullOrEmpty(EngineAssignPresetName))
+                return;
+
+            var existing = EngineProfileAssignments.FirstOrDefault(a => a.PlaceId == id);
+            if (existing is not null)
+                EngineProfileAssignments.Remove(existing);
+
+            EngineProfileAssignments.Add(new EnginePlaceAssignment(id, EngineAssignPresetName));
+            App.Settings.Prop.EnginePlaceProfiles[id] = EngineAssignPresetName;
+            EngineAssignPlaceId = "";
+        });
+
+        public ICommand RemoveEngineProfileAssignmentCommand => new RelayCommand<EnginePlaceAssignment>(assignment =>
+        {
+            if (assignment is null)
+                return;
+
+            EngineProfileAssignments.Remove(assignment);
+            App.Settings.Prop.EnginePlaceProfiles.Remove(assignment.PlaceId);
+        });
 
         // --- launcher memory manager (ported from Voidstrap MemoryManager) ---
 

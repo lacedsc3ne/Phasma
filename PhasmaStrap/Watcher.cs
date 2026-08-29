@@ -117,7 +117,11 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameLeave += (_, _) => ForcedResolution.OnGameLeave();
                 }
 
-                if (RobloxProcessOptimizer.ShouldRun(App.Settings.Prop))
+                // also wire up the optimizer if any per-game preset is assigned, even when the
+                // global toggles are all off - a place-specific preset should still fire (see
+                // EnginePresets.Resolve, invoked from StartProcessOptimizer once the join's place
+                // ID is known)
+                if (RobloxProcessOptimizer.ShouldRun(App.Settings.Prop) || App.Settings.Prop.EnginePlaceProfiles.Count > 0)
                 {
                     ActivityWatcher.OnGameJoin += (_, _) => StartProcessOptimizer();
                     ActivityWatcher.OnGameLeave += (_, _) => StopProcessOptimizer();
@@ -139,7 +143,12 @@ namespace PhasmaStrap
             if (_watcherData is null)
                 return;
 
-            _processOptimizer ??= new RobloxProcessOptimizer(_watcherData.ProcessId);
+            // ActivityWatcher.Data.PlaceId is already resolved by the time OnGameJoin fires, so the
+            // per-place preset/exclusion (EnginePresets.Resolve) can be looked up right here
+            long placeId = ActivityWatcher?.Data.PlaceId ?? 0;
+            EnginePresetValues effective = placeId != 0 ? EnginePresets.Resolve(placeId) : EnginePresets.FromSettings(App.Settings.Prop);
+
+            _processOptimizer ??= new RobloxProcessOptimizer(_watcherData.ProcessId, effective);
             _processOptimizer.Start();
         }
 

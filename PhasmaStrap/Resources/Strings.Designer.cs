@@ -8519,5 +8519,95 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.GameChat.Translation.Language.Description", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        public static string Menu_Performance_EnginePreset_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EnginePreset.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies a bundle of the toggles below at once. Pick Default to reset them..
+        /// </summary>
+        public static string Menu_Performance_EnginePreset_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EnginePreset.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Per-game overrides.
+        /// </summary>
+        public static string Menu_Performance_EnginePerGame_Header {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EnginePerGame.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Override the runtime optimizer for specific games, regardless of the global toggles above..
+        /// </summary>
+        public static string Menu_Performance_EnginePerGame_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EnginePerGame.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Excluded games.
+        /// </summary>
+        public static string Menu_Performance_EngineExcludedPlaces_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineExcludedPlaces.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The runtime optimizer is skipped entirely for these places, even while enabled globally..
+        /// </summary>
+        public static string Menu_Performance_EngineExcludedPlaces_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineExcludedPlaces.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID to exclude.
+        /// </summary>
+        public static string Menu_Performance_EngineExcludedPlaces_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineExcludedPlaces.PlaceholderText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Assigned presets.
+        /// </summary>
+        public static string Menu_Performance_EngineAssignments_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineAssignments.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies a specific preset only for the listed places, instead of the global toggles above..
+        /// </summary>
+        public static string Menu_Performance_EngineAssignments_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineAssignments.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID.
+        /// </summary>
+        public static string Menu_Performance_EngineAssignments_PlaceholderText {
+            get {
+                return ResourceManager.GetString("Menu.Performance.EngineAssignments.PlaceholderText", resourceCulture);
+            }
+        }
     }
 }
