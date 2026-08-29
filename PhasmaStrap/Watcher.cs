@@ -81,6 +81,9 @@ namespace PhasmaStrap
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
 
+                ActivityWatcher.OnGameJoin += (_, _) => Integrations.AntiAliasing.AntiAliasingManager.OnGameJoin();
+                ActivityWatcher.OnGameLeave += (_, _) => Integrations.AntiAliasing.AntiAliasingManager.OnGameLeave();
+
                 if (App.Settings.Prop.RiShadeEnabled)
                 {
                     RiShade = new(_watcherData.ProcessId);
@@ -175,6 +178,7 @@ namespace PhasmaStrap
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
 
             OverlayHub.Shutdown();
+            Integrations.AntiAliasing.AntiAliasingManager.Shutdown();
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();

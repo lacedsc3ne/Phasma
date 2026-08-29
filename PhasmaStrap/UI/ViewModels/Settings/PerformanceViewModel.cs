@@ -137,5 +137,30 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             else if (!enabled)
                 directories.Remove(key);
         }
+
+        public bool AntiAliasingEnabled
+        {
+            get => App.Settings.Prop.AntiAliasingEnabled;
+            set
+            {
+                Integrations.AntiAliasing.AntiAliasingManager.SetEnabled(value);
+                OnPropertyChanged(nameof(AntiAliasingEnabled));
+            }
+        }
+
+        public string[] AntiAliasingMethodNames => Integrations.AntiAliasing.AntiAliasingSettings.MethodNames;
+
+        public int AntiAliasingMethodIndex
+        {
+            get => Integrations.AntiAliasing.AntiAliasingSettings.MethodIndex;
+            set
+            {
+                if (value < 0)
+                    return;
+
+                Integrations.AntiAliasing.AntiAliasingManager.SetMethod(value);
+                OnPropertyChanged(nameof(AntiAliasingMethodIndex));
+            }
+        }
     }
 }

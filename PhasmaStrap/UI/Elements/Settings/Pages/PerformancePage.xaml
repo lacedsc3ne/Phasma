@@ -69,6 +69,17 @@
             <ui:ToggleSwitch IsChecked="{Binding PerformanceStatsVisible, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <TextBlock Text="Anti-Aliasing" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="Enable Anti-Aliasing overlay" Description="Off by default, since this is an extra rendering pass on top of Roblox.">
+            <ui:ToggleSwitch IsChecked="{Binding AntiAliasingEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="Anti-Aliasing method" Description="Which shader technique to apply once the overlay is enabled.">
+            <ComboBox Padding="10,5,10,5" MinWidth="160" IsEnabled="{Binding AntiAliasingEnabled}" ItemsSource="{Binding AntiAliasingMethodNames, Mode=OneTime}" SelectedIndex="{Binding AntiAliasingMethodIndex, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
