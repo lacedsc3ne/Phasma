@@ -9,12 +9,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
+using PhasmaStrap.Server.Auth;
 using PhasmaStrap.Server.Common;
 
 namespace PhasmaStrap.Server.WebServer;
 
 public class Program
 {
+	// Fixed base port for the ported auth negotiation service (Auth/AuthHost.Run). Chosen to sit well away from
+	// the WebServer's own default port (80) and the ephemeral port range, so it never collides with either.
+	// AuthHost derives ProxyPort/WebServerPort = this value and RobloxPort = this value + 1.
+	private const ushort AuthBasePort = 40010;
+
 	private static void FixUrl(RewriteContext context)
 	{
 		HttpRequest request = context.HttpContext.Request;
@@ -90,6 +96,26 @@ public class Program
 		{
 		}
 		Environment.Exit(123);
+	}
+
+	// AuthHost.Run blocks (Task.WaitAny) and its Config.Load calls Environment.Exit(2) on invalid args, which
+	// would kill this whole process - so the args passed here must always be well-formed, and any exception
+	// escaping Run must be caught here rather than crash the WebServer half of the process.
+	private static void StartAuthHost(int clientProcessId)
+	{
+		string[] authArgs = new string[]
+		{
+			"--port", AuthBasePort.ToString(),
+			"--clientprocessid", (clientProcessId != 0 ? clientProcessId : -1).ToString()
+		};
+		try
+		{
+			AuthHost.Run(authArgs);
+		}
+		catch (Exception ex)
+		{
+			Logger.Instance.Warn("Auth host exited unexpectedly: " + ex.Message);
+		}
 	}
 
 	public static void Main(string[] args)
@@ -184,6 +210,12 @@ public class Program
 			thread.IsBackground = true;
 			thread.Start();
 		}
+		Thread authThread = new Thread((ThreadStart)delegate
+		{
+			StartAuthHost(processId);
+		});
+		authThread.IsBackground = true;
+		authThread.Start();
 		try
 		{
 			webApplication.Run();
