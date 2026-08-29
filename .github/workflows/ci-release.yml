@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
 
+    permissions:
+      contents: write
+
     steps:
       # This fork doesn't have access to Bloxstrap Labs' SignPath organization, so releases here
       # are unsigned - Windows SmartScreen will flag them on first run. See the release notes
