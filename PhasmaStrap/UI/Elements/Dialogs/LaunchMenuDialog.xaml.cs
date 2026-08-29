@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using PhasmaStrap.UI.ViewModels.Dialogs;
@@ -37,5 +38,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             InitializeComponent();
         }
+
+        private void LaunchMenuDialog_MistLoaded(object sender, RoutedEventArgs e) =>
+            ((Storyboard)Resources["MistDrift"]).Begin(this);
     }
 }
