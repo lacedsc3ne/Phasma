@@ -29,6 +29,16 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             JsonTextBox.Text = File.ReadAllText(dialog.FileName);
         }
 
+        private void PresetValuesButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new FFlagPresetsDialog { Owner = this };
+
+            dialog.ShowDialog();
+
+            if (dialog.Result == MessageBoxResult.OK && !string.IsNullOrEmpty(dialog.SelectedValue))
+                FlagValueTextBox.Text = dialog.SelectedValue;
+        }
+
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Result = MessageBoxResult.OK;

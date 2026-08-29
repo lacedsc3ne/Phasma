@@ -2491,4 +2491,99 @@ Defaulting to {1}.</value>
     <value>Image files</value>
     <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "Image files (*.png)"</comment>
   </data>
+  <data name="Common.Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Dialog.AddFastFlag.PresetValues" xml:space="preserve">
+    <value>Preset values</value>
+  </data>
+  <data name="Dialog.CopyFlags.CountPlural" xml:space="preserve">
+    <value>{0} flags will be copied to your clipboard.</value>
+    <comment>{0} is a number</comment>
+  </data>
+  <data name="Dialog.CopyFlags.CountSingular" xml:space="preserve">
+    <value>1 flag will be copied to your clipboard.</value>
+  </data>
+  <data name="Dialog.CopyFlags.Format.Base64" xml:space="preserve">
+    <value>Base64</value>
+  </data>
+  <data name="Dialog.CopyFlags.Format.GroupedJson" xml:space="preserve">
+    <value>Grouped JSON</value>
+  </data>
+  <data name="Dialog.CopyFlags.Format.Json" xml:space="preserve">
+    <value>JSON</value>
+  </data>
+  <data name="Dialog.CopyFlags.Title" xml:space="preserve">
+    <value>Copy flags</value>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.CountPlural" xml:space="preserve">
+    <value>{0} settings will be copied to your clipboard.</value>
+    <comment>{0} is a number</comment>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.CountSingular" xml:space="preserve">
+    <value>1 setting will be copied to your clipboard.</value>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.Format.Base64Nip" xml:space="preserve">
+    <value>Base64 NIP</value>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.Format.NipProfile" xml:space="preserve">
+    <value>NIP profile</value>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.Format.SettingRows" xml:space="preserve">
+    <value>Setting rows</value>
+  </data>
+  <data name="Dialog.CopyNvidiaSettings.Title" xml:space="preserve">
+    <value>Copy NVIDIA settings</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.BasicNumbers" xml:space="preserve">
+    <value>Basic Numbers</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.Boolean" xml:space="preserve">
+    <value>Boolean</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.FPSValues" xml:space="preserve">
+    <value>FPS Values</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.LargeNumbers" xml:space="preserve">
+    <value>Large Numbers</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.MemoryValues" xml:space="preserve">
+    <value>Memory Values</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.Percentages" xml:space="preserve">
+    <value>Percentages</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.QualityLevels" xml:space="preserve">
+    <value>Quality Levels</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Category.SpecialValues" xml:space="preserve">
+    <value>Special Values</value>
+  </data>
+  <data name="Dialog.FFlagPresetValues.Title" xml:space="preserve">
+    <value>FFlag preset values</value>
+  </data>
+  <data name="Menu.FastFlagEditor.NoFlagsToCopy" xml:space="preserve">
+    <value>There are no flags to copy.</value>
+  </data>
+  <data name="FileTypes.NIPFiles" xml:space="preserve">
+    <value>NVIDIA Profile Inspector files</value>
+    <comment>Shown in the save file dialog, where the file type selection dropdown is, e.g. "NVIDIA Profile Inspector files (*.nip)"</comment>
+  </data>
+  <data name="Menu.Nvidia.ExportNipButton" xml:space="preserve">
+    <value>Export .nip</value>
+  </data>
+  <data name="Menu.Nvidia.CopySettingsButton" xml:space="preserve">
+    <value>Copy settings</value>
+  </data>
+  <data name="Menu.Nvidia.NipExported" xml:space="preserve">
+    <value>NVIDIA profile exported successfully.</value>
+  </data>
+  <data name="Menu.Nvidia.NipExportFailed" xml:space="preserve">
+    <value>Failed to export the NVIDIA profile:
+{0}</value>
+    <comment>{0} is an exception message</comment>
+  </data>
+  <data name="Menu.Nvidia.SettingsCopiedToClipboard" xml:space="preserve">
+    <value>Copied the NVIDIA settings to the clipboard.</value>
+  </data>
 </root>

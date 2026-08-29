@@ -6925,5 +6925,281 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Appearance.WindowBackdrop.Title", resourceCulture);
             }
         }
+
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string Common_Copy {
+            get {
+                return ResourceManager.GetString("Common.Copy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset values.
+        /// </summary>
+        public static string Dialog_AddFastFlag_PresetValues {
+            get {
+                return ResourceManager.GetString("Dialog.AddFastFlag.PresetValues", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} flags will be copied to your clipboard..
+        /// </summary>
+        public static string Dialog_CopyFlags_CountPlural {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.CountPlural", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 1 flag will be copied to your clipboard..
+        /// </summary>
+        public static string Dialog_CopyFlags_CountSingular {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.CountSingular", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Base64.
+        /// </summary>
+        public static string Dialog_CopyFlags_Format_Base64 {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.Format.Base64", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Grouped JSON.
+        /// </summary>
+        public static string Dialog_CopyFlags_Format_GroupedJson {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.Format.GroupedJson", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to JSON.
+        /// </summary>
+        public static string Dialog_CopyFlags_Format_Json {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.Format.Json", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy flags.
+        /// </summary>
+        public static string Dialog_CopyFlags_Title {
+            get {
+                return ResourceManager.GetString("Dialog.CopyFlags.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} settings will be copied to your clipboard..
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_CountPlural {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.CountPlural", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 1 setting will be copied to your clipboard..
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_CountSingular {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.CountSingular", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Base64 NIP.
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_Format_Base64Nip {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.Format.Base64Nip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NIP profile.
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_Format_NipProfile {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.Format.NipProfile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setting rows.
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_Format_SettingRows {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.Format.SettingRows", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy NVIDIA settings.
+        /// </summary>
+        public static string Dialog_CopyNvidiaSettings_Title {
+            get {
+                return ResourceManager.GetString("Dialog.CopyNvidiaSettings.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Basic Numbers.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_BasicNumbers {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.BasicNumbers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Boolean.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_Boolean {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.Boolean", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS Values.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_FPSValues {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.FPSValues", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Large Numbers.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_LargeNumbers {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.LargeNumbers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Memory Values.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_MemoryValues {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.MemoryValues", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Percentages.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_Percentages {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.Percentages", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Quality Levels.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_QualityLevels {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.QualityLevels", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Special Values.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Category_SpecialValues {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Category.SpecialValues", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FFlag preset values.
+        /// </summary>
+        public static string Dialog_FFlagPresetValues_Title {
+            get {
+                return ResourceManager.GetString("Dialog.FFlagPresetValues.Title", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA Profile Inspector files.
+        /// </summary>
+        public static string FileTypes_NIPFiles {
+            get {
+                return ResourceManager.GetString("FileTypes.NIPFiles", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to There are no flags to copy..
+        /// </summary>
+        public static string Menu_FastFlagEditor_NoFlagsToCopy {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.NoFlagsToCopy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Export .nip.
+        /// </summary>
+        public static string Menu_Nvidia_ExportNipButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ExportNipButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy settings.
+        /// </summary>
+        public static string Menu_Nvidia_CopySettingsButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.CopySettingsButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA profile exported successfully..
+        /// </summary>
+        public static string Menu_Nvidia_NipExported {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.NipExported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to export the NVIDIA profile:
+        ///{0}.
+        /// </summary>
+        public static string Menu_Nvidia_NipExportFailed {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.NipExportFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copied the NVIDIA settings to the clipboard..
+        /// </summary>
+        public static string Menu_Nvidia_SettingsCopiedToClipboard {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.SettingsCopiedToClipboard", resourceCulture);
+            }
+        }
     }
 }

@@ -388,11 +388,77 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             ReloadList();
         }
 
+        private static readonly Regex _groupPrefixRegex = new("^[A-Z]+[a-z]*", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private void ExportJSONButton_Click(object sender, RoutedEventArgs e)
         {
-            string json = JsonSerializer.Serialize(App.FastFlags.Prop, new JsonSerializerOptions { WriteIndented = true });
-            Clipboard.SetDataObject(json);
+            var prop = App.FastFlags.Prop;
+
+            if (prop.Count == 0)
+            {
+                Frontend.ShowMessageBox(Strings.Menu_FastFlagEditor_NoFlagsToCopy, MessageBoxImage.Information);
+                return;
+            }
+
+            var dialog = new CopyFlagsDialog(prop.Count)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            dialog.ShowDialog();
+
+            if (dialog.Result != MessageBoxResult.OK)
+                return;
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+
+            string payload = dialog.SelectedFormat switch
+            {
+                CopyFlagsFormat.GroupedJson => BuildGroupedJson(prop),
+                CopyFlagsFormat.Base64 => Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(prop, options))),
+                _ => JsonSerializer.Serialize(prop, options)
+            };
+
+            Clipboard.SetDataObject(payload);
             Frontend.ShowMessageBox(Strings.Menu_FastFlagEditor_JsonCopiedToClipboard, MessageBoxImage.Information);
+        }
+
+        private static string BuildGroupedJson(Dictionary<string, object> prop)
+        {
+            var groups = prop
+                .GroupBy(kvp =>
+                {
+                    var match = _groupPrefixRegex.Match(kvp.Key);
+                    return match.Success ? match.Value : "Other";
+                })
+                .OrderBy(g => g.Key);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("{");
+
+            int groupIndex = 0;
+            int groupCount = groups.Count();
+
+            foreach (var group in groups)
+            {
+                sb.Append("  // ").AppendLine(group.Key);
+
+                var entries = group.OrderBy(kvp => kvp.Key).ToList();
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    string value = JsonSerializer.Serialize(entries[i].Value);
+                    bool isLastEntry = i == entries.Count - 1;
+                    bool isLastGroup = groupIndex == groupCount - 1;
+
+                    sb.Append("  \"").Append(entries[i].Key).Append("\": ").Append(value);
+                    sb.AppendLine(isLastEntry && isLastGroup ? "" : ",");
+                }
+
+                groupIndex++;
+            }
+
+            sb.AppendLine("}");
+            return sb.ToString();
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
