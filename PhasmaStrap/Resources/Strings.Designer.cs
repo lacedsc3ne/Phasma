@@ -6465,5 +6465,194 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.RiShade.ImportPreset.Failed", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FastFlag Profiles.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create named bundles of FastFlag overrides and assign them to specific games. A place's assigned profile is merged in automatically whenever you launch it..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Profiles.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ProfilesHeader {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ProfilesHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create, rename, and delete FastFlag profiles. Select a profile below to edit its overrides..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ProfilesDescription {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ProfilesDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to New profile name.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_NewProfilePlaceholder {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.NewProfilePlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add profile.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_AddProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.AddProfile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Rename selected.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_RenameProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.RenameProfile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete selected.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_DeleteProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.DeleteProfile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a profile name..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ProfileNameEmpty {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ProfileNameEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A profile with this name already exists..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ProfileNameDuplicate {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ProfileNameDuplicate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete profile '{0}'? Any place assignments using it will also be removed..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_DeleteProfileConfirmMessage {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.DeleteProfileConfirmMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select or create a profile above to edit its FastFlag overrides..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_NoProfileSelectedHint {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.NoProfileSelectedHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Editing profile: {0}.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_EditingProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.EditingProfile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add flag.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_AddFlag {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.AddFlag", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete selected.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_DeleteSelectedFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.DeleteSelectedFlags", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place assignments.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_PlacesHeader {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.PlacesHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Assign a profile to a place ID. Its overrides are merged in automatically whenever that place is launched, if Engine Settings is enabled..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_PlacesDescription {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.PlacesDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Place ID.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_PlaceIdPlaceholder {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.PlaceIdPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Assign.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_AddAssignment {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.AddAssignment", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a valid place ID..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_InvalidPlaceId {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.InvalidPlaceId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create a profile above before assigning it to a place..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_NoProfilesAvailable {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.NoProfilesAvailable", resourceCulture);
+            }
+        }
     }
 }

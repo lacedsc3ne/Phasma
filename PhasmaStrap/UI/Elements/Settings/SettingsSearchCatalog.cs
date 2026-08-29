@@ -73,6 +73,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             string mods = Strings.Menu_Mods_Title;
             string extensions = "Extensions";
             string fastFlags = Strings.Menu_FastFlags_Title;
+            string fastFlagProfiles = Strings.Menu_FastFlagProfiles_Title;
             string channel = "Channel";
             string performance = "Performance";
             string nvidia = "NVIDIA";
@@ -225,6 +226,10 @@ namespace PhasmaStrap.UI.Elements.Settings
 
                 Entry(Strings.Menu_FastFlags_Reset_Title, "", typeof(FastFlagsPage), fastFlags),
                 Entry(Strings.Menu_FastFlagEditor_Title, Strings.Menu_FastFlags_Editor_Description, typeof(FastFlagsPage), fastFlags),
+
+                // FastFlag Profiles
+                Entry(Strings.Menu_FastFlagProfiles_Title, Strings.Menu_FastFlagProfiles_Description, typeof(FastFlagProfilesPage), fastFlagProfiles),
+                Entry(Strings.Menu_FastFlagProfiles_PlacesHeader, Strings.Menu_FastFlagProfiles_PlacesDescription, typeof(FastFlagProfilesPage), fastFlagProfiles),
 
                 // Channel
                 Entry("Currently active channel", "Which Roblox deployment channel is currently running.", typeof(ChannelPage), channel),
