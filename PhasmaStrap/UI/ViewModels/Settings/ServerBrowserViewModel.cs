@@ -97,6 +97,37 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 .OrderBy(dc => dc.City)
                 .Select(dc => new DatacenterExclusion { Display = $"{dc.City}, {dc.Country}", Key = Matchmaker.DatacenterKey(dc) });
 
+        public ObservableCollection<string> ExcludedPlaces { get; } = new(App.Settings.Prop.MatchmakerExcludedPlaces);
+
+        private string _excludePlaceId = "";
+
+        public string ExcludePlaceId
+        {
+            get => _excludePlaceId;
+            set { _excludePlaceId = value; OnPropertyChanged(nameof(ExcludePlaceId)); }
+        }
+
+        public ICommand AddExcludedPlaceCommand => new RelayCommand(() =>
+        {
+            string id = ExcludePlaceId.Trim();
+
+            if (!long.TryParse(id, out _) || ExcludedPlaces.Contains(id))
+                return;
+
+            ExcludedPlaces.Add(id);
+            App.Settings.Prop.MatchmakerExcludedPlaces.Add(id);
+            ExcludePlaceId = "";
+        });
+
+        public ICommand RemoveExcludedPlaceCommand => new RelayCommand<string>(id =>
+        {
+            if (id is null)
+                return;
+
+            ExcludedPlaces.Remove(id);
+            App.Settings.Prop.MatchmakerExcludedPlaces.Remove(id);
+        });
+
         public ICommand SearchCommand => new AsyncRelayCommand(SearchAsync);
 
         public ICommand JoinCommand => new RelayCommand<ServerListItem>(server =>

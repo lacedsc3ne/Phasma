@@ -22,6 +22,10 @@ namespace PhasmaStrap.UI.Elements.Settings
     {
         private Models.Persistable.WindowState _state => App.State.Prop.SettingsWindow;
 
+        private System.Windows.Forms.NotifyIcon? _trayIcon;
+
+        private bool _exitRequested = false;
+
         public MainWindow(bool showAlreadyRunningWarning)
         {
             var viewModel = new MainWindowViewModel();
@@ -276,6 +280,22 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void WpfUiWindow_Closing(object sender, CancelEventArgs e)
         {
+            var viewModel = (MainWindowViewModel)DataContext;
+
+            bool shouldMinimizeToTray = App.Settings.Prop.MinimizeToTrayOnClose
+                && !_exitRequested
+                && !viewModel.RestartAfterClose
+                && !viewModel.LaunchAfterClose
+                && !App.LaunchSettings.TestModeFlag.Active;
+
+            if (shouldMinimizeToTray)
+            {
+                // nothing is discarded by hiding the window, so skip the unsaved-changes prompt below
+                e.Cancel = true;
+                MinimizeToTray();
+                return;
+            }
+
             if (App.FastFlags.Changed || App.PendingSettingTasks.Any())
             {
                 var result = Frontend.ShowMessageBox(Strings.Menu_UnsavedChanges, MessageBoxImage.Warning, MessageBoxButton.YesNo);
@@ -293,8 +313,52 @@ namespace PhasmaStrap.UI.Elements.Settings
             App.State.Save();
         }
 
+        private void MinimizeToTray()
+        {
+            Hide();
+
+            if (_trayIcon is not null)
+                return;
+
+            _trayIcon = new System.Windows.Forms.NotifyIcon
+            {
+                Icon = Properties.Resources.IconPhasmaStrap,
+                Text = App.ProjectName,
+                Visible = true
+            };
+
+            _trayIcon.DoubleClick += (_, _) => RestoreFromTray();
+
+            var contextMenu = new System.Windows.Forms.ContextMenuStrip();
+            contextMenu.Items.Add(Strings.Common_Open, null, (_, _) => RestoreFromTray());
+            contextMenu.Items.Add(Strings.Common_Exit, null, (_, _) => ExitFromTray());
+            _trayIcon.ContextMenuStrip = contextMenu;
+        }
+
+        private void RestoreFromTray()
+        {
+            Show();
+            WindowState = System.Windows.WindowState.Normal;
+            Activate();
+
+            _trayIcon?.Dispose();
+            _trayIcon = null;
+        }
+
+        private void ExitFromTray()
+        {
+            _exitRequested = true;
+
+            _trayIcon?.Dispose();
+            _trayIcon = null;
+
+            Close();
+        }
+
         private void WpfUiWindow_Closed(object sender, EventArgs e)
         {
+            _trayIcon?.Dispose();
+
             ControllerService.Shutdown();
 
             var viewModel = (MainWindowViewModel)DataContext;

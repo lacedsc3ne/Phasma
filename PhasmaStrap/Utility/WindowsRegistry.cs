@@ -108,6 +108,26 @@ namespace PhasmaStrap.Utility
                 uriKey.SetValueSafe("", RobloxPlaceKey);
         }
 
+        private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+
+        /// <summary>
+        /// Adds a per-user Run key so PhasmaStrap opens to the settings window on Windows sign-in.
+        /// </summary>
+        public static void RegisterStartup()
+        {
+            using RegistryKey runKey = Registry.CurrentUser.CreateSubKey(RunKeyPath);
+            runKey.SetValueSafe(App.ProjectName, $"\"{Paths.Application}\" -settings");
+        }
+
+        /// <summary>
+        /// Removes the Run key added by <see cref="RegisterStartup"/>. Safe to call even if it was never set.
+        /// </summary>
+        public static void UnregisterStartup()
+        {
+            using RegistryKey? runKey = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true);
+            runKey?.DeleteValue(App.ProjectName, throwOnMissingValue: false);
+        }
+
         public static void Unregister(string key)
         {
             try

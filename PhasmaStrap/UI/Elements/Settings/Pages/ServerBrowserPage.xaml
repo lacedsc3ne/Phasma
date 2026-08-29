@@ -6,6 +6,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:ServerBrowserViewModel, IsDesignTimeCreatable=True}"
       Title="ServerBrowserPage"
@@ -45,6 +46,30 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <CheckBox Margin="0,0,16,6" Content="{Binding Display}" IsChecked="{Binding IsBlocked, Mode=TwoWay}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_Description}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_PlaceholderText}" Text="{Binding ExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddExcludedPlaceCommand, Mode=OneTime}" />
+        </StackPanel>
+        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding ExcludedPlaces, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </StackPanel>
+                    </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

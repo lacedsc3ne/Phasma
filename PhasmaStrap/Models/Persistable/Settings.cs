@@ -151,5 +151,16 @@ namespace PhasmaStrap.Models.Persistable
         // downloaded from. Left blank uses ClassicClients.DefaultBaseUrl - a third-party GitHub release archive
         // (see the comment on that constant). Only ever used if it resolves to an https:// GitHub releases URL.
         public string ClassicDownloadBaseUrl { get; set; } = "";
+
+        // launch PhasmaStrap (to the settings window, minimized to tray if MinimizeToTrayOnStartup is set) when
+        // Windows starts, via a per-user Run registry key - see WindowsRegistry.RegisterStartup/UnregisterStartup
+        public bool LaunchAtStartup { get; set; } = false;
+
+        // when closing the settings window while a classic client / matchmaker background session is active,
+        // minimize to the tray instead of exiting - see MainWindowViewModel's window-closing handling
+        public bool MinimizeToTrayOnClose { get; set; } = false;
+
+        // place IDs the matchmaker should never suggest as a candidate, regardless of MatchmakerAutoCandidates
+        public List<string> MatchmakerExcludedPlaces { get; set; } = new();
     }
 }

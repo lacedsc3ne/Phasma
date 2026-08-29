@@ -590,6 +590,12 @@ namespace PhasmaStrap
                 if (!long.TryParse(queryParams["placeId"], out long placeId) || placeId <= 0)
                     return;
 
+                if (App.Settings.Prop.MatchmakerExcludedPlaces.Contains(placeId.ToString()))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} is on the matchmaker exclusion list, skipping");
+                    return;
+                }
+
                 App.Logger.WriteLine(LOG_IDENT, $"Matchmaker is on, looking for a better server for place {placeId}");
 
                 int maxCandidates = Matchmaker.ResolveEffectiveCandidateCount();
