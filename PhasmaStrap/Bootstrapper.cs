@@ -571,11 +571,11 @@ namespace PhasmaStrap
             }
         }
 
-        // rewrites the launch URI to target a specific, better server, when the matchmaker
-        // is enabled. Only handles the "roblox://experiences/start?placeId=X" deep link
-        // format (what the modern web Play button, and PhasmaStrap's own Server Browser,
-        // both use) - the legacy ticket-based "roblox-player:...+placelauncherurl:..." format
-        // resolves its server assignment inside Roblox's own client and isn't rewritten here.
+        // rewrites the launch URI to target a specific, better server, when the matchmaker is
+        // enabled. Handles the "roblox://experiences/start?placeId=X" deep link format (what the
+        // modern web Play button, and PhasmaStrap's own Server Browser, both use); falls back to
+        // TryApplyLegacyTicketMatchmakingAsync for the older ticket-based
+        // "roblox-player:...+placelauncherurl:..." format some browsers/embeds still emit.
         private async Task TryApplyMatchmakingAsync()
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyMatchmakingAsync";
@@ -584,7 +584,10 @@ namespace PhasmaStrap
             {
                 Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
                 if (!uriMatch.Success)
+                {
+                    await TryApplyLegacyTicketMatchmakingAsync();
                     return;
+                }
 
                 string query = uriMatch.Groups[1].Value;
                 var queryParams = HttpUtility.ParseQueryString(query);
@@ -622,6 +625,57 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Matchmaking failed, launching normally: {ex.Message}");
             }
+        }
+
+        // legacy ticket-based launch format: "roblox-player:1+launchmode:play+...+placelauncherurl:<url-encoded
+        // PlaceLauncher.ashx URL>+...". The place/server assignment lives inside that embedded, separately-encoded
+        // URL rather than in the outer command line, so it needs its own extraction/rewrite instead of the simple
+        // query-string patch TryApplyMatchmakingAsync does for the modern deep-link format.
+        private async Task TryApplyLegacyTicketMatchmakingAsync()
+        {
+            const string LOG_IDENT = "Bootstrapper::TryApplyLegacyTicketMatchmakingAsync";
+
+            Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
+            if (!ticketMatch.Success)
+                return;
+
+            string decodedUrl = HttpUtility.UrlDecode(ticketMatch.Groups[1].Value);
+
+            int queryIndex = decodedUrl.IndexOf('?');
+            if (queryIndex < 0)
+                return;
+
+            var queryParams = HttpUtility.ParseQueryString(decodedUrl[(queryIndex + 1)..]);
+
+            if (!long.TryParse(queryParams["placeId"], out long placeId) || placeId <= 0)
+                return;
+
+            if (App.Settings.Prop.MatchmakerExcludedPlaces.Contains(placeId.ToString()))
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} is on the matchmaker exclusion list, skipping");
+                return;
+            }
+
+            App.Logger.WriteLine(LOG_IDENT, $"Matchmaker is on, looking for a better server for place {placeId} (legacy ticket launch)");
+
+            int maxCandidates = Matchmaker.ResolveEffectiveCandidateCount();
+            MatchmakerCandidate? winner = await Matchmaker.PickBestJobIdAsync(placeId, maxCandidates: maxCandidates);
+
+            if (winner is null)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "No better server found, letting Roblox assign one normally");
+                return;
+            }
+
+            queryParams["request"] = "RequestGameJob";
+            queryParams["gameId"] = winner.JobId;
+
+            string newUrl = decodedUrl[..queryIndex] + "?" + queryParams;
+            string newEncodedUrl = HttpUtility.UrlEncode(newUrl);
+
+            _launchCommandLine = _launchCommandLine[..ticketMatch.Groups[1].Index] + newEncodedUrl + _launchCommandLine[(ticketMatch.Groups[1].Index + ticketMatch.Groups[1].Length)..];
+
+            App.Logger.WriteLine(LOG_IDENT, $"Redirecting to {winner.DatacenterName} (about {winner.EstimatedPingMs}ms), JobId {winner.JobId}");
         }
 
         // shared with TryApplyFastFlagProfileAsync below - both need the placeId from the same
