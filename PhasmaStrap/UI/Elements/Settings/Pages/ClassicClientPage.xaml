@@ -8,6 +8,9 @@
       mc:Ignorable="d"
       Title="ClassicClientPage"
       Scrollable="True">
+    <ui:UiPage.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:UiPage.Resources>
     <StackPanel Margin="0,0,14,14">
         <TextBlock TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
             Runs a private Roblox server on your own machine and points classic/legacy Roblox clients at it, by
@@ -38,7 +41,51 @@
             </Grid>
 
             <TextBlock Margin="0,12,0,0" Text="{Binding EngineStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <TextBlock Margin="0,4,0,0" Text="{Binding EngineDataStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
             <TextBlock Margin="0,4,0,0" Text="{Binding RedirectStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+            <TextBlock Text="Acquire clients" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                Downloads the engine data pack and classic client archives from a third-party GitHub release
+                (not built or hosted by PhasmaStrap - see the code comment on ClassicClients.DefaultBaseUrl).
+                Every download is verified against that release's own published SHA-256 digest before it is
+                extracted.
+            </TextBlock>
+
+            <ui:Button Margin="0,8,0,0" Icon="ArrowDownload24" Content="Install engine data pack"
+                       HorizontalAlignment="Stretch" IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                       Command="{Binding InstallEngineCommand}" />
+
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableClients}" SelectedItem="{Binding SelectedAvailableClient, Mode=TwoWay}"
+                          DisplayMemberPath="Name" IsEnabled="{Binding IsNotBusy, Mode=OneWay}" />
+                <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="ArrowDownload24" Content="Install"
+                           IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                           Command="{Binding InstallSelectedClientCommand}" />
+            </Grid>
+
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:Button Grid.Column="0" Icon="ArrowSync24" Content="Update engine, maps and installed clients"
+                           HorizontalAlignment="Stretch" IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                           Command="{Binding UpdateAllCommand}" />
+                <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="Cancel" Appearance="Danger"
+                           IsEnabled="{Binding IsBusy, Mode=OneWay}" Command="{Binding CancelOperationCommand}" />
+            </Grid>
+
+            <ProgressBar Margin="0,8,0,0" Height="6" Minimum="0" Maximum="100"
+                         Value="{Binding ProgressValue, Mode=OneWay}"
+                         Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock Margin="0,4,0,0" Text="{Binding ProgressText, Mode=OneWay}" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
             <TextBlock Text="Installed clients" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
             <Grid Margin="0,8,0,0">

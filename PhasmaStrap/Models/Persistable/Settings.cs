@@ -146,5 +146,10 @@ namespace PhasmaStrap.Models.Persistable
         // frame generation (shader-based frame interpolation overlay)
         public int FrameGenModeIndex { get; set; } = 0;
         public int FrameGenQuality { get; set; } = 1;
+
+        // classic client acquisition (Integrations.ClassicClients): where the classic engine/client archives are
+        // downloaded from. Left blank uses ClassicClients.DefaultBaseUrl - a third-party GitHub release archive
+        // (see the comment on that constant). Only ever used if it resolves to an https:// GitHub releases URL.
+        public string ClassicDownloadBaseUrl { get; set; } = "";
     }
 }

@@ -9,6 +9,206 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class ClassicClientViewModel : NotifyPropertyChangedViewModel
     {
+        private bool _isBusy;
+        private double _progressValue;
+        private string _progressText = "";
+        private CancellationTokenSource? _operationCts;
+
+        public bool IsBusy
+        {
+            get => _isBusy;
+            private set { _isBusy = value; OnPropertyChanged(nameof(IsBusy)); OnPropertyChanged(nameof(IsNotBusy)); }
+        }
+
+        public bool IsNotBusy => !_isBusy;
+
+        public double ProgressValue
+        {
+            get => _progressValue;
+            private set { _progressValue = value; OnPropertyChanged(nameof(ProgressValue)); }
+        }
+
+        public string ProgressText
+        {
+            get => _progressText;
+            private set { _progressText = value; OnPropertyChanged(nameof(ProgressText)); }
+        }
+
+        public ObservableCollection<ClassicCatalogEntry> AvailableClients { get; } = new();
+
+        private ClassicCatalogEntry? _selectedAvailableClient;
+
+        public ClassicCatalogEntry? SelectedAvailableClient
+        {
+            get => _selectedAvailableClient;
+            set { _selectedAvailableClient = value; OnPropertyChanged(nameof(SelectedAvailableClient)); }
+        }
+
+        public string EngineDataStatus => ClassicClients.EngineDataInstalled
+            ? "The classic engine data pack (scripts, assets, maps) is installed."
+            : "The classic engine data pack is not installed yet - install it before installing a classic client.";
+
+        public ICommand InstallEngineCommand => new AsyncRelayCommand(InstallEngineAsync);
+
+        public ICommand InstallSelectedClientCommand => new AsyncRelayCommand(InstallSelectedClientAsync);
+
+        public ICommand UpdateAllCommand => new AsyncRelayCommand(UpdateAllAsync);
+
+        public ICommand CancelOperationCommand => new RelayCommand(CancelOperation);
+
+        public ClassicClientViewModel()
+        {
+            foreach (ClassicCatalogEntry entry in ClassicClients.Catalog)
+                AvailableClients.Add(entry);
+
+            _ = RefreshCatalogAsync();
+        }
+
+        private async Task RefreshCatalogAsync()
+        {
+            try
+            {
+                List<ClassicCatalogEntry> clients = await ClassicClients.FetchManifestClientsAsync(CancellationToken.None);
+                if (clients.Count == 0)
+                    return;
+
+                AvailableClients.Clear();
+                foreach (ClassicCatalogEntry entry in clients)
+                    AvailableClients.Add(entry);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("ClassicClientViewModel::RefreshCatalog", $"Failed to fetch remote catalog, keeping built-in list: {ex.Message}");
+            }
+        }
+
+        private void ReportProgress(double percent, string text)
+        {
+            // InstallEngineAsync/InstallClientAsync run on a background thread, but these are UI-bound
+            // properties - App.Current.Dispatcher marshals the update back to the UI thread.
+            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+            {
+                ProgressValue = Math.Clamp(percent, 0, 100);
+                ProgressText = text;
+            });
+        }
+
+        private async Task InstallEngineAsync()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+            ProgressValue = 0;
+            ProgressText = "Starting...";
+            _operationCts = new CancellationTokenSource();
+
+            try
+            {
+                await ClassicClients.InstallEngineAsync(ReportProgress, _operationCts.Token);
+                ProgressText = "Engine data installed.";
+            }
+            catch (OperationCanceledException)
+            {
+                ProgressText = "Cancelled.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("ClassicClientViewModel::InstallEngine", ex);
+                Frontend.ShowMessageBox($"Failed to install the classic engine data pack: {ex.Message}", System.Windows.MessageBoxImage.Error);
+                ProgressText = "Failed.";
+            }
+            finally
+            {
+                IsBusy = false;
+                _operationCts?.Dispose();
+                _operationCts = null;
+                OnPropertyChanged(nameof(EngineDataStatus));
+            }
+        }
+
+        private async Task InstallSelectedClientAsync()
+        {
+            if (IsBusy || SelectedAvailableClient is null)
+                return;
+
+            string code = SelectedAvailableClient.Code;
+
+            IsBusy = true;
+            ProgressValue = 0;
+            ProgressText = "Starting...";
+            _operationCts = new CancellationTokenSource();
+
+            try
+            {
+                await ClassicClients.InstallClientAsync(code, ReportProgress, _operationCts.Token);
+                ProgressText = $"{code} installed.";
+                RefreshClients();
+            }
+            catch (OperationCanceledException)
+            {
+                ProgressText = "Cancelled.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("ClassicClientViewModel::InstallClient", ex);
+                Frontend.ShowMessageBox($"Failed to install classic client {code}: {ex.Message}", System.Windows.MessageBoxImage.Error);
+                ProgressText = "Failed.";
+            }
+            finally
+            {
+                IsBusy = false;
+                _operationCts?.Dispose();
+                _operationCts = null;
+                OnPropertyChanged(nameof(EngineDataStatus));
+            }
+        }
+
+        private async Task UpdateAllAsync()
+        {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+            ProgressValue = 0;
+            ProgressText = "Checking for updates...";
+            _operationCts = new CancellationTokenSource();
+
+            try
+            {
+                await ClassicClients.UpdateEverythingAsync(
+                    SelectedClassicClient,
+                    text => ReportProgress(ProgressValue, text),
+                    ReportProgress,
+                    _operationCts.Token);
+                ProgressText = "Up to date.";
+                RefreshClients();
+            }
+            catch (OperationCanceledException)
+            {
+                ProgressText = "Cancelled.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("ClassicClientViewModel::UpdateAll", ex);
+                Frontend.ShowMessageBox($"Failed to update classic clients: {ex.Message}", System.Windows.MessageBoxImage.Error);
+                ProgressText = "Failed.";
+            }
+            finally
+            {
+                IsBusy = false;
+                _operationCts?.Dispose();
+                _operationCts = null;
+                OnPropertyChanged(nameof(EngineDataStatus));
+            }
+        }
+
+        private void CancelOperation()
+        {
+            try { _operationCts?.Cancel(); }
+            catch { }
+        }
+
         public bool ClassicClientEnabled
         {
             get => App.Settings.Prop.ClassicClientEnabled;
@@ -70,6 +270,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 InstalledClients.Add(client);
 
             OnPropertyChanged(nameof(EngineStatus));
+            OnPropertyChanged(nameof(EngineDataStatus));
             OnPropertyChanged(nameof(RedirectStatus));
         }
 

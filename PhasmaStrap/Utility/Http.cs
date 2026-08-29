@@ -47,5 +47,35 @@
 
             return Encoding.UTF8.GetString(output.ToArray());
         }
+
+        /// <summary>
+        /// Binary counterpart to <see cref="ReadStringBoundedAsync"/> - reads the content of an HTTP response as a
+        /// byte array, refusing to buffer more than <paramref name="maxBytes"/>. Used for API/metadata responses
+        /// that are not text but must still be bounded (e.g. GitHub release JSON read via a raw byte buffer before
+        /// UTF-8/JSON parsing, so a misbehaving endpoint can't exhaust memory).
+        /// </summary>
+        public static async Task<byte[]> ReadBytesBoundedAsync(HttpContent content, int maxBytes, CancellationToken token = default)
+        {
+            if (content.Headers.ContentLength is long contentLength && contentLength > maxBytes)
+                throw new InvalidOperationException("Response content exceeded the allowed size limit");
+
+            await using Stream input = await content.ReadAsStreamAsync(token);
+            using var output = new MemoryStream(content.Headers.ContentLength is long len && len > 0 ? (int)len : 4096);
+            byte[] buffer = new byte[8192];
+
+            while (true)
+            {
+                int read = await input.ReadAsync(buffer.AsMemory(0, buffer.Length), token);
+                if (read == 0)
+                    break;
+
+                if (output.Length + read > maxBytes)
+                    throw new InvalidOperationException("Response content exceeded the allowed size limit");
+
+                await output.WriteAsync(buffer.AsMemory(0, read), token);
+            }
+
+            return output.ToArray();
+        }
     }
 }
