@@ -16,6 +16,7 @@
     d:DataContext="{d:DesignInstance dmodels:BootstrapperEditorWindowViewModel,
                                      IsDesignTimeCreatable=True}"
     Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+    Closed="OnClosed"
     Closing="OnClosing"
     ExtendsContentIntoTitleBar="True"
     WindowStartupLocation="CenterScreen"
@@ -45,11 +46,21 @@
             Style="{StaticResource NewTextEditor}"
             SyntaxHighlighting="XML" />
 
-        <ui:Button
+        <StackPanel
             Grid.Row="2"
             Margin="10"
-            Command="{Binding Path=OpenThemeFolderCommand, Mode=OneTime}"
-            Content="{x:Static resources:Strings.CustomTheme_Editor_OpenThemeDirectory}" />
+            HorizontalAlignment="Left"
+            Orientation="Horizontal">
+            <ui:Button
+                Margin="0,0,4,0"
+                Command="{Binding Path=OpenThemeFolderCommand, Mode=OneTime}"
+                Content="{x:Static resources:Strings.CustomTheme_Editor_OpenThemeDirectory}" />
+
+            <ui:Button
+                Margin="4,0,0,0"
+                Click="OpenExternal_Click"
+                Content="{x:Static resources:Strings.CustomTheme_Editor_OpenExternal_Button}" />
+        </StackPanel>
 
         <Grid
             Grid.Row="2"

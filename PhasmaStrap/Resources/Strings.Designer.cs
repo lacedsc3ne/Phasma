@@ -8753,5 +8753,78 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlags.EngineScope.Places.PlaceholderText", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open in External Editor.
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_Button {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.Button", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open Editor.
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_Title {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No other code editors were found on this PC..
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_NoEditors {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.NoEditors", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Editing Theme.xml in {0}. Changes appear here when you save..
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_Launched {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.Launched", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Could not start {0}..
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_LaunchFailed {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.LaunchFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reloaded from {0}..
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_Reloaded {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.Reloaded", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open External Editor.
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_PickerTitle {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.PickerTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose which editor to open Theme.xml in.
+        /// </summary>
+        public static string CustomTheme_Editor_OpenExternal_PickerPrompt {
+            get {
+                return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.PickerPrompt", resourceCulture);
+            }
+        }
     }
 }
