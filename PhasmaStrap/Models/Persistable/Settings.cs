@@ -252,5 +252,10 @@ namespace PhasmaStrap.Models.Persistable
         // Bootstrapper.TryApplyEngineSettingsScopeAsync.
         public EngineSettingsScopeMode EngineSettingsScope { get; set; } = EngineSettingsScopeMode.All;
         public List<string> EngineSettingsScopedPlaces { get; set; } = new();
+
+        // bootstrapper theme editor (BootstrapperEditorWindow): remembers which detected external
+        // editor (its full .exe path, from Utility.ExternalEditor.Detect) "Open in External Editor"
+        // should launch directly next time, skipping the picker dialog. Empty means always ask.
+        public string PreferredExternalEditorPath { get; set; } = "";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using System.Windows.Threading;
 using System.Xml;
 
 using ICSharpCode.AvalonEdit.CodeCompletion;
@@ -8,6 +9,8 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Highlighting;
 
 using PhasmaStrap.UI.Elements.Base;
+using PhasmaStrap.UI.Elements.ContextMenu;
+using PhasmaStrap.UI.Elements.Controls;
 using PhasmaStrap.UI.ViewModels.Editor;
 using System.Windows;
 
@@ -134,6 +137,18 @@ namespace PhasmaStrap.UI.Elements.Editor
         private BootstrapperEditorWindowViewModel _viewModel;
         private CompletionWindow? _completionWindow = null;
 
+        // line-diff highlighting (ported from Voidstrap's LineDiff + TextMarkerService): shades
+        // lines that differ from the last-saved baseline so unsaved edits stand out in the gutter.
+        private TextMarkerService? _diffMarkerService;
+        private DispatcherTimer? _diffTimer;
+        private string _baselineCode = "";
+
+        // external editor integration (ported from Voidstrap's ExternalEditor/ExternalEditorPickerDialog):
+        // launches a locally installed editor on Theme.xml and reloads it here when that editor saves.
+        private ExternalEditorInfo? _externalEditor;
+        private FileSystemWatcher? _externalWatcher;
+        private DispatcherTimer? _externalReloadTimer;
+
         public BootstrapperEditorWindow(string name)
         {
             CustomBootstrapperSchema.ParseSchema();
@@ -158,6 +173,9 @@ namespace PhasmaStrap.UI.Elements.Editor
             UIXML.TextArea.TextEntered += OnTextAreaTextEntered;
 
             LoadHighlightingTheme();
+
+            _baselineCode = _viewModel.Code;
+            InitializeDiffHighlighting();
         }
 
         private void LoadHighlightingTheme()
@@ -173,9 +191,15 @@ namespace PhasmaStrap.UI.Elements.Editor
         private void ThemeSavedCallback(bool success, string message)
         {
             if (success)
+            {
+                _baselineCode = _viewModel.Code;
+                UpdateDiffHighlighting();
                 Snackbar.Show(Strings.CustomTheme_Editor_Save_Success, message, Wpf.Ui.Common.SymbolRegular.CheckmarkCircle32, Wpf.Ui.Common.ControlAppearance.Success);
+            }
             else
+            {
                 Snackbar.Show(Strings.CustomTheme_Editor_Save_Error, message, Wpf.Ui.Common.SymbolRegular.ErrorCircle24, Wpf.Ui.Common.ControlAppearance.Danger);
+            }
         }
 
         private static string ToCRLF(string text)
@@ -187,6 +211,7 @@ namespace PhasmaStrap.UI.Elements.Editor
         {
             _viewModel.Code = UIXML.Text;
             _viewModel.CodeChanged = true;
+            QueueDiffHighlighting();
         }
 
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -204,6 +229,236 @@ namespace PhasmaStrap.UI.Elements.Editor
                 _viewModel.SaveCommand.Execute(null);
             }
         }
+
+        private void OnClosed(object? sender, EventArgs e)
+        {
+            _diffTimer?.Stop();
+            if (_diffTimer != null)
+                _diffTimer.Tick -= DiffTimer_Tick;
+            _diffTimer = null;
+
+            StopExternalWatch();
+        }
+
+        #region Line-diff highlighting
+
+        private void InitializeDiffHighlighting()
+        {
+            _diffMarkerService = new TextMarkerService(UIXML.Document);
+            UIXML.TextArea.TextView.BackgroundRenderers.Add(_diffMarkerService);
+            UIXML.TextArea.TextView.LineTransformers.Add(_diffMarkerService);
+
+            _diffTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMilliseconds(200)
+            };
+            _diffTimer.Tick += DiffTimer_Tick;
+        }
+
+        private void QueueDiffHighlighting()
+        {
+            if (_diffTimer == null)
+                return;
+
+            _diffTimer.Stop();
+            _diffTimer.Start();
+        }
+
+        private void DiffTimer_Tick(object? sender, EventArgs e)
+        {
+            _diffTimer?.Stop();
+            UpdateDiffHighlighting();
+        }
+
+        private void UpdateDiffHighlighting()
+        {
+            if (_diffMarkerService == null)
+                return;
+
+            _diffMarkerService.RemoveAll(_ => true);
+
+            List<DiffLine> diff = LineDiff.Compare(_baselineCode, UIXML.Text);
+
+            foreach (DiffLine line in diff)
+            {
+                if (line.Kind != DiffKind.Added)
+                    continue;
+
+                if (line.NewNumber <= 0 || line.NewNumber > UIXML.Document.LineCount)
+                    continue;
+
+                var docLine = UIXML.Document.GetLineByNumber(line.NewNumber);
+                var marker = _diffMarkerService.Create(docLine.Offset, docLine.Length);
+                marker.BackgroundColor = System.Windows.Media.Color.FromArgb(0x2A, 0x4C, 0xAF, 0x50);
+            }
+
+            UIXML.TextArea.TextView.Redraw();
+        }
+
+        #endregion
+
+        #region External editor
+
+        private void OpenExternal_Click(object sender, RoutedEventArgs e)
+        {
+            IReadOnlyList<ExternalEditorInfo> editors = ExternalEditor.Detect();
+
+            if (editors.Count == 0)
+            {
+                Snackbar.Show(Strings.CustomTheme_Editor_OpenExternal_Title, Strings.CustomTheme_Editor_OpenExternal_NoEditors);
+                return;
+            }
+
+            ExternalEditorInfo? chosen = null;
+
+            if (!string.IsNullOrEmpty(App.Settings.Prop.PreferredExternalEditorPath))
+            {
+                foreach (var editor in editors)
+                {
+                    if (string.Equals(editor.Path, App.Settings.Prop.PreferredExternalEditorPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        chosen = editor;
+                        break;
+                    }
+                }
+            }
+
+            if (chosen == null)
+            {
+                var dialog = new ExternalEditorPickerDialog(editors) { Owner = this };
+                dialog.ShowDialog();
+
+                if (dialog.Result != MessageBoxResult.OK || dialog.SelectedEditor == null)
+                    return;
+
+                chosen = dialog.SelectedEditor;
+                App.Settings.Prop.PreferredExternalEditorPath = chosen.Path;
+                App.Settings.Save();
+            }
+
+            LaunchExternal(chosen);
+        }
+
+        private void LaunchExternal(ExternalEditorInfo editor)
+        {
+            // make sure the file on disk matches what's in the buffer before handing it off
+            _viewModel.SaveCommand.Execute(null);
+
+            string themePath = Path.Combine(_viewModel.Directory, "Theme.xml");
+
+            if (!ExternalEditor.Open(editor, themePath))
+            {
+                Snackbar.Show(Strings.CustomTheme_Editor_OpenExternal_Title, string.Format(Strings.CustomTheme_Editor_OpenExternal_LaunchFailed, editor.Name), Wpf.Ui.Common.SymbolRegular.ErrorCircle24, Wpf.Ui.Common.ControlAppearance.Danger);
+                return;
+            }
+
+            _externalEditor = editor;
+            StartExternalWatch(themePath);
+            Snackbar.Show(Strings.CustomTheme_Editor_OpenExternal_Title, string.Format(Strings.CustomTheme_Editor_OpenExternal_Launched, editor.Name));
+        }
+
+        private void StartExternalWatch(string themePath)
+        {
+            StopExternalWatch();
+
+            string? folder = Path.GetDirectoryName(themePath);
+            if (string.IsNullOrEmpty(folder))
+                return;
+
+            try
+            {
+                _externalWatcher = new FileSystemWatcher(folder, Path.GetFileName(themePath))
+                {
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+                    EnableRaisingEvents = true
+                };
+                _externalWatcher.Changed += OnExternalFileChanged;
+                _externalWatcher.Created += OnExternalFileChanged;
+            }
+            catch (Exception ex)
+            {
+                App.Logger?.WriteLine("BootstrapperEditorWindow", "Could not watch the theme file: " + ex.Message);
+                _externalWatcher = null;
+            }
+        }
+
+        private void StopExternalWatch()
+        {
+            if (_externalWatcher != null)
+            {
+                try
+                {
+                    _externalWatcher.EnableRaisingEvents = false;
+                    _externalWatcher.Changed -= OnExternalFileChanged;
+                    _externalWatcher.Created -= OnExternalFileChanged;
+                    _externalWatcher.Dispose();
+                }
+                catch
+                {
+                }
+
+                _externalWatcher = null;
+            }
+
+            if (_externalReloadTimer != null)
+            {
+                _externalReloadTimer.Stop();
+                _externalReloadTimer.Tick -= OnExternalReloadTick;
+                _externalReloadTimer = null;
+            }
+        }
+
+        private void OnExternalFileChanged(object sender, FileSystemEventArgs e)
+        {
+            if (Dispatcher.HasShutdownStarted)
+                return;
+
+            try
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (_externalReloadTimer == null)
+                    {
+                        _externalReloadTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+                        _externalReloadTimer.Tick += OnExternalReloadTick;
+                    }
+
+                    _externalReloadTimer.Stop();
+                    _externalReloadTimer.Start();
+                }));
+            }
+            catch (Exception ex)
+            {
+                App.Logger?.WriteLine("BootstrapperEditorWindow", "External reload dispatch failed: " + ex.Message);
+            }
+        }
+
+        private void OnExternalReloadTick(object? sender, EventArgs e)
+        {
+            _externalReloadTimer?.Stop();
+
+            string themePath = Path.Combine(_viewModel.Directory, "Theme.xml");
+
+            try
+            {
+                string text = ToCRLF(File.ReadAllText(themePath));
+
+                if (text == UIXML.Text)
+                    return;
+
+                int caret = UIXML.CaretOffset;
+                UIXML.Text = text;
+                UIXML.CaretOffset = Math.Min(caret, text.Length);
+
+                Snackbar.Show(Strings.CustomTheme_Editor_OpenExternal_Title, string.Format(Strings.CustomTheme_Editor_OpenExternal_Reloaded, _externalEditor?.Name ?? ""));
+            }
+            catch (Exception ex)
+            {
+                App.Logger?.WriteLine("BootstrapperEditorWindow", "Could not reload the theme: " + ex.Message);
+            }
+        }
+
+        #endregion
 
         private void OnTextAreaTextEntered(object sender, TextCompositionEventArgs e)
         {
