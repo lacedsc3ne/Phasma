@@ -150,6 +150,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Title}" PageType="{x:Type pages:FastFlagsPage}" Icon="Flag24" PageTag="fastflags" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagProfiles_Title}" PageType="{x:Type pages:FastFlagProfilesPage}" Icon="Games24" PageTag="fastflagprofiles" />
                     <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GBSEditor_Title}" PageType="{x:Type pages:GBSEditorPage}" Icon="WrenchScrewdriver20" PageTag="gbseditor" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Nvidia_Title}" PageType="{x:Type pages:NvidiaPage}" Icon="TopSpeed24" PageTag="nvidia" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />

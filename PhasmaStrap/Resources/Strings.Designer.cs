@@ -1495,7 +1495,88 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Dialog.AddFastFlag.Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Available Channels.
+        /// </summary>
+        public static string Dialog_ChannelLists_Title {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse known deployment channels and their currently deployed version..
+        /// </summary>
+        public static string Dialog_ChannelLists_Description {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Channel Name.
+        /// </summary>
+        public static string Dialog_ChannelLists_ColumnChannel {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.ColumnChannel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string Dialog_ChannelLists_ColumnVersion {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.ColumnVersion", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version GUID.
+        /// </summary>
+        public static string Dialog_ChannelLists_ColumnVersionGuid {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.ColumnVersionGuid", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading channels....
+        /// </summary>
+        public static string Dialog_ChannelLists_Loading {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.Loading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string Dialog_ChannelLists_Refresh {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.Refresh", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        public static string Dialog_ChannelLists_Select {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.Select", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Browse all channels....
+        /// </summary>
+        public static string Dialog_ChannelLists_BrowseButton {
+            get {
+                return ResourceManager.GetString("Dialog.ChannelLists.BrowseButton", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Please wait for installation to finish..
         /// </summary>
@@ -8012,6 +8093,96 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to System-level tweaks.
+        /// </summary>
+        public static string Menu_Performance_SystemBoost_Header {
+            get {
+                return ResourceManager.GetString("Menu.Performance.SystemBoost.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to These don't touch a single Roblox FastFlag - they change how Windows itself treats the Roblox process, which is where a lot of the FPS gap on laptops and background-heavy PCs actually comes from..
+        /// </summary>
+        public static string Menu_Performance_SystemBoost_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.SystemBoost.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Force high-performance GPU.
+        /// </summary>
+        public static string Menu_Performance_ForceHighPerformanceGpu_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ForceHighPerformanceGpu.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to On laptops with both an integrated and a dedicated GPU, pins Roblox to the dedicated one. Windows sometimes runs Roblox on the weaker integrated GPU by default since it isn't recognized as a full-screen game..
+        /// </summary>
+        public static string Menu_Performance_ForceHighPerformanceGpu_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.ForceHighPerformanceGpu.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Disable Game Bar / Game DVR for Roblox.
+        /// </summary>
+        public static string Menu_Performance_DisableGameDVR_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.DisableGameDVR.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Stops Xbox Game Bar's background recording from hooking into Roblox, which costs some FPS and can add input latency even when you never open the overlay..
+        /// </summary>
+        public static string Menu_Performance_DisableGameDVR_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.DisableGameDVR.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Smoother frame pacing.
+        /// </summary>
+        public static string Menu_Performance_BoostTimerResolution_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.BoostTimerResolution.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Raises the system timer resolution while you're in a game, the same trick most FPS-unlocker tools use to reduce stutter and frame-time inconsistency. Small effect, no downside beyond marginally higher power use..
+        /// </summary>
+        public static string Menu_Performance_BoostTimerResolution_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.BoostTimerResolution.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use High performance power plan in-game.
+        /// </summary>
+        public static string Menu_Performance_UseHighPerformancePowerPlan_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.UseHighPerformancePowerPlan.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Switches Windows to the High performance power plan while playing and restores your previous plan afterward. Matters most on laptops, where the default Balanced plan throttles CPU boost clocks..
+        /// </summary>
+        public static string Menu_Performance_UseHighPerformancePowerPlan_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.UseHighPerformancePowerPlan.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Multi-monitor and in-game resolution.
         /// </summary>
         public static string Menu_Performance_Display_Header {
@@ -8826,5 +8997,249 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("CustomTheme.Editor.OpenExternal.PickerPrompt", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to GBS Editor.
+        /// </summary>
+        public static string Menu_GBSEditor_Title {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Directly view, add, edit, and remove every raw key stored in Roblox's GlobalBasicSettings file, not just the curated toggles on the Performance page..
+        /// </summary>
+        public static string Menu_GBSEditor_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use with caution..
+        /// </summary>
+        public static string Menu_GBSEditor_BannerTitle {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.BannerTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Values are not validated. Misusing this can lead to instability or unexpected things happening..
+        /// </summary>
+        public static string Menu_GBSEditor_BannerText {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.BannerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Lock settings file.
+        /// </summary>
+        public static string Menu_GBSEditor_LockFile {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.LockFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marks the Roblox settings file read only so Roblox cannot overwrite your changes..
+        /// </summary>
+        public static string Menu_GBSEditor_LockFileDescription {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.LockFileDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add new.
+        /// </summary>
+        public static string Menu_GBSEditor_AddNew {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.AddNew", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete selected.
+        /// </summary>
+        public static string Menu_GBSEditor_DeleteSelected {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.DeleteSelected", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A setting with this name already exists..
+        /// </summary>
+        public static string Menu_GBSEditor_AlreadyExists {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.AlreadyExists", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a name for the setting..
+        /// </summary>
+        public static string Menu_GBSEditor_InvalidName {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.InvalidName", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string Menu_GBSEditor_Type {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Type", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to RPC Debug.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Title {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This is a live view of what PhasmaStrap is currently telling Discord to display for your session..
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Description {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No Rich Presence is currently active..
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Placeholder {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Placeholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Details {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Details", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to State.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_State {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.State", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Images.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Images {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Images", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Large Image Key.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_LargeImageKey {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.LargeImageKey", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Large Image Text.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_LargeImageText {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.LargeImageText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Small Image Key.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_SmallImageKey {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.SmallImageKey", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Small Image Text.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_SmallImageText {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.SmallImageText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Timestamps.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Timestamps {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Timestamps", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Start.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_TimestampStart {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.TimestampStart", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to End.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_TimestampEnd {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.TimestampEnd", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Buttons.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_Buttons {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.Buttons", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No buttons are currently set..
+        /// </summary>
+        public static string ContextMenu_RPCWindow_NoButtons {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.NoButtons", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Last updated:.
+        /// </summary>
+        public static string ContextMenu_RPCWindow_LastUpdated {
+            get {
+                return ResourceManager.GetString("ContextMenu.RPCWindow.LastUpdated", resourceCulture);
+            }
+        }
+
     }
 }

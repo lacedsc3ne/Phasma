@@ -278,6 +278,33 @@ Click for more information</value>
   <data name="Dialog.AddFastFlag.Title" xml:space="preserve">
     <value>Add Fast Flag</value>
   </data>
+  <data name="Dialog.ChannelLists.Title" xml:space="preserve">
+    <value>Available Channels</value>
+  </data>
+  <data name="Dialog.ChannelLists.Description" xml:space="preserve">
+    <value>Browse known deployment channels and their currently deployed version.</value>
+  </data>
+  <data name="Dialog.ChannelLists.ColumnChannel" xml:space="preserve">
+    <value>Channel Name</value>
+  </data>
+  <data name="Dialog.ChannelLists.ColumnVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="Dialog.ChannelLists.ColumnVersionGuid" xml:space="preserve">
+    <value>Version GUID</value>
+  </data>
+  <data name="Dialog.ChannelLists.Loading" xml:space="preserve">
+    <value>Loading channels...</value>
+  </data>
+  <data name="Dialog.ChannelLists.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Dialog.ChannelLists.Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Dialog.ChannelLists.BrowseButton" xml:space="preserve">
+    <value>Browse all channels...</value>
+  </data>
   <data name="Dialog.Connectivity.MoreInfo" xml:space="preserve">
     <value>More information:</value>
   </data>
@@ -2870,6 +2897,36 @@ Example:
   <data name="Menu.Performance.SoftwareRendering.Description" xml:space="preserve">
     <value>Disables GPU-accelerated rendering for PhasmaStrap's own windows. Useful if you're seeing rendering glitches or crashes related to your graphics driver.</value>
   </data>
+  <data name="Menu.Performance.SystemBoost.Header" xml:space="preserve">
+    <value>System-level tweaks</value>
+  </data>
+  <data name="Menu.Performance.SystemBoost.Description" xml:space="preserve">
+    <value>These don't touch a single Roblox FastFlag - they change how Windows itself treats the Roblox process, which is where a lot of the FPS gap on laptops and background-heavy PCs actually comes from.</value>
+  </data>
+  <data name="Menu.Performance.ForceHighPerformanceGpu.Title" xml:space="preserve">
+    <value>Force high-performance GPU</value>
+  </data>
+  <data name="Menu.Performance.ForceHighPerformanceGpu.Description" xml:space="preserve">
+    <value>On laptops with both an integrated and a dedicated GPU, pins Roblox to the dedicated one. Windows sometimes runs Roblox on the weaker integrated GPU by default since it isn't recognized as a full-screen game.</value>
+  </data>
+  <data name="Menu.Performance.DisableGameDVR.Title" xml:space="preserve">
+    <value>Disable Game Bar / Game DVR for Roblox</value>
+  </data>
+  <data name="Menu.Performance.DisableGameDVR.Description" xml:space="preserve">
+    <value>Stops Xbox Game Bar's background recording from hooking into Roblox, which costs some FPS and can add input latency even when you never open the overlay.</value>
+  </data>
+  <data name="Menu.Performance.BoostTimerResolution.Title" xml:space="preserve">
+    <value>Smoother frame pacing</value>
+  </data>
+  <data name="Menu.Performance.BoostTimerResolution.Description" xml:space="preserve">
+    <value>Raises the system timer resolution while you're in a game, the same trick most FPS-unlocker tools use to reduce stutter and frame-time inconsistency. Small effect, no downside beyond marginally higher power use.</value>
+  </data>
+  <data name="Menu.Performance.UseHighPerformancePowerPlan.Title" xml:space="preserve">
+    <value>Use High performance power plan in-game</value>
+  </data>
+  <data name="Menu.Performance.UseHighPerformancePowerPlan.Description" xml:space="preserve">
+    <value>Switches Windows to the High performance power plan while playing and restores your previous plan afterward. Matters most on laptops, where the default Balanced plan throttles CPU boost clocks.</value>
+  </data>
   <data name="Menu.Performance.Display.Header" xml:space="preserve">
     <value>Multi-monitor and in-game resolution</value>
   </data>
@@ -3172,5 +3229,87 @@ Example:
   </data>
   <data name="CustomTheme.Editor.OpenExternal.PickerPrompt" xml:space="preserve">
     <value>Choose which editor to open Theme.xml in</value>
+  </data>
+  <data name="Menu.GBSEditor.Title" xml:space="preserve">
+    <value>GBS Editor</value>
+  </data>
+  <data name="Menu.GBSEditor.Description" xml:space="preserve">
+    <value>Directly view, add, edit, and remove every raw key stored in Roblox's GlobalBasicSettings file, not just the curated toggles on the Performance page.</value>
+  </data>
+  <data name="Menu.GBSEditor.BannerTitle" xml:space="preserve">
+    <value>Use with caution.</value>
+  </data>
+  <data name="Menu.GBSEditor.BannerText" xml:space="preserve">
+    <value>Values are not validated. Misusing this can lead to instability or unexpected things happening.</value>
+    <comment>The element that this string is rendered in *cannot be wrapped* and may be truncated when displayed if too long. If so, try and paraphrase a shortened version.</comment>
+  </data>
+  <data name="Menu.GBSEditor.LockFile" xml:space="preserve">
+    <value>Lock settings file</value>
+  </data>
+  <data name="Menu.GBSEditor.LockFileDescription" xml:space="preserve">
+    <value>Marks the Roblox settings file read only so Roblox cannot overwrite your changes.</value>
+  </data>
+  <data name="Menu.GBSEditor.AddNew" xml:space="preserve">
+    <value>Add new</value>
+  </data>
+  <data name="Menu.GBSEditor.DeleteSelected" xml:space="preserve">
+    <value>Delete selected</value>
+  </data>
+  <data name="Menu.GBSEditor.AlreadyExists" xml:space="preserve">
+    <value>A setting with this name already exists.</value>
+  </data>
+  <data name="Menu.GBSEditor.InvalidName" xml:space="preserve">
+    <value>Enter a name for the setting.</value>
+  </data>
+  <data name="Menu.GBSEditor.Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Title" xml:space="preserve">
+    <value>RPC Debug</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Description" xml:space="preserve">
+    <value>This is a live view of what PhasmaStrap is currently telling Discord to display for your session.</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Placeholder" xml:space="preserve">
+    <value>No Rich Presence is currently active.</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Images" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.LargeImageKey" xml:space="preserve">
+    <value>Large Image Key</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.LargeImageText" xml:space="preserve">
+    <value>Large Image Text</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.SmallImageKey" xml:space="preserve">
+    <value>Small Image Key</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.SmallImageText" xml:space="preserve">
+    <value>Small Image Text</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Timestamps" xml:space="preserve">
+    <value>Timestamps</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.TimestampStart" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.TimestampEnd" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.Buttons" xml:space="preserve">
+    <value>Buttons</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.NoButtons" xml:space="preserve">
+    <value>No buttons are currently set.</value>
+  </data>
+  <data name="ContextMenu.RPCWindow.LastUpdated" xml:space="preserve">
+    <value>Last updated:</value>
   </data>
 </root>

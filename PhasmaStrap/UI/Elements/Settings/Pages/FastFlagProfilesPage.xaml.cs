@@ -83,14 +83,12 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             if (_selectedProfileName is null || !App.Settings.Prop.FastFlagProfiles.TryGetValue(_selectedProfileName, out var flags))
             {
                 EditingProfileTextBlock.Text = Strings.Menu_FastFlagProfiles_NoProfileSelectedHint;
-                FlagsDataGrid.IsEnabled = false;
                 AddFlagButton.IsEnabled = false;
                 DeleteFlagsButton.IsEnabled = false;
                 return;
             }
 
             EditingProfileTextBlock.Text = string.Format(Strings.Menu_FastFlagProfiles_EditingProfile, _selectedProfileName);
-            FlagsDataGrid.IsEnabled = true;
             AddFlagButton.IsEnabled = true;
 
             foreach (var pair in flags.OrderBy(x => x.Key))

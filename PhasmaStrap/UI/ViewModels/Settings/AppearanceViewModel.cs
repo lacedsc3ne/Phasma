@@ -101,10 +101,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public static List<string> Languages => Locale.GetLanguages();
 
-        public string SelectedLanguage 
-        { 
-            get => Locale.SupportedLocales[App.Settings.Prop.Locale]; 
-            set => App.Settings.Prop.Locale = Locale.GetIdentifierFromName(value);
+        public string SelectedLanguage
+        {
+            get => Locale.SupportedLocales[App.Settings.Prop.Locale];
+            set
+            {
+                string identifier = Locale.GetIdentifierFromName(value);
+
+                App.Settings.Prop.Locale = identifier;
+                Locale.Set(identifier);
+
+                // take effect immediately in every currently open window, rather than requiring
+                // a restart - see UI/LiveLanguageRefresher.cs for how/why
+                LiveLanguageRefresher.RefreshAllOpenWindows();
+            }
         }
 
         public IEnumerable<BootstrapperStyle> Dialogs { get; } = BootstrapperStyleEx.Selections;

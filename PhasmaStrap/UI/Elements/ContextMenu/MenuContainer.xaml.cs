@@ -29,6 +29,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private ChatLogs? _chatLogsWindow;
 
+        private RPCWindow? _rpcWindow;
+
         public MenuContainer(Watcher watcher)
         {
             InitializeComponent();
@@ -50,6 +52,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             if (App.Settings.Prop.GameChatEnabled)
                 ChatLogsMenuItem.Visibility = Visibility.Visible;
+
+            if (App.Settings.Prop.UseDiscordRichPresence)
+                RPCDebugMenuItem.Visibility = Visibility.Visible;
 
             VersionTextBlock.Text = $"{App.ProjectName} v{App.Version}";
         }
@@ -187,6 +192,23 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 _chatLogsWindow.ShowDialog();
             else
                 _chatLogsWindow.Activate();
+        }
+
+        private void RPCDebugMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_watcher.RichPresence is null)
+                return;
+
+            if (_rpcWindow is null)
+            {
+                _rpcWindow = new(_watcher.RichPresence);
+                _rpcWindow.Closed += (_, _) => _rpcWindow = null;
+            }
+
+            if (!_rpcWindow.IsVisible)
+                _rpcWindow.ShowDialog();
+            else
+                _rpcWindow.Activate();
         }
     }
 }

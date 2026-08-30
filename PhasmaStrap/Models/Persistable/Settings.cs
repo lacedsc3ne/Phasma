@@ -205,6 +205,15 @@ namespace PhasmaStrap.Models.Persistable
         public string SelectedCpuPriority { get; set; } = "Automatic";
         public string RobloxPriorityLimit { get; set; } = "Normal";
 
+        // system-level FPS tweaks that don't touch a single FastFlag (see SystemPerformanceBoost):
+        // pin Roblox to the discrete/high-performance GPU, stop Game Bar/DVR from hooking the
+        // process, raise the multimedia timer resolution, and use the High performance power plan
+        // while a session is active
+        public bool ForceHighPerformanceGpu { get; set; } = false;
+        public bool DisableGameDVR { get; set; } = false;
+        public bool BoostTimerResolution { get; set; } = false;
+        public bool UseHighPerformancePowerPlan { get; set; } = false;
+
         // launcher memory manager (ported from Voidstrap MemoryManager): tiered memory-pressure
         // handling for PhasmaStrap's own process while it's backgrounded, not Roblox's
         public bool LauncherMemoryManagerEnabled { get; set; } = false;

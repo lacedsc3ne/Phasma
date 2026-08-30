@@ -1,0 +1,103 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.GBSEditorPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="GBSEditorPage"
+      Loaded="Page_Loaded">
+    <Grid Margin="0,0,14,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Margin="0,0,0,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <ui:InfoBar Grid.Row="1" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_GBSEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_GBSEditor_BannerText}" Severity="Warning" IsClosable="False" />
+
+        <controls:OptionControl Grid.Row="2" Margin="0,0,0,16" Header="{x:Static resources:Strings.Menu_GBSEditor_LockFile}" Description="{x:Static resources:Strings.Menu_GBSEditor_LockFileDescription}">
+            <ui:ToggleSwitch IsChecked="{Binding SettingsFileReadOnly, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <WrapPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom">
+            <ui:TextBox x:Name="NewNameTextBox" Width="180" Margin="0,0,8,12" PlaceholderText="{x:Static resources:Strings.Common_Name}" />
+            <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="token" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
+            <ui:TextBox x:Name="NewValueTextBox" Width="180" Margin="0,0,12,12" PlaceholderText="{x:Static resources:Strings.Common_Value}" />
+            <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_GBSEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,12" />
+            <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_GBSEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger" Margin="0,0,12,12">
+                <ui:Button.Style>
+                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=DataGrid, Path=SelectedItems.Count}" Value="0">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:Button.Style>
+            </ui:Button>
+        </WrapPanel>
+
+        <DataGrid Name="DataGrid" Grid.Row="4" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+            <DataGrid.Style>
+                <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                </Style>
+            </DataGrid.Style>
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Padding" Value="8,0,8,0" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border Background="{TemplateBinding Background}" Padding="6,0,6,0">
+                                    <ContentPresenter VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.CellStyle>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="{x:Static resources:Strings.Menu_GBSEditor_Type}" Binding="{Binding Type}" />
+                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</ui:UiPage>

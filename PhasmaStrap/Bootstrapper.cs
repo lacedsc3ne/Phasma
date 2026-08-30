@@ -1610,12 +1610,22 @@ namespace PhasmaStrap
 
                 Directory.CreateDirectory(Path.GetDirectoryName(fileVersionFolder)!);
 
+                // the mod source file may itself be a OneDrive placeholder that hasn't been
+                // downloaded locally yet, which would otherwise make the copy below fail
+                CloudFiles.Hydrate(fileModFolder);
+
                 Filesystem.AssertReadOnly(fileVersionFolder);
                 try
                 {
                     File.Copy(fileModFolder, fileVersionFolder, true);
                     Filesystem.AssertReadOnly(fileVersionFolder);
                     App.Logger.WriteLine(LOG_IDENT, $"{relativeFile} has been copied to the version folder");
+                }
+                catch (Exception ex) when (CloudFiles.IsCloudFailure(ex, fileModFolder) || CloudFiles.IsCloudFailure(ex, fileVersionFolder))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Failed to apply modification ({relativeFile}) because a OneDrive/cloud-synced file was not available locally");
+                    App.Logger.WriteException(LOG_IDENT, ex);
+                    success = false;
                 }
                 catch (Exception ex)
                 {

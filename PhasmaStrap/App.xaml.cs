@@ -458,6 +458,20 @@ namespace PhasmaStrap
 
                 try
                 {
+                    // GPU preference and Game DVR are persistent per-user registry associations, not
+                    // something tied to a running Roblox process - reapply them on every start so a
+                    // manual registry change (or a Windows update resetting Game Bar) doesn't quietly
+                    // undo what the toggle says should be in effect.
+                    Integrations.SystemPerformanceBoost.ApplyGpuPreference();
+                    Integrations.SystemPerformanceBoost.ApplyGameDvr();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"System performance boost setup failed: {ex.Message}");
+                }
+
+                try
+                {
                     CpuCoreLimiter.ApplyConfiguredLimit();
                 }
                 catch (Exception ex)

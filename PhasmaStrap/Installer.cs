@@ -48,6 +48,10 @@ namespace PhasmaStrap
             {
                 Filesystem.AssertReadOnly(Paths.Application);
 
+                // if a previous install left behind a OneDrive/cloud-synced placeholder at this
+                // path, force it to hydrate first so the overwrite below doesn't fail
+                CloudFiles.Hydrate(Paths.Application);
+
                 try
                 {
                     File.Copy(Paths.Process, Paths.Application, true);
@@ -407,6 +411,10 @@ namespace PhasmaStrap
             App.Logger.WriteLine(LOG_IDENT, "Doing upgrade");
 
             Filesystem.AssertReadOnly(Paths.Application);
+
+            // in case the install folder was later swept up by OneDrive/Known Folder Move and the
+            // executable became a cloud-only placeholder, hydrate it before we try to overwrite it
+            CloudFiles.Hydrate(Paths.Application);
 
             using (var ipl = new InterProcessLock("AutoUpdater", TimeSpan.FromSeconds(5)))
             {

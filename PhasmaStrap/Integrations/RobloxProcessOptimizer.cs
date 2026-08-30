@@ -394,7 +394,7 @@ namespace PhasmaStrap.Integrations
             string priority = settings.RobloxPriorityLimit?.Trim() ?? "Normal";
             if (priority.Equals("Realtime", StringComparison.OrdinalIgnoreCase))
             {
-                return ProcessPriorityClass.High;
+                return ProcessPriorityClass.RealTime;
             }
             if (priority.Equals("High", StringComparison.OrdinalIgnoreCase))
             {
