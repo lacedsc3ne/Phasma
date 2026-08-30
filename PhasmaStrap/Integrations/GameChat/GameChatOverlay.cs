@@ -911,6 +911,7 @@ namespace PhasmaStrap.Integrations.GameChat
 
         private void OnClientMessage(object? sender, GameChatMessage msg)
         {
+            GameChatLog.Record(_client.ChannelId, msg.Sender, msg.Text);
             DispatchUi(() => AppendChatMessage(msg));
         }
 

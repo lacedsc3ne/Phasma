@@ -27,6 +27,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private OutputConsole? _outputConsoleWindow;
 
+        private ChatLogs? _chatLogsWindow;
+
         public MenuContainer(Watcher watcher)
         {
             InitializeComponent();
@@ -45,6 +47,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             if (_watcher.RichPresence is not null)
                 RichPresenceMenuItem.Visibility = Visibility.Visible;
+
+            if (App.Settings.Prop.GameChatEnabled)
+                ChatLogsMenuItem.Visibility = Visibility.Visible;
 
             VersionTextBlock.Text = $"{App.ProjectName} v{App.Version}";
         }
@@ -168,6 +173,20 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 _outputConsoleWindow.ShowDialog();
             else
                 _outputConsoleWindow.Activate();
+        }
+
+        private void ChatLogsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_chatLogsWindow is null)
+            {
+                _chatLogsWindow = new();
+                _chatLogsWindow.Closed += (_, _) => _chatLogsWindow = null;
+            }
+
+            if (!_chatLogsWindow.IsVisible)
+                _chatLogsWindow.ShowDialog();
+            else
+                _chatLogsWindow.Activate();
         }
     }
 }
