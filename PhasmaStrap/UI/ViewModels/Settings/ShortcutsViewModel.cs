@@ -1,6 +1,8 @@
 ﻿using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
+using PhasmaStrap.Utility;
+
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class ShortcutsViewModel : NotifyPropertyChangedViewModel
@@ -70,5 +72,48 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ShortcutTask SettingsIconTask { get; } = new("Settings", Paths.Desktop, $"{Strings.Menu_Title}.lnk", "-settings");
 
         public ExtractIconsTask ExtractIconsTask { get; } = new();
+
+        // --- per-game shortcut creator (deep-links into one specific game, with that game's own icon) ---
+
+        private string _gameShortcutInput = "";
+
+        public string GameShortcutInput
+        {
+            get => _gameShortcutInput;
+            set { _gameShortcutInput = value; OnPropertyChanged(nameof(GameShortcutInput)); }
+        }
+
+        private string _gameShortcutStatus = "";
+
+        public string GameShortcutStatus
+        {
+            get => _gameShortcutStatus;
+            private set { _gameShortcutStatus = value; OnPropertyChanged(nameof(GameShortcutStatus)); }
+        }
+
+        private bool _gameShortcutBusy;
+
+        public bool GameShortcutBusy
+        {
+            get => _gameShortcutBusy;
+            private set { _gameShortcutBusy = value; OnPropertyChanged(nameof(GameShortcutBusy)); }
+        }
+
+        public ICommand CreateGameShortcutCommand => new AsyncRelayCommand(async () =>
+        {
+            if (string.IsNullOrWhiteSpace(GameShortcutInput))
+                return;
+
+            GameShortcutBusy = true;
+            GameShortcutStatus = "";
+
+            GameShortcutCreator.Result result = await GameShortcutCreator.CreateAsync(GameShortcutInput, Paths.Desktop);
+
+            GameShortcutStatus = result.Message;
+            GameShortcutBusy = false;
+
+            if (result.Success)
+                GameShortcutInput = "";
+        });
     }
 }

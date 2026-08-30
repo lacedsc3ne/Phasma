@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="ChannelPage"
       Scrollable="True">
@@ -22,11 +23,17 @@
         <controls:OptionControl
             Header="Roblox channel"
             Description="Leave blank to use Roblox's default (production) channel. Pick a known channel below, or type a custom one.">
-            <ui:AutoSuggestBox
-                Width="240"
-                PlaceholderText="production"
-                Text="{Binding RobloxChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding KnownChannels, Mode=OneTime}" />
+            <StackPanel Orientation="Horizontal">
+                <ui:AutoSuggestBox
+                    Width="240"
+                    PlaceholderText="production"
+                    Text="{Binding RobloxChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding KnownChannels, Mode=OneTime}" />
+                <ui:Button
+                    Margin="8,0,0,0"
+                    Content="{x:Static resources:Strings.Dialog_ChannelLists_BrowseButton}"
+                    Click="BrowseChannelsButton_Click" />
+            </StackPanel>
         </controls:OptionControl>
 
         <controls:OptionControl

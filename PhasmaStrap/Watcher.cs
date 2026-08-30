@@ -133,6 +133,12 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameJoin += (_, _) => MemoryManager.SetGameplayActive(true);
                     ActivityWatcher.OnGameLeave += (_, _) => MemoryManager.SetGameplayActive(false);
                 }
+
+                if (App.Settings.Prop.BoostTimerResolution || App.Settings.Prop.UseHighPerformancePowerPlan)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => SystemPerformanceBoost.OnGameJoin();
+                    ActivityWatcher.OnGameLeave += (_, _) => SystemPerformanceBoost.OnGameLeave();
+                }
             }
 
             _notifyIcon = new(this);

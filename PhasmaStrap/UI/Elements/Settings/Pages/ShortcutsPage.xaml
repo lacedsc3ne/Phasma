@@ -90,5 +90,15 @@
         <controls:OptionControl Header="Studio Rich Presence" Description="Shows a separate Discord status while Roblox Studio is open.">
             <ui:ToggleSwitch IsChecked="{Binding StudioRichPresenceEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="Game shortcuts" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Create a desktop shortcut that launches straight into one specific game, using that game's own icon. Enter a place ID or a roblox.com/games/... link." />
+
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <ui:TextBox Width="260" PlaceholderText="Place ID or game link" Text="{Binding GameShortcutInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Margin="8,0,0,0" Content="Create shortcut" Icon="Add28" Command="{Binding CreateGameShortcutCommand, Mode=OneTime}" />
+        </StackPanel>
+
+        <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding GameShortcutStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
     </StackPanel>
 </ui:UiPage>

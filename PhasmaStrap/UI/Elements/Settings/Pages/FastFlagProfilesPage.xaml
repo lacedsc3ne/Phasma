@@ -36,7 +36,7 @@
             <ui:Button x:Name="DeleteFlagsButton" Content="{x:Static resources:Strings.Menu_FastFlagProfiles_DeleteSelectedFlags}" Icon="Delete48" Appearance="Danger" Click="DeleteFlagsButton_Click" Margin="0,0,8,8" IsEnabled="False" />
         </WrapPanel>
 
-        <DataGrid x:Name="FlagsDataGrid" Height="220" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsEnabled="False" CellEditEnding="FlagsDataGrid_CellEditEnding" SelectionChanged="FlagsDataGrid_SelectionChanged">
+        <DataGrid x:Name="FlagsDataGrid" Height="220" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CellEditEnding="FlagsDataGrid_CellEditEnding" SelectionChanged="FlagsDataGrid_SelectionChanged">
             <DataGrid.Style>
                 <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                     <Setter Property="Background" Value="Transparent" />

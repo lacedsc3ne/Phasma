@@ -76,6 +76,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             string fastFlagProfiles = Strings.Menu_FastFlagProfiles_Title;
             string channel = "Channel";
             string performance = "Performance";
+            string gbsEditor = Strings.Menu_GBSEditor_Title;
             string nvidia = "NVIDIA";
             string networking = "Networking";
             string servers = "Servers";
@@ -261,6 +262,10 @@ namespace PhasmaStrap.UI.Elements.Settings
                 Entry("PhasmaStrap download cache", "", typeof(PerformancePage), performance),
                 Entry("Roblox logs", "", typeof(PerformancePage), performance),
                 Entry("Roblox cache", "", typeof(PerformancePage), performance),
+
+                // GBS Editor
+                Entry(Strings.Menu_GBSEditor_Title, Strings.Menu_GBSEditor_Description, typeof(GBSEditorPage), gbsEditor),
+                Entry(Strings.Menu_GBSEditor_LockFile, Strings.Menu_GBSEditor_LockFileDescription, typeof(GBSEditorPage), gbsEditor),
 
                 // NVIDIA
                 Entry("Low Latency Mode", "NVIDIA Reflex-style control panel setting that reduces input latency.", typeof(NvidiaPage), nvidia),

@@ -121,6 +121,18 @@
                     </Grid>
                 </MenuItem.Header>
             </MenuItem>
+            <MenuItem x:Name="RPCDebugMenuItem" Visibility="Collapsed" Click="RPCDebugMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="WindowBulletList20"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="{x:Static resources:Strings.ContextMenu_RPCWindow_Title}" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
         </ContextMenu>
     </ui:UiWindow.ContextMenu>
 </base:WpfUiWindow>

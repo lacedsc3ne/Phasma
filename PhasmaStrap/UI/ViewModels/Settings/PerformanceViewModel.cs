@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using CommunityToolkit.Mvvm.Input;
 
@@ -245,12 +246,74 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.SelectedCpuPriority = value;
         }
 
-        public string[] RobloxPriorityLimitOptions { get; } = { "Idle", "Below Normal", "Normal", "Above Normal", "High" };
+        public string[] RobloxPriorityLimitOptions { get; } = { "Idle", "Below Normal", "Normal", "Above Normal", "High", "Realtime" };
 
         public string RobloxPriorityLimit
         {
             get => App.Settings.Prop.RobloxPriorityLimit;
-            set => App.Settings.Prop.RobloxPriorityLimit = value;
+            set
+            {
+                // Showing a modal confirmation dialog synchronously from inside a ComboBox.SelectedItem
+                // binding update is unreliable in WPF - the ComboBox can re-push its already-committed
+                // value back to the source once the nested dispatcher frame from ShowDialog() unwinds,
+                // silently overwriting any revert attempted from within this same call. Instead, accept
+                // the value immediately (letting the binding update finish cleanly), then defer the
+                // confirmation to run afterward as its own, non-nested dispatcher operation.
+                string previous = App.Settings.Prop.RobloxPriorityLimit;
+                App.Settings.Prop.RobloxPriorityLimit = value;
+
+                if (value.Equals("Realtime", StringComparison.OrdinalIgnoreCase))
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        MessageBoxResult result = Frontend.ShowMessageBox(
+                            "Realtime priority makes Roblox preempt almost everything else on your system, including your mouse and keyboard driver. If Roblox spikes CPU usage even briefly, your whole system can freeze or become unresponsive until it settles down. This is not recommended unless you know exactly what you're doing.\n\nSet Roblox to Realtime priority anyway?",
+                            MessageBoxImage.Warning,
+                            MessageBoxButton.YesNo,
+                            MessageBoxResult.No);
+
+                        if (result != MessageBoxResult.Yes && App.Settings.Prop.RobloxPriorityLimit.Equals("Realtime", StringComparison.OrdinalIgnoreCase))
+                        {
+                            App.Settings.Prop.RobloxPriorityLimit = previous;
+                            OnPropertyChanged(nameof(RobloxPriorityLimit));
+                        }
+                    }), DispatcherPriority.Background);
+                }
+            }
+        }
+
+        // --- system-level FPS tweaks that don't touch a single FastFlag (SystemPerformanceBoost) ---
+
+        public bool ForceHighPerformanceGpu
+        {
+            get => App.Settings.Prop.ForceHighPerformanceGpu;
+            set
+            {
+                App.Settings.Prop.ForceHighPerformanceGpu = value;
+                Integrations.SystemPerformanceBoost.ApplyGpuPreference();
+            }
+        }
+
+        public bool DisableGameDVR
+        {
+            get => App.Settings.Prop.DisableGameDVR;
+            set
+            {
+                App.Settings.Prop.DisableGameDVR = value;
+                Integrations.SystemPerformanceBoost.ApplyGameDvr();
+            }
+        }
+
+        public bool BoostTimerResolution
+        {
+            get => App.Settings.Prop.BoostTimerResolution;
+            set => App.Settings.Prop.BoostTimerResolution = value;
+        }
+
+        public bool UseHighPerformancePowerPlan
+        {
+            get => App.Settings.Prop.UseHighPerformancePowerPlan;
+            set => App.Settings.Prop.UseHighPerformancePowerPlan = value;
         }
 
         private static IEnumerable<string> BuildCpuPriorityOptions()

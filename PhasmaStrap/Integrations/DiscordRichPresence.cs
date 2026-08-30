@@ -4,6 +4,28 @@ using DiscordRPC;
 
 namespace PhasmaStrap.Integrations
 {
+    /// <summary>
+    /// A read-only snapshot of the fields most recently sent to Discord, as shown by the standalone
+    /// RPC Debug viewer window (UI/Elements/ContextMenu/RPCWindow.xaml). Deliberately mirrors only
+    /// what's actually presented to Discord - it's built from <see cref="DiscordRPC.RichPresence"/>
+    /// right before/after <see cref="DiscordRpcClient.SetPresence"/>/<see cref="DiscordRpcClient.ClearPresence"/>,
+    /// not from any of the intermediate BloxstrapRPC/template state that produced it.
+    /// </summary>
+    public sealed class RichPresenceSnapshot
+    {
+        public bool IsActive { get; init; }
+        public string? Details { get; init; }
+        public string? State { get; init; }
+        public string? LargeImageKey { get; init; }
+        public string? LargeImageText { get; init; }
+        public string? SmallImageKey { get; init; }
+        public string? SmallImageText { get; init; }
+        public DateTime? TimestampStart { get; init; }
+        public DateTime? TimestampEnd { get; init; }
+        public IReadOnlyList<(string Label, string Url)> Buttons { get; init; } = Array.Empty<(string, string)>();
+        public DateTime CapturedAt { get; init; } = DateTime.Now;
+    }
+
     public class DiscordRichPresence : IDisposable
     {
         private readonly DiscordRpcClient _rpcClient = new("1005469189907173486");
@@ -20,6 +42,20 @@ namespace PhasmaStrap.Integrations
         private CancellationTokenSource? _fetchThumbnailsToken;
 
         private bool _visible = true;
+
+        /// <summary>
+        /// The last presence snapshot actually sent to (or cleared from) Discord. Updated at the end
+        /// of every <see cref="UpdatePresence"/> call, which raises <see cref="PresenceChanged"/> -
+        /// used by the standalone RPC Debug viewer window to observe live presence state without
+        /// duplicating any of the RPC building logic above.
+        /// </summary>
+        public RichPresenceSnapshot CurrentSnapshot { get; private set; } = new RichPresenceSnapshot { IsActive = false };
+
+        /// <summary>
+        /// Raised (off the UI thread - marshal before touching UI state) whenever <see cref="CurrentSnapshot"/>
+        /// changes.
+        /// </summary>
+        public event EventHandler? PresenceChanged;
 
         public DiscordRichPresence(ActivityWatcher activityWatcher)
         {
@@ -318,7 +354,10 @@ namespace PhasmaStrap.Integrations
             if (_visible)
                 UpdatePresence();
             else
+            {
                 _rpcClient.ClearPresence();
+                PublishSnapshot(null);
+            }
         }
 
         public async Task<bool> SetCurrentGame()
@@ -537,6 +576,7 @@ namespace PhasmaStrap.Integrations
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Presence is empty, clearing");
                 _rpcClient.ClearPresence();
+                PublishSnapshot(null);
                 return;
             }
 
@@ -552,6 +592,29 @@ namespace PhasmaStrap.Integrations
                 if (Utility.RpcTranslationService.IsEnabled)
                     _ = ApplyPresenceTranslationAsync(_currentPresence);
             }
+
+            PublishSnapshot(_visible ? _currentPresence : null);
+        }
+
+        private void PublishSnapshot(DiscordRPC.RichPresence? presence)
+        {
+            CurrentSnapshot = presence is null
+                ? new RichPresenceSnapshot { IsActive = false }
+                : new RichPresenceSnapshot
+                {
+                    IsActive = true,
+                    Details = presence.Details,
+                    State = presence.State,
+                    LargeImageKey = presence.Assets?.LargeImageKey,
+                    LargeImageText = presence.Assets?.LargeImageText,
+                    SmallImageKey = presence.Assets?.SmallImageKey,
+                    SmallImageText = presence.Assets?.SmallImageText,
+                    TimestampStart = presence.Timestamps?.Start,
+                    TimestampEnd = presence.Timestamps?.End,
+                    Buttons = presence.Buttons?.Select(b => (b.Label, b.Url)).ToArray() ?? Array.Empty<(string, string)>()
+                };
+
+            PresenceChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private async Task ApplyPresenceTranslationAsync(DiscordRPC.RichPresence presence)
@@ -576,6 +639,7 @@ namespace PhasmaStrap.Integrations
         {
             App.Logger.WriteLine("DiscordRichPresence::Dispose", "Cleaning up Discord RPC and Presence");
             _rpcClient.ClearPresence();
+            PublishSnapshot(null);
             _rpcClient.Dispose();
             GC.SuppressFinalize(this);
         }
