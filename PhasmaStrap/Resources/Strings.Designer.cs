@@ -901,6 +901,78 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Chat logs.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_Title {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This is a live view of messages sent through PhasmaStrap&apos;s in-game chat overlay for your current session..
+        /// </summary>
+        public static string ContextMenu_ChatLogs_Description {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for chat messages....
+        /// </summary>
+        public static string ContextMenu_ChatLogs_Placeholder {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.Placeholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_ColumnTime {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.ColumnTime", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Channel.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_ColumnChannel {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.ColumnChannel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sender.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_ColumnSender {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.ColumnSender", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Message.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_ColumnMessage {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.ColumnMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The chat log could not be saved:.
+        /// </summary>
+        public static string ContextMenu_ChatLogs_ExportFailed {
+            get {
+                return ResourceManager.GetString("ContextMenu.ChatLogs.ExportFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Copy Instance ID.
         /// </summary>
         public static string ContextMenu_ServerInformation_CopyInstanceId {

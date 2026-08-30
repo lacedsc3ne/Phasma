@@ -1484,6 +1484,30 @@ Every person here is ranked by their overall pledge.</value>
   <data name="ContextMenu.OutputConsole.ExportFailed" xml:space="preserve">
     <value>The output console log could not be saved:</value>
   </data>
+  <data name="ContextMenu.ChatLogs.Title" xml:space="preserve">
+    <value>Chat logs</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.Description" xml:space="preserve">
+    <value>This is a live view of messages sent through PhasmaStrap's in-game chat overlay for your current session.</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.Placeholder" xml:space="preserve">
+    <value>Waiting for chat messages...</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.ColumnTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.ColumnChannel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.ColumnSender" xml:space="preserve">
+    <value>Sender</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.ColumnMessage" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="ContextMenu.ChatLogs.ExportFailed" xml:space="preserve">
+    <value>The chat log could not be saved:</value>
+  </data>
   <data name="ActivityWatcher.LocationQueryFailed" xml:space="preserve">
     <value>The server location could not be queried. You may be joining games too quickly.</value>
   </data>
