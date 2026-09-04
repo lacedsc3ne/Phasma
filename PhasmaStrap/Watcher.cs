@@ -139,9 +139,6 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameJoin += (_, _) => SystemPerformanceBoost.OnGameJoin();
                     ActivityWatcher.OnGameLeave += (_, _) => SystemPerformanceBoost.OnGameLeave();
                 }
-
-                if (App.Settings.Prop.AutoCleanRam)
-                    Utility.AutoRamCleaner.Start();
             }
 
             _notifyIcon = new(this);
@@ -235,7 +232,6 @@ namespace PhasmaStrap
             ForcedResolution.Shutdown();
             StopProcessOptimizer();
             MemoryManager.Shutdown();
-            Utility.AutoRamCleaner.Stop();
 
             GC.SuppressFinalize(this);
         }

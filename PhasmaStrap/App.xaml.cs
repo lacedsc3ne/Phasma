@@ -512,6 +512,16 @@ namespace PhasmaStrap
 
                 try
                 {
+                    if (Settings.Prop.AutoCleanRam)
+                        Utility.AutoRamCleaner.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Auto RAM cleaner startup failed: {ex.Message}");
+                }
+
+                try
+                {
                     Networking.NetworkingController.ReconcileOnStartup();
                 }
                 catch (Exception ex)

@@ -4,13 +4,13 @@ namespace PhasmaStrap.Utility
 {
     // Periodically checks system memory pressure and runs the same unelevated trim
     // SystemMemoryCleaner.TrimAllProcessWorkingSets() does, but only when memory is actually under
-    // pressure ("if not already [clean]") rather than on a fixed schedule regardless of need. Runs
-    // for the lifetime of a watched Roblox session (see Watcher.cs), matching where
-    // RobloxProcessOptimizer/SystemPerformanceBoost's other session-scoped tweaks live - the point
-    // is to keep memory free for the game you're actually playing, not to run as a general background
-    // service. Deliberately does NOT include the elevated standby-list purge from the manual "Clean
-    // RAM" button - prompting UAC unattended on a timer would be both intrusive and indistinguishable
-    // from malware behavior, so that part stays a manual, explicit action.
+    // pressure ("if not already [clean]") rather than on a fixed schedule regardless of need. Started
+    // once from App.xaml.cs's normal startup path whenever AutoCleanRam is on, so it runs for the
+    // lifetime of any "normal" PhasmaStrap process - the settings window, tray-resident
+    // (LaunchAtStartup/MinimizeToTrayOnClose), or a watched Roblox session alike - not just while a
+    // game is open. Deliberately does NOT include the elevated standby-list purge from the manual
+    // "Clean RAM" button - prompting UAC unattended on a timer would be both intrusive and
+    // indistinguishable from malware behavior, so that part stays a manual, explicit action.
     internal static class AutoRamCleaner
     {
         private const string LOG_IDENT = "AutoRamCleaner";
