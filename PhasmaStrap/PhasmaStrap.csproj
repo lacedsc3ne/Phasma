@@ -7,8 +7,8 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>PhasmaStrap.ico</ApplicationIcon>
-    <Version>2.13.0</Version>
-    <FileVersion>2.13.0</FileVersion>
+    <Version>2.13.1</Version>
+    <FileVersion>2.13.1</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

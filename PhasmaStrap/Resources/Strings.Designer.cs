@@ -2072,6 +2072,15 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to FastFlag files.
+        /// </summary>
+        public static string FileTypes_FastFlagFiles {
+            get {
+                return ResourceManager.GetString("FileTypes.FastFlagFiles", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Text files.
         /// </summary>
         public static string FileTypes_TextFiles {
@@ -8192,7 +8201,7 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Trims every process's memory usage and purges Windows' standby list, a real system-wide free-up rather than the per-game trimming above. The deep clean step needs a one-time administrator prompt..
+        ///   Looks up a localized string similar to Frees up RAM across your whole PC, not just Roblox. Needs one admin prompt to fully clear it..
         /// </summary>
         public static string Menu_Performance_CleanRam_Description {
             get {
@@ -8210,7 +8219,7 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Automatically clean RAM while playing.
+        ///   Looks up a localized string similar to Automatically clean RAM.
         /// </summary>
         public static string Menu_Performance_AutoCleanRam_Title {
             get {
@@ -8219,7 +8228,7 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Checks memory usage every few minutes during a game session and trims processes automatically once it's actually running high - not on a fixed schedule regardless of need. Only covers the unelevated trim step, not the standby-list purge, since prompting for admin rights unattended wouldn't be appropriate..
+        ///   Looks up a localized string similar to Cleans RAM on its own when usage gets high, even if you're not playing Roblox. Won't ask for admin rights, so it only does the safe part..
         /// </summary>
         public static string Menu_Performance_AutoCleanRam_Description {
             get {

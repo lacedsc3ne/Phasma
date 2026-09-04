@@ -1262,6 +1262,10 @@ Selecting 'No' will ignore this warning and continue installation.</value>
     <value>JSON files</value>
     <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "JSON files (*.json)"</comment>
   </data>
+  <data name="FileTypes.FastFlagFiles" xml:space="preserve">
+    <value>FastFlag files</value>
+    <comment>Shown in the open file dialog as the default filter, covering both *.json and *.txt so either extension shows without switching the filter dropdown, e.g. "FastFlag files (*.json;*.txt)"</comment>
+  </data>
   <data name="FileTypes.TextFiles" xml:space="preserve">
     <value>Text files</value>
     <comment>Shown in the open file dialog, where the file type selection dropdown is, e.g. "Text files (*.txt)"</comment>
@@ -2931,16 +2935,16 @@ Example:
     <value>Clean RAM</value>
   </data>
   <data name="Menu.Performance.CleanRam.Description" xml:space="preserve">
-    <value>Trims every process's memory usage and purges Windows' standby list, a real system-wide free-up rather than the per-game trimming above. The deep clean step needs a one-time administrator prompt.</value>
+    <value>Frees up RAM across your whole PC, not just Roblox. Needs one admin prompt to fully clear it.</value>
   </data>
   <data name="Menu.Performance.CleanRam.Button" xml:space="preserve">
     <value>Clean now</value>
   </data>
   <data name="Menu.Performance.AutoCleanRam.Title" xml:space="preserve">
-    <value>Automatically clean RAM while playing</value>
+    <value>Automatically clean RAM</value>
   </data>
   <data name="Menu.Performance.AutoCleanRam.Description" xml:space="preserve">
-    <value>Checks memory usage every few minutes during a game session and trims processes automatically once it's actually running high - not on a fixed schedule regardless of need. Only covers the unelevated trim step, not the standby-list purge, since prompting for admin rights unattended wouldn't be appropriate.</value>
+    <value>Cleans RAM on its own when usage gets high, even if you're not playing Roblox. Won't ask for admin rights, so it only does the safe part.</value>
   </data>
   <data name="Menu.Performance.Display.Header" xml:space="preserve">
     <value>Multi-monitor and in-game resolution</value>
