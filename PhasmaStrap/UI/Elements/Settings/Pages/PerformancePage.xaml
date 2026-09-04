@@ -172,6 +172,15 @@
             <ui:ToggleSwitch IsChecked="{Binding UseHighPerformancePowerPlan, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_CleanRam_Description}">
+            <ui:Button Content="{x:Static resources:Strings.Menu_Performance_CleanRam_Button}" Icon="Broom28" Command="{Binding CleanRamCommand, Mode=OneTime}" />
+        </controls:OptionControl>
+        <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding CleanRamStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding AutoCleanRam, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Header}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Description}" />
 

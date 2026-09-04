@@ -316,6 +316,57 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.UseHighPerformancePowerPlan = value;
         }
 
+        // --- system RAM cleaner (Utility.SystemMemoryCleaner) - a manual one-shot action, not a toggle ---
+
+        private bool _cleaningRam;
+
+        public bool CleaningRam
+        {
+            get => _cleaningRam;
+            private set { _cleaningRam = value; OnPropertyChanged(nameof(CleaningRam)); }
+        }
+
+        private string _cleanRamStatus = "";
+
+        public string CleanRamStatus
+        {
+            get => _cleanRamStatus;
+            private set { _cleanRamStatus = value; OnPropertyChanged(nameof(CleanRamStatus)); }
+        }
+
+        public ICommand CleanRamCommand => new AsyncRelayCommand(async () =>
+        {
+            if (CleaningRam)
+                return;
+
+            CleaningRam = true;
+            CleanRamStatus = "Cleaning...";
+
+            PhasmaStrap.Utility.SystemMemoryCleaner.TrimResult trim = await Task.Run(PhasmaStrap.Utility.SystemMemoryCleaner.TrimAllProcessWorkingSets);
+            bool purged = await Task.Run(PhasmaStrap.Utility.SystemMemoryCleaner.PurgeStandbyListElevated);
+
+            double freedMb = trim.BytesFreed / 1048576.0;
+            CleanRamStatus = purged
+                ? $"Trimmed {trim.ProcessesTrimmed} processes and purged the standby list (~{freedMb:0.#} MB reclaimed)."
+                : $"Trimmed {trim.ProcessesTrimmed} processes (~{freedMb:0.#} MB reclaimed). Standby list purge needs administrator rights - it was declined or failed.";
+
+            CleaningRam = false;
+        });
+
+        public bool AutoCleanRam
+        {
+            get => App.Settings.Prop.AutoCleanRam;
+            set
+            {
+                App.Settings.Prop.AutoCleanRam = value;
+
+                if (value)
+                    PhasmaStrap.Utility.AutoRamCleaner.Start();
+                else
+                    PhasmaStrap.Utility.AutoRamCleaner.Stop();
+            }
+        }
+
         private static IEnumerable<string> BuildCpuPriorityOptions()
         {
             List<string> options = new() { "Automatic" };

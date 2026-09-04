@@ -2927,6 +2927,21 @@ Example:
   <data name="Menu.Performance.UseHighPerformancePowerPlan.Description" xml:space="preserve">
     <value>Switches Windows to the High performance power plan while playing and restores your previous plan afterward. Matters most on laptops, where the default Balanced plan throttles CPU boost clocks.</value>
   </data>
+  <data name="Menu.Performance.CleanRam.Title" xml:space="preserve">
+    <value>Clean RAM</value>
+  </data>
+  <data name="Menu.Performance.CleanRam.Description" xml:space="preserve">
+    <value>Trims every process's memory usage and purges Windows' standby list, a real system-wide free-up rather than the per-game trimming above. The deep clean step needs a one-time administrator prompt.</value>
+  </data>
+  <data name="Menu.Performance.CleanRam.Button" xml:space="preserve">
+    <value>Clean now</value>
+  </data>
+  <data name="Menu.Performance.AutoCleanRam.Title" xml:space="preserve">
+    <value>Automatically clean RAM while playing</value>
+  </data>
+  <data name="Menu.Performance.AutoCleanRam.Description" xml:space="preserve">
+    <value>Checks memory usage every few minutes during a game session and trims processes automatically once it's actually running high - not on a fixed schedule regardless of need. Only covers the unelevated trim step, not the standby-list purge, since prompting for admin rights unattended wouldn't be appropriate.</value>
+  </data>
   <data name="Menu.Performance.Display.Header" xml:space="preserve">
     <value>Multi-monitor and in-game resolution</value>
   </data>

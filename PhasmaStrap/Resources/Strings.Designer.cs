@@ -8183,6 +8183,51 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Clean RAM.
+        /// </summary>
+        public static string Menu_Performance_CleanRam_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.CleanRam.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trims every process's memory usage and purges Windows' standby list, a real system-wide free-up rather than the per-game trimming above. The deep clean step needs a one-time administrator prompt..
+        /// </summary>
+        public static string Menu_Performance_CleanRam_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.CleanRam.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clean now.
+        /// </summary>
+        public static string Menu_Performance_CleanRam_Button {
+            get {
+                return ResourceManager.GetString("Menu.Performance.CleanRam.Button", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically clean RAM while playing.
+        /// </summary>
+        public static string Menu_Performance_AutoCleanRam_Title {
+            get {
+                return ResourceManager.GetString("Menu.Performance.AutoCleanRam.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Checks memory usage every few minutes during a game session and trims processes automatically once it's actually running high - not on a fixed schedule regardless of need. Only covers the unelevated trim step, not the standby-list purge, since prompting for admin rights unattended wouldn't be appropriate..
+        /// </summary>
+        public static string Menu_Performance_AutoCleanRam_Description {
+            get {
+                return ResourceManager.GetString("Menu.Performance.AutoCleanRam.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Multi-monitor and in-game resolution.
         /// </summary>
         public static string Menu_Performance_Display_Header {
