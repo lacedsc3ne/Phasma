@@ -725,7 +725,12 @@ namespace PhasmaStrap
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagProfileAsync";
 
-            if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
+            // NOT gated on UseFastFlagManager - that toggle only controls whether the GLOBAL mod-folder
+            // ClientAppSettings.json gets copied in (see ApplyModifications). FastFlag Profiles write
+            // their own overrides on top regardless, so a place assignment should still apply even if
+            // the user never turned on the unrelated global Engine Settings/FastFlags feature - it used
+            // to silently no-op here with no indication anywhere on the Profiles page why.
+            if (placeId is null)
                 return;
 
             try
