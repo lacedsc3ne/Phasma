@@ -52,6 +52,10 @@ namespace PhasmaStrap
 
         public LaunchFlag RemoveTelemetryBlockFlag  { get; } = new("removetelemetryblock");
 
+        // internal use only - launched by Utility.SystemMemoryCleaner.PurgeStandbyListElevated() under
+        // UAC elevation to purge the system standby list
+        public LaunchFlag PurgeStandbyFlag          { get; } = new("purgestandby");
+
 #if DEBUG
         public bool BypassUpdateCheck => true;
 #else

@@ -214,6 +214,11 @@ namespace PhasmaStrap.Models.Persistable
         public bool BoostTimerResolution { get; set; } = false;
         public bool UseHighPerformancePowerPlan { get; set; } = false;
 
+        // auto-trims process working sets while playing whenever system memory usage is high (see
+        // Utility.AutoRamCleaner) - the unelevated half of the manual "Clean RAM" button, run
+        // automatically only when actually needed
+        public bool AutoCleanRam { get; set; } = false;
+
         // launcher memory manager (ported from Voidstrap MemoryManager): tiered memory-pressure
         // handling for PhasmaStrap's own process while it's backgrounded, not Roblox's
         public bool LauncherMemoryManagerEnabled { get; set; } = false;

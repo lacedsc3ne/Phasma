@@ -329,6 +329,14 @@ namespace PhasmaStrap
                 return;
             }
 
+            // internal helper mode: relaunched (elevated) by Utility.SystemMemoryCleaner to purge the
+            // system standby list - the "RAM cleaner" button's deep-clean step
+            if (LaunchSettings.PurgeStandbyFlag.Active)
+            {
+                Shutdown(Utility.SystemMemoryCleaner.PurgeStandbyListNow() ? 0 : 1);
+                return;
+            }
+
             // installation check begins here
             using var uninstallKey = Registry.CurrentUser.OpenSubKey(UninstallKey);
             string? installLocation = null;

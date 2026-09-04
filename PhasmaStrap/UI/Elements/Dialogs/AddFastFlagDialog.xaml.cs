@@ -20,7 +20,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         {
             var dialog = new OpenFileDialog
             {
-                Filter = $"{Strings.FileTypes_JSONFiles}|*.json"
+                Filter = $"{Strings.FileTypes_JSONFiles}|*.json|{Strings.FileTypes_TextFiles}|*.txt"
             };
 
             if (dialog.ShowDialog() != true)
