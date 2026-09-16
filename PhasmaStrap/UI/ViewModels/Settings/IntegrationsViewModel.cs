@@ -1,13 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 using Microsoft.Win32;
 
 using CommunityToolkit.Mvvm.Input;
 
+using PhasmaStrap.Integrations;
+using PhasmaStrap.Models;
 using PhasmaStrap.UI.Elements.ContextMenu;
 using PhasmaStrap.UI.Elements.Dialogs;
 
@@ -15,19 +14,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class IntegrationsViewModel : NotifyPropertyChangedViewModel
     {
-        // the actual Roblox logo, for the Discord presence preview card below - same
-        // System.Drawing.Icon->BitmapSource conversion ExternalEditorPickerDialog.xaml.cs already
-        // uses, applied to the current-era Roblox icon already bundled for the bootstrapper's own
-        // splash/progress dialogs (see Properties/Resources.resx, BootstrapperIconEx.cs)
-        public ImageSource RobloxIconSource { get; } = CreateRobloxIconSource();
-
-        private static ImageSource CreateRobloxIconSource()
-        {
-            ImageSource source = Imaging.CreateBitmapSourceFromHIcon(Properties.Resources.Icon2022.Handle, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            source.Freeze();
-            return source;
-        }
-
         public ICommand AddIntegrationCommand => new RelayCommand(AddIntegration);
 
         public ICommand DeleteIntegrationCommand => new RelayCommand(DeleteIntegration);
@@ -49,31 +35,35 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         // Settings is always its own separate process from an active Roblox launch (see LaunchHandler.cs/
         // Watcher.cs - DiscordRichPresence only exists on a live Watcher instance, which Settings never
-        // has access to), so there's no way to show this tab's preview card from real, currently-playing
-        // data. Instead it cycles through a couple of static, clearly-illustrative examples of what a
-        // Discord Rich Presence card looks like - same spirit as the Appearance page's theme previews.
-        private static readonly (string Game, string Creator, string Elapsed)[] _previewSamples = new[]
-        {
-            ("Blade Ball", "Wiggity.", "00:39 elapsed"),
-            ("Adopt Me!", "DreamCraft", "12:04 elapsed"),
-            ("Brookhaven RP", "Wolfpaq", "03:21 elapsed"),
-        };
+        // has access to), so there's no way to show this tab's preview card from a real, currently-active
+        // presence. Instead it cycles through the user's own real play history (same PlayTimeStore data
+        // Home's "Continue Playing" uses) - a real game, with its real icon, just not a live session.
+        private readonly List<PlayTimeEntry> _previewEntries = PlayTimeStore.GetAll()
+            .OrderByDescending(x => x.LastPlayed)
+            .Take(5)
+            .ToList();
 
         private int _previewIndex;
 
-        public string PreviewGame => _previewSamples[_previewIndex].Game;
-        public string PreviewCreator => _previewSamples[_previewIndex].Creator;
-        public string PreviewElapsed => _previewSamples[_previewIndex].Elapsed;
+        public bool HasPreviewData => _previewEntries.Count > 0;
+        public string PreviewGame => HasPreviewData ? _previewEntries[_previewIndex].Name : "";
+        public string PreviewIconUrl => HasPreviewData ? _previewEntries[_previewIndex].IconUrl : "";
+        public string PreviewStateText => HasPreviewData
+            ? $"{_previewEntries[_previewIndex].TotalTimeText} played • last played {_previewEntries[_previewIndex].LastPlayedText}"
+            : "";
 
         public ICommand CyclePreviewCommand => new RelayCommand(CyclePreview);
 
         private void CyclePreview()
         {
-            _previewIndex = (_previewIndex + 1) % _previewSamples.Length;
+            if (_previewEntries.Count == 0)
+                return;
+
+            _previewIndex = (_previewIndex + 1) % _previewEntries.Count;
 
             OnPropertyChanged(nameof(PreviewGame));
-            OnPropertyChanged(nameof(PreviewCreator));
-            OnPropertyChanged(nameof(PreviewElapsed));
+            OnPropertyChanged(nameof(PreviewIconUrl));
+            OnPropertyChanged(nameof(PreviewStateText));
         }
 
         private void AddIntegration()
