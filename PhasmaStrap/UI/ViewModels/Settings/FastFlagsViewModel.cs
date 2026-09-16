@@ -160,30 +160,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.FastFlags.SetPreset("UI.RainbowText", value ? "True" : null);
         }
 
-        public bool FRMQualityOverrideEnabled
-        {
-            get => App.FastFlags.GetPreset("Rendering.FRMQualityOverride") != null;
-            set
-            {
-                if (value)
-                    FRMQualityOverride = 21;
-                else
-                    App.FastFlags.SetPreset("Rendering.FRMQualityOverride", null);
-
-                OnPropertyChanged(nameof(FRMQualityOverride));
-                OnPropertyChanged(nameof(FRMQualityOverrideEnabled));
-            }
-        }
-
-        public int FRMQualityOverride
-        {
-            get => int.TryParse(App.FastFlags.GetPreset("Rendering.FRMQualityOverride"), out var result) ? result : 21;
-            set
-            {
-                App.FastFlags.SetPreset("Rendering.FRMQualityOverride", value);
-                OnPropertyChanged(nameof(FRMQualityOverride));
-            }
-        }
+        // NOTE: "FRM quality override" (toggle + 0-21 number box) used to be a second,
+        // independent control writing the exact same underlying flag as the "FRM quality
+        // level" combo box below (both ultimately resolve to DFIntDebugFRMQualityLevelOverride
+        // via the "Rendering.FRMQualityOverride" and "Rendering.FrmQuality" preset aliases).
+        // Having two separate properties race to set one flag meant either control could
+        // silently undo the other. They've been consolidated onto SelectedQualityLevel -
+        // the combo box is the single authoritative control now (see FRMQualityLevelEditable
+        // for how "Shaders enabled" - which forces this same flag to its max value - is kept
+        // visibly in sync with it instead of just fighting it separately).
 
         public bool MeshQualityEnabled
         {
@@ -203,6 +188,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 }
 
                 OnPropertyChanged(nameof(MeshQualityEnabled));
+                OnPropertyChanged(nameof(LowPolyMeshes));
             }
         }
 
@@ -218,6 +204,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                 OnPropertyChanged(nameof(MeshQuality));
                 OnPropertyChanged(nameof(MeshQualityEnabled));
+                OnPropertyChanged(nameof(LowPolyMeshes));
             }
         }
 
@@ -251,15 +238,29 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        // "Low poly meshes" used to be a fully independent toggle that wrote its own set of
+        // preset aliases (Rendering.LowPolyMeshes1-4) which happen to resolve to the exact
+        // same underlying flags as MeshQuality's Geometry.MeshLOD.* aliases
+        // (DFIntCSGLevelOfDetailSwitchingDistance / L12 / L23 / L34) - forcing them to "0" is
+        // just what MeshQuality = 0 already does. Two independent properties writing one flag
+        // meant whichever was touched last won. It's now a thin quick-toggle wrapper around
+        // MeshQuality/MeshQualityEnabled so both controls always agree.
         public bool LowPolyMeshes
         {
-            get => App.FastFlags.GetPreset("Rendering.LowPolyMeshes1") == "0";
+            get => MeshQualityEnabled && MeshQuality == 0;
             set
             {
-                App.FastFlags.SetPreset("Rendering.LowPolyMeshes1", value ? "0" : null);
-                App.FastFlags.SetPreset("Rendering.LowPolyMeshes2", value ? "0" : null);
-                App.FastFlags.SetPreset("Rendering.LowPolyMeshes3", value ? "0" : null);
-                App.FastFlags.SetPreset("Rendering.LowPolyMeshes4", value ? "0" : null);
+                if (value)
+                {
+                    MeshQualityEnabled = true;
+                    MeshQuality = 0;
+                }
+                else if (LowPolyMeshes)
+                {
+                    MeshQualityEnabled = false;
+                }
+
+                OnPropertyChanged(nameof(LowPolyMeshes));
             }
         }
 
@@ -434,8 +435,17 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     App.FastFlags.SetPreset("Rendering.FrmQuality", null);
                 else
                     App.FastFlags.SetPreset("Rendering.FrmQuality", QualityLevels[value]);
+
+                OnPropertyChanged(nameof(SelectedQualityLevel));
             }
         }
+
+        // "Shaders enabled" writes to the exact same underlying flag as this combo box
+        // (DFIntDebugFRMQualityLevelOverride), forcing it to its max value while shaders are
+        // on. Rather than let the two fight over it silently, the combo is locked/greyed out
+        // while shaders are enabled - it'll show "Level 21" (what Shaders enabled forced it
+        // to) instead of letting the user pick a value that Shaders enabled would just clobber.
+        public bool FRMQualityLevelEditable => !ShadersEnabled;
 
         public bool DisablePostFX
         {
@@ -527,13 +537,27 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.FastFlags.SetPreset("System.BypassVulkan", value == "Automatic" ? null : value);
         }
 
+        // "Chrome UI" and the "In-game menu version" = V4Chrome option both used to write
+        // FFlagEnableInGameMenuChrome independently (via UI.Menu.ChromeUI2 and
+        // UI.Menu.Style.EnableV4Chrome respectively), so picking V4Chrome from the version
+        // combo and then flipping this toggle off (or vice versa) would silently undo the
+        // other. This toggle now drives the chrome flag through SelectedIGMenuVersion - the
+        // single authoritative control for it - and only owns the separate ABTest4 flag that
+        // nothing else touches.
         public bool ChromeUI
         {
-            get => App.FastFlags.GetPreset("UI.Menu.ChromeUI") == "True" && App.FastFlags.GetPreset("UI.Menu.ChromeUI2") == "True";
+            get => App.FastFlags.GetPreset("UI.Menu.ChromeUI") == "True" && SelectedIGMenuVersion == InGameMenuVersion.V4Chrome;
             set
             {
                 App.FastFlags.SetPreset("UI.Menu.ChromeUI", value ? "True" : null);
-                App.FastFlags.SetPreset("UI.Menu.ChromeUI2", value ? "True" : null);
+
+                if (value)
+                    SelectedIGMenuVersion = InGameMenuVersion.V4Chrome;
+                else if (SelectedIGMenuVersion == InGameMenuVersion.V4Chrome)
+                    SelectedIGMenuVersion = InGameMenuVersion.V4;
+
+                OnPropertyChanged(nameof(ChromeUI));
+                OnPropertyChanged(nameof(SelectedIGMenuVersion));
             }
         }
 
@@ -578,7 +602,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool ShadersEnabled
         {
             get => App.FastFlags.GetPreset("Rendering.Shaders2") == "21";
-            set => App.FastFlags.SetPreset("Rendering.Shaders2", value ? "21" : "0");
+            set
+            {
+                App.FastFlags.SetPreset("Rendering.Shaders2", value ? "21" : "0");
+
+                // this shares DFIntDebugFRMQualityLevelOverride with SelectedQualityLevel -
+                // keep the "FRM quality level" combo's displayed value and enabled state honest
+                OnPropertyChanged(nameof(ShadersEnabled));
+                OnPropertyChanged(nameof(SelectedQualityLevel));
+                OnPropertyChanged(nameof(FRMQualityLevelEditable));
+            }
         }
 
         public int ShadersLimit
@@ -750,6 +783,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        // "Faster loading" and "Preload assets" both used to independently write
+        // DFFlagEnableMeshPreloading2 (via the "Network.MeshPreloadding" and "Preload.Preload2"
+        // preset aliases, which resolve to the same flag) alongside their own exclusive flags.
+        // Since they're each toggled on their own but both want mesh preloading on, whichever
+        // was switched off last would silently clear it out from under the other. The flag is
+        // now derived as (FasterLoading || Preload) via SyncMeshPreloading so turning either
+        // one off no longer clobbers what the other one asked for.
         public bool FasterLoading
         {
             get => App.FastFlags.GetPreset("Network.MaxAssetPreload") == "2147483647";
@@ -757,9 +797,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 App.FastFlags.SetPreset("Network.MaxAssetPreload", value ? "2147483647" : null);
                 App.FastFlags.SetPreset("Network.PlayerImageDefault", value ? "1" : null);
-                App.FastFlags.SetPreset("Network.MeshPreloadding", value ? "True" : null);
+                SyncMeshPreloading(fasterLoading: value, preload: Preload);
             }
         }
+
+        // shared by FasterLoading and Preload - see the note on FasterLoading above
+        private void SyncMeshPreloading(bool fasterLoading, bool preload) =>
+            App.FastFlags.SetPreset("Preload.Preload2", (fasterLoading || preload) ? "True" : null);
 
         public bool BetterPacketSending
         {
@@ -864,16 +908,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public bool Preload
         {
-            get => App.FastFlags.GetPreset("Preload.Preload2") == "True";
+            // Preload.Preload2 is the flag shared with FasterLoading (see SyncMeshPreloading) -
+            // this reads back one of Preload's own exclusive flags instead so the toggle's
+            // displayed state can't be forced on just because FasterLoading is on.
+            get => App.FastFlags.GetPreset("Preload.SoundPreload") == "True";
             set
             {
-                App.FastFlags.SetPreset("Preload.Preload2", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.SoundPreload", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.Texture", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.TeleportPreload", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.FontsPreload", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.ItemPreload", value ? "True" : null);
                 App.FastFlags.SetPreset("Preload.Teleport2", value ? "True" : null);
+                SyncMeshPreloading(fasterLoading: FasterLoading, preload: value);
             }
         }
 

@@ -864,12 +864,6 @@ Selecting 'No' will ignore this warning and continue installation.</value>
   <data name="Menu.FastFlags.RainbowTheme.Description" xml:space="preserve">
     <value>Renders unthemed UI instances with a rainbow debug color.</value>
   </data>
-  <data name="Menu.FastFlags.FRMQualityOverride.Title" xml:space="preserve">
-    <value>FRM quality override</value>
-  </data>
-  <data name="Menu.FastFlags.FRMQualityOverrideLevel.Title" xml:space="preserve">
-    <value>FRM quality override level</value>
-  </data>
   <data name="Menu.FastFlags.MeshQuality.Title" xml:space="preserve">
     <value>Mesh quality</value>
   </data>
@@ -950,6 +944,9 @@ Selecting 'No' will ignore this warning and continue installation.</value>
   </data>
   <data name="Menu.FastFlags.FRMQualityLevel.Title" xml:space="preserve">
     <value>FRM quality level</value>
+  </data>
+  <data name="Menu.FastFlags.FRMQualityLevel.Description" xml:space="preserve">
+    <value>Locked to Level 21 while Shaders enabled is on, since that forces this to its max value.</value>
   </data>
   <data name="Menu.FastFlags.DisablePostFX.Title" xml:space="preserve">
     <value>Disable post processing effects</value>

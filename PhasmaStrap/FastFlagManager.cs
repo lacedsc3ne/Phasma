@@ -154,7 +154,6 @@ namespace PhasmaStrap
             { "Rendering.ForceVulkan", "FStringBuggyRenderpassList2" },
             { "System.BypassVulkan", "FStringVulkanBuggyRenderpassList2" },
             { "UI.Menu.ChromeUI", "FFlagEnableInGameMenuChromeABTest4" },
-            { "UI.Menu.ChromeUI2", "FFlagEnableInGameMenuChrome" },
             { "UI.OldChromeUI1", "FFlagEnableHamburgerIcon" },
             { "UI.OldChromeUI2", "FFlagEnableUnibarV4IA" },
             { "UI.OldChromeUI3", "FFlagEnableAlwaysOpenUnibar2" },
@@ -204,7 +203,6 @@ namespace PhasmaStrap
             { "Network.Payload11", "DFIntTotalRepPayloadLimit" },
             { "Network.MaxAssetPreload", "DFIntNumAssetsMaxToPreload" },
             { "Network.PlayerImageDefault", "FStringGetPlayerImageDefaultTimeout" },
-            { "Network.MeshPreloadding", "DFFlagEnableMeshPreloading2" },
             { "Network.BetterPacketSending1", "DFIntNetworkStopProducingPacketsToProcessThresholdMs" },
             { "Network.BetterPacketSending2", "DFIntMaxWaitTimeBeforeForcePacketProcessMS" },
             { "Network.BetterPacketSending3", "DFIntClientPacketMaxDelayMs" },
@@ -382,6 +380,7 @@ namespace PhasmaStrap
         public static IReadOnlyDictionary<QualityLevel, string?> QualityLevels => new Dictionary<QualityLevel, string?>
         {
             { QualityLevel.Disabled, null },
+            { QualityLevel.Level0, "0" },
             { QualityLevel.Level1, "1" },
             { QualityLevel.Level2, "2" },
             { QualityLevel.Level3, "3" },
