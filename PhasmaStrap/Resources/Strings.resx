@@ -2100,7 +2100,37 @@ Defaulting to {1}.</value>
     <value>NVIDIA GPU or driver not detected</value>
   </data>
   <data name="Menu.Nvidia.LatencyFramerate" xml:space="preserve">
-    <value>Latency &amp; framerate</value>
+    <value>Low Latency Modes</value>
+  </data>
+  <data name="Menu.Nvidia.LowLatencyModes.Description" xml:space="preserve">
+    <value>Controls how many frames are queued to reduce input latency.</value>
+  </data>
+  <data name="Menu.Nvidia.AdvancedEditor.Title" xml:space="preserve">
+    <value>Advanced Editor</value>
+  </data>
+  <data name="Menu.Nvidia.AdvancedEditor.Description" xml:space="preserve">
+    <value>Open the raw NVIDIA profile settings editor. Recommended for advanced users only.</value>
+  </data>
+  <data name="Menu.Nvidia.ApplyCard.Title" xml:space="preserve">
+    <value>Apply Changes</value>
+  </data>
+  <data name="Menu.Nvidia.ApplyCard.Description" xml:space="preserve">
+    <value>Apply only the modified NVIDIA FastFlags to the driver.</value>
+  </data>
+  <data name="Menu.Nvidia.FastFlagsHeader" xml:space="preserve">
+    <value>FastFlags</value>
+  </data>
+  <data name="Menu.Nvidia.GameDetails.Title" xml:space="preserve">
+    <value>Game Details</value>
+  </data>
+  <data name="Menu.Nvidia.GameDetails.Description" xml:space="preserve">
+    <value>Image quality, frame pacing, and performance-related options.</value>
+  </data>
+  <data name="Menu.Nvidia.HardwareOverrides.Title" xml:space="preserve">
+    <value>Hardware and Driver Overrides</value>
+  </data>
+  <data name="Menu.Nvidia.HardwareOverrides.Description" xml:space="preserve">
+    <value>Overrides that affect GPU behavior and driver features.</value>
   </data>
   <data name="Menu.Nvidia.LowLatencyMode.Title" xml:space="preserve">
     <value>Low Latency Mode</value>
@@ -3592,6 +3622,96 @@ Example:
   </data>
   <data name="Menu.AssetWarp.DisableMeshes.Title" xml:space="preserve">
     <value>Remove all meshes</value>
+  </data>
+  <data name="Menu.AssetWarp.PresenceSpoofer.Title" xml:space="preserve">
+    <value>Presence spoofer</value>
+  </data>
+  <data name="Menu.AssetWarp.PresenceSpoofer.Description" xml:space="preserve">
+    <value>Changes what others see - online, in Studio, or offline. Same setting as the Networking page.</value>
+  </data>
+  <data name="Menu.AssetWarp.Preloading.Header" xml:space="preserve">
+    <value>Preloading</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadEnabled.Title" xml:space="preserve">
+    <value>Asset preloading</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadEnabled.Description" xml:space="preserve">
+    <value>Caches the asset/thumbnail resolution responses that flow through the local proxy, so repeat lookups for the same asset skip the network round-trip. This caches which CDN URL an asset resolves to, not the asset content itself.</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadCacheLimit.Title" xml:space="preserve">
+    <value>Preload cache limit</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadCacheLimit.Description" xml:space="preserve">
+    <value>Limits how much disk space the preload cache can use. Oldest-accessed entries are removed first once over the limit.</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadAvatar.Title" xml:space="preserve">
+    <value>Preload avatar</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadAvatar.Description" xml:space="preserve">
+    <value>Fetches your avatar thumbnail ahead of each game launch, so it's already resolved by the time Roblox asks.</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadCrossGame.Title" xml:space="preserve">
+    <value>Preload recent games</value>
+  </data>
+  <data name="Menu.AssetWarp.PreloadCrossGame.Description" xml:space="preserve">
+    <value>Warms the cache with your recently played games' icons ahead of each launch.</value>
+  </data>
+  <data name="Menu.AssetWarp.ClientSpoofer.Header" xml:space="preserve">
+    <value>Client spoofer</value>
+  </data>
+  <data name="Menu.AssetWarp.ClientSpoofer.Description" xml:space="preserve">
+    <value>Client sided - only you see these changes. Nothing here affects what your real account looks like to anyone else via Roblox's own servers.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersName.Title" xml:space="preserve">
+    <value>Everyone else's username</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersName.Description" xml:space="preserve">
+    <value>Sets the client-sided name shown for every other player.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersApplyIngame.Title" xml:space="preserve">
+    <value>Apply everyone else's name</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersApplyIngame.Description" xml:space="preserve">
+    <value>The name above only takes effect once this is on.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersVerified.Title" xml:space="preserve">
+    <value>Verify everyone else</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofOthersVerified.Description" xml:space="preserve">
+    <value>Shows every other player as verified on this client only.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfName.Title" xml:space="preserve">
+    <value>Your username</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfName.Description" xml:space="preserve">
+    <value>Sets the client-sided name shown for your own account.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfApplyIngame.Title" xml:space="preserve">
+    <value>Apply your name</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfApplyIngame.Description" xml:space="preserve">
+    <value>The name above only takes effect once this is on.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfVerified.Title" xml:space="preserve">
+    <value>Verify your account</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfVerified.Description" xml:space="preserve">
+    <value>Shows your own account as verified on this client only.</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfGameCreator.Title" xml:space="preserve">
+    <value>Make yourself game creator</value>
+  </data>
+  <data name="Menu.AssetWarp.SpoofSelfGameCreator.Description" xml:space="preserve">
+    <value>Shows your own account as the creator of whatever game you're in, on this client only.</value>
+  </data>
+  <data name="Menu.AssetWarp.RobuxAdjuster.Title" xml:space="preserve">
+    <value>Robux adjuster</value>
+  </data>
+  <data name="Menu.AssetWarp.RobuxAdjuster.Empty" xml:space="preserve">
+    <value>Shows a different balance on your own screen only. Leave blank to disable.</value>
+  </data>
+  <data name="Menu.AssetWarp.RobuxAdjuster.Set" xml:space="preserve">
+    <value>Showing {0} instead of your real balance, on your own screen only.</value>
   </data>
   <data name="Menu.AssetWarp.DisableTextures.Description" xml:space="preserve">
     <value>Removes texture and texture pack entries from Roblox asset batches.</value>

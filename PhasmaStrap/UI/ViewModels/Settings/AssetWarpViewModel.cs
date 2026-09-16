@@ -68,6 +68,101 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.AssetWarpDisableAllMeshes = value; App.Settings.Save(); OnPropertyChanged(nameof(DisableAllMeshes)); OnPropertyChanged(nameof(StatusText)); }
         }
 
+        // --- presence spoofer (same underlying Settings.PresenceSpoofMode the Networking page exposes) ---
+
+        public IEnumerable<PresenceSpoofMode> PresenceSpoofModes { get; } = Enum.GetValues(typeof(PresenceSpoofMode)).Cast<PresenceSpoofMode>();
+
+        public PresenceSpoofMode SelectedPresenceSpoofMode
+        {
+            get => App.Settings.Prop.PresenceSpoofMode;
+            set { App.Settings.Prop.PresenceSpoofMode = value; App.Settings.Save(); }
+        }
+
+        // --- preloading ---
+
+        public bool PreloadEnabled
+        {
+            get => App.Settings.Prop.AssetWarpPreloadEnabled;
+            set { App.Settings.Prop.AssetWarpPreloadEnabled = value; App.Settings.Save(); }
+        }
+
+        public int PreloadCacheMb
+        {
+            get => App.Settings.Prop.AssetWarpPreloadCacheMb;
+            set { App.Settings.Prop.AssetWarpPreloadCacheMb = value; App.Settings.Save(); OnPropertyChanged(nameof(PreloadCacheMb)); OnPropertyChanged(nameof(PreloadCacheSizeDisplay)); }
+        }
+
+        public string PreloadCacheSizeDisplay => PreloadCacheMb >= 1024 ? $"{PreloadCacheMb / 1024.0:0.#} GB" : $"{PreloadCacheMb} MB";
+
+        public bool PreloadAvatar
+        {
+            get => App.Settings.Prop.AssetWarpPreloadAvatar;
+            set { App.Settings.Prop.AssetWarpPreloadAvatar = value; App.Settings.Save(); }
+        }
+
+        public bool PreloadCrossGame
+        {
+            get => App.Settings.Prop.AssetWarpPreloadCrossGame;
+            set { App.Settings.Prop.AssetWarpPreloadCrossGame = value; App.Settings.Save(); }
+        }
+
+        // --- client spoofer (self vs. others) ---
+
+        public string SpoofOthersName
+        {
+            get => App.Settings.Prop.SpoofOthersName;
+            set { App.Settings.Prop.SpoofOthersName = value; App.Settings.Save(); }
+        }
+
+        public bool SpoofOthersApplyIngame
+        {
+            get => App.Settings.Prop.SpoofOthersApplyIngame;
+            set { App.Settings.Prop.SpoofOthersApplyIngame = value; App.Settings.Save(); }
+        }
+
+        public bool SpoofOthersVerified
+        {
+            get => App.Settings.Prop.SpoofOthersVerified;
+            set { App.Settings.Prop.SpoofOthersVerified = value; App.Settings.Save(); }
+        }
+
+        public string SpoofSelfName
+        {
+            get => App.Settings.Prop.SpoofSelfName;
+            set { App.Settings.Prop.SpoofSelfName = value; App.Settings.Save(); }
+        }
+
+        public bool SpoofSelfApplyIngame
+        {
+            get => App.Settings.Prop.SpoofSelfApplyIngame;
+            set { App.Settings.Prop.SpoofSelfApplyIngame = value; App.Settings.Save(); }
+        }
+
+        public bool SpoofSelfVerified
+        {
+            get => App.Settings.Prop.SpoofSelfVerified;
+            set { App.Settings.Prop.SpoofSelfVerified = value; App.Settings.Save(); }
+        }
+
+        public bool SpoofSelfGameCreator
+        {
+            get => App.Settings.Prop.SpoofSelfGameCreator;
+            set { App.Settings.Prop.SpoofSelfGameCreator = value; App.Settings.Save(); }
+        }
+
+        // --- Robux adjuster (same underlying Settings.RobuxSpoofAmount the Networking page exposes) ---
+
+        public string RobuxSpoofAmount
+        {
+            get => App.Settings.Prop.RobuxSpoofAmount;
+            set { App.Settings.Prop.RobuxSpoofAmount = value; App.Settings.Save(); OnPropertyChanged(nameof(RobuxSpoofSummary)); }
+        }
+
+        public string RobuxSpoofSummary =>
+            string.IsNullOrWhiteSpace(App.Settings.Prop.RobuxSpoofAmount)
+                ? Strings.Menu_AssetWarp_RobuxAdjuster_Empty
+                : string.Format(Strings.Menu_AssetWarp_RobuxAdjuster_Set, App.Settings.Prop.RobuxSpoofAmount);
+
         public string StatusText
         {
             get

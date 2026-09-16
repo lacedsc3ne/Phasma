@@ -333,6 +333,15 @@ namespace PhasmaStrap
                     long? launchPlaceId = TryResolveLaunchPlaceId();
                     await TryApplyFastFlagProfileAsync(launchPlaceId);
                     await TryApplyEngineSettingsScopeAsync(launchPlaceId);
+
+                    // fire-and-forget: warms the AssetWarp preload cache ahead of the game
+                    // actually asking, never something a launch should wait on or fail over
+                    if (App.Settings.Prop.AssetWarpEnabled && App.Settings.Prop.AssetWarpPreloadEnabled)
+                    {
+                        _ = Networking.AssetPreloadCache.PreloadAvatarAsync();
+                        _ = Networking.AssetPreloadCache.PreloadRecentGamesAsync(
+                            Integrations.PlayTimeStore.GetAll().OrderByDescending(e => e.LastPlayed).Select(e => e.UniverseId).Where(id => id > 0));
+                    }
                 }
 
                 StartRoblox();

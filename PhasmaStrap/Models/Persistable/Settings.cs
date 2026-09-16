@@ -56,6 +56,25 @@ namespace PhasmaStrap.Models.Persistable
         public string RobuxSpoofAmount { get; set; } = "";
         public string UsernameSpoofName { get; set; } = "";
 
+        // full client-side spoofer (self vs. others), matching Voidstrap's breakdown - distinct
+        // from the older single-field UsernameSpoofName above, which rewrites every profile in a
+        // response uniformly. See Networking/UsernameSpoofer.cs.
+        public string SpoofOthersName { get; set; } = "";
+        public bool SpoofOthersApplyIngame { get; set; } = false;
+        public bool SpoofOthersVerified { get; set; } = false;
+        public string SpoofSelfName { get; set; } = "";
+        public bool SpoofSelfApplyIngame { get; set; } = false;
+        public bool SpoofSelfVerified { get; set; } = false;
+        public bool SpoofSelfGameCreator { get; set; } = false;
+
+        // AssetWarp preloading - learns which assets a game/avatar actually needs and serves them
+        // from a local disk cache instead of letting Roblox fetch them fresh every time. See
+        // Networking/AssetPreloadCache.cs.
+        public bool AssetWarpPreloadEnabled { get; set; } = false;
+        public int AssetWarpPreloadCacheMb { get; set; } = 1024;
+        public bool AssetWarpPreloadAvatar { get; set; } = false;
+        public bool AssetWarpPreloadCrossGame { get; set; } = false;
+
         // integration configuration
         public bool EnableActivityTracking { get; set; } = true;
         public bool UseDiscordRichPresence { get; set; } = true;

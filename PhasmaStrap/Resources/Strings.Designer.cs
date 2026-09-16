@@ -5754,6 +5754,66 @@ namespace PhasmaStrap.Resources {
             }
         }
 
+        public static string Menu_Nvidia_LowLatencyModes_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.LowLatencyModes.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_AdvancedEditor_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.AdvancedEditor.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_AdvancedEditor_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.AdvancedEditor.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_ApplyCard_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ApplyCard.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_ApplyCard_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.ApplyCard.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_FastFlagsHeader {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.FastFlagsHeader", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_GameDetails_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.GameDetails.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_GameDetails_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.GameDetails.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_HardwareOverrides_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.HardwareOverrides.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_Nvidia_HardwareOverrides_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.HardwareOverrides.Description", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Low Latency Mode.
         /// </summary>
@@ -10084,6 +10144,186 @@ namespace PhasmaStrap.Resources {
         public static string Menu_AssetWarp_DisableMeshes_Title {
             get {
                 return ResourceManager.GetString("Menu.AssetWarp.DisableMeshes.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PresenceSpoofer_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PresenceSpoofer.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PresenceSpoofer_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PresenceSpoofer.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_Preloading_Header {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Preloading.Header", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadEnabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadEnabled.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadEnabled.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadCacheLimit_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadCacheLimit.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadCacheLimit_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadCacheLimit.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadAvatar_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadAvatar.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadAvatar_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadAvatar.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadCrossGame_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadCrossGame.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_PreloadCrossGame_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.PreloadCrossGame.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_ClientSpoofer_Header {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.ClientSpoofer.Header", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_ClientSpoofer_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.ClientSpoofer.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersName_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersName.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersName_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersName.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersApplyIngame_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersApplyIngame.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersApplyIngame_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersApplyIngame.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersVerified_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersVerified.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofOthersVerified_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofOthersVerified.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfName_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfName.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfName_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfName.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfApplyIngame_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfApplyIngame.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfApplyIngame_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfApplyIngame.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfVerified_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfVerified.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfVerified_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfVerified.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfGameCreator_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfGameCreator.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_SpoofSelfGameCreator_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.SpoofSelfGameCreator.Description", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_RobuxAdjuster_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.RobuxAdjuster.Title", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_RobuxAdjuster_Empty {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.RobuxAdjuster.Empty", resourceCulture);
+            }
+        }
+
+        public static string Menu_AssetWarp_RobuxAdjuster_Set {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.RobuxAdjuster.Set", resourceCulture);
             }
         }
 
