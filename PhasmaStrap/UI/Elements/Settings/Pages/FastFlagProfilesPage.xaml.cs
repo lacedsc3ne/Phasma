@@ -399,31 +399,30 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             var flags = App.Settings.Prop.FastFlagProfiles[_selectedProfileName];
 
-            switch (e.Column.Header)
+            string? header = e.Column.Header as string;
+
+            if (header == Strings.Common_Name)
             {
-                case "Name":
-                    string oldName = entry.Name;
-                    string newName = textbox.Text.Trim();
+                string oldName = entry.Name;
+                string newName = textbox.Text.Trim();
 
-                    if (newName == oldName)
-                        return;
+                if (newName == oldName)
+                    return;
 
-                    if (string.IsNullOrEmpty(newName) || flags.ContainsKey(newName))
-                    {
-                        e.Cancel = true;
-                        textbox.Text = oldName;
-                        return;
-                    }
+                if (string.IsNullOrEmpty(newName) || flags.ContainsKey(newName))
+                {
+                    e.Cancel = true;
+                    textbox.Text = oldName;
+                    return;
+                }
 
-                    flags.Remove(oldName);
-                    flags[newName] = entry.Value;
-                    entry.Name = newName;
-
-                    break;
-
-                case "Value":
-                    flags[entry.Name] = textbox.Text;
-                    break;
+                flags.Remove(oldName);
+                flags[newName] = entry.Value;
+                entry.Name = newName;
+            }
+            else if (header == Strings.Common_Value)
+            {
+                flags[entry.Name] = textbox.Text;
             }
         }
 
