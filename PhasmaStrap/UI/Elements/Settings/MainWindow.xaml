@@ -141,37 +141,39 @@
                     <!-- Matches Voidstrap's own sidebar grouping/order/labels where PhasmaStrap has
                          a real equivalent page (Deployment=Behaviour, Global=GBS Editor, News=Releases,
                          Settings=Channel - label only, PageTag/underlying page unchanged so pinned
-                         items and search results still resolve). There is no separate "Game & Session"
-                         header - Voidstrap only has Core/Configuration/footer, so each PhasmaStrap-only
-                         page (ServerBrowser, History, ClassicClient, GameChat, FastFlagProfiles,
-                         Performance, Overlays, RiShade, Networking, Notifications) is slotted directly
-                         under Core or Configuration, next to whichever Voidstrap item it's thematically
-                         closest to (e.g. History next to Home, Overlays/RiShade next to Appearance,
-                         FastFlagProfiles next to the other FastFlag pages). News/Manager stay last in
-                         Configuration to match the screenshot's exact tail order. -->
+                         items and search results still resolve). Core and Configuration each hold
+                         exactly Voidstrap's own item count/order - nothing extra gets mixed in, so
+                         those two sections stay the same short length as the screenshot. PhasmaStrap's
+                         own additional pages (things Voidstrap doesn't have) get two headers of their
+                         own instead of being crammed into Core/Configuration: "Session" for
+                         gameplay/session tools, "Advanced" for technical/tuning pages. -->
                     <ui:NavigationHeader Text="Core" Icon="Home24" />
                     <ui:NavigationItem Content="Home" PageType="{x:Type pages:HomePage}" Icon="Home24" PageTag="home" />
-                    <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" PageTag="history" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Title}" PageType="{x:Type pages:IntegrationsPage}" Icon="Add28" PageTag="integrations" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Behaviour_Title}" PageType="{x:Type pages:BehaviourPage}" Icon="PlaySettings20" PageTag="bootstrapper" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ClassicClient_Title}" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Appearance_Title}" PageType="{x:Type pages:AppearancePage}" Icon="PaintBrush24" PageTag="appearance" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
+
+                    <ui:NavigationHeader Text="Session" Icon="Play24" />
+                    <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" PageTag="history" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ServerBrowser_Title}" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" PageTag="serverbrowser" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ClassicClient_Title}" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GameChat_Title}" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
 
                     <ui:NavigationHeader Text="Configuration" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagEditor_Title}" PageType="{x:Type pages:FastFlagEditorPage}" Icon="Flag24" PageTag="fastflageditor" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagProfiles_Title}" PageType="{x:Type pages:FastFlagProfilesPage}" Icon="Games24" PageTag="fastflagprofiles" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GBSEditor_Title}" PageType="{x:Type pages:GBSEditorPage}" Icon="Globe24" PageTag="gbseditor" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Mods_Title}" PageType="{x:Type pages:ModsPage}" Icon="WrenchScrewdriver20" PageTag="mods" />
-                    <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
-                    <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GameChat_Title}" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Releases_Title}" PageType="{x:Type pages:ReleasesPage}" Icon="DocumentBulletList24" PageTag="releases" />
                     <ui:NavigationItem Content="Manager" PageType="{x:Type installerpages:ManagerPage}" Icon="ArrowDownload24" PageTag="manager" />
+
+                    <ui:NavigationHeader Text="Advanced" Icon="Wrench24" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagProfiles_Title}" PageType="{x:Type pages:FastFlagProfilesPage}" Icon="Games24" PageTag="fastflagprofiles" />
+                    <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
+                    <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
                 </ui:NavigationFluent.Items>
                 <ui:NavigationFluent.Footer>
                     <ui:NavigationItem Content="Extensions" PageType="{x:Type pages:ExtensionsPage}" Icon="PuzzleCube24" PageTag="extensions" />
