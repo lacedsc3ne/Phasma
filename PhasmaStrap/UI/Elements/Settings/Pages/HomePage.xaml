@@ -40,10 +40,8 @@
                 <DataTemplate>
                     <ui:Card Margin="0,0,10,10" Padding="0">
                         <StackPanel>
-                            <Border Height="112" CornerRadius="8,8,0,0" ClipToBounds="True">
-                                <Border.Background>
-                                    <ImageBrush ImageSource="{Binding IconUrl, IsAsync=True}" Stretch="UniformToFill" />
-                                </Border.Background>
+                            <Border Height="160" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                <Image Source="{Binding IconUrl, IsAsync=True}" Stretch="Uniform" Margin="16" RenderOptions.BitmapScalingMode="HighQuality" />
                             </Border>
 
                             <StackPanel Margin="12,8,12,0">
