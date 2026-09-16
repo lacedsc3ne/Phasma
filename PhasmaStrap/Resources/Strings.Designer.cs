@@ -11417,6 +11417,169 @@ namespace PhasmaStrap.Resources {
             }
         }
 
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA Setup.
+        /// </summary>
+        public static string Menu_Nvidia_Setup_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Setup.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Learn how PhasmaStrap's NVIDIA integration works..
+        /// </summary>
+        public static string Menu_Nvidia_Setup_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Setup.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing how PhasmaStrap's NVIDIA integration works.
+        /// </summary>
+        public static string Menu_Nvidia_Setup_HelpText {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Setup.HelpText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Manage the custom NVIDIA settings stored in your PhasmaStrap driver profile, by raw NVIDIA Profile Inspector setting ID..
+        /// </summary>
+        public static string Menu_Nvidia_Editor_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search flags.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_Search {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.Search", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete all.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_DeleteAll {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.DeleteAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reset NIP.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_ResetNip {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.ResetNip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_ApplyButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.ApplyButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Flags added: {0}.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_FlagsAdded {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.FlagsAdded", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Selected: {0}.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_Selected {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.Selected", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_Column_Type {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.Column.Type", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setting ID.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_Column_SettingId {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.Column.SettingId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add an NVIDIA setting to get started..
+        /// </summary>
+        public static string Menu_Nvidia_Editor_EmptyState {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.EmptyState", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Delete all {0} custom NVIDIA setting(s)? This also resets them to the driver's default in your PhasmaStrap profile. This cannot be undone..
+        /// </summary>
+        public static string Menu_Nvidia_Editor_DeleteAllConfirm {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.DeleteAllConfirm", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This resets every NVIDIA setting currently stored in your PhasmaStrap driver profile - including the options on the previous screen - back to the driver's default. This cannot be undone. Continue?.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_ResetNipConfirm {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.ResetNipConfirm", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA Flag History.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_History_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.History.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No actions yet..
+        /// </summary>
+        public static string Menu_Nvidia_Editor_History_Empty {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.History.Empty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        public static string Menu_Nvidia_Editor_History_ClearButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.Editor.History.ClearButton", resourceCulture);
+            }
+        }
+
+
 
     }
 }

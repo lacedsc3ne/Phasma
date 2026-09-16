@@ -78,6 +78,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private int _textureLodBias;
         private string _benchmarkOverlayMode = Strings.Menu_Nvidia_BenchmarkOverlay_Disabled;
         private string _statusMessage = string.Empty;
+        private bool _nvidiaEditorViewMode;
 
         public NvidiaViewModel()
         {
@@ -86,6 +87,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             if (IsAvailable)
                 LoadFromDriver();
+
+            RefreshFlagHistory();
+            NvidiaFlagHistory.Changed += OnFlagHistoryChanged;
+        }
+
+        /// <summary>
+        /// Called from NvidiaPage's Unloaded handler so this viewmodel doesn't keep
+        /// <see cref="NvidiaFlagHistory"/> subscribed for the lifetime of the process after the
+        /// page itself has been navigated away from (mirrors NotificationsViewModel.Detach).
+        /// </summary>
+        public void Detach()
+        {
+            NvidiaFlagHistory.Changed -= OnFlagHistoryChanged;
         }
 
         public bool IsAvailable { get; }
@@ -113,6 +127,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // user applies is automatically picked back up here on the next load with no separate
         // storage needed.
         public ObservableCollection<NvidiaSetting> CustomSettings { get; } = new ObservableCollection<NvidiaSetting>();
+
+        // Recent actions taken from the grid view (add/remove/delete/reset/apply), refreshed
+        // from the shared NvidiaFlagHistory log - see that class' remarks for why this is
+        // session-only rather than persisted to disk.
+        public ObservableCollection<NvidiaHistoryEntry> FlagHistory { get; } = new ObservableCollection<NvidiaHistoryEntry>();
+
+        // Toggles NvidiaPage between the collapsed-card view (curated toggles + custom settings
+        // list) and the raw grid "Advanced Editor" view - both live in the same page/DataContext,
+        // this just flips which section is visible (see the DataTriggers in NvidiaPage.xaml).
+        public bool NvidiaEditorViewMode
+        {
+            get => _nvidiaEditorViewMode;
+            set { _nvidiaEditorViewMode = value; OnPropertyChanged(nameof(NvidiaEditorViewMode)); }
+        }
 
         public string LowLatencyMode
         {
@@ -270,6 +298,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Value = value,
                 Type = NvSettingType.Dword,
             });
+
+            NvidiaFlagHistory.Log("Added " + trimmedName + " (0x" + id.ToString("X8", CultureInfo.InvariantCulture) + ")");
         }
 
         // Removes a custom setting from the list and, if the driver is reachable, immediately
@@ -278,6 +308,35 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // in-memory list would otherwise leave the old value sitting in the live driver profile
         // until something else happened to overwrite that setting ID.
         public void RemoveCustomSetting(NvidiaSetting setting)
+        {
+            RemoveCustomSettingCore(setting);
+            NvidiaFlagHistory.Log("Removed " + setting.Name + " (0x" + setting.Id.ToString("X8", CultureInfo.InvariantCulture) + ")");
+        }
+
+        // Bulk version used by the grid view's "Delete Selected" and "Delete all" buttons - same
+        // per-setting removal/driver-reset as RemoveCustomSetting, just logged as one history
+        // entry instead of one per row.
+        public void RemoveCustomSettings(IEnumerable<NvidiaSetting> settings)
+        {
+            List<NvidiaSetting> list = settings is List<NvidiaSetting> already ? already : new List<NvidiaSetting>(settings);
+            if (list.Count == 0)
+                return;
+
+            foreach (NvidiaSetting setting in list)
+                RemoveCustomSettingCore(setting);
+
+            NvidiaFlagHistory.Log(list.Count == 1
+                ? "Removed " + list[0].Name + " (0x" + list[0].Id.ToString("X8", CultureInfo.InvariantCulture) + ")"
+                : "Deleted " + list.Count + " custom setting(s)");
+        }
+
+        // "Delete all" in the grid view - clears every custom setting currently shown.
+        public void ClearCustomSettings()
+        {
+            RemoveCustomSettings(new List<NvidiaSetting>(CustomSettings));
+        }
+
+        private void RemoveCustomSettingCore(NvidiaSetting setting)
         {
             CustomSettings.Remove(setting);
 
@@ -294,6 +353,37 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 App.Logger.WriteLine("NvidiaViewModel", "Failed to reset custom setting: " + ex.Message);
             }
+        }
+
+        // "Reset NIP" in the grid view. Resets *every* setting actually sitting in the live
+        // "PhasmaStrap" driver profile right now (read straight from the driver via ReadProfile,
+        // not guessed) back to its driver default - this includes both the curated
+        // toggles/sliders on the card view and every custom setting, since both are ultimately
+        // stored in the same profile. Reloads all page state from the driver afterwards so the
+        // card view and the grid both reflect the reset immediately.
+        //
+        // Runs on a background thread; the caller (NvidiaPage) is responsible for marshalling
+        // any UI feedback back to the dispatcher thread, same as ApplyToDriver.
+        public NvidiaApplyResult ResetProfile()
+        {
+            if (!IsAvailable)
+            {
+                NvidiaApplyResult unavailable = new NvidiaApplyResult { Ok = false, Message = UnavailableReason };
+                return unavailable;
+            }
+
+            List<NvidiaSetting> live = NvidiaProfileInspector.ReadProfile();
+            uint[] ids = live.Select(setting => setting.Id).ToArray();
+
+            NvidiaApplyResult result = NvidiaProfileInspector.Reset(ids);
+            NvidiaFlagHistory.Log(result.Ok
+                ? "Reset NIP: cleared " + result.Applied + " setting(s) to the driver default"
+                : "Reset NIP failed: " + result.Message);
+
+            if (result.Ok)
+                LoadFromDriver();
+
+            return result;
         }
 
         private Dictionary<uint, uint> BuildSettingsDictionary()
@@ -343,6 +433,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Dictionary<uint, uint> settings = BuildSettingsDictionary();
             NvidiaApplyResult result = NvidiaProfileInspector.Apply(settings);
             StatusMessage = result.Message;
+            NvidiaFlagHistory.Log(result.Ok
+                ? "Applied " + result.Applied + " setting(s)"
+                : "Apply failed: " + result.Message);
             return result;
         }
 
@@ -406,6 +499,21 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             if (IsAvailable)
                 LoadFromDriver();
+        }
+
+        private void OnFlagHistoryChanged(object? sender, EventArgs e)
+        {
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshFlagHistory));
+        }
+
+        private void RefreshFlagHistory()
+        {
+            FlagHistory.Clear();
+
+            foreach (NvidiaHistoryEntry entry in NvidiaFlagHistory.Entries)
+                FlagHistory.Add(entry);
+
+            OnPropertyChanged(nameof(FlagHistory));
         }
 
         private static string ReadEnum(Dictionary<uint, uint> live, uint id, ObservableCollection<string> options)
