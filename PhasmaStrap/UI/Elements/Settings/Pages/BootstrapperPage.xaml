@@ -69,6 +69,107 @@
                 </StackPanel>
             </TabItem>
 
+            <!-- Advanced: cleanup + Roblox process/engine tuning, moved here from PerformancePage
+                 since "what happens at launch/close" is a deployment concern, not a live in-game
+                 performance one - see BehaviourViewModel's Cleanup/Runtime-optimizer regions. -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="WrenchScrewdriver20" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Tab_Advanced}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" />
+                    <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Broom24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="What to clean" />
+                                <TextBlock FontSize="12" Text="Choose a schedule, then pick which caches and logs it applies to." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="Schedule">
+                                <ComboBox Width="160" ItemsSource="{Binding CleanerScheduleOptions, Mode=OneTime}" SelectedItem="{Binding CleanerSchedule, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="PhasmaStrap logs">
+                                <ui:ToggleSwitch IsChecked="{Binding CleanerLogsEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="PhasmaStrap download cache">
+                                <ui:ToggleSwitch IsChecked="{Binding CleanerCacheEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="Roblox logs">
+                                <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxLogsEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="Roblox cache">
+                                <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Gauge24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Engine &amp; process" />
+                                <TextBlock FontSize="12" Text="Which optimization preset runs and how Roblox itself behaves while playing." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_EnginePreset_Title}" Description="{x:Static resources:Strings.Menu_Performance_EnginePreset_Description}">
+                                <ComboBox Padding="10,5,10,5" MinWidth="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Title}" Description="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding OptimizeRoblox, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding RobloxEfficiencyMode, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Title}" Description="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ReduceMemoryOutOfFocus, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Options24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Priority &amp; memory" />
+                                <TextBlock FontSize="12" Text="How CPU priority and memory usage are managed for Roblox and the launcher." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CpuPriority_Title}" Description="{x:Static resources:Strings.Menu_Performance_CpuPriority_Description}">
+                                <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding CpuPriorityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedCpuPriority, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Description}">
+                                <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding RobloxPriorityLimitOptions, Mode=OneTime}" SelectedItem="{Binding RobloxPriorityLimit, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Title}" Description="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding LauncherMemoryManagerEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Title}" Description="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SoftwareRenderingEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+                </StackPanel>
+            </TabItem>
+
             <!-- Matchmaker: PhasmaStrap's own auto server-picker, moved here from the Server
                  Browser page to match Voidstrap's grouping - see BehaviourViewModel.Matchmaker,
                  which reuses ServerBrowserViewModel instead of duplicating this logic. The
