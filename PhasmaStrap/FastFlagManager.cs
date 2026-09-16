@@ -487,17 +487,23 @@ namespace PhasmaStrap
             return null;
         }
 
+        // matches the preset key itself, or a dot-delimited child of it (e.g. prefix "Rendering.Mode"
+        // matches "Rendering.Mode" and "Rendering.Mode.Vulkan", but NOT an unrelated sibling key like
+        // "Rendering.Shaders2" when prefix is "Rendering.Shaders" - plain StartsWith would wrongly
+        // treat "Shaders2" as a child of "Shaders" since there's no separator between them)
+        private static bool MatchesPresetPrefix(string key, string prefix) => key == prefix || key.StartsWith(prefix + ".");
+
         public void SetPreset(string prefix, object? value)
         {
-            foreach (var pair in PresetFlags.Where(x => x.Key.StartsWith(prefix)))
+            foreach (var pair in PresetFlags.Where(x => MatchesPresetPrefix(x.Key, prefix)))
                 SetValue(pair.Value, value);
         }
 
         public void SetPresetEnum(string prefix, string target, object? value)
         {
-            foreach (var pair in PresetFlags.Where(x => x.Key.StartsWith(prefix)))
+            foreach (var pair in PresetFlags.Where(x => MatchesPresetPrefix(x.Key, prefix)))
             {
-                if (pair.Key.StartsWith($"{prefix}.{target}"))
+                if (MatchesPresetPrefix(pair.Key, $"{prefix}.{target}"))
                     SetValue(pair.Value, value);
                 else
                     SetValue(pair.Value, null);
