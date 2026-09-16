@@ -70,23 +70,33 @@ namespace PhasmaStrap.Networking
 
         private static void RegisterHosts()
         {
-            AssetProxyServer.InterceptedHosts[PresenceSpoofPolicy.Host] = (PresenceSpoofPolicy.TransformRequest, null);
+            AssetProxyServer.InterceptedHosts[PresenceSpoofPolicy.Host] = (PresenceSpoofPolicy.TransformRequest, null, null);
 
             AssetProxyServer.InterceptedHosts.TryGetValue(RobuxSpoofer.Host, out var existingEconomy);
-            AssetProxyServer.InterceptedHosts[RobuxSpoofer.Host] = (existingEconomy.RequestTransform, RobuxSpoofer.ProcessResponse);
+            AssetProxyServer.InterceptedHosts[RobuxSpoofer.Host] = (existingEconomy.RequestTransform, RobuxSpoofer.ProcessResponse, existingEconomy.TryServeFromCache);
 
             AssetProxyServer.InterceptedHosts.TryGetValue(UsernameSpoofer.Host, out var existingApis);
-            AssetProxyServer.InterceptedHosts[UsernameSpoofer.Host] = (existingApis.RequestTransform, CombineResponseTransforms(existingApis.ResponseTransform, UsernameSpoofer.ProcessResponse));
+            AssetProxyServer.InterceptedHosts[UsernameSpoofer.Host] = (existingApis.RequestTransform, CombineResponseTransforms(existingApis.ResponseTransform, UsernameSpoofer.ProcessResponse), existingApis.TryServeFromCache);
+
+            AssetProxyServer.InterceptedHosts.TryGetValue(GameCreatorSpoofer.Host, out var existingGames);
+            AssetProxyServer.InterceptedHosts[GameCreatorSpoofer.Host] = (existingGames.RequestTransform, CombineResponseTransforms(existingGames.ResponseTransform, GameCreatorSpoofer.ProcessResponse), existingGames.TryServeFromCache);
 
             RegisterAssetWarpHosts();
         }
 
         private static void RegisterAssetWarpHosts()
         {
-            AssetProxyServer.InterceptedHosts[AssetWarpPolicy.Host] = (AssetWarpPolicy.TransformRequest, null);
+            AssetProxyServer.InterceptedHosts.TryGetValue(AssetWarpPolicy.Host, out var existingDelivery);
+            AssetProxyServer.InterceptedHosts[AssetWarpPolicy.Host] = (
+                AssetWarpPolicy.TransformRequest,
+                CombineResponseTransforms(existingDelivery.ResponseTransform, AssetPreloadCache.CacheResponse),
+                AssetPreloadCache.TryServeFromCache);
 
             AssetProxyServer.InterceptedHosts.TryGetValue(AssetWarpThumbnailPolicy.Host, out var existingThumbnails);
-            AssetProxyServer.InterceptedHosts[AssetWarpThumbnailPolicy.Host] = (existingThumbnails.RequestTransform, CombineResponseTransforms(existingThumbnails.ResponseTransform, AssetWarpThumbnailPolicy.ProcessResponse));
+            AssetProxyServer.InterceptedHosts[AssetWarpThumbnailPolicy.Host] = (
+                existingThumbnails.RequestTransform,
+                CombineResponseTransforms(existingThumbnails.ResponseTransform, AssetWarpThumbnailPolicy.ProcessResponse),
+                existingThumbnails.TryServeFromCache);
         }
 
         private static Func<ProxiedRequest, ProxiedResponse, byte[]?> CombineResponseTransforms(

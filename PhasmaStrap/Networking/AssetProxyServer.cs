@@ -23,8 +23,12 @@ namespace PhasmaStrap.Networking
         // this only ever binds to loopback, so it can't be reached from outside this machine.
         public const int Port = 443;
 
-        // hostname -> optional request transform, optional response transform
-        public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform)> InterceptedHosts
+        // hostname -> optional request transform, optional response transform, optional cache
+        // short-circuit (checked before ever contacting the real server - if it returns a
+        // response, that's used directly and ForwardToUpstreamAsync is skipped entirely; this is
+        // what actually makes AssetWarp's "Preloading" serve cached assets without a network
+        // round-trip, rather than just rewriting a response that was already fetched)
+        public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform, Func<ProxiedRequest, ProxiedResponse?>? TryServeFromCache)> InterceptedHosts
             = new(StringComparer.OrdinalIgnoreCase);
 
         private static TcpListener? _listener;
@@ -138,7 +142,7 @@ namespace PhasmaStrap.Networking
                 if (request is null)
                     return;
 
-                var (requestTransform, responseTransform) = InterceptedHosts[sniHost];
+                var (requestTransform, responseTransform, tryServeFromCache) = InterceptedHosts[sniHost];
 
                 if (requestTransform is not null)
                 {
@@ -147,14 +151,20 @@ namespace PhasmaStrap.Networking
                         request = request with { Body = transformed };
                 }
 
-                ProxiedResponse? response = await ForwardToUpstreamAsync(request, token);
+                ProxiedResponse? response = tryServeFromCache?.Invoke(request);
+                bool servedFromCache = response is not null;
+
                 if (response is null)
                 {
-                    await WriteSimpleResponseAsync(sslStream, 502, "Bad Gateway", token);
-                    return;
+                    response = await ForwardToUpstreamAsync(request, token);
+                    if (response is null)
+                    {
+                        await WriteSimpleResponseAsync(sslStream, 502, "Bad Gateway", token);
+                        return;
+                    }
                 }
 
-                if (responseTransform is not null)
+                if (!servedFromCache && responseTransform is not null)
                 {
                     byte[]? transformed = responseTransform(request, response);
                     if (transformed is not null)

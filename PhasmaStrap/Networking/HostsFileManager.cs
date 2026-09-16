@@ -27,6 +27,7 @@ namespace PhasmaStrap.Networking
                 PresenceSpoofPolicy.Host,
                 RobuxSpoofer.Host,
                 UsernameSpoofer.Host,
+                GameCreatorSpoofer.Host,
                 AssetWarpPolicy.Host,
                 AssetWarpThumbnailPolicy.Host,
             }

@@ -20,64 +20,108 @@
         </Border>
 
         <StackPanel Visibility="{Binding AvailableVisibility}">
-            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_LatencyFramerate}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Description}">
-                <ComboBox Width="140" ItemsSource="{Binding LowLatencyModes, Mode=OneTime}" SelectedItem="{Binding LowLatencyMode, Mode=TwoWay}" />
+            <controls:OptionControl Margin="0,16,0,0" Header="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Description}">
+                <ui:Button Content="{x:Static resources:Strings.Common_Open}" Icon="Open24" Click="CopySettings_Click" />
             </controls:OptionControl>
 
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Description}">
-                <ComboBox Width="140" ItemsSource="{Binding FrlLowLatencyModes, Mode=OneTime}" SelectedItem="{Binding FrlLowLatencyMode, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Description}">
-                <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding FrameRateLimit, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Description}">
-                <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Description}">
-                <ComboBox Width="280" ItemsSource="{Binding BenchmarkOverlayModes, Mode=OneTime}" SelectedItem="{Binding BenchmarkOverlayMode, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding ResizableBar, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_ImageQuality}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding DlssSuperResolution, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding DlssFrameGeneration, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding Mfaa, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding Fxaa, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Description}">
-                <ui:ToggleSwitch IsChecked="{Binding GammaCorrection, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Description}">
-                <ComboBox Width="140" ItemsSource="{Binding SilkSmoothnessModes, Mode=OneTime}" SelectedItem="{Binding SilkSmoothness, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_TextureLodBias_Title}" Description="{Binding TextureLodBiasLabel}">
-                <StackPanel Orientation="Horizontal">
-                    <Slider Width="200" Minimum="-32" Maximum="120" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding TextureLodBias, Mode=TwoWay}" />
-                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TextureLodBias, Mode=OneWay}" />
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Nvidia_ApplyCard_Title}" />
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Nvidia_ApplyCard_Description}" />
                 </StackPanel>
-            </controls:OptionControl>
+                <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Nvidia_ApplyButton}" Appearance="Primary" Icon="CheckmarkCircle24" Click="Apply_Click" x:Name="ApplyButton" />
+            </Grid>
+
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_FastFlagsHeader}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+            <ui:CardExpander Margin="0,8,0,0">
+                <ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_GameDetails_Title}" />
+                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Nvidia_GameDetails_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Description}">
+                        <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding FrameRateLimit, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Description}">
+                        <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Description}">
+                        <ComboBox Width="280" ItemsSource="{Binding BenchmarkOverlayModes, Mode=OneTime}" SelectedItem="{Binding BenchmarkOverlayMode, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssSuperResolution_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding DlssSuperResolution, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_DlssFrameGeneration_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding DlssFrameGeneration, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </ui:CardExpander>
+
+            <ui:CardExpander Margin="0,8,0,0">
+                <ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_LatencyFramerate}" />
+                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Nvidia_LowLatencyModes_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_LowLatencyMode_Description}">
+                        <ComboBox Width="140" ItemsSource="{Binding LowLatencyModes, Mode=OneTime}" SelectedItem="{Binding LowLatencyMode, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrlLowLatencyMode_Description}">
+                        <ComboBox Width="140" ItemsSource="{Binding FrlLowLatencyModes, Mode=OneTime}" SelectedItem="{Binding FrlLowLatencyMode, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </ui:CardExpander>
+
+            <ui:CardExpander Margin="0,8,0,0">
+                <ui:CardExpander.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_HardwareOverrides_Title}" />
+                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Nvidia_HardwareOverrides_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding ResizableBar, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Mfaa_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding Mfaa, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_Fxaa_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding Fxaa, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_GammaCorrection_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding GammaCorrection, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_SilkSmoothness_Description}">
+                        <ComboBox Width="140" ItemsSource="{Binding SilkSmoothnessModes, Mode=OneTime}" SelectedItem="{Binding SilkSmoothness, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_TextureLodBias_Title}" Description="{Binding TextureLodBiasLabel}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="-32" Maximum="120" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding TextureLodBias, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TextureLodBias, Mode=OneWay}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                </StackPanel>
+            </ui:CardExpander>
 
             <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
             <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_Description}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,2,0,8" />
@@ -119,8 +163,7 @@
             <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_AddButton}" Icon="AddCircle24" HorizontalAlignment="Left" Margin="0,8,0,0" Click="AddCustomSetting_Click" />
 
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ApplyButton}" Appearance="Primary" Click="Apply_Click" x:Name="ApplyButton" />
-                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ReloadButton}" Margin="8,0,0,0" Click="Reload_Click" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ReloadButton}" Click="Reload_Click" />
                 <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ExportNipButton}" Margin="8,0,0,0" Click="ExportNip_Click" />
                 <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_CopySettingsButton}" Margin="8,0,0,0" Click="CopySettings_Click" />
             </StackPanel>

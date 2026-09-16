@@ -99,6 +99,92 @@
                                 Description="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Description}">
                                 <ui:ToggleSwitch IsChecked="{Binding DisableAllMeshes, Mode=TwoWay}" />
                             </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_PresenceSpoofer_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_PresenceSpoofer_Description}">
+                                <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_Preloading_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding PreloadEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Description}">
+                                <StackPanel Width="250">
+                                    <Slider Minimum="256" Maximum="8192" TickFrequency="256" IsSnapToTickEnabled="True" Value="{Binding PreloadCacheMb, Mode=TwoWay}" />
+                                    <TextBlock HorizontalAlignment="Right" Text="{Binding PreloadCacheSizeDisplay, Mode=OneWay}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding PreloadAvatar, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding PreloadCrossGame, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
+                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,4" />
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Description}">
+                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofOthersName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SpoofOthersApplyIngame, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SpoofOthersVerified, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Description}">
+                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofSelfName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfApplyIngame, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_RobuxAdjuster_Title}"
+                                Description="{Binding RobuxSpoofSummary, Mode=OneWay}">
+                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfVerified, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfGameCreator, Mode=TwoWay}" />
+                            </controls:OptionControl>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
