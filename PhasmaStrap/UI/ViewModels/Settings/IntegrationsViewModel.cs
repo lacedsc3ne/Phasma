@@ -1,5 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 using Microsoft.Win32;
 
@@ -12,6 +15,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class IntegrationsViewModel : NotifyPropertyChangedViewModel
     {
+        // the actual Roblox logo, for the Discord presence preview card below - same
+        // System.Drawing.Icon->BitmapSource conversion ExternalEditorPickerDialog.xaml.cs already
+        // uses, applied to the current-era Roblox icon already bundled for the bootstrapper's own
+        // splash/progress dialogs (see Properties/Resources.resx, BootstrapperIconEx.cs)
+        public ImageSource RobloxIconSource { get; } = CreateRobloxIconSource();
+
+        private static ImageSource CreateRobloxIconSource()
+        {
+            ImageSource source = Imaging.CreateBitmapSourceFromHIcon(Properties.Resources.Icon2022.Handle, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            source.Freeze();
+            return source;
+        }
+
         public ICommand AddIntegrationCommand => new RelayCommand(AddIntegration);
 
         public ICommand DeleteIntegrationCommand => new RelayCommand(DeleteIntegration);
