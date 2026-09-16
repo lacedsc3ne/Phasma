@@ -539,7 +539,7 @@ Would you like to upgrade your currently installed version?</value>
     <value>Force Roblox reinstallation</value>
   </data>
   <data name="Menu.Behaviour.Title" xml:space="preserve">
-    <value>Bootstrapper</value>
+    <value>Deployment</value>
   </data>
   <data name="Menu.FastFlagEditor.AddNew" xml:space="preserve">
     <value>Add new</value>
@@ -3151,7 +3151,7 @@ Example:
     <value>Search releases...</value>
   </data>
   <data name="Menu.Releases.Title" xml:space="preserve">
-    <value>Releases</value>
+    <value>News</value>
   </data>
   <data name="Menu.Releases.ViewOnGitHub" xml:space="preserve">
     <value>View on GitHub</value>
@@ -3292,7 +3292,7 @@ Example:
     <value>Choose which editor to open Theme.xml in</value>
   </data>
   <data name="Menu.GBSEditor.Title" xml:space="preserve">
-    <value>GBS Editor</value>
+    <value>Global</value>
   </data>
   <data name="Menu.GBSEditor.Description" xml:space="preserve">
     <value>Directly view, add, edit, and remove every raw key stored in Roblox's GlobalBasicSettings file, not just the curated toggles on the Performance page.</value>
