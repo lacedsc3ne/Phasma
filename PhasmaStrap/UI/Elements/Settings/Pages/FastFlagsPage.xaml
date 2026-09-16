@@ -181,8 +181,8 @@
                     <ui:ToggleSwitch IsChecked="{Binding MinimalRendering, Mode=TwoWay}" />
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Title}">
-                    <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Description}">
+                    <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" IsEnabled="{Binding FRMQualityLevelEditable}" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
@@ -201,14 +201,6 @@
                 </StackPanel>
             </ui:CardExpander.Header>
             <StackPanel>
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityOverride_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding FRMQualityOverrideEnabled, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityOverrideLevel_Title}" Visibility="{Binding FRMQualityOverrideEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ui:NumberBox Width="140" Min="0" Max="21" Value="{Binding FRMQualityOverride, Mode=TwoWay}" />
-                </controls:OptionControl>
-
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MeshQuality_Title}">
                     <ui:ToggleSwitch IsChecked="{Binding MeshQualityEnabled, Mode=TwoWay}" />
                 </controls:OptionControl>

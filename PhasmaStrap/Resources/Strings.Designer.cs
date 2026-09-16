@@ -3373,24 +3373,6 @@ namespace PhasmaStrap.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FRM quality override.
-        /// </summary>
-        public static string Menu_FastFlags_FRMQualityOverride_Title {
-            get {
-                return ResourceManager.GetString("Menu.FastFlags.FRMQualityOverride.Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to FRM quality override level.
-        /// </summary>
-        public static string Menu_FastFlags_FRMQualityOverrideLevel_Title {
-            get {
-                return ResourceManager.GetString("Menu.FastFlags.FRMQualityOverrideLevel.Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Mesh quality.
         /// </summary>
         public static string Menu_FastFlags_MeshQuality_Title {
@@ -3632,7 +3614,16 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlags.FRMQualityLevel.Title", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Locked to Level 21 while Shaders enabled is on, since that forces this to its max value..
+        /// </summary>
+        public static string Menu_FastFlags_FRMQualityLevel_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlags.FRMQualityLevel.Description", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Disable post processing effects.
         /// </summary>

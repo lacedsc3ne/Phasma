@@ -145,8 +145,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                 // Engine Settings - Rendering
                 Entry(Strings.Menu_FastFlags_LightCulling_Title, Strings.Menu_FastFlags_LightCulling_Description, typeof(FastFlagSettingsPage), fastFlags),
                 Entry(Strings.Menu_FastFlags_RainbowTheme_Title, Strings.Menu_FastFlags_RainbowTheme_Description, typeof(FastFlagSettingsPage), fastFlags),
-                Entry(Strings.Menu_FastFlags_FRMQualityOverride_Title, "", typeof(FastFlagSettingsPage), fastFlags),
-                Entry(Strings.Menu_FastFlags_FRMQualityOverrideLevel_Title, "", typeof(FastFlagSettingsPage), fastFlags),
                 Entry(Strings.Menu_FastFlags_MeshQuality_Title, "", typeof(FastFlagSettingsPage), fastFlags),
                 Entry(Strings.Menu_FastFlags_MeshQualityLevel_Title, "", typeof(FastFlagSettingsPage), fastFlags),
                 Entry(Strings.Menu_FastFlags_UnlimitedCameraZoom_Title, Strings.Menu_FastFlags_UnlimitedCameraZoom_Description, typeof(FastFlagSettingsPage), fastFlags),

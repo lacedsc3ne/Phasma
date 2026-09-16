@@ -4,6 +4,8 @@ namespace PhasmaStrap.Enums.FlagPresets
     {
         [EnumName(StaticName = "Disabled")]
         Disabled,
+        [EnumName(StaticName = "Level 0")]
+        Level0,
         [EnumName(StaticName = "Level 1")]
         Level1,
         [EnumName(StaticName = "Level 2")]
