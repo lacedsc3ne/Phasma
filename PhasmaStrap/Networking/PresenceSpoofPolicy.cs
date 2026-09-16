@@ -71,6 +71,36 @@ namespace PhasmaStrap.Networking
             }
         }
 
+        // Roblox's presence backend only considers a session "online" while pulses for it
+        // keep arriving - there's no ClientType/Location pair that means "offline" the way
+        // Studio/Website mean "in Studio"/"online", so rewriting the body like Online/Studio
+        // do can't express it, and would still renew the online session regardless of what
+        // values were sent. Instead, Offline mode short-circuits the request entirely (via
+        // AssetProxyServer's TryServeFromCache hook) and hands back a synthesized success
+        // response without ever forwarding the pulse upstream. With no pulse reaching the
+        // real server, the session's presence naturally ages out and Roblox reports it
+        // offline to friends/followers, while the client stays fully logged in and playing.
+        public static ProxiedResponse? TryServeFromCache(ProxiedRequest request)
+        {
+            PresenceSpoofMode mode = App.Settings.Prop.PresenceSpoofMode;
+
+            if (mode != PresenceSpoofMode.Offline)
+                return null;
+
+            if (!request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            if (!request.Path.Contains(PulseFragment, StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Content-Type"] = "application/json"
+            };
+
+            return new ProxiedResponse(200, "OK", headers, Encoding.UTF8.GetBytes("{}"));
+        }
+
         private static (string Key, JsonObject? Value) FindObject(JsonObject value, string name)
         {
             foreach ((string key, JsonNode? node) in value)
