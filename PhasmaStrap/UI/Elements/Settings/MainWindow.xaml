@@ -162,7 +162,6 @@
                     <ui:NavigationHeader Text="Configuration" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Mods_Title}" PageType="{x:Type pages:ModsPage}" Icon="WrenchScrewdriver20" PageTag="mods" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagEditor_Title}" PageType="{x:Type pages:FastFlagEditorPage}" Icon="Flag24" PageTag="fastflageditor" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GBSEditor_Title}" PageType="{x:Type pages:GBSEditorPage}" Icon="Globe24" PageTag="gbseditor" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Releases_Title}" PageType="{x:Type pages:ReleasesPage}" Icon="DocumentBulletList24" PageTag="releases" />
                     <ui:NavigationItem Content="Manager" PageType="{x:Type installerpages:ManagerPage}" Icon="ArrowDownload24" PageTag="manager" />
@@ -171,7 +170,6 @@
                     <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagProfiles_Title}" PageType="{x:Type pages:FastFlagProfilesPage}" Icon="Games24" PageTag="fastflagprofiles" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
                 </ui:NavigationFluent.Items>

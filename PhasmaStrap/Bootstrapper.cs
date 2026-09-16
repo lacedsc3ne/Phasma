@@ -331,7 +331,6 @@ namespace PhasmaStrap
                         await TryApplyMatchmakingAsync();
 
                     long? launchPlaceId = TryResolveLaunchPlaceId();
-                    await TryApplyFastFlagProfileAsync(launchPlaceId);
                     await TryApplyEngineSettingsScopeAsync(launchPlaceId);
 
                     // fire-and-forget: warms the AssetWarp preload cache ahead of the game
@@ -711,7 +710,7 @@ namespace PhasmaStrap
             App.Logger.WriteLine(LOG_IDENT, $"Redirecting to {winner.DatacenterName} (about {winner.EstimatedPingMs}ms), JobId {winner.JobId}");
         }
 
-        // shared with TryApplyFastFlagProfileAsync below - both need the placeId from the same
+        // shared with TryApplyEngineSettingsScopeAsync below - needs the placeId from the same
         // "roblox://experiences/start?placeId=X" deep link format, independent of whether the
         // matchmaker itself is enabled
         private long? TryResolveLaunchPlaceId()
@@ -729,7 +728,7 @@ namespace PhasmaStrap
 
             // legacy ticket-based launch format - same extraction as TryApplyLegacyTicketMatchmakingAsync,
             // since a real browser Play click just as often lands here as on the modern deep-link format
-            // above, and FastFlag profiles / Engine Settings scope need to resolve a place ID for either
+            // above, and Engine Settings scope needs to resolve a place ID for either
             Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
             if (!ticketMatch.Success)
                 return null;
@@ -744,119 +743,6 @@ namespace PhasmaStrap
 
             if (long.TryParse(ticketQueryParams["placeId"], out long ticketPlaceId) && ticketPlaceId > 0)
                 return ticketPlaceId;
-
-            return null;
-        }
-
-        // merges a named FastFlag profile's overrides on top of the already-materialized
-        // ClientAppSettings.json in the version folder, if the resolved place has one assigned. Runs after
-        // ApplyModifications() has already copied the global flag set in, and before StartRoblox() - so this
-        // only ever adjusts what's on disk in _latestVersionDirectory, never the user's global mod-folder flags.
-        //
-        // That version-folder file is a SINGLE file shared by every launch of this Roblox version, not
-        // something scoped per-session - and ApplyModifications() only resets it to the global baseline
-        // when UseFastFlagManager is on (it skips touching ClientAppSettings.json entirely when that's
-        // off). So a profile's flags added here for one place would otherwise sit there forever and leak
-        // into every later launch, including places with no profile assigned at all. To stay scoped
-        // correctly regardless of that setting, every run first strips out every flag name that belongs
-        // to ANY known profile, then re-adds only the flags for the place actually being launched into.
-        private async Task TryApplyFastFlagProfileAsync(long? placeId)
-        {
-            const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagProfileAsync";
-
-            Dictionary<string, Dictionary<string, object>> allProfiles = App.Settings.Prop.FastFlagProfiles;
-            if (allProfiles.Count == 0)
-                return;
-
-            try
-            {
-                string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
-
-                Dictionary<string, object> flags = new();
-
-                if (File.Exists(filePath))
-                {
-                    string existing = await File.ReadAllTextAsync(filePath);
-                    if (!string.IsNullOrWhiteSpace(existing))
-                        flags = JsonSerializer.Deserialize<Dictionary<string, object>>(existing) ?? new();
-                }
-
-                int removed = 0;
-                foreach (string flagName in allProfiles.Values.SelectMany(p => p.Keys).Distinct())
-                {
-                    if (flags.Remove(flagName))
-                        removed++;
-                }
-
-                string? profileName = FindMatchingFastFlagProfile(placeId, out Dictionary<string, object>? overrides);
-                int added = 0;
-
-                if (profileName is not null && overrides is not null && overrides.Count > 0)
-                {
-                    foreach (var (flag, value) in overrides)
-                        flags[flag] = value;
-
-                    added = overrides.Count;
-                }
-
-                if (removed == 0 && added == 0)
-                    return;
-
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                Filesystem.AssertReadOnly(filePath);
-                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true }));
-                Filesystem.AssertReadOnly(filePath);
-
-                if (added > 0)
-                    App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag profile '{profileName}' ({added} override(s)) for place {placeId}, cleared {removed} leftover flag(s) from other profiles");
-                else
-                    App.Logger.WriteLine(LOG_IDENT, $"No profile assigned to place {placeId?.ToString() ?? "unknown"}, cleared {removed} leftover flag(s) from other profiles");
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag profile, launching with the global flag set: {ex.Message}");
-            }
-        }
-
-        // finds the first FastFlag profile (in stable alphabetical order, for determinism when more
-        // than one profile's scope happens to cover the same place) whose own "Applies to" scope
-        // (Settings.FastFlagProfileScopes) matches the given place - same All/OnlyListedPlaces/
-        // AllExceptListedPlaces semantics as EngineSettingsScopeMode. A profile with no scope entry
-        // applies nowhere (treated as OnlyListedPlaces with an empty list).
-        private static string? FindMatchingFastFlagProfile(long? placeId, out Dictionary<string, object>? overrides)
-        {
-            overrides = null;
-
-            if (placeId is null)
-                return null;
-
-            string placeIdStr = placeId.Value.ToString();
-            var allProfiles = App.Settings.Prop.FastFlagProfiles;
-            var scopes = App.Settings.Prop.FastFlagProfileScopes;
-
-            foreach (string candidate in allProfiles.Keys.OrderBy(x => x, StringComparer.Ordinal))
-            {
-                if (!scopes.TryGetValue(candidate, out FastFlagProfileScope? scope))
-                    continue;
-
-                bool isListed = scope.Places.Contains(placeIdStr);
-                bool matches = scope.Mode switch
-                {
-                    EngineSettingsScopeMode.All => true,
-                    EngineSettingsScopeMode.OnlyListedPlaces => isListed,
-                    EngineSettingsScopeMode.AllExceptListedPlaces => !isListed,
-                    _ => false
-                };
-
-                if (!matches)
-                    continue;
-
-                if (!allProfiles.TryGetValue(candidate, out Dictionary<string, object>? candidateOverrides) || candidateOverrides.Count == 0)
-                    continue;
-
-                overrides = candidateOverrides;
-                return candidate;
-            }
 
             return null;
         }
