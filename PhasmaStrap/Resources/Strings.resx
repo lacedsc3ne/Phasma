@@ -3470,4 +3470,97 @@ Example:
   <data name="Installer.Extensions.Other.Text" xml:space="preserve">
     <value>Locate and launch third-party tools alongside Roblox. PhasmaStrap doesn't bundle or download these - point it at an existing install.</value>
   </data>
+  <data name="Menu.Behaviour.Section.Launching.Header" xml:space="preserve">
+    <value>Launching</value>
+  </data>
+  <data name="Menu.Behaviour.Section.Launching.Description" xml:space="preserve">
+    <value>What happens when you launch a Roblox game through PhasmaStrap.</value>
+  </data>
+  <data name="Menu.Behaviour.Section.Updates.Header" xml:space="preserve">
+    <value>Roblox updates &amp; installation</value>
+  </data>
+  <data name="Menu.Behaviour.Section.Updates.Description" xml:space="preserve">
+    <value>Keep your Roblox install current, or force a clean reinstall.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.Section.Actions.Header" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Menu.FastFlagEditor.Section.Flags.Header" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.General.Header" xml:space="preserve">
+    <value>Startup &amp; updates</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.General.Description" xml:space="preserve">
+    <value>Controls how PhasmaStrap runs in the background and keeps itself current.</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.Privacy.Header" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.Privacy.Description" xml:space="preserve">
+    <value>What PhasmaStrap sends back to us, if anything.</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.Diagnostics.Header" xml:space="preserve">
+    <value>Diagnostics</value>
+  </data>
+  <data name="Menu.PhasmaStrap.Section.Diagnostics.Description" xml:space="preserve">
+    <value>Package up information for troubleshooting.</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.General.Header" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Entries.Header" xml:space="preserve">
+    <value>Entries</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Entries.Description" xml:space="preserve">
+    <value>Add, edit, or remove individual GlobalBasicSettings keys.</value>
+  </data>
+  <data name="Menu.Integrations.RPCTemplates.Title" xml:space="preserve">
+    <value>Custom Rich Presence Templates</value>
+  </data>
+  <data name="Menu.Integrations.RPCTemplates.Description" xml:space="preserve">
+    <value>Author your own Discord Rich Presence text/images/button for a specific game, applied as the default presence whenever you're in that game. Supported placeholder tokens for the details and state text: {gameName}, {status}, {creator}, {placeId}, {universeId}. If the game itself reports its own rich presence data (via the BloxstrapRPC protocol), that always takes priority over your template while you're playing.</value>
+  </data>
+  <data name="Menu.Shortcuts.StudioCompanion.Title" xml:space="preserve">
+    <value>Studio companion</value>
+  </data>
+  <data name="Menu.Shortcuts.StudioCompanion.Description" xml:space="preserve">
+    <value>Installs a Roblox Studio plugin that reports what you're working on back to PhasmaStrap.</value>
+  </data>
+  <data name="Menu.Shortcuts.GameShortcuts.Title" xml:space="preserve">
+    <value>Game shortcuts</value>
+  </data>
+  <data name="Menu.Shortcuts.GameShortcuts.Description" xml:space="preserve">
+    <value>Create a desktop shortcut that launches straight into one specific game, using that game's own icon. Enter a place ID or a roblox.com/games/... link.</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairAppearance.Title" xml:space="preserve">
+    <value>Crosshair appearance</value>
+  </data>
+  <data name="Menu.Overlays.CrosshairAppearance.Description" xml:space="preserve">
+    <value>Fine-tune the crosshair's size, thickness, opacity, and colors.</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.EngineData.Title" xml:space="preserve">
+    <value>Engine data</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.EngineData.Description" xml:space="preserve">
+    <value>The shared engine files every classic client depends on to run.</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.InstallUpdate.Title" xml:space="preserve">
+    <value>Install &amp; update clients</value>
+  </data>
+  <data name="Menu.ClassicClient.AcquireClients.InstallUpdate.Description" xml:space="preserve">
+    <value>Download a new classic client, or check your existing ones for updates.</value>
+  </data>
+  <data name="Menu.Appearance.IconSection.Title" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="Menu.Appearance.IconSection.Description" xml:space="preserve">
+    <value>Choose the icon PhasmaStrap uses, or customise the title and icon shown while it's launching.</value>
+  </data>
+  <data name="Menu.Appearance.VisualEffects.Title" xml:space="preserve">
+    <value>Visual effects</value>
+  </data>
+  <data name="Menu.Appearance.VisualEffects.Description" xml:space="preserve">
+    <value>Window material, transition animations, and other cosmetic touches.</value>
+  </data>
 </root>

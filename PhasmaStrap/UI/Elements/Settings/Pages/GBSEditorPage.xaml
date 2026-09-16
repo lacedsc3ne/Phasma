@@ -17,6 +17,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -24,11 +26,18 @@
 
         <ui:InfoBar Grid.Row="1" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_GBSEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_GBSEditor_BannerText}" Severity="Warning" IsClosable="False" />
 
-        <controls:OptionControl Grid.Row="2" Margin="0,0,0,16" Header="{x:Static resources:Strings.Menu_GBSEditor_LockFile}" Description="{x:Static resources:Strings.Menu_GBSEditor_LockFileDescription}">
+        <TextBlock Grid.Row="2" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+
+        <controls:OptionControl Grid.Row="3" Margin="0,0,0,16" Header="{x:Static resources:Strings.Menu_GBSEditor_LockFile}" Description="{x:Static resources:Strings.Menu_GBSEditor_LockFileDescription}">
             <ui:ToggleSwitch IsChecked="{Binding SettingsFileReadOnly, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <WrapPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="4" Margin="0,0,0,8">
+            <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Header}" FontSize="20" FontWeight="Medium" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Description}" />
+        </StackPanel>
+
+        <WrapPanel Grid.Row="5" Orientation="Horizontal" VerticalAlignment="Bottom">
             <ui:TextBox x:Name="NewNameTextBox" Width="180" Margin="0,0,8,12" PlaceholderText="{x:Static resources:Strings.Common_Name}" />
             <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="token" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
             <ui:TextBox x:Name="NewValueTextBox" Width="180" Margin="0,0,12,12" PlaceholderText="{x:Static resources:Strings.Common_Value}" />
@@ -46,7 +55,7 @@
             </ui:Button>
         </WrapPanel>
 
-        <DataGrid Name="DataGrid" Grid.Row="4" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+        <DataGrid Name="DataGrid" Grid.Row="6" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
             <DataGrid.Style>
                 <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                     <Setter Property="Background" Value="Transparent" />

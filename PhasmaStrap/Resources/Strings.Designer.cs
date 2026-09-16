@@ -9717,5 +9717,288 @@ namespace PhasmaStrap.Resources {
             }
         }
 
+        /// <summary>
+        ///   Looks up a localized string similar to Launching.
+        /// </summary>
+        public static string Menu_Behaviour_Section_Launching_Header {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Section.Launching.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to What happens when you launch a Roblox game through PhasmaStrap..
+        /// </summary>
+        public static string Menu_Behaviour_Section_Launching_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Section.Launching.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox updates &amp; installation.
+        /// </summary>
+        public static string Menu_Behaviour_Section_Updates_Header {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Section.Updates.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Keep your Roblox install current, or force a clean reinstall..
+        /// </summary>
+        public static string Menu_Behaviour_Section_Updates_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Section.Updates.Description", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Startup &amp; updates.
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_General_Header {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.General.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Controls how PhasmaStrap runs in the background and keeps itself current..
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_General_Description {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.General.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Privacy.
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_Privacy_Header {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.Privacy.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to What PhasmaStrap sends back to us, if anything..
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_Privacy_Description {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.Privacy.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Diagnostics.
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_Diagnostics_Header {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.Diagnostics.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Package up information for troubleshooting..
+        /// </summary>
+        public static string Menu_PhasmaStrap_Section_Diagnostics_Description {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Section.Diagnostics.Description", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Actions.
+        /// </summary>
+        public static string Menu_FastFlagEditor_Section_Actions_Header {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.Section.Actions.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_Section_Flags_Header {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.Section.Flags.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_General_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.General.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Entries.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Entries_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Entries.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add, edit, or remove individual GlobalBasicSettings keys..
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Entries_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Entries.Description", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Custom Rich Presence Templates.
+        /// </summary>
+        public static string Menu_Integrations_RPCTemplates_Title {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.RPCTemplates.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Author your own Discord Rich Presence text/images/button for a specific game, applied as the default presence whenever you&apos;re in that game. Supported placeholder tokens for the details and state text: {gameName}, {status}, {creator}, {placeId}, {universeId}. If the game itself reports its own rich presence data (via the BloxstrapRPC protocol), that always takes priority over your template while you&apos;re playing..
+        /// </summary>
+        public static string Menu_Integrations_RPCTemplates_Description {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.RPCTemplates.Description", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Studio companion.
+        /// </summary>
+        public static string Menu_Shortcuts_StudioCompanion_Title {
+            get {
+                return ResourceManager.GetString("Menu.Shortcuts.StudioCompanion.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installs a Roblox Studio plugin that reports what you&apos;re working on back to PhasmaStrap..
+        /// </summary>
+        public static string Menu_Shortcuts_StudioCompanion_Description {
+            get {
+                return ResourceManager.GetString("Menu.Shortcuts.StudioCompanion.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Game shortcuts.
+        /// </summary>
+        public static string Menu_Shortcuts_GameShortcuts_Title {
+            get {
+                return ResourceManager.GetString("Menu.Shortcuts.GameShortcuts.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create a desktop shortcut that launches straight into one specific game, using that game&apos;s own icon. Enter a place ID or a roblox.com/games/... link..
+        /// </summary>
+        public static string Menu_Shortcuts_GameShortcuts_Description {
+            get {
+                return ResourceManager.GetString("Menu.Shortcuts.GameShortcuts.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Crosshair appearance.
+        /// </summary>
+        public static string Menu_Overlays_CrosshairAppearance_Title {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairAppearance.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fine-tune the crosshair&apos;s size, thickness, opacity, and colors..
+        /// </summary>
+        public static string Menu_Overlays_CrosshairAppearance_Description {
+            get {
+                return ResourceManager.GetString("Menu.Overlays.CrosshairAppearance.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Engine data.
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_EngineData_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.EngineData.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The shared engine files every classic client depends on to run..
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_EngineData_Description {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.EngineData.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install &amp; update clients.
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_InstallUpdate_Title {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.InstallUpdate.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Download a new classic client, or check your existing ones for updates..
+        /// </summary>
+        public static string Menu_ClassicClient_AcquireClients_InstallUpdate_Description {
+            get {
+                return ResourceManager.GetString("Menu.ClassicClient.AcquireClients.InstallUpdate.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the icon PhasmaStrap uses, or customise the title and icon shown while it's launching..
+        /// </summary>
+        public static string Menu_Appearance_IconSection_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.IconSection.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Icon.
+        /// </summary>
+        public static string Menu_Appearance_IconSection_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.IconSection.Title", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Window material, transition animations, and other cosmetic touches..
+        /// </summary>
+        public static string Menu_Appearance_VisualEffects_Description {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.VisualEffects.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Visual effects.
+        /// </summary>
+        public static string Menu_Appearance_VisualEffects_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.VisualEffects.Title", resourceCulture);
+            }
+        }
+
+
     }
 }

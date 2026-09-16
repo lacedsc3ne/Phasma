@@ -17,19 +17,25 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Margin="0,0,0,8" Text="{x:Static resources:Strings.Menu_Behaviour_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl 
+        <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Section_Launching_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Behaviour_Section_Launching_Description}" />
+
+        <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Behaviour_ConfirmLaunches_Title}"
             Description="{x:Static resources:Strings.Menu_Behaviour_ConfirmLaunches_Description}">
             <ui:ToggleSwitch IsChecked="{Binding ConfirmLaunches, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl 
+        <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Section_Updates_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Behaviour_Section_Updates_Description}" />
+
+        <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Behaviour_BackgroundUpdates_Title}"
             Description="{x:Static resources:Strings.Menu_Behaviour_BackgroundUpdates_Description}">
             <ui:ToggleSwitch IsChecked="{Binding BackgroundUpdates, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl 
+        <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Behaviour_ForceRobloxReinstall_Title}"
             Description="{x:Static resources:Strings.Menu_Behaviour_ForceRobloxReinstall_Description}">
             <controls:OptionControl.Style>
