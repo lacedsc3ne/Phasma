@@ -4076,4 +4076,60 @@ Example:
   <data name="Menu.Mods.Tabs.PresetMod" xml:space="preserve">
     <value>Preset Mod</value>
   </data>
+  <data name="Menu.Nvidia.Setup.Title" xml:space="preserve">
+    <value>NVIDIA Setup</value>
+  </data>
+  <data name="Menu.Nvidia.Setup.Description" xml:space="preserve">
+    <value>Learn how PhasmaStrap's NVIDIA integration works.</value>
+  </data>
+  <data name="Menu.Nvidia.Setup.HelpText" xml:space="preserve">
+    <value>PhasmaStrap talks to the NVIDIA driver directly through NVAPI - there's no separate "NVIDIA Profile Inspector" install to download or point PhasmaStrap at.
+
+Everything on this page (and the Advanced Editor) reads and writes a dedicated "PhasmaStrap" driver profile scoped to RobloxPlayerBeta.exe/RobloxStudioBeta.exe. Changing a value here does nothing until you press Apply, which needs administrator rights the first time Windows asks for them.</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.Description" xml:space="preserve">
+    <value>Manage the custom NVIDIA settings stored in your PhasmaStrap driver profile, by raw NVIDIA Profile Inspector setting ID.</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.Search" xml:space="preserve">
+    <value>Search flags</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.DeleteAll" xml:space="preserve">
+    <value>Delete all</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.ResetNip" xml:space="preserve">
+    <value>Reset NIP</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.ApplyButton" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.FlagsAdded" xml:space="preserve">
+    <value>Flags added: {0}</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.Selected" xml:space="preserve">
+    <value>Selected: {0}</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.Column.Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.Column.SettingId" xml:space="preserve">
+    <value>Setting ID</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.EmptyState" xml:space="preserve">
+    <value>Add an NVIDIA setting to get started.</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.DeleteAllConfirm" xml:space="preserve">
+    <value>Delete all {0} custom NVIDIA setting(s)? This also resets them to the driver's default in your PhasmaStrap profile. This cannot be undone.</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.ResetNipConfirm" xml:space="preserve">
+    <value>This resets every NVIDIA setting currently stored in your PhasmaStrap driver profile - including the options on the previous screen - back to the driver's default. This cannot be undone. Continue?</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.History.Title" xml:space="preserve">
+    <value>NVIDIA Flag History</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.History.Empty" xml:space="preserve">
+    <value>No actions yet.</value>
+  </data>
+  <data name="Menu.Nvidia.Editor.History.ClearButton" xml:space="preserve">
+    <value>Clear</value>
+  </data>
 </root>

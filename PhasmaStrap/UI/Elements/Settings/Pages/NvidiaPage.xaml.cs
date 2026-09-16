@@ -1,4 +1,6 @@
+using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 
 using Microsoft.Win32;
 
@@ -13,15 +15,30 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
     /// </summary>
     public partial class NvidiaPage
     {
+        // Grid view's filtered copy of _viewModel.CustomSettings, same code-behind-only DataGrid
+        // idiom as FastFlagEditorPage (see the comment at the top of that file) - kept in sync
+        // with the viewmodel's collection via CollectionChanged rather than an XAML binding, so
+        // the search box can filter it without touching the underlying data.
+        private readonly ObservableCollection<NvidiaSetting> _gridSettings = new();
+
         private readonly NvidiaViewModel _viewModel;
 
+        private string _gridSearchFilter = string.Empty;
         private bool _applying;
+        private bool _resetting;
 
         public NvidiaPage()
         {
             _viewModel = new NvidiaViewModel();
             DataContext = _viewModel;
             InitializeComponent();
+
+            _viewModel.CustomSettings.CollectionChanged += (_, _) => ReloadGridList();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _viewModel.Detach();
         }
 
         private async void Apply_Click(object sender, RoutedEventArgs e)
@@ -31,6 +48,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             _applying = true;
             ApplyButton.IsEnabled = false;
+            ApplyButtonGrid.IsEnabled = false;
 
             try
             {
@@ -49,7 +67,149 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             {
                 _applying = false;
                 ApplyButton.IsEnabled = true;
+                ApplyButtonGrid.IsEnabled = true;
             }
+        }
+
+        // "Advanced Editor" row on the card view - flips to the raw grid view in place (same
+        // page/DataContext, see the DataTriggers in NvidiaPage.xaml), rather than opening a new
+        // window/page.
+        private void AdvancedEditor_Click(object sender, RoutedEventArgs e)
+        {
+            ReloadGridList();
+            _viewModel.NvidiaEditorViewMode = true;
+        }
+
+        // "Back" button in the grid view - flips back to the card view.
+        private void AdvancedEditorBack_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.NvidiaEditorViewMode = false;
+        }
+
+        // "NVIDIA Setup" row. PhasmaStrap's NVIDIA integration talks to the driver directly via
+        // NVAPI (see NvidiaProfileInspector.cs) - there's no separate "NVIDIA Profile Inspector"
+        // tool to install or point PhasmaStrap at like Voidstrap needs, so there's nothing to
+        // walk the user through installing. This just explains that in place, rather than
+        // linking out to a wiki page that doesn't exist for this feature.
+        private void NvidiaSetup_Click(object sender, RoutedEventArgs e)
+        {
+            Frontend.ShowMessageBox(Strings.Menu_Nvidia_Setup_HelpText, MessageBoxImage.Information);
+        }
+
+        private void EditorSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _gridSearchFilter = EditorSearchTextBox.Text;
+            ReloadGridList();
+        }
+
+        // Rebuilds the grid's filtered list from _viewModel.CustomSettings, filtering by Name or
+        // Setting ID (decimal or hex) the same way FastFlagEditorPage's ReloadList filters by
+        // flag name. Preserves the current selection across a refresh so deleting a filtered
+        // subset or adding a new setting doesn't surprise-clear what's selected.
+        private void ReloadGridList()
+        {
+            HashSet<uint> selected = new HashSet<uint>();
+            foreach (object item in NvidiaEditorGrid.SelectedItems)
+            {
+                if (item is NvidiaSetting setting)
+                    selected.Add(setting.Id);
+            }
+
+            _gridSettings.Clear();
+
+            foreach (NvidiaSetting setting in _viewModel.CustomSettings)
+            {
+                if (_gridSearchFilter.Length > 0
+                    && setting.Name.IndexOf(_gridSearchFilter, StringComparison.OrdinalIgnoreCase) < 0
+                    && setting.HexId.IndexOf(_gridSearchFilter, StringComparison.OrdinalIgnoreCase) < 0
+                    && !setting.Id.ToString(CultureInfo.InvariantCulture).Contains(_gridSearchFilter, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                _gridSettings.Add(setting);
+            }
+
+            if (NvidiaEditorGrid.ItemsSource is null)
+                NvidiaEditorGrid.ItemsSource = _gridSettings;
+
+            foreach (NvidiaSetting setting in _gridSettings)
+            {
+                if (selected.Contains(setting.Id))
+                    NvidiaEditorGrid.SelectedItems.Add(setting);
+            }
+        }
+
+        private void DeleteSelectedSettings_Click(object sender, RoutedEventArgs e)
+        {
+            List<NvidiaSetting> selected = new List<NvidiaSetting>();
+            foreach (object item in NvidiaEditorGrid.SelectedItems)
+            {
+                if (item is NvidiaSetting setting)
+                    selected.Add(setting);
+            }
+
+            if (selected.Count == 0)
+                return;
+
+            _viewModel.RemoveCustomSettings(selected);
+        }
+
+        private void DeleteAllSettings_Click(object sender, RoutedEventArgs e)
+        {
+            int count = _viewModel.CustomSettings.Count;
+            if (count == 0)
+                return;
+
+            MessageBoxResult result = Frontend.ShowMessageBox(
+                string.Format(Strings.Menu_Nvidia_Editor_DeleteAllConfirm, count),
+                MessageBoxImage.Warning,
+                MessageBoxButton.YesNo);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            _viewModel.ClearCustomSettings();
+        }
+
+        private async void ResetNip_Click(object sender, RoutedEventArgs e)
+        {
+            if (_resetting)
+                return;
+
+            MessageBoxResult confirm = Frontend.ShowMessageBox(
+                Strings.Menu_Nvidia_Editor_ResetNipConfirm,
+                MessageBoxImage.Warning,
+                MessageBoxButton.YesNo);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            _resetting = true;
+            ResetNipButton.IsEnabled = false;
+
+            try
+            {
+                NvidiaApplyResult result = await Task.Run(() => _viewModel.ResetProfile());
+                ReloadGridList();
+
+                Frontend.ShowMessageBox(
+                    Describe(result),
+                    result.Ok ? MessageBoxImage.Asterisk : MessageBoxImage.Exclamation);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("NvidiaPage::ResetNip_Click", ex);
+                Frontend.ShowMessageBox("Failed to reset the NVIDIA driver profile:\n" + ex.Message, MessageBoxImage.Error);
+            }
+            finally
+            {
+                _resetting = false;
+                ResetNipButton.IsEnabled = true;
+            }
+        }
+
+        private void ClearFlagHistory_Click(object sender, RoutedEventArgs e)
+        {
+            NvidiaFlagHistory.Clear();
         }
 
         private void Reload_Click(object sender, RoutedEventArgs e)
@@ -81,6 +241,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             try
             {
                 NvidiaProfileManager.SaveToNip(dialog.FileName, snapshot);
+                NvidiaFlagHistory.Log("Exported .nip to " + dialog.FileName);
                 Frontend.ShowMessageBox(Strings.Menu_Nvidia_NipExported, MessageBoxImage.Asterisk);
             }
             catch (Exception ex)

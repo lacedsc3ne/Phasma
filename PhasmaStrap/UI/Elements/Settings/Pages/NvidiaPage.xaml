@@ -8,7 +8,8 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="NvidiaPage"
-      Scrollable="True">
+      Scrollable="True"
+      Unloaded="Page_Unloaded">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
@@ -19,10 +20,33 @@
             </StackPanel>
         </Border>
 
+        <!-- Collapsed-card view: curated toggles + custom settings list. Swapped in place for
+             EditorView below (same page/DataContext) whenever NvidiaEditorViewMode is false. -->
         <StackPanel Visibility="{Binding AvailableVisibility}">
-            <controls:OptionControl Margin="0,16,0,0" Header="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Description}">
-                <ui:Button Content="{x:Static resources:Strings.Common_Open}" Icon="Open24" Click="CopySettings_Click" />
-            </controls:OptionControl>
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NvidiaEditorViewMode}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <ui:CardAction Margin="0,16,0,0" Icon="Edit24" Click="AdvancedEditor_Click">
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Title}" />
+                        <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Nvidia_AdvancedEditor_Description}" Padding="0,0,16,0" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ui:CardAction>
+
+                <ui:CardAction Margin="0,8,0,0" Icon="Phone24" Click="NvidiaSetup_Click">
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_Setup_Title}" />
+                        <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Nvidia_Setup_Description}" Padding="0,0,16,0" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ui:CardAction>
 
             <Grid Margin="0,8,0,0">
                 <Grid.ColumnDefinitions>
@@ -169,6 +193,184 @@
             </StackPanel>
 
             <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Advanced Editor (raw grid) view: same DataContext, swapped in place of the card
+                 view above whenever NvidiaEditorViewMode is true. Mirrors FastFlagEditorPage's
+                 search box + DataGrid + add/delete toolbar idiom, adapted to NVIDIA's
+                 Type/Name/Setting ID/Value columns and multi-row selection. -->
+            <Grid Margin="0,16,0,0">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NvidiaEditorViewMode}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Margin="0,0,0,12" Text="{x:Static resources:Strings.Menu_Nvidia_Editor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                <WrapPanel Grid.Row="1" Orientation="Horizontal">
+                    <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_FastFlagEditor_AddNew}" Click="AddCustomSetting_Click" Margin="0,0,12,12" />
+                    <ui:Button x:Name="DeleteSelectedButton" Icon="Delete48" Appearance="Danger" Content="{x:Static resources:Strings.Menu_FastFlagEditor_DeleteSelected}" Click="DeleteSelectedSettings_Click" Margin="0,0,12,12">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=NvidiaEditorGrid, Path=SelectedItems.Count}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+                    <ui:Button Icon="Broom24" Content="{x:Static resources:Strings.Menu_Nvidia_Editor_DeleteAll}" Click="DeleteAllSettings_Click" Margin="0,0,12,12" />
+                    <ui:Button x:Name="ResetNipButton" Icon="ArrowReset24" Content="{x:Static resources:Strings.Menu_Nvidia_Editor_ResetNip}" Click="ResetNip_Click" Margin="0,0,12,12" />
+                    <ui:Button x:Name="ApplyButtonGrid" Icon="CheckmarkCircle24" Appearance="Primary" Content="{x:Static resources:Strings.Menu_Nvidia_Editor_ApplyButton}" Click="Apply_Click" Margin="0,0,12,12" />
+                </WrapPanel>
+
+                <Grid Grid.Row="2" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox x:Name="EditorSearchTextBox" Grid.Column="0" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_Nvidia_Editor_Search}" TextChanged="EditorSearchTextBox_TextChanged" />
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="{Binding CustomSettings.Count, StringFormat={x:Static resources:Strings.Menu_Nvidia_Editor_FlagsAdded}}" />
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="{Binding ElementName=NvidiaEditorGrid, Path=SelectedItems.Count, StringFormat={x:Static resources:Strings.Menu_Nvidia_Editor_Selected}}" />
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <DataGrid Name="NvidiaEditorGrid" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Extended">
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </DataGrid.Style>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                                <Setter Property="Height" Value="32" />
+                                <Setter Property="Padding" Value="8,0,8,0" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Foreground">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                                <Setter Property="Height" Value="32" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Background="{TemplateBinding Background}" Padding="6,0,6,0">
+                                                <ContentPresenter VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Menu_Nvidia_Editor_Column_Type}" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Menu_Nvidia_Editor_Column_SettingId}" Binding="{Binding HexId}" />
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CustomSettings.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <ui:SymbolIcon Symbol="Flag24" FontSize="32" HorizontalAlignment="Center" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                        <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Nvidia_Editor_EmptyState}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,16,0,0">
+                    <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ExportNipButton}" Click="ExportNip_Click" />
+                    <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_CopySettingsButton}" Margin="8,0,0,0" Click="CopySettings_Click" />
+                    <ui:Button Icon="ArrowLeft48" Content="{x:Static resources:Strings.Menu_FastFlagEditor_Back}" Margin="8,0,0,0" Click="AdvancedEditorBack_Click" />
+                </StackPanel>
+
+                <ui:CardExpander Grid.Row="5" Margin="0,16,0,0">
+                    <ui:CardExpander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="History24" Margin="0,0,8,0" />
+                            <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Nvidia_Editor_History_Title}" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_Editor_History_ClearButton}" HorizontalAlignment="Left" Margin="0,0,0,8" Click="ClearFlagHistory_Click" />
+
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_Editor_History_Empty}" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding FlagHistory.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding FlagHistory}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss}'}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="12" />
+                                        <TextBlock Grid.Column="1" Margin="12,0,0,0" Text="{Binding Message}" FontSize="12" TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ui:CardExpander>
+            </Grid>
         </StackPanel>
     </StackPanel>
 </ui:UiPage>
