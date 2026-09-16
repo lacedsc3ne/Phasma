@@ -43,7 +43,18 @@ namespace PhasmaStrap.Integrations.Overlays
     ///    background (solid/gradient/video) behind Roblox's own loading/menu screens. It isn't
     ///    part of the "overlay content the compositor renders on its own" (HUD/crosshair/
     ///    diagnostics/display) and pulls in image/video decode dependencies PhasmaStrap doesn't
-    ///    have, so it was dropped rather than ported.
+    ///    have, so it was dropped rather than ported. Two things worth spelling out for anyone
+    ///    revisiting this: (1) everything this compositor draws - HUD, crosshair, RiShade,
+    ///    AntiAliasing, FrameGen - is layered ON TOP of a desktop-duplication capture of whatever
+    ///    Roblox already rendered; none of it draws "behind" Roblox's own pixels, so simply
+    ///    plugging a background in as another stage here would occlude Roblox's real home-menu UI
+    ///    (buttons, game tiles) rather than sit behind it - doing that "for real" needs a D3D
+    ///    present/draw hook injected into RobloxPlayerBeta.exe itself, which nothing in this
+    ///    codebase currently does (RiShade included - see RiShadeStage.cs, it's a post-process
+    ///    filter on the captured copy, not a hook into Roblox's own device). (2) Independent of
+    ///    that, OverlaySettings.AnyEnabled requires OverlayHub.InGame, so this compositor never
+    ///    even runs while Roblox is only showing its home/games menu - it only exists during
+    ///    actual gameplay, i.e. the opposite of when a homepage background would need to show.
     ///  - No Roblox-FPS-cap-aware capture pacing (RobloxFpsCap.cs) or present-statistics-based
     ///    "actual FPS" tracking (RobloxPresentTracer.cs) - both existed almost entirely to feed
     ///    Frame Generation's capture cadence and quality decisions. Capture here is simply
