@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
+using PhasmaStrap.Models;
 using PhasmaStrap.UI.Elements.Dialogs;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
@@ -14,16 +15,18 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         // same reasoning as FastFlagEditorPage - a DataGrid (plus a ListBox driving which dictionary it's bound to)
         // is a codebehind-only affair, mvvm buys nothing here
 
-        private sealed class PlaceAssignment
+        // same three options/order as FastFlagsViewModel.EngineScopeModeOptions, kept in sync manually
+        // since this page is codebehind-only and has no viewmodel to share the constant with
+        public static readonly string[] ScopeModeOptions =
         {
-            public string PlaceId { get; init; } = "";
-            public string ProfileName { get; init; } = "";
-            public string Display => $"{PlaceId} → {ProfileName}";
-        }
+            "Apply everywhere",
+            "Only apply to listed games",
+            "Apply everywhere except listed games",
+        };
 
         private readonly ObservableCollection<string> _profileNames = new();
         private readonly ObservableCollection<FastFlag> _profileFlags = new();
-        private readonly ObservableCollection<PlaceAssignment> _placeAssignments = new();
+        private readonly ObservableCollection<string> _scopePlaces = new();
 
         private string? _selectedProfileName;
 
@@ -33,8 +36,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             ProfilesListBox.ItemsSource = _profileNames;
             FlagsDataGrid.ItemsSource = _profileFlags;
-            AssignmentProfileComboBox.ItemsSource = _profileNames;
-            AssignmentsItemsControl.ItemsSource = _placeAssignments;
+            ScopePlacesItemsControl.ItemsSource = _scopePlaces;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e) => ReloadAll();
@@ -42,8 +44,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         private void ReloadAll()
         {
             ReloadProfileNames();
-            ReloadAssignments();
             ReloadSelectedProfileFlags();
+            ReloadScopeSection();
         }
 
         private void ReloadProfileNames()
@@ -66,14 +68,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
 
             UpdateProfileButtonStates();
-        }
-
-        private void ReloadAssignments()
-        {
-            _placeAssignments.Clear();
-
-            foreach (var pair in App.Settings.Prop.FastFlagPlaceProfiles.OrderBy(x => x.Key))
-                _placeAssignments.Add(new PlaceAssignment { PlaceId = pair.Key, ProfileName = pair.Value });
         }
 
         private void ReloadSelectedProfileFlags()
@@ -103,6 +97,56 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DeleteFlagsButton.IsEnabled = FlagsDataGrid.SelectedItems.Count > 0;
         }
 
+        private FastFlagProfileScope? GetSelectedScope()
+        {
+            if (_selectedProfileName is null)
+                return null;
+
+            var scopes = App.Settings.Prop.FastFlagProfileScopes;
+
+            if (!scopes.TryGetValue(_selectedProfileName, out FastFlagProfileScope? scope))
+            {
+                scope = new FastFlagProfileScope();
+                scopes[_selectedProfileName] = scope;
+            }
+
+            return scope;
+        }
+
+        private void ReloadScopeSection()
+        {
+            _scopePlaces.Clear();
+
+            bool hasSelection = _selectedProfileName is not null;
+            ScopeModeComboBox.IsEnabled = hasSelection;
+            ScopePlaceIdTextBox.IsEnabled = hasSelection;
+            AddScopePlaceButton.IsEnabled = hasSelection;
+
+            if (!hasSelection)
+            {
+                ScopeDescriptionTextBlock.Text = Strings.Menu_FastFlagProfiles_NoProfileSelectedHint;
+                ScopeModeComboBox.SelectedIndex = -1;
+                return;
+            }
+
+            App.Settings.Prop.FastFlagProfileScopes.TryGetValue(_selectedProfileName!, out FastFlagProfileScope? scope);
+            scope ??= new FastFlagProfileScope();
+
+            ScopeDescriptionTextBlock.Text = string.Format(Strings.Menu_FastFlagProfiles_ScopeDescription_Selected, _selectedProfileName);
+
+            ScopeModeComboBox.SelectionChanged -= ScopeModeComboBox_SelectionChanged;
+            ScopeModeComboBox.SelectedIndex = scope.Mode switch
+            {
+                EngineSettingsScopeMode.OnlyListedPlaces => 1,
+                EngineSettingsScopeMode.AllExceptListedPlaces => 2,
+                _ => 0,
+            };
+            ScopeModeComboBox.SelectionChanged += ScopeModeComboBox_SelectionChanged;
+
+            foreach (string placeId in scope.Places)
+                _scopePlaces.Add(placeId);
+        }
+
         private void UpdateProfileButtonStates()
         {
             bool hasSelection = _selectedProfileName is not null;
@@ -119,6 +163,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             _selectedProfileName = ProfilesListBox.SelectedItem as string;
             UpdateProfileButtonStates();
             ReloadSelectedProfileFlags();
+            ReloadScopeSection();
         }
 
         private void AddProfileButton_Click(object sender, RoutedEventArgs e)
@@ -143,6 +188,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             _selectedProfileName = name;
             ReloadProfileNames();
             ReloadSelectedProfileFlags();
+            ReloadScopeSection();
         }
 
         private void RenameProfileButton_Click(object sender, RoutedEventArgs e)
@@ -172,17 +218,20 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             profiles.Remove(_selectedProfileName);
             profiles[newName] = flags;
 
-            // repoint any place assignments that used the old name
-            var placeProfiles = App.Settings.Prop.FastFlagPlaceProfiles;
-            foreach (string placeId in placeProfiles.Where(x => x.Value == _selectedProfileName).Select(x => x.Key).ToList())
-                placeProfiles[placeId] = newName;
+            // repoint this profile's own scope entry to the new name
+            var scopes = App.Settings.Prop.FastFlagProfileScopes;
+            if (scopes.TryGetValue(_selectedProfileName, out FastFlagProfileScope? scope))
+            {
+                scopes.Remove(_selectedProfileName);
+                scopes[newName] = scope;
+            }
 
             NewProfileNameTextBox.Text = "";
             _selectedProfileName = newName;
 
             ReloadProfileNames();
-            ReloadAssignments();
             ReloadSelectedProfileFlags();
+            ReloadScopeSection();
         }
 
         private void DeleteProfileButton_Click(object sender, RoutedEventArgs e)
@@ -201,16 +250,14 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             App.Settings.Prop.FastFlagProfiles.Remove(_selectedProfileName);
 
-            // nothing should point at a profile that no longer exists
-            var placeProfiles = App.Settings.Prop.FastFlagPlaceProfiles;
-            foreach (string placeId in placeProfiles.Where(x => x.Value == _selectedProfileName).Select(x => x.Key).ToList())
-                placeProfiles.Remove(placeId);
+            // nothing should keep a scope for a profile that no longer exists
+            App.Settings.Prop.FastFlagProfileScopes.Remove(_selectedProfileName);
 
             _selectedProfileName = null;
 
             ReloadProfileNames();
-            ReloadAssignments();
             ReloadSelectedProfileFlags();
+            ReloadScopeSection();
         }
 
         #endregion
@@ -382,38 +429,55 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         #endregion
 
-        #region Place assignments
+        #region Per-profile scope
 
-        private void AddAssignmentButton_Click(object sender, RoutedEventArgs e)
+        private void ScopeModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string placeId = PlaceIdTextBox.Text.Trim();
-            string? profileName = AssignmentProfileComboBox.SelectedItem as string;
+            FastFlagProfileScope? scope = GetSelectedScope();
+            if (scope is null)
+                return;
 
-            if (!long.TryParse(placeId, out long parsed) || parsed <= 0)
+            scope.Mode = ScopeModeComboBox.SelectedIndex switch
+            {
+                1 => EngineSettingsScopeMode.OnlyListedPlaces,
+                2 => EngineSettingsScopeMode.AllExceptListedPlaces,
+                _ => EngineSettingsScopeMode.All,
+            };
+        }
+
+        private void AddScopePlaceButton_Click(object sender, RoutedEventArgs e)
+        {
+            FastFlagProfileScope? scope = GetSelectedScope();
+            if (scope is null)
+                return;
+
+            string id = ScopePlaceIdTextBox.Text.Trim();
+
+            if (!long.TryParse(id, out _) || id.Length == 0)
             {
                 Frontend.ShowMessageBox(Strings.Menu_FastFlagProfiles_InvalidPlaceId, MessageBoxImage.Error);
                 return;
             }
 
-            if (profileName is null)
-            {
-                Frontend.ShowMessageBox(Strings.Menu_FastFlagProfiles_NoProfilesAvailable, MessageBoxImage.Error);
+            if (scope.Places.Contains(id))
                 return;
-            }
 
-            App.Settings.Prop.FastFlagPlaceProfiles[placeId] = profileName;
-            PlaceIdTextBox.Text = "";
-
-            ReloadAssignments();
+            scope.Places.Add(id);
+            _scopePlaces.Add(id);
+            ScopePlaceIdTextBox.Text = "";
         }
 
-        private void RemoveAssignmentButton_Click(object sender, RoutedEventArgs e)
+        private void RemoveScopePlaceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not FrameworkElement element || element.Tag is not PlaceAssignment assignment)
+            FastFlagProfileScope? scope = GetSelectedScope();
+            if (scope is null)
                 return;
 
-            App.Settings.Prop.FastFlagPlaceProfiles.Remove(assignment.PlaceId);
-            ReloadAssignments();
+            if (sender is not FrameworkElement element || element.Tag is not string placeId)
+                return;
+
+            scope.Places.Remove(placeId);
+            _scopePlaces.Remove(placeId);
         }
 
         #endregion

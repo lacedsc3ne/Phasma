@@ -105,6 +105,8 @@
                 <ui:NavigationFluent.Items>
                     <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Welcome_Title}" PageType="{x:Type pages:WelcomePage}" Icon="ArrowCircleRight48" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Install_Title}" PageType="{x:Type pages:InstallPage}" Icon="ArrowCircleRight48" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Manager_Title}" PageType="{x:Type pages:ManagerPage}" Icon="ArrowCircleRight48" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Extensions_Title}" PageType="{x:Type pages:ExtensionsPage}" Icon="ArrowCircleRight48" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Completion_Title}" PageType="{x:Type pages:CompletionPage}" Icon="ArrowCircleRight48" />
                 </ui:NavigationFluent.Items>
             </ui:NavigationFluent>

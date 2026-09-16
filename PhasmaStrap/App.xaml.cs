@@ -431,6 +431,17 @@ namespace PhasmaStrap
                 State.Load();
                 FastFlags.Load();
 
+                try
+                {
+                    // one-time upgrade of the old flat "place ID -> profile name" FastFlag Profile
+                    // mapping into each profile's own scope - see Settings.FastFlagPlaceProfiles
+                    Integrations.FastFlagProfileMigration.MigrateLegacyPlaceProfiles();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"FastFlag Profile scope migration failed: {ex.Message}");
+                }
+
                 // UI polish (ported from Voidstrap): smooth ProgressBar value transitions,
                 // installed as a WPF class handler so it applies to every ProgressBar
                 if (Settings.Prop.SmoothProgressBarsEnabled)

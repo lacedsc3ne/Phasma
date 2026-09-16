@@ -13,9 +13,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
     // The setting IDs below are the community-known NVIDIA driver profile setting IDs (as
     // used by NVIDIA Profile Inspector) for each feature - ported over from the curated list
     // Voidstrap's NvidiaFastFlagsViewModel exposed, which is the actually-useful subset of
-    // what NvidiaProfileInspector.cs can read/write. Voidstrap's raw arbitrary-setting editor,
-    // .nip import/export, and "copy from another app" dialogs were intentionally not ported -
-    // see NvidiaPage.xaml.cs for why.
+    // what NvidiaProfileInspector.cs can read/write. Voidstrap's multi-type NIP import/export
+    // and "copy from another app" dialogs were intentionally not ported (PhasmaStrap has no
+    // .nip round-trip - see NvidiaProfileManager.cs), but the ability to add a setting beyond
+    // this curated list *was* ported as CustomSettings below, adapted to read/write straight
+    // from the live driver profile instead of a persisted .nip file.
     public class NvidiaViewModel : NotifyPropertyChangedViewModel
     {
         private const uint IdLowLatencyMode = 390467;
@@ -35,6 +37,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private const uint IdTextureFilteringQuality = 13510289;
         private const uint IdAnisotropicFilteringMode = 282245910;
         private const uint IdTransparencySupersampling = 282364549;
+        private const uint IdBenchmarkOverlay = 2945366;
 
         private static readonly uint[] AllTrackedIds = new[]
         {
@@ -42,7 +45,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             IdResizableBar, IdDlssSuperResolution, IdDlssFrameGeneration, IdMfaa,
             IdFxaaEnable, IdAntialiasingMode, IdGammaCorrection, IdLineGamma,
             IdSilkSmoothness, IdTextureLodBias, IdTextureFilteringQuality,
-            IdAnisotropicFilteringMode, IdTransparencySupersampling,
+            IdAnisotropicFilteringMode, IdTransparencySupersampling, IdBenchmarkOverlay,
+        };
+
+        // Single source of truth for the Benchmark Overlay combo box: both the display list
+        // (BenchMarkOverlayModes) and the value lookups (BenchmarkOverlayFromValue/ToValue)
+        // read from this same array, so a translated label can never desync between what's
+        // shown and what's compared against (see the ComboBox desync bug this project has hit
+        // before, e.g. with SILK/latency mode strings).
+        private static readonly (string Label, uint Value)[] BenchmarkOverlayOptions =
+        {
+            (Strings.Menu_Nvidia_BenchmarkOverlay_Disabled, 0u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_GraphFlipFps, 1u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_GraphPresentFps, 2u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_GraphAppPresentFps, 4u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_DisplayPaging, 8u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_DisplayAppThreadWait, 16u),
+            (Strings.Menu_Nvidia_BenchmarkOverlay_Enabled, 511u),
         };
 
         private string _lowLatencyMode = Strings.Menu_Nvidia_Mode_Off;
@@ -57,6 +76,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private bool _gammaCorrection = true;
         private string _silkSmoothness = Strings.Menu_Nvidia_Mode_Off;
         private int _textureLodBias;
+        private string _benchmarkOverlayMode = Strings.Menu_Nvidia_BenchmarkOverlay_Disabled;
         private string _statusMessage = string.Empty;
 
         public NvidiaViewModel()
@@ -81,6 +101,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ObservableCollection<string> FrlLowLatencyModes { get; } = new ObservableCollection<string> { Strings.Menu_Nvidia_Mode_Off, Strings.Menu_Nvidia_Mode_On };
 
         public ObservableCollection<string> SilkSmoothnessModes { get; } = new ObservableCollection<string> { Strings.Menu_Nvidia_Mode_Off, Strings.Menu_Nvidia_Mode_Low, Strings.Menu_Nvidia_Mode_Medium, Strings.Menu_Nvidia_Mode_High, Strings.Menu_Nvidia_Mode_Ultra };
+
+        public ObservableCollection<string> BenchmarkOverlayModes { get; } = new ObservableCollection<string>(BenchmarkOverlayOptions.Select(option => option.Label));
+
+        // Driver profile settings the user has added beyond the curated list above (see
+        // AddNvidiaCustomSettingDialog / NvidiaPage's "Custom settings" section) - ported from
+        // Voidstrap's arbitrary setting editor (AddNvidiaFFlagWindow/NvidiaFFlagEditorPage), but
+        // adapted to PhasmaStrap's live-driver-read architecture instead of a persisted .nip
+        // file: NvidiaProfileInspector.ReadProfile() already returns every setting sitting in
+        // the driver's "PhasmaStrap" profile (curated and custom alike), so a custom entry the
+        // user applies is automatically picked back up here on the next load with no separate
+        // storage needed.
+        public ObservableCollection<NvidiaSetting> CustomSettings { get; } = new ObservableCollection<NvidiaSetting>();
 
         public string LowLatencyMode
         {
@@ -164,6 +196,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 ? string.Format(CultureInfo.InvariantCulture, Strings.Menu_Nvidia_LodBiasLabel_Override, TextureLodBias / 8.0)
                 : Strings.Menu_Nvidia_LodBiasLabel_Default;
 
+        public string BenchmarkOverlayMode
+        {
+            get => _benchmarkOverlayMode;
+            set { _benchmarkOverlayMode = value; OnPropertyChanged(nameof(BenchmarkOverlayMode)); }
+        }
+
         public string StatusMessage
         {
             get => _statusMessage;
@@ -186,6 +224,76 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             GammaCorrection = !ReadBool(live, IdGammaCorrection) || !ReadBool(live, IdLineGamma);
             SilkSmoothness = SilkFromValue(ReadInt(live, IdSilkSmoothness));
             TextureLodBias = live.TryGetValue(IdTextureLodBias, out uint bias) ? unchecked((int)bias) : 0;
+            BenchmarkOverlayMode = BenchmarkOverlayFromValue(live.TryGetValue(IdBenchmarkOverlay, out uint overlay) ? overlay : 0u);
+
+            LoadCustomSettings();
+        }
+
+        // Populates CustomSettings from whatever is currently sitting in the driver's
+        // "PhasmaStrap" profile that isn't one of the curated IDs above - see the doc comment
+        // on the CustomSettings property.
+        private void LoadCustomSettings()
+        {
+            CustomSettings.Clear();
+
+            HashSet<uint> curated = new HashSet<uint>(AllTrackedIds);
+            foreach (NvidiaSetting setting in NvidiaProfileInspector.ReadProfile())
+            {
+                if (setting.Type != NvSettingType.Dword || curated.Contains(setting.Id))
+                    continue;
+
+                CustomSettings.Add(setting);
+            }
+        }
+
+        public bool IsCustomSettingIdTaken(uint id)
+        {
+            if (Array.IndexOf(AllTrackedIds, id) >= 0)
+                return true;
+
+            foreach (NvidiaSetting setting in CustomSettings)
+            {
+                if (setting.Id == id)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void AddCustomSetting(string name, uint id, uint value)
+        {
+            string trimmedName = string.IsNullOrWhiteSpace(name) ? "Setting " + id.ToString(CultureInfo.InvariantCulture) : name.Trim();
+            CustomSettings.Add(new NvidiaSetting
+            {
+                Id = id,
+                Name = trimmedName,
+                Value = value,
+                Type = NvSettingType.Dword,
+            });
+        }
+
+        // Removes a custom setting from the list and, if the driver is reachable, immediately
+        // resets it in the "PhasmaStrap" driver profile too - PhasmaStrap has no persisted .nip
+        // file for these (see CustomSettings' doc comment) so simply dropping it from the
+        // in-memory list would otherwise leave the old value sitting in the live driver profile
+        // until something else happened to overwrite that setting ID.
+        public void RemoveCustomSetting(NvidiaSetting setting)
+        {
+            CustomSettings.Remove(setting);
+
+            if (!IsAvailable)
+                return;
+
+            try
+            {
+                NvidiaApplyResult result = NvidiaProfileInspector.Reset(new[] { setting.Id });
+                if (!result.Ok)
+                    App.Logger.WriteLine("NvidiaViewModel", "Failed to reset custom setting 0x" + setting.Id.ToString("X8", CultureInfo.InvariantCulture) + ": " + result.Message);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("NvidiaViewModel", "Failed to reset custom setting: " + ex.Message);
+            }
         }
 
         private Dictionary<uint, uint> BuildSettingsDictionary()
@@ -204,6 +312,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 [IdAntialiasingMode] = Fxaa ? 1u : 0u,
                 [IdSilkSmoothness] = (uint)SilkToValue(SilkSmoothness),
                 [IdTextureLodBias] = unchecked((uint)TextureLodBias),
+                [IdBenchmarkOverlay] = BenchmarkOverlayToValue(BenchmarkOverlayMode),
             };
 
             uint gamma = GammaCorrection ? 0u : 1u;
@@ -216,6 +325,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 settings[IdAnisotropicFilteringMode] = 1u;
                 settings[IdTransparencySupersampling] = 8u;
             }
+
+            // Custom (non-curated) settings the user added via AddNvidiaCustomSettingDialog are
+            // folded into the exact same dictionary that both ApplyToDriver and
+            // BuildSettingsSnapshot read from, rather than being applied/exported through a
+            // separate path - this is the one place that ever needs to know about them.
+            foreach (NvidiaSetting custom in CustomSettings)
+                settings[custom.Id] = custom.Value;
 
             return settings;
         }
@@ -253,21 +369,31 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             [IdTextureFilteringQuality] = "Texture Filtering Quality",
             [IdAnisotropicFilteringMode] = "Anisotropic Filtering Mode",
             [IdTransparencySupersampling] = "Transparency Supersampling",
+            [IdBenchmarkOverlay] = "Benchmark Overlay",
         };
 
         // Snapshot of the currently-configured (not necessarily yet-applied) settings, for
-        // exporting to a .nip file or copying to the clipboard via NvidiaPage.
+        // exporting to a .nip file or copying to the clipboard via NvidiaPage. Includes custom
+        // settings (using the name the user gave them) since BuildSettingsDictionary folds
+        // those into the same dictionary this reads from.
         public List<NvidiaSetting> BuildSettingsSnapshot()
         {
             Dictionary<uint, uint> settings = BuildSettingsDictionary();
+            Dictionary<uint, string> customNames = CustomSettings.ToDictionary(setting => setting.Id, setting => setting.Name);
             List<NvidiaSetting> results = new List<NvidiaSetting>();
 
             foreach (KeyValuePair<uint, uint> pair in settings)
             {
+                string name = SettingNames.TryGetValue(pair.Key, out string? curatedName)
+                    ? curatedName
+                    : customNames.TryGetValue(pair.Key, out string? customName)
+                        ? customName
+                        : "Setting " + pair.Key;
+
                 results.Add(new NvidiaSetting
                 {
                     Id = pair.Key,
-                    Name = SettingNames.TryGetValue(pair.Key, out string? name) ? name : "Setting " + pair.Key,
+                    Name = name,
                     Value = pair.Value,
                     Type = NvSettingType.Dword,
                 });
@@ -322,6 +448,32 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (mode == Strings.Menu_Nvidia_Mode_Ultra)
                 return 4;
             return 0;
+        }
+
+        // Benchmark Overlay isn't an ordinal enum like the modes above - the driver setting is a
+        // bitmask (Disabled=0, individual graph/indicator bits, Enabled=511 for "everything") -
+        // so both directions look the value up in BenchmarkOverlayOptions instead of using
+        // ObservableCollection index math.
+        private static string BenchmarkOverlayFromValue(uint value)
+        {
+            foreach ((string Label, uint Value) option in BenchmarkOverlayOptions)
+            {
+                if (option.Value == value)
+                    return option.Label;
+            }
+
+            return BenchmarkOverlayOptions[0].Label;
+        }
+
+        private static uint BenchmarkOverlayToValue(string label)
+        {
+            foreach ((string Label, uint Value) option in BenchmarkOverlayOptions)
+            {
+                if (option.Label == label)
+                    return option.Value;
+            }
+
+            return 0u;
         }
     }
 }

@@ -1,0 +1,77 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Installer.Pages.ExtensionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Installer.Pages"
+      xmlns:smodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance smodels:ExtensionsViewModel, IsDesignTimeCreatable=True}"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="ExtensionsPage"
+      Scrollable="True"
+      Loaded="UiPage_Loaded">
+
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{x:Static resources:Strings.Installer_Extensions_Title}" TextWrapping="Wrap" />
+        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Installer_Extensions_Text}" TextWrapping="Wrap" />
+
+        <TextBlock Text="Rojo" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="Syncs external files into Roblox Studio for development. Unlike the tools below, PhasmaStrap downloads and manages Rojo itself." />
+
+        <ui:Card Margin="0,8,0,0" Padding="14" DataContext="{Binding Rojo}">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding InstalledVersionText}" FontSize="14" FontWeight="Medium" />
+                        <TextBlock Text="{Binding ProjectPathText}" FontSize="11" FontFamily="Consolas" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:Button Content="{Binding InstallOrUpdateButtonText}" Icon="ArrowDownload24" Margin="0,0,8,0" IsEnabled="{Binding CanInstallOrUpdate}" Command="{Binding InstallOrUpdateCommand}" />
+                        <ui:Button Content="{Binding ServeButtonText}" Icon="Play24" Margin="0,0,8,0" IsEnabled="{Binding CanToggleServe}" Command="{Binding ToggleServeCommand}" />
+                        <ui:Button Content="{x:Static resources:Strings.Common_Delete}" Icon="Delete24" Appearance="Secondary" IsEnabled="{Binding CanUninstall}" Command="{Binding UninstallCommand}" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Margin="0,8,0,0" Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </ui:Card>
+
+        <TextBlock Text="{x:Static resources:Strings.Installer_Extensions_Other_Title}" FontSize="16" FontWeight="SemiBold" Margin="0,20,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Installer_Extensions_Other_Text}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Extensions}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ui:Card Margin="0,0,0,8" Padding="14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="Medium" />
+                                <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,2,0,4" />
+                                <TextBlock Text="{Binding StatusText}" FontSize="11" FontFamily="Consolas" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="{x:Static resources:Strings.Common_Launch}" Icon="Play24" Margin="0,0,8,0" IsEnabled="{Binding IsInstalled}"
+                                           Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Content="{x:Static resources:Strings.Common_Browse}" Icon="Folder24" Margin="0,0,8,0"
+                                           Command="{Binding DataContext.BrowseCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Content="{x:Static resources:Strings.Common_Delete}" Icon="Delete24" Appearance="Secondary" IsEnabled="{Binding IsInstalled}"
+                                           Command="{Binding DataContext.ClearCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Grid>
+                    </ui:Card>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>

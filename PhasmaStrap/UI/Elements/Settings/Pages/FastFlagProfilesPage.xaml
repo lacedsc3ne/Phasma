@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       d:DesignHeight="800" d:DesignWidth="800"
@@ -89,17 +90,22 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Place assignments -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_PlacesHeader}" FontSize="14" FontWeight="Medium" Margin="0,24,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_PlacesDescription}" />
+        <!-- Per-profile scope: same "Applies to" mode + place list pattern as Engine Settings' own
+             scope on FastFlagsPage, but owned by whichever profile is currently selected above instead
+             of one global scope - each profile can target its own set of places. -->
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_ScopeHeader}" FontSize="14" FontWeight="Medium" Margin="0,24,0,0" />
+        <TextBlock x:Name="ScopeDescriptionTextBlock" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_ScopeDescription}" />
 
-        <WrapPanel Orientation="Horizontal" Margin="0,8,0,0">
-            <ui:TextBox x:Name="PlaceIdTextBox" Width="160" Margin="0,0,8,8" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagProfiles_PlaceIdPlaceholder}" />
-            <ComboBox x:Name="AssignmentProfileComboBox" Width="180" Margin="0,0,8,8" VerticalAlignment="Center" />
-            <ui:Button Content="{x:Static resources:Strings.Menu_FastFlagProfiles_AddAssignment}" Click="AddAssignmentButton_Click" Margin="0,0,8,8" />
-        </WrapPanel>
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_Scope_Mode_Title}" FontSize="12" FontWeight="Medium" Margin="0,8,0,0" />
+        <ComboBox x:Name="ScopeModeComboBox" Padding="10,5,10,5" MinWidth="220" HorizontalAlignment="Left" Margin="0,4,0,0" IsEnabled="False" ItemsSource="{Binding Source={x:Static local:FastFlagProfilesPage.ScopeModeOptions}, Mode=OneTime}" SelectionChanged="ScopeModeComboBox_SelectionChanged" />
 
-        <ItemsControl x:Name="AssignmentsItemsControl" Margin="0,4,0,0">
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagProfiles_Scope_Places_Title}" FontSize="12" FontWeight="Medium" Margin="0,8,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagProfiles_Scope_Places_Description}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <ui:TextBox x:Name="ScopePlaceIdTextBox" Width="200" IsEnabled="False" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagProfiles_PlaceIdPlaceholder}" />
+            <ui:Button x:Name="AddScopePlaceButton" Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Click="AddScopePlaceButton_Click" IsEnabled="False" />
+        </StackPanel>
+        <ItemsControl x:Name="ScopePlacesItemsControl" Margin="0,4,0,0">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
@@ -109,8 +115,8 @@
                 <DataTemplate>
                     <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
-                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Click="RemoveAssignmentButton_Click" Tag="{Binding}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Click="RemoveScopePlaceButton_Click" Tag="{Binding}" />
                         </StackPanel>
                     </Border>
                 </DataTemplate>

@@ -164,11 +164,22 @@ namespace PhasmaStrap.Models.Persistable
         public List<string> MatchmakerExcludedPlaces { get; set; } = new();
 
         // per-game FastFlag profiles: a named bundle of flag overrides (real FFlag name -> value, same shape as
-        // FastFlagManager's own Prop) merged on top of the global ClientAppSettings.json at launch, only for
-        // places listed in FastFlagPlaceProfiles. See Bootstrapper.TryApplyFastFlagProfileAsync.
+        // FastFlagManager's own Prop) merged on top of the global ClientAppSettings.json at launch, for
+        // whichever places each profile's own scope (FastFlagProfileScopes below) says it applies to. See
+        // Bootstrapper.TryApplyFastFlagProfileAsync.
         public Dictionary<string, Dictionary<string, object>> FastFlagProfiles { get; set; } = new();
 
-        // place ID (string) -> profile name (key into FastFlagProfiles)
+        // each profile's own "Applies to" scope - same shape/meaning as EngineSettingsScope/
+        // EngineSettingsScopedPlaces below, but per-profile instead of one global scope, since multiple
+        // profiles can each target their own set of places (or all places, or all-except). A profile with
+        // no entry here defaults to OnlyListedPlaces with an empty list, i.e. it applies nowhere until
+        // explicitly scoped - matching the old behavior where a profile needed an explicit place
+        // assignment before it ever activated.
+        public Dictionary<string, FastFlagProfileScope> FastFlagProfileScopes { get; set; } = new();
+
+        // legacy place ID (string) -> profile name map from before per-profile scoping existed. Kept only
+        // so Bootstrapper can migrate it into FastFlagProfileScopes once on first load after upgrading;
+        // never read for anything else. See Bootstrapper.MigrateLegacyFastFlagPlaceProfiles.
         public Dictionary<string, string> FastFlagPlaceProfiles { get; set; } = new();
 
         // in-app notification center (NotificationCenter/NotificationToast) - master switch plus

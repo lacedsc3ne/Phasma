@@ -90,6 +90,27 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
         }
 
+        private void AddCustomSetting_Click(object sender, RoutedEventArgs e)
+        {
+            AddNvidiaCustomSettingDialog dialog = new AddNvidiaCustomSettingDialog(_viewModel.IsCustomSettingIdTaken)
+            {
+                Owner = Window.GetWindow(this),
+            };
+
+            dialog.ShowDialog();
+
+            if (dialog.Result != MessageBoxResult.OK)
+                return;
+
+            _viewModel.AddCustomSetting(dialog.SettingName, dialog.SettingId, dialog.SettingValue);
+        }
+
+        private void RemoveCustomSetting_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag is NvidiaSetting setting)
+                _viewModel.RemoveCustomSetting(setting);
+        }
+
         private void CopySettings_Click(object sender, RoutedEventArgs e)
         {
             List<NvidiaSetting> snapshot = _viewModel.BuildSettingsSnapshot();
