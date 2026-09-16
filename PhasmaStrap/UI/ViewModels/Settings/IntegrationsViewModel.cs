@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using CommunityToolkit.Mvvm.Input;
 
 using PhasmaStrap.UI.Elements.ContextMenu;
+using PhasmaStrap.UI.Elements.Dialogs;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
@@ -21,9 +22,43 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand DeleteRPCTemplateCommand => new RelayCommand(DeleteRPCTemplate);
 
+        // opens the Custom RPC template editor (list/detail editor for per-game Discord presence
+        // templates) - moved out of the inline tab into its own window to match Voidstrap's "Custom
+        // RPC" card + View button layout, without losing the multi-template editing this already had.
+        public ICommand OpenCustomRPCCommand => new RelayCommand(() => new RPCTemplatesWindow(this).Show());
+
         // opens the standalone Roblox account switcher (Integrations > Roblox tab) - see
         // AccountSwitcherViewModel.cs for how switching an account actually works end to end
         public ICommand AccountWindowCommand => new RelayCommand(() => new AccountSwitcherWindow().Show());
+
+        // Settings is always its own separate process from an active Roblox launch (see LaunchHandler.cs/
+        // Watcher.cs - DiscordRichPresence only exists on a live Watcher instance, which Settings never
+        // has access to), so there's no way to show this tab's preview card from real, currently-playing
+        // data. Instead it cycles through a couple of static, clearly-illustrative examples of what a
+        // Discord Rich Presence card looks like - same spirit as the Appearance page's theme previews.
+        private static readonly (string Game, string Creator, string Elapsed)[] _previewSamples = new[]
+        {
+            ("Blade Ball", "Wiggity.", "00:39 elapsed"),
+            ("Adopt Me!", "DreamCraft", "12:04 elapsed"),
+            ("Brookhaven RP", "Wolfpaq", "03:21 elapsed"),
+        };
+
+        private int _previewIndex;
+
+        public string PreviewGame => _previewSamples[_previewIndex].Game;
+        public string PreviewCreator => _previewSamples[_previewIndex].Creator;
+        public string PreviewElapsed => _previewSamples[_previewIndex].Elapsed;
+
+        public ICommand CyclePreviewCommand => new RelayCommand(CyclePreview);
+
+        private void CyclePreview()
+        {
+            _previewIndex = (_previewIndex + 1) % _previewSamples.Length;
+
+            OnPropertyChanged(nameof(PreviewGame));
+            OnPropertyChanged(nameof(PreviewCreator));
+            OnPropertyChanged(nameof(PreviewElapsed));
+        }
 
         private void AddIntegration()
         {

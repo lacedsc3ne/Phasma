@@ -61,98 +61,75 @@
             <TabItem Header="{x:Static resources:Strings.Menu_Integrations_Tabs_Discord}">
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Common_DiscordRichPresence}" FontSize="20" FontWeight="Medium" />
-                    <controls:MarkdownTextBlock MarkdownText="{Binding Source={x:Static resources:Strings.Menu_Integrations_RequiresActivityTracking}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/discord-rich-presence/'}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <Border Margin="0,8,0,8" Padding="12,10" CornerRadius="6" Background="{DynamicResource SystemFillColorNeutralBackgroundBrush}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="Info24" Filled="True" Foreground="{DynamicResource PaletteBlueBrush}" Margin="0,2,10,0" VerticalAlignment="Top" />
+                            <controls:MarkdownTextBlock MarkdownText="{Binding Source={x:Static resources:Strings.Menu_Integrations_RequiresActivityTracking}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/discord-rich-presence/'}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Title}"
+                        Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/help/discord-rich-presence-not-working/'}"
+                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}"
+                        x:Name="DiscordActivityOption">
+                        <ui:ToggleSwitch IsChecked="{Binding DiscordActivityEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Title}"
+                        Description="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Description}"
+                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                        <ui:ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"
+                        Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"
+                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                        <ui:ToggleSwitch IsChecked="{Binding DiscordActivityJoinEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
+                        Description="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}">
+                        <ui:Button Content="View" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />
+                    </controls:OptionControl>
+
+                    <ui:Card Margin="0,8,0,0" Padding="12">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Playing Roblox" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                <ui:Button Grid.Column="1" Content="Preview" Appearance="Secondary" Command="{Binding CyclePreviewCommand, Mode=OneTime}" />
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Border Width="52" Height="52" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                    <ui:SymbolIcon Symbol="Games24" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Roblox" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding PreviewGame, Mode=OneWay}" FontSize="13" />
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="by " /><Run Text="{Binding PreviewCreator, Mode=OneWay}" /><Run Text=". | Public server" />
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding PreviewElapsed, Mode=OneWay}" FontSize="12" Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:Card>
 
                     <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
-                            <StackPanel>
-                                <TextBlock FontSize="14" Text="Presence settings" />
-                                <TextBlock FontSize="12" Text="Configure what shows on your Discord profile while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
-                            </StackPanel>
+                            <TextBlock FontSize="14" Text="RPC Advanced" />
                         </ui:CardExpander.Header>
-                        <StackPanel>
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Title}"
-                                Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/help/discord-rich-presence-not-working/'}"
-                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}"
-                                x:Name="DiscordActivityOption">
-                                <ui:ToggleSwitch IsChecked="{Binding DiscordActivityEnabled, Mode=TwoWay}" />
-                            </controls:OptionControl>
-
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"
-                                Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"
-                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                                <ui:ToggleSwitch IsChecked="{Binding DiscordActivityJoinEnabled, Mode=TwoWay}" />
-                            </controls:OptionControl>
-
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Title}"
-                                Description="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Description}"
-                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                                <ui:ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
-                            </controls:OptionControl>
-                        </StackPanel>
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Text="The card above always shows a sample - Settings runs as its own process, separate from an active Roblox session, so it can't display your real live presence here. To see exactly what's currently being sent to Discord while you're playing, right-click the PhasmaStrap tray icon and open &quot;RPC Debug&quot;." />
                     </ui:CardExpander>
-
-                    <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}" />
-                    <Grid Margin="0,8,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="250" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <ListBox x:Name="RPCTemplatesListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" ItemsSource="{Binding RPCTemplates, Mode=OneWay}" DisplayMemberPath="GameID" SelectionChanged="RPCTemplateSelection" SelectedIndex="{Binding SelectedRPCTemplateIndex, Mode=TwoWay}" />
-                        <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ui:Button Grid.Column="0" Margin="0,0,4,0" Icon="Add28" Content="{x:Static resources:Strings.Common_New}" HorizontalAlignment="Stretch" Command="{Binding AddRPCTemplateCommand, Mode=OneTime}" />
-                            <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Delete28" Content="{x:Static resources:Strings.Common_Delete}" HorizontalAlignment="Stretch" Appearance="Danger" IsEnabled="{Binding IsRPCTemplateSelected, Mode=OneWay}" Command="{Binding DeleteRPCTemplateCommand, Mode=OneTime}" />
-                        </Grid>
-                        <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="4,0,0,0">
-                            <StackPanel.Style>
-                                <Style>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="False">
-                                            <Setter Property="StackPanel.Visibility" Value="Hidden"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                            <CheckBox Content="Enabled" IsChecked="{Binding SelectedRPCTemplate.Enabled}" />
-                            <TextBlock Margin="0,8,0,0" Text="Place ID" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" PlaceholderText="606849621" Text="{Binding SelectedRPCTemplate.GameID, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="Details text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" PlaceholderText="Playing {gameName}" Text="{Binding SelectedRPCTemplate.DetailsTemplate, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="State text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" PlaceholderText="{}{status}" Text="{Binding SelectedRPCTemplate.StateTemplate, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="Large image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.LargeImageUrl, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="Small image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.SmallImageUrl, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="Extra button label (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonLabel, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Margin="0,8,0,0" Text="Extra button URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonUrl, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-                        <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="No template selected" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <TextBlock.Style>
-                                <Style>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="True">
-                                            <Setter Property="TextBlock.Visibility" Value="Hidden"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
                 </StackPanel>
             </TabItem>
 
