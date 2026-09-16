@@ -1,0 +1,87 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.RPCTemplatesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+        mc:Ignorable="d"
+        Title="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
+        Width="720"
+        Height="560"
+        MinWidth="600"
+        MinHeight="420"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}" ShowMinimize="False" ShowMaximize="False" CanMaximize="False" KeyboardNavigation.TabNavigation="None" />
+
+        <StackPanel Grid.Row="1" Margin="16">
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}" />
+
+            <Grid Margin="0,8,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="RPCTemplatesListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" ItemsSource="{Binding RPCTemplates, Mode=OneWay}" DisplayMemberPath="GameID" SelectionChanged="RPCTemplateSelection" SelectedIndex="{Binding SelectedRPCTemplateIndex, Mode=TwoWay}" />
+                <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ui:Button Grid.Column="0" Margin="0,0,4,0" Icon="Add28" Content="{x:Static resources:Strings.Common_New}" HorizontalAlignment="Stretch" Command="{Binding AddRPCTemplateCommand, Mode=OneTime}" />
+                    <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Delete28" Content="{x:Static resources:Strings.Common_Delete}" HorizontalAlignment="Stretch" Appearance="Danger" IsEnabled="{Binding IsRPCTemplateSelected, Mode=OneWay}" Command="{Binding DeleteRPCTemplateCommand, Mode=OneTime}" />
+                </Grid>
+                <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="4,0,0,0">
+                    <StackPanel.Style>
+                        <Style>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="False">
+                                    <Setter Property="StackPanel.Visibility" Value="Hidden"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <CheckBox Content="Enabled" IsChecked="{Binding SelectedRPCTemplate.Enabled}" />
+                    <TextBlock Margin="0,8,0,0" Text="Place ID" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" PlaceholderText="606849621" Text="{Binding SelectedRPCTemplate.GameID, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="Details text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" PlaceholderText="Playing {gameName}" Text="{Binding SelectedRPCTemplate.DetailsTemplate, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="State text" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" PlaceholderText="{}{status}" Text="{Binding SelectedRPCTemplate.StateTemplate, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="Large image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.LargeImageUrl, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="Small image URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.SmallImageUrl, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="Extra button label (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonLabel, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="0,8,0,0" Text="Extra button URL (optional)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:TextBox Margin="0,4,0,0" Text="{Binding SelectedRPCTemplate.ButtonUrl, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="No template selected" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRPCTemplateSelected}" Value="True">
+                                    <Setter Property="TextBlock.Visibility" Value="Hidden"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</base:WpfUiWindow>
