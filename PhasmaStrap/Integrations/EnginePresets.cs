@@ -5,9 +5,8 @@ namespace PhasmaStrap.Integrations
     // Named bundles of the Roblox process optimizer's 5 tunable properties (PerformancePage's
     // "Runtime optimizer" section), plus per-place resolution so a specific game can either use a
     // different bundle than the global default or be excluded from optimization entirely. Mirrors
-    // FastFlagPlaceProfiles/FastFlagProfiles (named bundle assigned per place ID) and
-    // MatchmakerExcludedPlaces (a flat exclusion list) - see Bootstrapper.TryApplyFastFlagProfileAsync
-    // and TryApplyMatchmakingAsync for the equivalent patterns elsewhere in this codebase.
+    // MatchmakerExcludedPlaces (a flat exclusion list) - see Bootstrapper.TryApplyMatchmakingAsync
+    // for the equivalent pattern elsewhere in this codebase.
     public sealed record EnginePresetValues(
         bool OptimizeRoblox,
         bool RobloxEfficiencyMode,
