@@ -3563,4 +3563,400 @@ Example:
   <data name="Menu.Appearance.VisualEffects.Description" xml:space="preserve">
     <value>Window material, transition animations, and other cosmetic touches.</value>
   </data>
+  <data name="Menu.Appearance.Application.Title" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="Menu.AssetWarp.Description" xml:space="preserve">
+    <value>Blocks whole categories of asset from loading in-game, for a performance boost. Works by removing blocked asset types from the batch resolution request Roblox's client sends through PhasmaStrap's local proxy, before it ever learns a CDN URL to fetch them from - it does not intercept or substitute the actual asset content servers. Turning this on will start the local proxy automatically if it isn't already running.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableAnimations.Description" xml:space="preserve">
+    <value>Removes animation entries from Roblox asset batches. This breaks games with no animation fallback.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableAnimations.Title" xml:space="preserve">
+    <value>Remove all animations</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableDecals.Description" xml:space="preserve">
+    <value>Removes decal entries from Roblox asset batches.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableDecals.Title" xml:space="preserve">
+    <value>Remove all decals</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableImages.Description" xml:space="preserve">
+    <value>Removes image entries from Roblox asset batches.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableImages.Title" xml:space="preserve">
+    <value>Remove all images</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableMeshes.Description" xml:space="preserve">
+    <value>Removes mesh and meshpart entries from Roblox asset batches. This makes all 3D geometry invisible.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableMeshes.Title" xml:space="preserve">
+    <value>Remove all meshes</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableTextures.Description" xml:space="preserve">
+    <value>Removes texture and texture pack entries from Roblox asset batches.</value>
+  </data>
+  <data name="Menu.AssetWarp.DisableTextures.Title" xml:space="preserve">
+    <value>Remove all textures</value>
+  </data>
+  <data name="Menu.AssetWarp.Enabled.Title" xml:space="preserve">
+    <value>Enable Asset Warp</value>
+  </data>
+  <data name="Menu.AssetWarp.Status.Blocking" xml:space="preserve">
+    <value>Blocking selected asset type(s) through the local proxy</value>
+  </data>
+  <data name="Menu.AssetWarp.Status.NoneSelected" xml:space="preserve">
+    <value>On, but no asset types selected below - nothing is blocked yet</value>
+  </data>
+  <data name="Menu.AssetWarp.Status.Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Menu.AssetWarp.Status.ProxyNotRunning" xml:space="preserve">
+    <value>Enabled, but the local proxy isn't confirmed running - check the log</value>
+  </data>
+  <data name="Menu.FastFlagSettings.Description" xml:space="preserve">
+    <value>Configure Roblox engine FastFlags, NVIDIA driver tuning, and the Asset Warp asset-blocking proxy from one place.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.Tab.AssetWarp" xml:space="preserve">
+    <value>Asset Warp</value>
+  </data>
+  <data name="Menu.FastFlagSettings.Tab.NvidiaFFlags" xml:space="preserve">
+    <value>NVIDIA FFlags</value>
+  </data>
+  <data name="Menu.FastFlagSettings.Tab.RobloxFFlags" xml:space="preserve">
+    <value>Roblox FFlags</value>
+  </data>
+  <data name="Menu.FastFlagSettings.Title" xml:space="preserve">
+    <value>FastFlag Settings</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Interface" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Graphics" xml:space="preserve">
+    <value>Graphics</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Audio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Input" xml:space="preserve">
+    <value>Input</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.VR" xml:space="preserve">
+    <value>VR</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Network" xml:space="preserve">
+    <value>Network</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Menu.GBSEditor.Tab.RawEditor" xml:space="preserve">
+    <value>Raw Editor</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Interface.Header" xml:space="preserve">
+    <value>User Interface</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Graphics.Header" xml:space="preserve">
+    <value>Graphics and Rendering</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Audio.Header" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Input.Header" xml:space="preserve">
+    <value>Input and Controls</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.VR.Header" xml:space="preserve">
+    <value>Virtual Reality</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Network.Header" xml:space="preserve">
+    <value>Network and Connectivity</value>
+  </data>
+  <data name="Menu.GBSEditor.Section.Advanced.Header" xml:space="preserve">
+    <value>Advanced and Developer</value>
+  </data>
+  <data name="Menu.GBSEditor.UITransparency.Header" xml:space="preserve">
+    <value>UI Transparency</value>
+  </data>
+  <data name="Menu.GBSEditor.UITransparency.Description" xml:space="preserve">
+    <value>Sets your preferred interface transparency.</value>
+  </data>
+  <data name="Menu.GBSEditor.PreferredTextSize.Header" xml:space="preserve">
+    <value>Text Size</value>
+  </data>
+  <data name="Menu.GBSEditor.PreferredTextSize.Description" xml:space="preserve">
+    <value>Controls the overall UI text size.</value>
+  </data>
+  <data name="Menu.GBSEditor.ReducedMotion.Header" xml:space="preserve">
+    <value>Reduced Motion</value>
+  </data>
+  <data name="Menu.GBSEditor.ReducedMotion.Description" xml:space="preserve">
+    <value>Disables UI animations for accessibility.</value>
+  </data>
+  <data name="Menu.GBSEditor.HudVisible.Header" xml:space="preserve">
+    <value>HUD Visibility</value>
+  </data>
+  <data name="Menu.GBSEditor.HudVisible.Description" xml:space="preserve">
+    <value>Toggles the in-game HUD on or off.</value>
+  </data>
+  <data name="Menu.GBSEditor.ChatVisible.Header" xml:space="preserve">
+    <value>Chat Visibility</value>
+  </data>
+  <data name="Menu.GBSEditor.ChatVisible.Description" xml:space="preserve">
+    <value>Toggles in-game chat visibility on or off.</value>
+  </data>
+  <data name="Menu.GBSEditor.PlayerNamesEnabled.Header" xml:space="preserve">
+    <value>Player Names Visible</value>
+  </data>
+  <data name="Menu.GBSEditor.PlayerNamesEnabled.Description" xml:space="preserve">
+    <value>Shows other players' names above their characters.</value>
+  </data>
+  <data name="Menu.GBSEditor.BadgeVisible.Header" xml:space="preserve">
+    <value>Badge Visible</value>
+  </data>
+  <data name="Menu.GBSEditor.BadgeVisible.Description" xml:space="preserve">
+    <value>Shows badges earned in-game.</value>
+  </data>
+  <data name="Menu.GBSEditor.FramerateCap.Header" xml:space="preserve">
+    <value>Framerate Cap</value>
+  </data>
+  <data name="Menu.GBSEditor.FramerateCap.Description" xml:space="preserve">
+    <value>Limits Roblox's maximum FPS. 0 leaves it uncapped.</value>
+  </data>
+  <data name="Menu.GBSEditor.GraphicsQuality.Header" xml:space="preserve">
+    <value>Graphics Quality</value>
+  </data>
+  <data name="Menu.GBSEditor.GraphicsQuality.Description" xml:space="preserve">
+    <value>Sets a manual graphics level (1-10) or Automatic. Only takes effect when graphics mode isn't set to Automatic in-game.</value>
+  </data>
+  <data name="Menu.GBSEditor.Fullscreen.Header" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="Menu.GBSEditor.Fullscreen.Description" xml:space="preserve">
+    <value>Toggles Roblox's own fullscreen mode.</value>
+  </data>
+  <data name="Menu.GBSEditor.MasterVolume.Header" xml:space="preserve">
+    <value>Master Volume</value>
+  </data>
+  <data name="Menu.GBSEditor.MasterVolume.Description" xml:space="preserve">
+    <value>Overall in-game volume.</value>
+  </data>
+  <data name="Menu.GBSEditor.VoiceChatVolume.Header" xml:space="preserve">
+    <value>Voice Chat Volume</value>
+  </data>
+  <data name="Menu.GBSEditor.VoiceChatVolume.Description" xml:space="preserve">
+    <value>Volume for voice chat communication.</value>
+  </data>
+  <data name="Menu.GBSEditor.MouseSensitivity.Header" xml:space="preserve">
+    <value>Mouse Sensitivity</value>
+  </data>
+  <data name="Menu.GBSEditor.MouseSensitivity.Description" xml:space="preserve">
+    <value>Adjusts in-game mouse look sensitivity.</value>
+  </data>
+  <data name="Menu.GBSEditor.CameraYInverted.Header" xml:space="preserve">
+    <value>Invert Y-Axis</value>
+  </data>
+  <data name="Menu.GBSEditor.CameraYInverted.Description" xml:space="preserve">
+    <value>Reverses the vertical camera direction.</value>
+  </data>
+  <data name="Menu.GBSEditor.GamepadSensitivity.Header" xml:space="preserve">
+    <value>Gamepad Sensitivity</value>
+  </data>
+  <data name="Menu.GBSEditor.GamepadSensitivity.Description" xml:space="preserve">
+    <value>Adjusts joystick look sensitivity.</value>
+  </data>
+  <data name="Menu.GBSEditor.ControllerVibration.Header" xml:space="preserve">
+    <value>Controller Vibration</value>
+  </data>
+  <data name="Menu.GBSEditor.ControllerVibration.Description" xml:space="preserve">
+    <value>Toggles haptic feedback on controllers.</value>
+  </data>
+  <data name="Menu.GBSEditor.VREnabled.Header" xml:space="preserve">
+    <value>Enable VR</value>
+  </data>
+  <data name="Menu.GBSEditor.VREnabled.Description" xml:space="preserve">
+    <value>Toggles virtual reality mode.</value>
+  </data>
+  <data name="Menu.GBSEditor.VRComfortSetting.Header" xml:space="preserve">
+    <value>VR Comfort Setting</value>
+  </data>
+  <data name="Menu.GBSEditor.VRComfortSetting.Description" xml:space="preserve">
+    <value>Controls how the camera moves in VR.</value>
+  </data>
+  <data name="Menu.GBSEditor.VignetteEnabled.Header" xml:space="preserve">
+    <value>Vignette in VR</value>
+  </data>
+  <data name="Menu.GBSEditor.VignetteEnabled.Description" xml:space="preserve">
+    <value>Enables a vignette effect in VR to help reduce motion sickness.</value>
+  </data>
+  <data name="Menu.GBSEditor.NetworkStatsVisible.Header" xml:space="preserve">
+    <value>Network Debug Stats</value>
+  </data>
+  <data name="Menu.GBSEditor.NetworkStatsVisible.Description" xml:space="preserve">
+    <value>Shows Roblox's built-in FPS/ping/memory overlay.</value>
+  </data>
+  <data name="Menu.GBSEditor.ChatTranslationEnabled.Header" xml:space="preserve">
+    <value>Chat Translation</value>
+  </data>
+  <data name="Menu.GBSEditor.ChatTranslationEnabled.Description" xml:space="preserve">
+    <value>Automatically translates in-game chat messages.</value>
+  </data>
+  <data name="Menu.GBSEditor.MicroProfilerWebServerEnabled.Header" xml:space="preserve">
+    <value>Microprofiler</value>
+  </data>
+  <data name="Menu.GBSEditor.MicroProfilerWebServerEnabled.Description" xml:space="preserve">
+    <value>Enables Roblox's built-in microprofiler web server.</value>
+  </data>
+  <data name="Menu.GBSEditor.OnScreenProfilerEnabled.Header" xml:space="preserve">
+    <value>On-Screen Profiler</value>
+  </data>
+  <data name="Menu.GBSEditor.OnScreenProfilerEnabled.Description" xml:space="preserve">
+    <value>Shows an FPS and performance overlay.</value>
+  </data>
+  <data name="Menu.GBSEditor.ResetToDefaults.Header" xml:space="preserve">
+    <value>Reset to Default Settings</value>
+  </data>
+  <data name="Menu.GBSEditor.ResetToDefaults.Description" xml:space="preserve">
+    <value>Restores every curated setting on this page to its default value.</value>
+  </data>
+  <data name="Menu.GBSEditor.ResetToDefaults.Button" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Menu.Integrations.Tabs.Activity" xml:space="preserve">
+    <value>Activity</value>
+  </data>
+  <data name="Menu.Integrations.Tabs.Discord" xml:space="preserve">
+    <value>Discord</value>
+  </data>
+  <data name="Menu.Integrations.Tabs.Roblox" xml:space="preserve">
+    <value>Roblox</value>
+  </data>
+  <data name="Menu.Integrations.Tabs.Custom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="Menu.Integrations.AccountSwitcher.Title" xml:space="preserve">
+    <value>Account Switcher</value>
+  </data>
+  <data name="Menu.Integrations.AccountSwitcher.Description" xml:space="preserve">
+    <value>Save multiple Roblox accounts and switch between them without signing out each time. Your saved logins never leave this PC, and stay protected the same way Roblox's own client already protects your session.</value>
+  </data>
+  <data name="Menu.Behaviour.Tab.General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Menu.Behaviour.Tab.Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Menu.Behaviour.Tab.Matchmaker" xml:space="preserve">
+    <value>Matchmaker</value>
+  </data>
+  <data name="Menu.Behaviour.Tab.Roblox" xml:space="preserve">
+    <value>Roblox</value>
+  </data>
+  <data name="Menu.Behaviour.DisableRobloxCrashHandler.Title" xml:space="preserve">
+    <value>Disable RobloxCrashHandler</value>
+  </data>
+  <data name="Menu.Behaviour.DisableRobloxCrashHandler.Description" xml:space="preserve">
+    <value>Closes the RobloxCrashHandler process shortly after Roblox launches. It isn't required for Roblox to run - some players just don't want it sitting in the background.</value>
+  </data>
+  <data name="Menu.Behaviour.Advanced.Description" xml:space="preserve">
+    <value>Cache/log cleanup, CPU priority, and Roblox process memory tuning already live on the Performance page - see its Cleanup and Runtime optimizer sections.</value>
+  </data>
+  <data name="Menu.Behaviour.Roblox.Description" xml:space="preserve">
+    <value>Customizes the live Roblox game window itself. Fake exclusive fullscreen lives on the Performance page.</value>
+  </data>
+  <data name="Menu.Behaviour.RobloxTitle.Title" xml:space="preserve">
+    <value>Window title</value>
+  </data>
+  <data name="Menu.Behaviour.RobloxTitle.Description" xml:space="preserve">
+    <value>Leave blank to keep the title Roblox sets.</value>
+  </data>
+  <data name="Menu.Behaviour.CycleTitleWithGameName.Title" xml:space="preserve">
+    <value>Add the game name</value>
+  </data>
+  <data name="Menu.Behaviour.CycleTitleWithGameName.Description" xml:space="preserve">
+    <value>Shows the experience you're playing in the title bar.</value>
+  </data>
+  <data name="Menu.Behaviour.ShowServerInfoInTitle.Title" xml:space="preserve">
+    <value>Add the player count</value>
+  </data>
+  <data name="Menu.Behaviour.ShowServerInfoInTitle.Description" xml:space="preserve">
+    <value>Shows the current game's live player count in the title bar, next to the game name.</value>
+  </data>
+  <data name="Menu.Behaviour.UseGameIconForRobloxWindow.Title" xml:space="preserve">
+    <value>Use the game icon</value>
+  </data>
+  <data name="Menu.Behaviour.UseGameIconForRobloxWindow.Description" xml:space="preserve">
+    <value>Shows the experience's own icon on the Roblox window and taskbar button instead of the Roblox icon.</value>
+  </data>
+  <data name="Menu.Behaviour.Matchmaker.Datacenters.AllowColumn" xml:space="preserve">
+    <value>Allow</value>
+  </data>
+  <data name="Menu.Behaviour.Matchmaker.Datacenters.DatacenterColumn" xml:space="preserve">
+    <value>Datacenter</value>
+  </data>
+  <data name="Menu.Behaviour.Matchmaker.Datacenters.LatencyColumn" xml:space="preserve">
+    <value>Est. latency</value>
+  </data>
+  <data name="Menu.Behaviour.Matchmaker.JoinApi.Title" xml:space="preserve">
+    <value>Join API</value>
+  </data>
+  <data name="Menu.Behaviour.Matchmaker.JoinApi.Description" xml:space="preserve">
+    <value>Which Roblox join endpoint the matchmaker uses to resolve server locations. Change only if joins stop working.</value>
+  </data>
+  <data name="Menu.Mods.Misc.CursorSetManager.Description" xml:space="preserve">
+    <value>Save named cursor sets you can switch between, and import or export them to share.</value>
+  </data>
+  <data name="Menu.Mods.Misc.CursorSetManager.Title" xml:space="preserve">
+    <value>Custom cursor set manager</value>
+  </data>
+  <data name="Menu.Mods.Misc.CustomDeathSound.Description" xml:space="preserve">
+    <value>Replaces the death sound with your own audio file.</value>
+  </data>
+  <data name="Menu.Mods.Misc.CustomDeathSound.Title" xml:space="preserve">
+    <value>Custom death sound</value>
+  </data>
+  <data name="Menu.Mods.Misc.Skybox.Description" xml:space="preserve">
+    <value>Replace Roblox's default skybox with your own image(s).</value>
+  </data>
+  <data name="Menu.Mods.Misc.Skybox.Title" xml:space="preserve">
+    <value>Skybox manager</value>
+  </data>
+  <data name="Menu.Mods.ModManagement.Description" xml:space="preserve">
+    <value>Keep several mods as separate, independently toggled packages instead of one flat folder. Drag a card to change apply order, or drop files here to create a new mod.</value>
+  </data>
+  <data name="Menu.Mods.ModManagement.Title" xml:space="preserve">
+    <value>Mod Management</value>
+  </data>
+  <data name="Menu.Mods.Overlays.Description" xml:space="preserve">
+    <value>Customize the background shown behind the Roblox homepage. This is unrelated to the in-game crosshair overlay found on the Overlays page.</value>
+  </data>
+  <data name="Menu.Mods.Overlays.Title" xml:space="preserve">
+    <value>Homepage Background</value>
+  </data>
+  <data name="Menu.Mods.Overlays.Enable.Description" xml:space="preserve">
+    <value>Turns the homepage background customization on or off.</value>
+  </data>
+  <data name="Menu.Mods.Overlays.Enable.Title" xml:space="preserve">
+    <value>Enable homepage background</value>
+  </data>
+  <data name="Menu.Mods.Overlays.HomepageBackground.Description" xml:space="preserve">
+    <value>Choose a solid color or gradient to show behind the Roblox homepage.</value>
+  </data>
+  <data name="Menu.Mods.Overlays.HomepageBackground.Title" xml:space="preserve">
+    <value>Background style</value>
+  </data>
+  <data name="Menu.Mods.Presets.ModApplyTarget.Description" xml:space="preserve">
+    <value>Choose whether your mods are applied to the Roblox player, Roblox Studio, or both.</value>
+  </data>
+  <data name="Menu.Mods.Presets.ModApplyTarget.Title" xml:space="preserve">
+    <value>Apply mods to</value>
+  </data>
+  <data name="Menu.Mods.Tabs.ModManagement" xml:space="preserve">
+    <value>Mod Management</value>
+  </data>
+  <data name="Menu.Mods.Tabs.Overlays" xml:space="preserve">
+    <value>Overlays</value>
+  </data>
+  <data name="Menu.Mods.Tabs.PresetMod" xml:space="preserve">
+    <value>Preset Mod</value>
+  </data>
 </root>

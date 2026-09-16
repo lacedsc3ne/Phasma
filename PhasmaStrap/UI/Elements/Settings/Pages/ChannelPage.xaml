@@ -10,74 +10,170 @@
       Title="ChannelPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Choose which Roblox deployment channel PhasmaStrap installs and launches." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="Choose which Roblox deployment channel PhasmaStrap installs and launches, tune how it downloads Roblox, and see which days an experience typically ships updates on." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <TextBlock Text="Channel" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="App-level settings such as PhasmaStrap's own CPU limit, resolution/monitor changing, force-reinstall, background Roblox updates, hardware acceleration and notifications already live on their own dedicated Performance / Bootstrapper / Notifications pages, so they aren't duplicated here." />
 
-        <controls:OptionControl
-            Header="Currently active channel"
-            Description="{Binding CurrentActiveChannel, Mode=OneWay, StringFormat='Roblox is currently running on the {0} channel.'}">
-            <TextBlock Text="{Binding CurrentActiveChannel, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontFamily="Consolas" />
-        </controls:OptionControl>
+        <TabControl Margin="0,12,0,0">
 
-        <controls:OptionControl
-            Header="Roblox channel"
-            Description="Leave blank to use Roblox's default (production) channel. Pick a known channel below, or type a custom one.">
-            <StackPanel Orientation="Horizontal">
-                <ui:AutoSuggestBox
-                    Width="240"
-                    PlaceholderText="production"
-                    Text="{Binding RobloxChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ItemsSource="{Binding KnownChannels, Mode=OneTime}" />
-                <ui:Button
-                    Margin="8,0,0,0"
-                    Content="{x:Static resources:Strings.Dialog_ChannelLists_BrowseButton}"
-                    Click="BrowseChannelsButton_Click" />
-            </StackPanel>
-        </controls:OptionControl>
-
-        <controls:OptionControl
-            Header="If Roblox's channel changes"
-            Description="Automatic keeps your saved channel every launch. Prompt asks before switching. Ignore never overrides whatever channel Roblox itself reports.">
-            <ComboBox Width="160" ItemsSource="{Binding ChannelChangeModes, Mode=OneTime}" SelectedItem="{Binding SelectedChannelChangeMode, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="Download mirror" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock Text="Which Roblox CDN mirror to download from. Auto picks whichever responds fastest." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-
-        <controls:OptionControl Header="Preferred mirror">
-            <ComboBox Width="260" ItemsSource="{Binding MirrorChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Url" SelectedValue="{Binding PreferredMirror, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="Update heatmap" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Looks at an experience's public update timestamp and badge-award history to show which days of the week it typically ships updates on. Uses Roblox's own public APIs - no login required." />
-
-        <controls:OptionControl Header="Place ID" Margin="0,16,0,0">
-            <StackPanel Orientation="Horizontal">
-                <ui:TextBox Width="200" PlaceholderText="e.g. 13700835620" Text="{Binding HeatmapPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Margin="8,0,0,0" Content="Load" Icon="ArrowClockwise24" Command="{Binding LoadHeatmapCommand, Mode=OneTime}" />
-            </StackPanel>
-        </controls:OptionControl>
-
-        <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding HeatmapStatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-
-        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding HeatmapDays, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical" Width="48" Margin="0,0,4,0">
-                        <Grid Height="80" VerticalAlignment="Bottom">
-                            <Border VerticalAlignment="Bottom" Width="28" Height="{Binding BarHeight}" Background="{DynamicResource AccentFillColorDefaultBrush}" CornerRadius="3" />
-                        </Grid>
-                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" Margin="0,4,0,0" FontSize="12" />
-                        <TextBlock Text="{Binding Count}" HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Games24" Margin="0,0,6,0" />
+                        <TextBlock Text="Roblox" />
                     </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                </TabItem.Header>
+                <StackPanel Margin="10">
+                    <TextBlock Text="Channel" FontSize="20" FontWeight="Medium" />
+
+                    <controls:OptionControl
+                        Header="Currently active channel"
+                        Description="{Binding CurrentActiveChannel, Mode=OneWay, StringFormat='Roblox is currently running on the {0} channel.'}">
+                        <TextBlock Text="{Binding CurrentActiveChannel, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontFamily="Consolas" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="Roblox channel"
+                        Description="Leave blank to use Roblox's default (production) channel. Pick a known channel below, or type a custom one.">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:AutoSuggestBox
+                                Width="240"
+                                PlaceholderText="production"
+                                Text="{Binding RobloxChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                ItemsSource="{Binding KnownChannels, Mode=OneTime}" />
+                            <ui:Button
+                                Margin="8,0,0,0"
+                                Content="{x:Static resources:Strings.Dialog_ChannelLists_BrowseButton}"
+                                Click="BrowseChannelsButton_Click" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="If Roblox's channel changes"
+                        Description="Automatic keeps your saved channel every launch. Prompt asks before switching. Ignore never overrides whatever channel Roblox itself reports.">
+                        <ComboBox Width="160" ItemsSource="{Binding ChannelChangeModes, Mode=OneTime}" SelectedItem="{Binding SelectedChannelChangeMode, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <TextBlock Text="Channel build info" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Looks up which build (version + version GUID) is currently deployed on the channel typed in above, without switching to it." />
+
+                    <controls:OptionControl Header="Look up build" Margin="0,16,0,0">
+                        <ui:Button Content="Look up" Icon="ArrowClockwise24" Command="{Binding LookupChannelInfoCommand, Mode=OneTime}" />
+                    </controls:OptionControl>
+
+                    <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding ChannelInfoStatusText, Mode=OneWay}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowChannelInfoError}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <Grid Margin="0,8,0,0">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ChannelDeployInfo}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,16,4" VerticalAlignment="Center" Text="Version" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontFamily="Consolas" Text="{Binding ChannelDeployInfo.Version, Mode=OneWay}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center" Text="Version GUID" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontFamily="Consolas" Text="{Binding ChannelDeployInfo.VersionGuid, Mode=OneWay}" />
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="ArrowDownload24" Margin="0,0,6,0" />
+                        <TextBlock Text="Installer" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="10">
+                    <TextBlock Text="Download mirror" FontSize="20" FontWeight="Medium" />
+                    <TextBlock Text="Which Roblox CDN mirror to download from. Auto picks whichever responds fastest." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <controls:OptionControl Header="Preferred mirror">
+                        <ComboBox Width="260" ItemsSource="{Binding MirrorChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Url" SelectedValue="{Binding PreferredMirror, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <TextBlock Text="Download tuning" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Controls how Bootstrapper downloads Roblox's packages. The defaults below exactly match PhasmaStrap's original behaviour (one package at a time, no segmentation) - raising these can speed up installs on fast connections, but puts more simultaneous load on Roblox's CDN." />
+
+                    <controls:OptionControl Header="Download buffer size (KB)" Description="Larger buffers can speed up downloads on fast connections.">
+                        <ComboBox Width="140" ItemsSource="{Binding DownloadBufferOptions, Mode=OneTime}" SelectedItem="{Binding DownloadBufferKb, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Concurrent downloads" Description="How many packages download at the same time. Higher is faster but uses more bandwidth.">
+                        <ComboBox Width="140" ItemsSource="{Binding ConcurrentDownloadOptions, Mode=OneTime}" SelectedItem="{Binding MaxConcurrentDownloads, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Segments per file" Description="Splits each sufficiently large package into this many parallel ranged downloads. Falls back automatically to a normal single-connection download for packages or mirrors that don't support this.">
+                        <ComboBox Width="140" ItemsSource="{Binding DownloadSegmentOptions, Mode=OneTime}" SelectedItem="{Binding MaxDownloadSegments, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="History24" Margin="0,0,6,0" />
+                        <TextBlock Text="Heatmap" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="10">
+                    <TextBlock Text="Update heatmap" FontSize="20" FontWeight="Medium" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Looks at an experience's public update timestamp and badge-award history to show which days of the week it typically ships updates on. Uses Roblox's own public APIs - no login required." />
+
+                    <controls:OptionControl Header="Place ID" Margin="0,16,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:TextBox Width="200" PlaceholderText="e.g. 13700835620" Text="{Binding HeatmapPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button Margin="8,0,0,0" Content="Load" Icon="ArrowClockwise24" Command="{Binding LoadHeatmapCommand, Mode=OneTime}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding HeatmapStatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding HeatmapDays, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Width="48" Margin="0,0,4,0">
+                                    <Grid Height="80" VerticalAlignment="Bottom">
+                                        <Border VerticalAlignment="Bottom" Width="28" Height="{Binding BarHeight}" Background="{DynamicResource AccentFillColorDefaultBrush}" CornerRadius="3" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" Margin="0,4,0,0" FontSize="12" />
+                                    <TextBlock Text="{Binding Count}" HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </TabItem>
+
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

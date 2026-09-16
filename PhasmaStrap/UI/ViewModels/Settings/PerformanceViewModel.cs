@@ -12,8 +12,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class PerformanceViewModel : NotifyPropertyChangedViewModel
     {
-        private readonly GBSEditor _gbs = new();
-
         public int CpuCoreLimit
         {
             get => App.Settings.Prop.CpuCoreLimit;
@@ -60,48 +58,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!value)
                     PhasmaStrap.Integrations.HeadsetAudio.Shutdown();
             }
-        }
-
-        public bool SettingsFileReadOnly
-        {
-            get => _gbs.GetReadOnly();
-            set => _gbs.SetReadOnly(value);
-        }
-
-        public int FramerateCap
-        {
-            get => _gbs.GetInt("FramerateCap", 0);
-            set { _gbs.SetInt("FramerateCap", value); _gbs.Save(); }
-        }
-
-        public int SavedQualityLevel
-        {
-            get => _gbs.GetInt("SavedQualityLevel", 10);
-            set { _gbs.SetInt("SavedQualityLevel", value); _gbs.Save(); }
-        }
-
-        public float MouseSensitivity
-        {
-            get => _gbs.GetFloat("MouseSensitivity", 0.5f);
-            set { _gbs.SetFloat("MouseSensitivity", value); _gbs.Save(); }
-        }
-
-        public bool ReducedMotion
-        {
-            get => _gbs.GetBool("ReducedMotion");
-            set { _gbs.SetBool("ReducedMotion", value); _gbs.Save(); }
-        }
-
-        public bool VREnabled
-        {
-            get => _gbs.GetBool("VREnabled");
-            set { _gbs.SetBool("VREnabled", value); _gbs.Save(); }
-        }
-
-        public bool PerformanceStatsVisible
-        {
-            get => _gbs.GetBool("PerformanceStatsVisible");
-            set { _gbs.SetBool("PerformanceStatsVisible", value); _gbs.Save(); }
         }
 
         public IEnumerable<CleanerOptions> CleanerScheduleOptions { get; } = Enum.GetValues(typeof(CleanerOptions)).Cast<CleanerOptions>();

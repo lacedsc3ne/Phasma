@@ -724,10 +724,17 @@ namespace PhasmaStrap.Integrations
             }
         }
 
+        // whether join-instance requests should use Roblox's newer v2 gamejoin endpoint instead of the
+        // long-stable v1 one - user-selectable via Settings.MatchmakerGamejoinApiVersion (Matchmaker tab)
+        private static bool UseV2GamejoinApi() => App.Settings.Prop.MatchmakerGamejoinApiVersion >= 2;
+
         private static HttpRequestMessage BuildJoinRequest(long placeId, string jobId, string cookie, string? csrf)
         {
-            const string url = "https://gamejoin.roblox.com/v1/join-game-instance";
-            string body = JsonSerializer.Serialize(new { placeId, gameId = jobId, gameJoinAttemptId = Guid.NewGuid().ToString() });
+            bool useV2 = UseV2GamejoinApi();
+            string url = useV2 ? "https://gamejoin.roblox.com/v2/join-game-instance" : "https://gamejoin.roblox.com/v1/join-game-instance";
+            string body = useV2
+                ? JsonSerializer.Serialize(new { placeId, gameId = jobId, gameJoinAttemptId = Guid.NewGuid().ToString(), joinOrigin = "PhasmaStrapFetchInfo" })
+                : JsonSerializer.Serialize(new { placeId, gameId = jobId, gameJoinAttemptId = Guid.NewGuid().ToString() });
 
             var req = new HttpRequestMessage(HttpMethod.Post, url);
             req.Headers.TryAddWithoutValidation("Cookie", $".ROBLOSECURITY={cookie}");

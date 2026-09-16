@@ -141,6 +141,9 @@ namespace PhasmaStrap
                 }
             }
 
+            if (RobloxWindowCustomizer.IsEnabled)
+                RobloxWindowCustomizer.Start(ActivityWatcher);
+
             _notifyIcon = new(this);
         }
 
@@ -230,6 +233,7 @@ namespace PhasmaStrap
             AudioDucker.Shutdown();
             HeadsetAudio.Shutdown();
             ForcedResolution.Shutdown();
+            RobloxWindowCustomizer.Shutdown();
             StopProcessOptimizer();
             MemoryManager.Shutdown();
 

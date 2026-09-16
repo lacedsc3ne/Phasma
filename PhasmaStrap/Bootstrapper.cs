@@ -20,6 +20,10 @@ using System.Windows.Forms;
 using System.Windows.Shell;
 
 using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
+
+using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 
 using PhasmaStrap.AppData;
 using PhasmaStrap.RobloxInterfaces;
@@ -63,6 +67,12 @@ namespace PhasmaStrap
         private double _taskbarProgressMaximum;
         private long _totalDownloadedBytes = 0;
         private bool _packageExtractionSuccess = true;
+
+        // shared cap on concurrent in-flight HTTP GET/range requests across every package/segment
+        // being downloaded at once (see DownloadConfiguration.NormalizeConcurrent/NormalizeSegments) -
+        // set up once per UpgradeRoblox call so the two settings can't multiply into an unbounded
+        // number of simultaneous connections to Roblox's CDN
+        private SemaphoreSlim? _downloadRequestThrottle;
 
         private bool _mustUpgrade => App.LaunchSettings.ForceFlag.Active || App.State.Prop.ForceReinstall || String.IsNullOrEmpty(AppData.DistributionState.VersionGuid) || !File.Exists(AppData.ExecutablePath);
         private bool _noConnection = false;
@@ -124,6 +134,15 @@ namespace PhasmaStrap
         {
             if (Dialog is null)
                 return;
+
+            // downloads can now run concurrently (see MaxConcurrentDownloads/MaxDownloadSegments),
+            // so this can be called from background threads - the WPF-based dialogs' ProgressValue
+            // setters aren't self-marshaling like WinFormsDialogBase's, so bounce onto the UI thread
+            if (System.Windows.Application.Current is not null && !System.Windows.Application.Current.Dispatcher.CheckAccess())
+            {
+                System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(UpdateProgressBar));
+                return;
+            }
 
             // UI progress
             int progressValue = (int)Math.Floor(_progressIncrement * _totalDownloadedBytes);
@@ -317,6 +336,9 @@ namespace PhasmaStrap
                 }
 
                 StartRoblox();
+
+                if (App.Settings.Prop.DisableRobloxCrashHandler)
+                    _ = DisableCrashHandlerIfNeeded();
             }
 
             await mutex.ReleaseAsync();
@@ -1005,6 +1027,46 @@ namespace PhasmaStrap
             Thread.Sleep(1000);
         }
 
+        // kills RobloxCrashHandler.exe shortly after launch when the user has opted in (Behaviour
+        // page, General tab) - it isn't needed for Roblox itself to run, and some users prefer it
+        // not sitting in the background. Ported from Voidstrap's DisableCrashHandlerIfNeeded.
+        private async Task DisableCrashHandlerIfNeeded()
+        {
+            const string LOG_IDENT = "Bootstrapper::DisableCrashHandlerIfNeeded";
+
+            try
+            {
+                await Task.Delay(800);
+
+                foreach (var process in Process.GetProcessesByName("RobloxCrashHandler"))
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.CloseMainWindow();
+                            if (!process.WaitForExit(1000))
+                                process.Kill();
+
+                            App.Logger.WriteLine(LOG_IDENT, $"Terminated RobloxCrashHandler {process.Id}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Failed to close RobloxCrashHandler {process.Id}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException(LOG_IDENT, ex);
+            }
+        }
+
         private bool ShouldRunAsAdmin()
         {
             foreach (var root in WindowsRegistry.Roots)
@@ -1400,22 +1462,69 @@ namespace PhasmaStrap
                 _taskbarProgressIncrement = _taskbarProgressMaximum / (double)totalPackedSize;
             }
 
-            var extractionTasks = new List<Task>();
+            var extractionTasks = new ConcurrentBag<Task>();
 
-            foreach (var package in _versionPackageManifest)
+            // MaxConcurrentDownloads/MaxDownloadSegments (Settings > Roblox > Installer) default to 1,
+            // which preserves the original one-package-at-a-time, unsegmented download behaviour exactly.
+            // Raising either is opt-in - see Utility/DownloadConfiguration.cs for the normalization/caps.
+            int packageConcurrency = DownloadConfiguration.NormalizeConcurrent(App.Settings.Prop.MaxConcurrentDownloads);
+            int downloadSegments = DownloadConfiguration.NormalizeSegments(App.Settings.Prop.MaxDownloadSegments);
+
+            _downloadRequestThrottle = new SemaphoreSlim(Math.Clamp(packageConcurrency * downloadSegments, 1, 32));
+
+            try
             {
-                if (_cancelTokenSource.IsCancellationRequested)
-                    return;
+                if (packageConcurrency <= 1)
+                {
+                    // download all the packages synchronously
+                    foreach (var package in _versionPackageManifest)
+                    {
+                        if (_cancelTokenSource.IsCancellationRequested)
+                            return;
 
-                // download all the packages synchronously
-                await DownloadPackage(package);
+                        await DownloadPackage(package);
 
-                // we'll extract the runtime installer later if we need to
-                if (package.Name == "WebView2RuntimeInstaller.zip")
-                    continue;
+                        // we'll extract the runtime installer later if we need to
+                        if (package.Name == "WebView2RuntimeInstaller.zip")
+                            continue;
 
-                // extract the package async immediately after download
-                extractionTasks.Add(Task.Run(() => ExtractPackage(package), _cancelTokenSource.Token));
+                        // extract the package async immediately after download
+                        extractionTasks.Add(Task.Run(() => ExtractPackage(package), _cancelTokenSource.Token));
+                    }
+                }
+                else
+                {
+                    // download up to packageConcurrency packages at once
+                    using var packageThrottle = new SemaphoreSlim(packageConcurrency);
+
+                    var downloadTasks = _versionPackageManifest.Select(async package =>
+                    {
+                        await packageThrottle.WaitAsync(_cancelTokenSource.Token);
+                        try
+                        {
+                            if (_cancelTokenSource.IsCancellationRequested)
+                                return;
+
+                            await DownloadPackage(package);
+
+                            if (package.Name == "WebView2RuntimeInstaller.zip")
+                                return;
+
+                            extractionTasks.Add(Task.Run(() => ExtractPackage(package), _cancelTokenSource.Token));
+                        }
+                        finally
+                        {
+                            packageThrottle.Release();
+                        }
+                    });
+
+                    await Task.WhenAll(downloadTasks);
+                }
+            }
+            finally
+            {
+                _downloadRequestThrottle.Dispose();
+                _downloadRequestThrottle = null;
             }
 
             if (_cancelTokenSource.IsCancellationRequested)
@@ -1573,6 +1682,21 @@ namespace PhasmaStrap
 
             SetStatus(Strings.Bootstrapper_Status_ApplyingModifications);
 
+            // Preset Mod tab's "Mod apply target": skip applying mods entirely when this launch's
+            // executable isn't in scope for the configured target
+            bool modsTargetThisLaunch = App.Settings.Prop.ModApplyTarget switch
+            {
+                ModApplyTarget.Player => !IsStudioLaunch,
+                ModApplyTarget.Studio => IsStudioLaunch,
+                _ => true
+            };
+
+            if (!modsTargetThisLaunch)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Skipping mod application - ModApplyTarget is {App.Settings.Prop.ModApplyTarget} and this is a {(IsStudioLaunch ? "Studio" : "Player")} launch");
+                return true;
+            }
+
             // handle file mods
             App.Logger.WriteLine(LOG_IDENT, "Checking file mods...");
 
@@ -1582,6 +1706,69 @@ namespace PhasmaStrap
             List<string> modFolderFiles = new();
 
             Directory.CreateDirectory(Paths.Modifications);
+
+            // Mod Management tab: materialize files from enabled managed mod packages into the
+            // flat Modifications folder so the existing apply/restore pipeline below picks them up
+            // exactly like any manually placed mod. We only ever touch paths we previously wrote
+            // ourselves (tracked in DistributionState.ManagedModManifest) so a user's own manually
+            // placed mod at the same relative path is never deleted out from under them - it can
+            // still be overwritten by a managed mod occupying the same path, which is the same
+            // "last writer wins" behavior manually placed mods already have with each other.
+            try
+            {
+                var previousManagedManifest = new HashSet<string>(AppData.DistributionState.ManagedModManifest, StringComparer.OrdinalIgnoreCase);
+                var currentManagedManifest = new List<string>();
+                var currentManagedSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                ManagedModScanResult managedScan = ManagedModStore.ScanEnabledFiles();
+
+                foreach (ManagedModFile file in managedScan.Files)
+                {
+                    if (_cancelTokenSource.IsCancellationRequested)
+                        return true;
+
+                    if (file.Relative.EndsWith(".lock", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string destination = Path.Combine(Paths.Modifications, file.Relative);
+                    Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+
+                    CloudFiles.Hydrate(file.Source);
+                    File.Copy(file.Source, destination, true);
+
+                    currentManagedSet.Add(file.Relative);
+                    currentManagedManifest.Add(file.Relative);
+                }
+
+                foreach (string stalePath in previousManagedManifest)
+                {
+                    if (currentManagedSet.Contains(stalePath))
+                        continue;
+
+                    string staleFile = Path.Combine(Paths.Modifications, stalePath);
+                    if (!File.Exists(staleFile))
+                        continue;
+
+                    try
+                    {
+                        Filesystem.AssertReadOnly(staleFile);
+                        File.Delete(staleFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Could not remove stale managed mod file {stalePath}: {ex.Message}");
+                    }
+                }
+
+                foreach ((string id, string message) in managedScan.Failures)
+                    App.Logger.WriteLine(LOG_IDENT, $"Managed mod {id[..8]} could not be indexed: {message}");
+
+                AppData.DistributionState.ManagedModManifest = currentManagedManifest;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Managed mods could not be applied: " + ex.Message);
+            }
 
             // check custom font mod
             // instead of replacing the fonts themselves, we'll just alter the font family manifests
@@ -1800,7 +1987,7 @@ namespace PhasmaStrap
                 {
                     App.Logger.WriteLine(LOG_IDENT, $"Package is already downloaded, skipping...");
 
-                    _totalDownloadedBytes += package.PackedSize;
+                    Interlocked.Add(ref _totalDownloadedBytes, package.PackedSize);
                     UpdateProgressBar();
 
                     return;
@@ -1814,7 +2001,7 @@ namespace PhasmaStrap
                 App.Logger.WriteLine(LOG_IDENT, $"Found existing copy at '{robloxPackageLocation}'! Copying to Downloads folder...");
                 File.Copy(robloxPackageLocation, package.DownloadPath);
 
-                _totalDownloadedBytes += package.PackedSize;
+                Interlocked.Add(ref _totalDownloadedBytes, package.PackedSize);
                 UpdateProgressBar();
 
                 return;
@@ -1827,49 +2014,36 @@ namespace PhasmaStrap
 
             App.Logger.WriteLine(LOG_IDENT, "Downloading...");
 
-            var buffer = new byte[4096];
+            // Settings > Roblox > Installer: "Download Buffer Size" / "Segments Per File" - both
+            // default to values that reproduce the original hardcoded behaviour (4KB buffer, no
+            // segmentation), so this only changes anything if the user has opted into larger values
+            int bufferSize = DownloadConfiguration.NormalizeBufferKb(App.Settings.Prop.DownloadBufferKb) * 1024;
+            int segmentCount = DownloadConfiguration.NormalizeSegments(App.Settings.Prop.MaxDownloadSegments);
 
             for (int i = 1; i <= maxTries; i++)
             {
                 if (_cancelTokenSource.IsCancellationRequested)
                     return;
 
-                int totalBytesRead = 0;
+                long totalBytesRead = 0;
 
                 try
                 {
-                    var response = await App.HttpClient.GetAsync(packageUrl, HttpCompletionOption.ResponseHeadersRead, _cancelTokenSource.Token);
-                    await using var stream = await response.Content.ReadAsStreamAsync(_cancelTokenSource.Token);
-                    await using var fileStream = new FileStream(package.DownloadPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Delete);
+                    bool downloadedSegmented = segmentCount > 1 &&
+                        await TryDownloadPackageSegmented(package, packageUrl, segmentCount, bufferSize, n => Interlocked.Add(ref totalBytesRead, n));
 
-                    while (true)
+                    if (!downloadedSegmented)
                     {
-                        if (_cancelTokenSource.IsCancellationRequested)
-                        {
-                            stream.Close();
-                            fileStream.Close();
-                            return;
-                        }
-
-                        int bytesRead = await stream.ReadAsync(buffer, _cancelTokenSource.Token);
-
-                        if (bytesRead == 0)
-                            break;
-
-                        totalBytesRead += bytesRead;
-
-                        await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), _cancelTokenSource.Token);
-
-                        _totalDownloadedBytes += bytesRead;
-                        UpdateProgressBar();
+                        Interlocked.Exchange(ref totalBytesRead, 0);
+                        totalBytesRead = await DownloadPackageSingleStream(package, packageUrl, bufferSize);
                     }
 
-                    string hash = MD5Hash.FromStream(fileStream);
+                    string hash = MD5Hash.FromFile(package.DownloadPath);
 
                     if (hash != package.Signature)
                         throw new ChecksumFailedException($"Failed to verify download of {packageUrl}\n\nExpected hash: {package.Signature}\nGot hash: {hash}");
 
-                    App.Logger.WriteLine(LOG_IDENT, $"Finished downloading! ({totalBytesRead} bytes total)");
+                    App.Logger.WriteLine(LOG_IDENT, $"Finished downloading! ({totalBytesRead} bytes total, {(downloadedSegmented ? $"{segmentCount} segments" : "single stream")})");
                     break;
                 }
                 catch (Exception ex)
@@ -1896,7 +2070,7 @@ namespace PhasmaStrap
                     if (File.Exists(package.DownloadPath))
                         File.Delete(package.DownloadPath);
 
-                    _totalDownloadedBytes -= totalBytesRead;
+                    Interlocked.Add(ref _totalDownloadedBytes, -totalBytesRead);
                     UpdateProgressBar();
 
                     // attempt download over HTTP
@@ -1910,6 +2084,161 @@ namespace PhasmaStrap
                 }
             }
         }
+
+        /// <summary>
+        /// Original single-connection download path, parameterized on the configurable read buffer
+        /// size. Used whenever segmented downloading is disabled (the default) or unavailable for
+        /// this package (server doesn't support ranged requests, or it's too small to bother).
+        /// </summary>
+        private async Task<long> DownloadPackageSingleStream(Package package, string packageUrl, int bufferSize)
+        {
+            long totalBytesRead = 0;
+            var buffer = new byte[bufferSize];
+
+            var response = await App.HttpClient.GetAsync(packageUrl, HttpCompletionOption.ResponseHeadersRead, _cancelTokenSource.Token);
+            await using var stream = await response.Content.ReadAsStreamAsync(_cancelTokenSource.Token);
+
+            using (var fileStream = new FileStream(package.DownloadPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Delete))
+            {
+                while (true)
+                {
+                    if (_cancelTokenSource.IsCancellationRequested)
+                    {
+                        stream.Close();
+                        fileStream.Close();
+                        return totalBytesRead;
+                    }
+
+                    int bytesRead = await stream.ReadAsync(buffer, _cancelTokenSource.Token);
+
+                    if (bytesRead == 0)
+                        break;
+
+                    totalBytesRead += bytesRead;
+
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), _cancelTokenSource.Token);
+
+                    Interlocked.Add(ref _totalDownloadedBytes, bytesRead);
+                    UpdateProgressBar();
+                }
+            }
+
+            return totalBytesRead;
+        }
+
+        /// <summary>
+        /// Attempts a parallel, HTTP range-request based download of <paramref name="package"/> split
+        /// into <paramref name="segmentCount"/> pieces (Settings > Roblox > Installer > Segments Per
+        /// File). Returns false (having written nothing) if the server doesn't support ranged requests
+        /// or the package is too small to be worth segmenting, so the caller can fall back to
+        /// <see cref="DownloadPackageSingleStream"/> for this attempt.
+        /// </summary>
+        private async Task<bool> TryDownloadPackageSegmented(Package package, string packageUrl, int segmentCount, int bufferSize, Action<long> onBytesRead)
+        {
+            string LOG_IDENT = $"Bootstrapper::DownloadPackageSegmented.{package.Name}";
+
+            long totalLength;
+
+            await AcquireDownloadSlot();
+            try
+            {
+                using var probeRequest = new HttpRequestMessage(HttpMethod.Get, packageUrl);
+                probeRequest.Headers.Range = new RangeHeaderValue(0, 0);
+
+                using var probeResponse = await App.HttpClient.SendAsync(probeRequest, HttpCompletionOption.ResponseHeadersRead, _cancelTokenSource.Token);
+
+                if (probeResponse.StatusCode != HttpStatusCode.PartialContent || probeResponse.Content.Headers.ContentRange?.Length is not long length || length <= 0)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Server did not respond to a ranged request, falling back to a single-stream download for this package");
+                    return false;
+                }
+
+                totalLength = length;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Ranged request probe failed, falling back to a single-stream download for this package");
+                App.Logger.WriteException(LOG_IDENT, ex);
+                return false;
+            }
+            finally
+            {
+                ReleaseDownloadSlot();
+            }
+
+            if (totalLength < DownloadConfiguration.MinSegmentablePackageSize)
+                return false;
+
+            long segmentSize = (long)Math.Ceiling(totalLength / (double)segmentCount);
+
+            using (var presizeStream = new FileStream(package.DownloadPath, FileMode.CreateNew, FileAccess.Write, FileShare.Delete))
+                presizeStream.SetLength(totalLength);
+
+            using (SafeFileHandle handle = File.OpenHandle(package.DownloadPath, FileMode.Open, FileAccess.Write, FileShare.Delete))
+            {
+                var segmentTasks = new List<Task>();
+
+                for (long start = 0; start < totalLength; start += segmentSize)
+                {
+                    long segmentStart = start;
+                    long segmentEnd = Math.Min(start + segmentSize - 1, totalLength - 1);
+
+                    segmentTasks.Add(DownloadSegment(handle, packageUrl, segmentStart, segmentEnd, bufferSize, onBytesRead));
+                }
+
+                await Task.WhenAll(segmentTasks);
+            }
+
+            return true;
+        }
+
+        private async Task DownloadSegment(SafeFileHandle handle, string packageUrl, long start, long end, int bufferSize, Action<long> onBytesRead)
+        {
+            await AcquireDownloadSlot();
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, packageUrl);
+                request.Headers.Range = new RangeHeaderValue(start, end);
+
+                using var response = await App.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _cancelTokenSource.Token);
+                response.EnsureSuccessStatusCode();
+
+                await using var stream = await response.Content.ReadAsStreamAsync(_cancelTokenSource.Token);
+
+                var buffer = new byte[bufferSize];
+                long offset = start;
+
+                while (true)
+                {
+                    if (_cancelTokenSource.IsCancellationRequested)
+                        return;
+
+                    int bytesRead = await stream.ReadAsync(buffer, _cancelTokenSource.Token);
+
+                    if (bytesRead == 0)
+                        break;
+
+                    await RandomAccess.WriteAsync(handle, buffer.AsMemory(0, bytesRead), offset, _cancelTokenSource.Token);
+                    offset += bytesRead;
+
+                    onBytesRead(bytesRead);
+                    Interlocked.Add(ref _totalDownloadedBytes, bytesRead);
+                    UpdateProgressBar();
+                }
+            }
+            finally
+            {
+                ReleaseDownloadSlot();
+            }
+        }
+
+        // _downloadRequestThrottle is only non-null while UpgradeRoblox's package download phase is
+        // running (see there) - fall back to no throttling if something calls this outside that window
+        private Task AcquireDownloadSlot() =>
+            _downloadRequestThrottle?.WaitAsync(_cancelTokenSource.Token) ?? Task.CompletedTask;
+
+        private void ReleaseDownloadSlot() =>
+            _downloadRequestThrottle?.Release();
 
         private void ExtractPackage(Package package, List<string>? files = null)
         {

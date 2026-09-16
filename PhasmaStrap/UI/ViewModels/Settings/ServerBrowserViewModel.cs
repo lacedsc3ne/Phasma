@@ -32,6 +32,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<ServerListItem> Servers { get; } = new();
 
+        public ServerBrowserViewModel()
+        {
+            _ = LoadDatacenterDistancesAsync();
+        }
+
         public bool MatchmakerEnabled
         {
             get => App.Settings.Prop.MatchmakerEnabled;
@@ -75,6 +80,44 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             public string Display { get; init; } = "";
             public string Key { get; init; } = "";
+            public double Lat { get; init; }
+            public double Lon { get; init; }
+
+            private double _distanceKm = -1.0;
+            private string _pingDisplay = "...";
+
+            public double DistanceKm
+            {
+                get => _distanceKm;
+                set
+                {
+                    if (_distanceKm == value)
+                        return;
+                    _distanceKm = value;
+                    OnPropertyChanged(nameof(DistanceKm));
+                    OnPropertyChanged(nameof(DistanceDisplay));
+                }
+            }
+
+            public string DistanceDisplay => _distanceKm < 0.0 ? "" : $"{(int)_distanceKm} km away";
+
+            public string PingDisplay
+            {
+                get => _pingDisplay;
+                set
+                {
+                    if (_pingDisplay == value)
+                        return;
+                    _pingDisplay = value;
+                    OnPropertyChanged(nameof(PingDisplay));
+                }
+            }
+
+            public bool IsAllowed
+            {
+                get => !IsBlocked;
+                set => IsBlocked = !value;
+            }
 
             public bool IsBlocked
             {
@@ -88,14 +131,59 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         blocked.Remove(Key);
 
                     OnPropertyChanged(nameof(IsBlocked));
+                    OnPropertyChanged(nameof(IsAllowed));
                 }
             }
         }
 
-        public IEnumerable<DatacenterExclusion> DatacenterExclusions { get; } =
+        // per-datacenter allow/block grid, with an estimated distance/ping column filled in
+        // once the user's own location resolves (see LoadDatacenterDistancesAsync) - the
+        // estimate uses the same haversine-distance heuristic the matchmaker itself scores
+        // candidates with (Matchmaker.HaversineKm/EstimatePingMs), not a live network probe.
+        public ObservableCollection<DatacenterExclusion> DatacenterExclusions { get; } = new(
             RobloxDatacenterMap.AllDatacenters()
                 .OrderBy(dc => dc.City)
-                .Select(dc => new DatacenterExclusion { Display = $"{dc.City}, {dc.Country}", Key = Matchmaker.DatacenterKey(dc) });
+                .Select(dc => new DatacenterExclusion { Display = $"{dc.City}, {dc.Country}", Key = Matchmaker.DatacenterKey(dc), Lat = dc.Lat, Lon = dc.Lon }));
+
+        private async Task LoadDatacenterDistancesAsync()
+        {
+            try
+            {
+                UserGeo? geo = await Matchmaker.GetUserGeoAsync();
+                if (geo is null)
+                    return;
+
+                foreach (DatacenterExclusion dc in DatacenterExclusions)
+                {
+                    if (dc.Lat == 0.0 && dc.Lon == 0.0)
+                        continue;
+
+                    double km = Matchmaker.HaversineKm(geo.Lat, geo.Lon, dc.Lat, dc.Lon);
+                    dc.DistanceKm = km;
+                    dc.PingDisplay = $"~{Matchmaker.EstimatePingMs(km)} ms";
+                }
+            }
+            catch
+            {
+                // best-effort only - the grid still works for allow/block without distances
+            }
+        }
+
+        // which Roblox gamejoin API version the matchmaker uses to resolve/join candidate
+        // servers (see Matchmaker.BuildJoinRequest) - change only if joins stop resolving
+        public sealed record GamejoinApiOption(string Display, int Value);
+
+        public IEnumerable<GamejoinApiOption> GamejoinApiOptions { get; } = new[]
+        {
+            new GamejoinApiOption("V1 (stable)", 1),
+            new GamejoinApiOption("V2 (newer)", 2),
+        };
+
+        public int MatchmakerGamejoinApiVersion
+        {
+            get => App.Settings.Prop.MatchmakerGamejoinApiVersion;
+            set => App.Settings.Prop.MatchmakerGamejoinApiVersion = value;
+        }
 
         public ObservableCollection<string> ExcludedPlaces { get; } = new(App.Settings.Prop.MatchmakerExcludedPlaces);
 

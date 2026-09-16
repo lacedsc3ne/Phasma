@@ -360,7 +360,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             if (Window.GetWindow(this) is INavigationWindow window)
-                window.Navigate(typeof(FastFlagsPage));
+                window.Navigate(typeof(FastFlagSettingsPage));
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e) => ShowAddDialog();

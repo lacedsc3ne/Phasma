@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using PhasmaStrap.Integrations;
+using PhasmaStrap.Models.APIs.Roblox;
 using PhasmaStrap.RobloxInterfaces;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
@@ -48,6 +49,125 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private static string Describe(string url) =>
             String.IsNullOrEmpty(url) ? "Auto (fastest responding server)" : new Uri(url).Host;
+
+        // ---- Download tuning (Utility.DownloadConfiguration, read by Bootstrapper.DownloadPackage;
+        // ported from Voidstrap's Installer tab). Defaults reproduce PhasmaStrap's original
+        // single-connection, unsegmented, 4KB-buffer download behaviour exactly - see Settings.cs ----
+
+        public IReadOnlyList<int> DownloadBufferOptions => DownloadConfiguration.BufferKbChoices;
+
+        public int DownloadBufferKb
+        {
+            get => App.Settings.Prop.DownloadBufferKb;
+            set
+            {
+                int normalized = DownloadConfiguration.NormalizeBufferKb(value);
+
+                if (App.Settings.Prop.DownloadBufferKb == normalized)
+                    return;
+
+                App.Settings.Prop.DownloadBufferKb = normalized;
+                OnPropertyChanged(nameof(DownloadBufferKb));
+            }
+        }
+
+        public IReadOnlyList<int> ConcurrentDownloadOptions => DownloadConfiguration.ConcurrentDownloadChoices;
+
+        public int MaxConcurrentDownloads
+        {
+            get => App.Settings.Prop.MaxConcurrentDownloads;
+            set
+            {
+                int normalized = DownloadConfiguration.NormalizeConcurrent(value);
+
+                if (App.Settings.Prop.MaxConcurrentDownloads == normalized)
+                    return;
+
+                App.Settings.Prop.MaxConcurrentDownloads = normalized;
+                OnPropertyChanged(nameof(MaxConcurrentDownloads));
+            }
+        }
+
+        public IReadOnlyList<int> DownloadSegmentOptions => DownloadConfiguration.SegmentChoices;
+
+        public int MaxDownloadSegments
+        {
+            get => App.Settings.Prop.MaxDownloadSegments;
+            set
+            {
+                int normalized = DownloadConfiguration.NormalizeSegments(value);
+
+                if (App.Settings.Prop.MaxDownloadSegments == normalized)
+                    return;
+
+                App.Settings.Prop.MaxDownloadSegments = normalized;
+                OnPropertyChanged(nameof(MaxDownloadSegments));
+            }
+        }
+
+        // ---- Live channel info lookup (ported from Voidstrap's Roblox tab "Channels - [Roblox
+        // Build]" card): looks up the version/build GUID currently deployed on whatever channel is
+        // typed into the channel box above, without needing to actually switch to it first ----
+
+        private ClientVersion? _channelDeployInfo;
+        public ClientVersion? ChannelDeployInfo
+        {
+            get => _channelDeployInfo;
+            private set { _channelDeployInfo = value; OnPropertyChanged(nameof(ChannelDeployInfo)); }
+        }
+
+        private bool _isChannelInfoLoading;
+        public bool IsChannelInfoLoading
+        {
+            get => _isChannelInfoLoading;
+            private set { _isChannelInfoLoading = value; OnPropertyChanged(nameof(IsChannelInfoLoading)); }
+        }
+
+        private bool _showChannelInfoError;
+        public bool ShowChannelInfoError
+        {
+            get => _showChannelInfoError;
+            private set { _showChannelInfoError = value; OnPropertyChanged(nameof(ShowChannelInfoError)); }
+        }
+
+        private string _channelInfoStatusText = "Enter a channel above (or leave it blank for production) and look it up to see its current build.";
+        public string ChannelInfoStatusText
+        {
+            get => _channelInfoStatusText;
+            private set { _channelInfoStatusText = value; OnPropertyChanged(nameof(ChannelInfoStatusText)); }
+        }
+
+        public ICommand LookupChannelInfoCommand => new AsyncRelayCommand(LookupChannelInfoAsync);
+
+        private async Task LookupChannelInfoAsync()
+        {
+            string channel = String.IsNullOrWhiteSpace(RobloxChannel) ? Deployment.DefaultChannel : RobloxChannel.Trim().ToLowerInvariant();
+
+            IsChannelInfoLoading = true;
+            ShowChannelInfoError = false;
+            ChannelDeployInfo = null;
+            ChannelInfoStatusText = $"Looking up '{channel}'...";
+
+            try
+            {
+                ChannelDeployInfo = await Deployment.GetInfo(channel);
+                ChannelInfoStatusText = $"Currently deployed on '{channel}'.";
+            }
+            catch (InvalidChannelException)
+            {
+                ShowChannelInfoError = true;
+                ChannelInfoStatusText = $"'{channel}' doesn't exist or isn't accessible.";
+            }
+            catch (Exception ex)
+            {
+                ShowChannelInfoError = true;
+                ChannelInfoStatusText = $"Failed to look up channel: {ex.Message}";
+            }
+            finally
+            {
+                IsChannelInfoLoading = false;
+            }
+        }
 
         // ---- Update heatmap (Integrations.RobloxUpdateHeatmapService, ported from Voidstrap) ----
 

@@ -7,106 +7,409 @@
       xmlns:local="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="GBSEditorPage"
+      Scrollable="True"
       Loaded="Page_Loaded">
-    <Grid Margin="0,0,14,14">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Margin="0,0,0,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <TextBlock Grid.Row="0" Margin="0,0,0,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <ui:InfoBar Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_GBSEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_GBSEditor_BannerText}" Severity="Warning" IsClosable="False" />
 
-        <ui:InfoBar Grid.Row="1" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_GBSEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_GBSEditor_BannerText}" Severity="Warning" IsClosable="False" />
-
-        <TextBlock Grid.Row="2" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
-
-        <controls:OptionControl Grid.Row="3" Margin="0,0,0,16" Header="{x:Static resources:Strings.Menu_GBSEditor_LockFile}" Description="{x:Static resources:Strings.Menu_GBSEditor_LockFileDescription}">
+        <controls:OptionControl Margin="0,0,0,16" Header="{x:Static resources:Strings.Menu_GBSEditor_LockFile}" Description="{x:Static resources:Strings.Menu_GBSEditor_LockFileDescription}">
             <ui:ToggleSwitch IsChecked="{Binding SettingsFileReadOnly, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <StackPanel Grid.Row="4" Margin="0,0,0,8">
-            <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Header}" FontSize="20" FontWeight="Medium" />
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Description}" />
-        </StackPanel>
+        <TabControl>
 
-        <WrapPanel Grid.Row="5" Orientation="Horizontal" VerticalAlignment="Bottom">
-            <ui:TextBox x:Name="NewNameTextBox" Width="180" Margin="0,0,8,12" PlaceholderText="{x:Static resources:Strings.Common_Name}" />
-            <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="token" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
-            <ui:TextBox x:Name="NewValueTextBox" Width="180" Margin="0,0,12,12" PlaceholderText="{x:Static resources:Strings.Common_Value}" />
-            <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_GBSEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,12" />
-            <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_GBSEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger" Margin="0,0,12,12">
-                <ui:Button.Style>
-                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=DataGrid, Path=SelectedItems.Count}" Value="0">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ui:Button.Style>
-            </ui:Button>
-        </WrapPanel>
+            <!-- Interface -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Grid24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Interface}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Interface_Header}" />
 
-        <DataGrid Name="DataGrid" Grid.Row="6" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
-            <DataGrid.Style>
-                <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="BorderThickness" Value="0" />
-                </Style>
-            </DataGrid.Style>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_UITransparency_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_UITransparency_Description}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding UITransparency, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding UITransparency, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                        </StackPanel>
+                    </controls:OptionControl>
 
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
-                    <Setter Property="Height" Value="32" />
-                    <Setter Property="Padding" Value="8,0,8,0" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
-                    <Setter Property="BorderThickness" Value="1" />
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_PreferredTextSize_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_PreferredTextSize_Description}">
+                        <ComboBox Padding="10,5,10,5" Width="160" SelectedValuePath="Tag" SelectedValue="{Binding PreferredTextSize, Mode=TwoWay}">
+                            <ComboBoxItem Content="Small">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>0</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="Normal">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>1</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="Large">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>2</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </controls:OptionControl>
 
-            <DataGrid.CellStyle>
-                <Style TargetType="DataGridCell">
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Foreground">
-                                <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Background">
-                                <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}" />
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                    <Setter Property="Height" Value="32" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="DataGridCell">
-                                <Border Background="{TemplateBinding Background}" Padding="6,0,6,0">
-                                    <ContentPresenter VerticalAlignment="Center" />
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </DataGrid.CellStyle>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ReducedMotion_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ReducedMotion_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
+                    </controls:OptionControl>
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
-                <DataGridTextColumn Header="{x:Static resources:Strings.Menu_GBSEditor_Type}" Binding="{Binding Type}" />
-                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding HudVisible, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding ChatVisible, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding PlayerNamesEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding BadgeVisible, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Graphics -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Color24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Graphics}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Graphics_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_FramerateCap_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_FramerateCap_Description}">
+                        <ui:NumberBox Width="140" Min="0" Max="10000" Value="{Binding FramerateCap, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Description}">
+                        <ComboBox Padding="10,5,10,5" Width="160" SelectedValuePath="Tag" SelectedValue="{Binding GraphicsQuality, Mode=TwoWay}">
+                            <ComboBoxItem Content="Automatic">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>0</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="1">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>1</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="2">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>2</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="3">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>3</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="4">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>4</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="5">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>5</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="6">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>6</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="7">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>7</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="8">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>8</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="9">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>9</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="10">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>10</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_Fullscreen_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_Fullscreen_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding Fullscreen, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Audio -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="MusicNote224" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Audio}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Audio_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MasterVolume_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MasterVolume_Description}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0" Maximum="1" TickFrequency="0.05" Value="{Binding MasterVolume, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MasterVolume, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VoiceChatVolume_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VoiceChatVolume_Description}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0" Maximum="1" TickFrequency="0.05" Value="{Binding VoiceChatVolume, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding VoiceChatVolume, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Input -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Games24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Input}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Input_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Description}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0.01" Maximum="10" TickFrequency="0.01" Value="{Binding MouseSensitivity, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MouseSensitivity, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding CameraYInverted, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Description}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0.1" Maximum="2.0" TickFrequency="0.1" Value="{Binding GamepadSensitivity, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GamepadSensitivity, Mode=OneWay, StringFormat={}{0:0.0}}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding ControllerVibration, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- VR -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Rocket24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_VR}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_VR_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VREnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VREnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding VREnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VRComfortSetting_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VRComfortSetting_Description}">
+                        <ComboBox Padding="10,5,10,5" Width="150" SelectedValuePath="Tag" SelectedValue="{Binding VRComfortSetting, Mode=TwoWay}">
+                            <ComboBoxItem Content="Comfort">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>0</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="Normal">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>1</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                            <ComboBoxItem Content="Intense">
+                                <FrameworkElement.Tag>
+                                    <sys:Int32>2</sys:Int32>
+                                </FrameworkElement.Tag>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VignetteEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VignetteEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Network -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="PlugConnected24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Network}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Network_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_NetworkStatsVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_NetworkStatsVisible_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding NetworkStatsVisible, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ChatTranslationEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ChatTranslationEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding ChatTranslationEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Advanced -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Wrench24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Advanced}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Advanced_Header}" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MicroProfilerWebServerEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MicroProfilerWebServerEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding MicroProfilerWebServerEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_OnScreenProfilerEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_OnScreenProfilerEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding OnScreenProfilerEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ResetToDefaults_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ResetToDefaults_Description}">
+                        <ui:Button Content="{x:Static resources:Strings.Menu_GBSEditor_ResetToDefaults_Button}" Appearance="Danger" Command="{Binding ResetToDefaultsCommand, Mode=OneTime}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Raw Editor - the FastFlagEditorPage-style complete key/value/type editor, kept from before
+                 this page grew curated tabs. Everything here shares the same GBSEditor backend and the
+                 same in-memory document as the curated tabs above. -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Table24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_RawEditor}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="0,12,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="400" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Header}" FontSize="20" FontWeight="Medium" />
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Entries_Description}" />
+                    </StackPanel>
+
+                    <WrapPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <ui:TextBox x:Name="NewNameTextBox" Width="180" Margin="0,0,8,12" PlaceholderText="{x:Static resources:Strings.Common_Name}" />
+                        <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="token" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
+                        <ui:TextBox x:Name="NewValueTextBox" Width="180" Margin="0,0,12,12" PlaceholderText="{x:Static resources:Strings.Common_Value}" />
+                        <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_GBSEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,12" />
+                        <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_GBSEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger" Margin="0,0,12,12">
+                            <ui:Button.Style>
+                                <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=DataGrid, Path=SelectedItems.Count}" Value="0">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                        </ui:Button>
+                    </WrapPanel>
+
+                    <DataGrid Name="DataGrid" Grid.Row="2" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </DataGrid.Style>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                                <Setter Property="Height" Value="32" />
+                                <Setter Property="Padding" Value="8,0,8,0" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Foreground">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                                <Setter Property="Height" Value="32" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Background="{TemplateBinding Background}" Padding="6,0,6,0">
+                                                <ContentPresenter VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Menu_GBSEditor_Type}" Binding="{Binding Type}" />
+                            <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </StackPanel>
 </ui:UiPage>

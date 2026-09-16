@@ -33,43 +33,6 @@
             <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Roblox game settings" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock Text="These edit Roblox's own GlobalBasicSettings file directly, rather than going through FastFlags." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-
-        <controls:OptionControl Header="Lock settings file" Description="Marks the file read-only so Roblox can't silently overwrite these changes on its own.">
-            <ui:ToggleSwitch IsChecked="{Binding SettingsFileReadOnly, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Framerate cap" Description="0 leaves it uncapped.">
-            <ui:NumberBox Width="140" Min="0" Max="10000" Value="{Binding FramerateCap, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Graphics quality level" Description="0 to 10, where 10 is Roblox's highest preset. Only takes effect when graphics mode isn't set to Automatic in-game.">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SavedQualityLevel, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SavedQualityLevel, Mode=OneWay}" />
-            </StackPanel>
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Mouse sensitivity">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0.01" Maximum="10" TickFrequency="0.01" Value="{Binding MouseSensitivity, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MouseSensitivity, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Reduced motion" Description="Cuts down on in-game UI animation.">
-            <ui:ToggleSwitch IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="VR enabled">
-            <ui:ToggleSwitch IsChecked="{Binding VREnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Show performance stats" Description="Roblox's built-in FPS/ping/memory overlay.">
-            <ui:ToggleSwitch IsChecked="{Binding PerformanceStatsVisible, Mode=TwoWay}" />
-        </controls:OptionControl>
-
         <TextBlock Text="Anti-Aliasing" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 

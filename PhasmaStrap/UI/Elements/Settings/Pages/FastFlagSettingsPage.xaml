@@ -1,0 +1,109 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagSettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="900" d:DesignWidth="900"
+      Title="FastFlagSettingsPage"
+      Scrollable="False">
+    <!--
+        Consolidated nav page: hosts the previously-separate FastFlagsPage ("Engine Settings")
+        and NvidiaPage as tabs, plus a new Asset Warp tab, mirroring Voidstrap's
+        FastFlagsPage.xaml tab layout. The two existing pages are embedded via Frame/Source
+        rather than having their (large, independently maintained) XAML/ViewModel content
+        copied in - each keeps constructing and owning its own ViewModel exactly as it does
+        when it's its own top-level nav page today, so nothing about how they work changes.
+    -->
+    <Grid Margin="0,0,14,14">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagSettings_Description}" />
+        <TabControl Padding="0,8,0,0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Flag24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Tab_RobloxFFlags}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="FastFlagsPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="TopSpeed24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Tab_NvidiaFFlags}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="NvidiaPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="PaintBrush24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Tab_AssetWarp}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto">
+                    <!-- DataContext for this tab's content comes from the page itself (see FastFlagSettingsPage.xaml.cs) -->
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_AssetWarp_Description}" />
+
+                        <controls:OptionControl
+                            Margin="0,12,0,0"
+                            Header="{x:Static resources:Strings.Menu_AssetWarp_Enabled_Title}"
+                            Description="{Binding StatusText, Mode=OneWay}">
+                            <ui:ToggleSwitch IsChecked="{Binding AssetWarpEnabled, Mode=TwoWay}" />
+                        </controls:OptionControl>
+
+                        <StackPanel IsEnabled="{Binding AssetWarpEnabled, Mode=OneWay}">
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAllTextures, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAllDecals, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAllImages, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAllAnimations, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Title}"
+                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAllMeshes, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+        </DockPanel>
+    </Grid>
+</ui:UiPage>
