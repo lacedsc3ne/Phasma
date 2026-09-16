@@ -176,6 +176,10 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
                 </ui:NavigationFluent.Items>
                 <ui:NavigationFluent.Footer>
+                    <!-- Footer isn't pinned to the bottom of the window in this narrow sidebar - it
+                         just continues straight on from Items once the list overflows, so it needs its
+                         own header here to read as a separate group rather than more Advanced items. -->
+                    <ui:NavigationHeader Text="App" Icon="Apps24" />
                     <ui:NavigationItem Content="Extensions" PageType="{x:Type pages:ExtensionsPage}" Icon="PuzzleCube24" PageTag="extensions" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Common_Shortcuts}" PageType="{x:Type pages:ShortcutsPage}" Icon="Apps28" PageTag="shortcuts" />
                     <ui:NavigationItem Content="Settings" PageType="{x:Type pages:ChannelPage}" Icon="ArrowRepeatAll24" PageTag="channel" />
