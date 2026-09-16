@@ -757,14 +757,10 @@ namespace PhasmaStrap
                         removed++;
                 }
 
-                string? profileName = null;
+                string? profileName = FindMatchingFastFlagProfile(placeId, out Dictionary<string, object>? overrides);
                 int added = 0;
 
-                if (placeId is not null
-                    && App.Settings.Prop.FastFlagPlaceProfiles.TryGetValue(placeId.Value.ToString(), out profileName)
-                    && !string.IsNullOrEmpty(profileName)
-                    && allProfiles.TryGetValue(profileName, out Dictionary<string, object>? overrides)
-                    && overrides.Count > 0)
+                if (profileName is not null && overrides is not null && overrides.Count > 0)
                 {
                     foreach (var (flag, value) in overrides)
                         flags[flag] = value;
@@ -789,6 +785,49 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag profile, launching with the global flag set: {ex.Message}");
             }
+        }
+
+        // finds the first FastFlag profile (in stable alphabetical order, for determinism when more
+        // than one profile's scope happens to cover the same place) whose own "Applies to" scope
+        // (Settings.FastFlagProfileScopes) matches the given place - same All/OnlyListedPlaces/
+        // AllExceptListedPlaces semantics as EngineSettingsScopeMode. A profile with no scope entry
+        // applies nowhere (treated as OnlyListedPlaces with an empty list).
+        private static string? FindMatchingFastFlagProfile(long? placeId, out Dictionary<string, object>? overrides)
+        {
+            overrides = null;
+
+            if (placeId is null)
+                return null;
+
+            string placeIdStr = placeId.Value.ToString();
+            var allProfiles = App.Settings.Prop.FastFlagProfiles;
+            var scopes = App.Settings.Prop.FastFlagProfileScopes;
+
+            foreach (string candidate in allProfiles.Keys.OrderBy(x => x, StringComparer.Ordinal))
+            {
+                if (!scopes.TryGetValue(candidate, out FastFlagProfileScope? scope))
+                    continue;
+
+                bool isListed = scope.Places.Contains(placeIdStr);
+                bool matches = scope.Mode switch
+                {
+                    EngineSettingsScopeMode.All => true,
+                    EngineSettingsScopeMode.OnlyListedPlaces => isListed,
+                    EngineSettingsScopeMode.AllExceptListedPlaces => !isListed,
+                    _ => false
+                };
+
+                if (!matches)
+                    continue;
+
+                if (!allProfiles.TryGetValue(candidate, out Dictionary<string, object>? candidateOverrides) || candidateOverrides.Count == 0)
+                    continue;
+
+                overrides = candidateOverrides;
+                return candidate;
+            }
+
+            return null;
         }
 
         // scopes FastFlagsPage's curated "Engine Settings" toggle set to specific places, or excludes

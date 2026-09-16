@@ -6800,6 +6800,60 @@ namespace PhasmaStrap.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Applies to.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ScopeHeader {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ScopeHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Select a profile above to set which games it applies to..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ScopeDescription {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ScopeDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Which games "{0}" applies to..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_ScopeDescription_Selected {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.ScopeDescription.Selected", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Applies to.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_Scope_Mode_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.Scope.Mode.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Games.
+        /// </summary>
+        public static string Menu_FastFlagProfiles_Scope_Places_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.Scope.Places.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only used when "Applies to" above is set to one of the listed-games modes..
+        /// </summary>
+        public static string Menu_FastFlagProfiles_Scope_Places_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagProfiles.Scope.Places.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Assign.
         /// </summary>
         public static string Menu_FastFlagProfiles_AddAssignment {
@@ -9292,6 +9346,374 @@ namespace PhasmaStrap.Resources {
         public static string ContextMenu_RPCWindow_LastUpdated {
             get {
                 return ResourceManager.GetString("ContextMenu.RPCWindow.LastUpdated", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark overlay.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Displays NVIDIA driver-level performance overlays such as FPS graphs and present timing data..
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_Disabled {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.Disabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS graph, measured on display hardware flip.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_GraphFlipFps {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.GraphFlipFps", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS graph, measured when the driver starts processing present.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_GraphPresentFps {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.GraphPresentFps", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS graph, measured on app present.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_GraphAppPresentFps {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.GraphAppPresentFps", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS graph with paging indicator bars.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_DisplayPaging {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.DisplayPaging", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FPS graph with app thread wait indicator bars.
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_DisplayAppThreadWait {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.DisplayAppThreadWait", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled (everything).
+        /// </summary>
+        public static string Menu_Nvidia_BenchmarkOverlay_Enabled {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.BenchmarkOverlay.Enabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom settings.
+        /// </summary>
+        public static string Menu_Nvidia_CustomSettings_Title {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.CustomSettings.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Driver profile settings beyond the curated list above, by raw NVIDIA Profile Inspector setting ID. Applied together with everything above when you click Apply..
+        /// </summary>
+        public static string Menu_Nvidia_CustomSettings_Description {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.CustomSettings.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No custom settings added..
+        /// </summary>
+        public static string Menu_Nvidia_CustomSettings_Empty {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.CustomSettings.Empty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add custom setting.
+        /// </summary>
+        public static string Menu_Nvidia_CustomSettings_AddButton {
+            get {
+                return ResourceManager.GetString("Menu.Nvidia.CustomSettings.AddButton", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add NVIDIA Setting.
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Title {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use the setting ID and value shown by NVIDIA Profile Inspector. Only Dword values are supported..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Description {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Setting ID.
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_SettingId {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.SettingId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Decimal or 0x hex..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_ValueHint {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.ValueHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a setting name..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Error_Name {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Error.Name", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a valid decimal or 0x hex setting ID..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Error_SettingId {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Error.SettingId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to That setting ID is already tracked, either above or in the curated list..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Error_Duplicate {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Error.Duplicate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a valid decimal or 0x hex value..
+        /// </summary>
+        public static string Dialog_AddNvidiaCustomSetting_Error_Value {
+            get {
+                return ResourceManager.GetString("Dialog.AddNvidiaCustomSetting.Error.Value", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Launch.
+        /// </summary>
+        public static string Common_Launch {
+            get {
+                return ResourceManager.GetString("Common.Launch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Extensions.
+        /// </summary>
+        public static string Installer_Extensions_Title {
+            get {
+                return ResourceManager.GetString("Installer.Extensions.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to PhasmaStrap can sync development files into Studio with Rojo, and launch other tools alongside Roblox. Set these up now, or configure them later from settings..
+        /// </summary>
+        public static string Installer_Extensions_Text {
+            get {
+                return ResourceManager.GetString("Installer.Extensions.Text", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Other Extensions.
+        /// </summary>
+        public static string Installer_Extensions_Other_Title {
+            get {
+                return ResourceManager.GetString("Installer.Extensions.Other.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Locate and launch third-party tools alongside Roblox. PhasmaStrap doesn&apos;t bundle or download these - point it at an existing install..
+        /// </summary>
+        public static string Installer_Extensions_Other_Text {
+            get {
+                return ResourceManager.GetString("Installer.Extensions.Other.Text", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Manager.
+        /// </summary>
+        public static string Installer_Manager_Title {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install, update, or remove Roblox Player and Studio right from here. You can always come back to this later from PhasmaStrap&apos;s settings..
+        /// </summary>
+        public static string Installer_Manager_Text {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Text", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox Player.
+        /// </summary>
+        public static string Installer_Manager_Player_Title {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Player.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Roblox client for playing experiences.
+        /// </summary>
+        public static string Installer_Manager_Player_Description {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Player.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox Studio.
+        /// </summary>
+        public static string Installer_Manager_Studio_Title {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Studio.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Create and edit experiences.
+        /// </summary>
+        public static string Installer_Manager_Studio_Description {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Studio.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not installed.
+        /// </summary>
+        public static string Installer_Manager_Status_NotInstalled {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Status.NotInstalled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installed ({0}).
+        /// </summary>
+        public static string Installer_Manager_Status_Installed {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Status.Installed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Installing....
+        /// </summary>
+        public static string Installer_Manager_Status_Installing {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Status.Installing", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install failed: {0}.
+        /// </summary>
+        public static string Installer_Manager_Status_InstallFailed {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Status.InstallFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This will remove {0} from your computer. Continue?.
+        /// </summary>
+        public static string Installer_Manager_ConfirmDelete {
+            get {
+                return ResourceManager.GetString("Installer.Manager.ConfirmDelete", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Install location.
+        /// </summary>
+        public static string Installer_Manager_Map_Title {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Map.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose which drive new Roblox installs and updates are saved to. This can only be changed before Player or Studio has been installed..
+        /// </summary>
+        public static string Installer_Manager_Map_Description {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Map.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The install drive can&apos;t be changed once Roblox Player or Studio has been installed..
+        /// </summary>
+        public static string Installer_Manager_Map_CannotChange {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Map.CannotChange", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t move the install location: {0}.
+        /// </summary>
+        public static string Installer_Manager_Map_Failed {
+            get {
+                return ResourceManager.GetString("Installer.Manager.Map.Failed", resourceCulture);
             }
         }
 

@@ -2441,14 +2441,26 @@ Defaulting to {1}.</value>
   <data name="Menu.FastFlagProfiles.DeleteSelectedFlags" xml:space="preserve">
     <value>Delete selected</value>
   </data>
-  <data name="Menu.FastFlagProfiles.PlacesHeader" xml:space="preserve">
-    <value>Place assignments</value>
-  </data>
-  <data name="Menu.FastFlagProfiles.PlacesDescription" xml:space="preserve">
-    <value>Assign a profile to a place ID. Its overrides are merged in automatically whenever that place is launched, if Engine Settings is enabled.</value>
-  </data>
   <data name="Menu.FastFlagProfiles.PlaceIdPlaceholder" xml:space="preserve">
     <value>Place ID</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ScopeHeader" xml:space="preserve">
+    <value>Applies to</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ScopeDescription" xml:space="preserve">
+    <value>Select a profile above to set which games it applies to.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.ScopeDescription.Selected" xml:space="preserve">
+    <value>Which games "{0}" applies to.</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.Scope.Mode.Title" xml:space="preserve">
+    <value>Applies to</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.Scope.Places.Title" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="Menu.FastFlagProfiles.Scope.Places.Description" xml:space="preserve">
+    <value>Only used when "Applies to" above is set to one of the listed-games modes.</value>
   </data>
   <data name="Menu.FastFlagProfiles.AddAssignment" xml:space="preserve">
     <value>Assign</value>
@@ -3330,5 +3342,132 @@ Example:
   </data>
   <data name="ContextMenu.RPCWindow.LastUpdated" xml:space="preserve">
     <value>Last updated:</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.Title" xml:space="preserve">
+    <value>Benchmark overlay</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.Description" xml:space="preserve">
+    <value>Displays NVIDIA driver-level performance overlays such as FPS graphs and present timing data.</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.GraphFlipFps" xml:space="preserve">
+    <value>FPS graph, measured on display hardware flip</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.GraphPresentFps" xml:space="preserve">
+    <value>FPS graph, measured when the driver starts processing present</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.GraphAppPresentFps" xml:space="preserve">
+    <value>FPS graph, measured on app present</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.DisplayPaging" xml:space="preserve">
+    <value>FPS graph with paging indicator bars</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.DisplayAppThreadWait" xml:space="preserve">
+    <value>FPS graph with app thread wait indicator bars</value>
+  </data>
+  <data name="Menu.Nvidia.BenchmarkOverlay.Enabled" xml:space="preserve">
+    <value>Enabled (everything)</value>
+  </data>
+  <data name="Menu.Nvidia.CustomSettings.Title" xml:space="preserve">
+    <value>Custom settings</value>
+  </data>
+  <data name="Menu.Nvidia.CustomSettings.Description" xml:space="preserve">
+    <value>Driver profile settings beyond the curated list above, by raw NVIDIA Profile Inspector setting ID. Applied together with everything above when you click Apply.</value>
+  </data>
+  <data name="Menu.Nvidia.CustomSettings.Empty" xml:space="preserve">
+    <value>No custom settings added.</value>
+  </data>
+  <data name="Menu.Nvidia.CustomSettings.AddButton" xml:space="preserve">
+    <value>Add custom setting</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Title" xml:space="preserve">
+    <value>Add NVIDIA Setting</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Description" xml:space="preserve">
+    <value>Use the setting ID and value shown by NVIDIA Profile Inspector. Only Dword values are supported.</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.SettingId" xml:space="preserve">
+    <value>Setting ID</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.ValueHint" xml:space="preserve">
+    <value>Decimal or 0x hex.</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Error.Name" xml:space="preserve">
+    <value>Enter a setting name.</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Error.SettingId" xml:space="preserve">
+    <value>Enter a valid decimal or 0x hex setting ID.</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Error.Duplicate" xml:space="preserve">
+    <value>That setting ID is already tracked, either above or in the curated list.</value>
+  </data>
+  <data name="Dialog.AddNvidiaCustomSetting.Error.Value" xml:space="preserve">
+    <value>Enter a valid decimal or 0x hex value.</value>
+  </data>
+  <data name="Common.Launch" xml:space="preserve">
+    <value>Launch</value>
+  </data>
+  <data name="Installer.Manager.Title" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="Installer.Manager.Text" xml:space="preserve">
+    <value>Install, update, or remove Roblox Player and Studio right from here. You can always come back to this later from PhasmaStrap's settings.</value>
+  </data>
+  <data name="Installer.Manager.Player.Title" xml:space="preserve">
+    <value>Roblox Player</value>
+  </data>
+  <data name="Installer.Manager.Player.Description" xml:space="preserve">
+    <value>The Roblox client for playing experiences</value>
+  </data>
+  <data name="Installer.Manager.Studio.Title" xml:space="preserve">
+    <value>Roblox Studio</value>
+  </data>
+  <data name="Installer.Manager.Studio.Description" xml:space="preserve">
+    <value>Create and edit experiences</value>
+  </data>
+  <data name="Installer.Manager.Status.NotInstalled" xml:space="preserve">
+    <value>Not installed</value>
+  </data>
+  <data name="Installer.Manager.Status.Installed" xml:space="preserve">
+    <value>Installed ({0})</value>
+    <comment>{0} is the installed version's identifier</comment>
+  </data>
+  <data name="Installer.Manager.Status.Installing" xml:space="preserve">
+    <value>Installing...</value>
+  </data>
+  <data name="Installer.Manager.Status.InstallFailed" xml:space="preserve">
+    <value>Install failed: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Installer.Manager.ConfirmDelete" xml:space="preserve">
+    <value>This will remove {0} from your computer. Continue?</value>
+    <comment>{0} is either "Roblox Player" or "Roblox Studio"</comment>
+  </data>
+  <data name="Installer.Manager.Map.Title" xml:space="preserve">
+    <value>Install location</value>
+  </data>
+  <data name="Installer.Manager.Map.Description" xml:space="preserve">
+    <value>Choose which drive new Roblox installs and updates are saved to. This can only be changed before Player or Studio has been installed.</value>
+  </data>
+  <data name="Installer.Manager.Map.CannotChange" xml:space="preserve">
+    <value>The install drive can't be changed once Roblox Player or Studio has been installed.</value>
+  </data>
+  <data name="Installer.Manager.Map.Failed" xml:space="preserve">
+    <value>Couldn't move the install location: {0}</value>
+    <comment>{0} is an error message</comment>
+  </data>
+  <data name="Installer.Extensions.Title" xml:space="preserve">
+    <value>Extensions</value>
+  </data>
+  <data name="Installer.Extensions.Text" xml:space="preserve">
+    <value>PhasmaStrap can sync development files into Studio with Rojo, and launch other tools alongside Roblox. Set these up now, or configure them later from settings.</value>
+  </data>
+  <data name="Installer.Extensions.Other.Title" xml:space="preserve">
+    <value>Other Extensions</value>
+  </data>
+  <data name="Installer.Extensions.Other.Text" xml:space="preserve">
+    <value>Locate and launch third-party tools alongside Roblox. PhasmaStrap doesn't bundle or download these - point it at an existing install.</value>
   </data>
 </root>

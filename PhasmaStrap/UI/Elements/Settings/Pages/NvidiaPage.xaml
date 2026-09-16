@@ -38,6 +38,10 @@
                 <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
             </controls:OptionControl>
 
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Description}">
+                <ComboBox Width="280" ItemsSource="{Binding BenchmarkOverlayModes, Mode=OneTime}" SelectedItem="{Binding BenchmarkOverlayMode, Mode=TwoWay}" />
+            </controls:OptionControl>
+
             <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_ResizableBar_Description}">
                 <ui:ToggleSwitch IsChecked="{Binding ResizableBar, Mode=TwoWay}" />
             </controls:OptionControl>
@@ -74,6 +78,45 @@
                     <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TextureLodBias, Mode=OneWay}" />
                 </StackPanel>
             </controls:OptionControl>
+
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_Description}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,2,0,8" />
+
+            <ItemsControl ItemsSource="{Binding CustomSettings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,6" Padding="10,8" CornerRadius="6" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Medium" />
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding HexId}" />
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Value}" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" VerticalAlignment="Center" Content="{x:Static resources:Strings.Common_Delete}" Tag="{Binding}" Click="RemoveCustomSetting_Click" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_Empty}" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,4,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CustomSettings.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_CustomSettings_AddButton}" Icon="AddCircle24" HorizontalAlignment="Left" Margin="0,8,0,0" Click="AddCustomSetting_Click" />
 
             <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                 <ui:Button Content="{x:Static resources:Strings.Menu_Nvidia_ApplyButton}" Appearance="Primary" Click="Apply_Click" x:Name="ApplyButton" />
