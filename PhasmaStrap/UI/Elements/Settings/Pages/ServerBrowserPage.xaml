@@ -12,69 +12,12 @@
       Title="ServerBrowserPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_Matchmaker_Title}" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_Matchmaker_Description}" />
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_EnableMatchmaker_Title}" Margin="0,8,0,0">
-            <ui:ToggleSwitch IsChecked="{Binding MatchmakerEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding MatchmakerPreferEmpty, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Description}">
-            <ComboBox Width="220" ItemsSource="{Binding DatacenterChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Key" SelectedValue="{Binding PreferredDatacenter, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding MatchmakerAutoCandidates, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Description}">
-            <ui:NumberBox Width="120" Min="8" Max="64" Value="{Binding MatchmakerMaxCandidates, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedDatacenters_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedDatacenters_Description}" />
-        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding DatacenterExclusions, Mode=OneTime}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox Margin="0,0,16,6" Content="{Binding Display}" IsChecked="{Binding IsBlocked, Mode=TwoWay}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_Description}" />
-        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_ServerBrowser_ExcludedPlaces_PlaceholderText}" Text="{Binding ExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddExcludedPlaceCommand, Mode=OneTime}" />
-        </StackPanel>
-        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding ExcludedPlaces, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
-                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_Browser_Title}" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
+        <!-- The automatic matchmaker (enable/prefer-empty/preferred datacenter/candidate count/
+             allow-block grid/excluded games) moved to the Behaviour page's "Matchmaker" tab, to
+             match Voidstrap's grouping - see BehaviourViewModel.Matchmaker, which binds to this
+             same ServerBrowserViewModel type so no logic was duplicated. This page now only
+             holds the manual "search a place id, then join a specific server" browser below. -->
+        <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_Browser_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_Browser_Description}" />
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PlaceId_Title}" Margin="0,16,0,0">

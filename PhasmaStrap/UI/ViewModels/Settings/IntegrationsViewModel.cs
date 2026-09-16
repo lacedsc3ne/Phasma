@@ -5,6 +5,8 @@ using Microsoft.Win32;
 
 using CommunityToolkit.Mvvm.Input;
 
+using PhasmaStrap.UI.Elements.ContextMenu;
+
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class IntegrationsViewModel : NotifyPropertyChangedViewModel
@@ -18,6 +20,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand AddRPCTemplateCommand => new RelayCommand(AddRPCTemplate);
 
         public ICommand DeleteRPCTemplateCommand => new RelayCommand(DeleteRPCTemplate);
+
+        // opens the standalone Roblox account switcher (Integrations > Roblox tab) - see
+        // AccountSwitcherViewModel.cs for how switching an account actually works end to end
+        public ICommand AccountWindowCommand => new RelayCommand(() => new AccountSwitcherWindow().Show());
 
         private void AddIntegration()
         {

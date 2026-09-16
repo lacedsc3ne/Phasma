@@ -15,7 +15,21 @@ namespace PhasmaStrap.Networking
         private const string BlockStart = "# PhasmaStrap proxy - do not edit this block by hand";
         private const string BlockEnd = "# PhasmaStrap proxy end";
 
-        public static readonly string[] InterceptedHostnames = new[] { PresenceSpoofPolicy.Host, RobuxSpoofer.Host, UsernameSpoofer.Host }
+        // NOTE: AssetWarpPolicy.Host/AssetWarpThumbnailPolicy.Host are always included here,
+        // same as the other policies below - they're unconditionally registered with
+        // AssetProxyServer too (see NetworkingController.RegisterAssetWarpHosts), and it's the
+        // policies themselves (AssetWarpPolicy.IsEnabled / AssetWarpThumbnailPolicy.IsEnabled)
+        // that gate whether anything actually gets stripped. Without an entry here, Windows
+        // would resolve those hostnames normally and Roblox would talk to them directly,
+        // bypassing the proxy (and therefore AssetWarp) entirely regardless of its toggles.
+        public static readonly string[] InterceptedHostnames = new[]
+            {
+                PresenceSpoofPolicy.Host,
+                RobuxSpoofer.Host,
+                UsernameSpoofer.Host,
+                AssetWarpPolicy.Host,
+                AssetWarpThumbnailPolicy.Host,
+            }
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

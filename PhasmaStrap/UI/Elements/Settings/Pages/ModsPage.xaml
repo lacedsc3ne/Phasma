@@ -8,9 +8,10 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      xmlns:pages="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:ModsViewModel, IsDesignTimeCreatable=True}"
-      d:DesignHeight="800" d:DesignWidth="800"
+      d:DesignHeight="800" d:DesignWidth="900"
       Title="ModsPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
@@ -25,7 +26,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
+
             <ui:CardAction Grid.Row="0" Grid.Column="0" x:Name="OpenModFolderCardAction" Margin="0,0,4,0" Icon="Folder24" Command="{Binding OpenModsFolderCommand}">
                 <StackPanel>
                     <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Mods_OpenModsFolder_Title}" TextWrapping="Wrap" />
@@ -48,66 +49,422 @@
             </ui:CardAction>
         </Grid>
 
-        <TextBlock Text="{x:Static resources:Strings.Common_Presets}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TabControl Name="ModsTabs" Margin="0,16,0,0">
+            <!-- ================= Preset Mod ================= -->
+            <TabItem FontWeight="Medium">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Color24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Tabs_PresetMod}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,16,0,0">
+                    <TextBlock Text="{x:Static resources:Strings.Common_Presets}" FontSize="20" FontWeight="Medium" />
 
-        <controls:OptionControl 
-            Header="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Title}" 
-            Description="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Description}">
-            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding CursorTypeTask.Selections, Mode=OneTime}" Text="{Binding CursorTypeTask.NewState, Mode=TwoWay}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </controls:OptionControl>
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Description}">
+                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding ModApplyTargets, Mode=OneTime}" SelectedItem="{Binding ModApplyTarget, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </controls:OptionControl>
 
-        <controls:OptionControl
-            Header="Custom Cursor Set"
-            Description="Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.">
-            <StackPanel>
-                <TextBlock Margin="0,0,0,6" FontSize="12" Text="{Binding CustomCursorSetFolderDisplay, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" TextAlignment="Right" MaxWidth="260" HorizontalAlignment="Right" />
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ui:Button Margin="0,0,4,0" Icon="Eye16" Content="Preview" Command="{Binding PreviewCustomCursorSetCommand}" Visibility="{Binding PreviewCustomCursorSetVisibility, Mode=OneWay}" />
-                    <ui:Button Icon="FolderAdd16" Content="Browse" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding ChooseCustomCursorSetVisibility, Mode=OneWay}" />
-                    <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding DeleteCustomCursorSetVisibility, Mode=OneWay}" />
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Description}">
+                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding CursorTypeTask.Selections, Mode=OneTime}" Text="{Binding CursorTypeTask.NewState, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="Custom Cursor Set (quick folder)"
+                        Description="Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.">
+                        <StackPanel>
+                            <TextBlock Margin="0,0,0,6" FontSize="12" Text="{Binding CustomCursorSetFolderDisplay, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" TextAlignment="Right" MaxWidth="260" HorizontalAlignment="Right" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <ui:Button Margin="0,0,4,0" Icon="Eye16" Content="Preview" Command="{Binding PreviewCustomCursorSetCommand}" Visibility="{Binding PreviewCustomCursorSetVisibility, Mode=OneWay}" />
+                                <ui:Button Icon="FolderAdd16" Content="Browse" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding ChooseCustomCursorSetVisibility, Mode=OneWay}" />
+                                <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding DeleteCustomCursorSetVisibility, Mode=OneWay}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding OldAvatarBackgroundTask.NewState, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding OldCharacterSoundsTask.NewState, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Description}">
+                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="220" ItemsSource="{Binding EmojiFontTask.Selections, Mode=OneTime}" Text="{Binding EmojiFontTask.NewState, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </controls:OptionControl>
+
+                    <TextBlock Text="{x:Static resources:Strings.Common_Miscellaneous}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Title}">
+                        <StackPanel>
+                            <ui:Button Margin="0,0,0,4" Icon="TextFont16" Content="{x:Static resources:Strings.Menu_Mods_Misc_GoogleFonts_Browse}" Command="{Binding BrowseGoogleFontsCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />
+                            <ui:Button Icon="DocumentAdd16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Choose}" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />
+                            <ui:Button Icon="Delete16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Remove}" Appearance="Danger" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding DeleteCustomFontVisibility, Mode=OneWay}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Misc_CustomDeathSound_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Misc_CustomDeathSound_Description}">
+                        <StackPanel>
+                            <ui:Button Icon="DocumentAdd16" Content="Choose Sound..." Command="{Binding AddCustomDeathSoundCommand}" Visibility="{Binding ChooseCustomDeathSoundVisibility, Mode=OneWay}" />
+                            <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding RemoveCustomDeathSoundCommand}" Visibility="{Binding DeleteCustomDeathSoundVisibility, Mode=OneWay}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Description}">
+                        <StackPanel Width="360">
+                            <ui:CardExpander Margin="0,0,0,8" IsExpanded="False">
+                                <HeaderedContentControl.Header>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" Text="Custom skybox" />
+                                        <TextBlock Margin="0,2,0,0" FontSize="12" Text="Use one image for every side, or choose each face." Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                </HeaderedContentControl.Header>
+                                <StackPanel>
+                                    <ui:Button HorizontalAlignment="Stretch" Content="Use one image for every side" Icon="ImageAdd24" Command="{Binding ChooseSingleSkyboxImageCommand}" />
+                                    <Grid Margin="0,8,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Back" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxBack}" ToolTip="{Binding CustomSkyboxBack}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Back" />
+                                    </Grid>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Down" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxDown}" ToolTip="{Binding CustomSkyboxDown}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Down" />
+                                    </Grid>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Front" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxFront}" ToolTip="{Binding CustomSkyboxFront}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Front" />
+                                    </Grid>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Left" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxLeft}" ToolTip="{Binding CustomSkyboxLeft}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Left" />
+                                    </Grid>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Right" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxRight}" ToolTip="{Binding CustomSkyboxRight}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Right" />
+                                    </Grid>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Text="Up" />
+                                        <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding CustomSkyboxUp}" ToolTip="{Binding CustomSkyboxUp}" Command="{Binding ChooseSkyboxFaceCommand}" CommandParameter="Up" />
+                                    </Grid>
+                                    <WrapPanel Margin="0,10,0,0" HorizontalAlignment="Right">
+                                        <ui:Button Margin="0,0,8,0" Appearance="Danger" Content="Remove custom" Icon="Delete16" Command="{Binding RemoveCustomSkyboxCommand}" Visibility="{Binding HasCustomSkybox, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <ui:Button Appearance="Primary" Content="Save and use" Command="{Binding ApplyCustomSkyboxCommand}" IsEnabled="{Binding CustomSkyboxCanApply}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </ui:CardExpander>
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <ui:CardExpander Margin="0,8,0,0" IsExpanded="False">
+                        <HeaderedContentControl.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Mods_Misc_CursorSetManager_Title}" />
+                                <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Mods_Misc_CursorSetManager_Description}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </HeaderedContentControl.Header>
+                        <Grid Margin="-8,4,-8,0" MinHeight="280">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="260" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <ListBox Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" DisplayMemberPath="Name" ItemsSource="{Binding CursorSets}" SelectedItem="{Binding SelectedCursorSet, Mode=TwoWay}" />
+                            <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:Button Grid.Column="0" Margin="0,0,4,0" Height="32" Icon="Add28" Content="New" HorizontalAlignment="Stretch" Command="{Binding AddCustomCursorSetCommand}" />
+                                <ui:Button Grid.Column="1" Margin="4,0,0,0" Height="32" Icon="Delete28" Content="Delete" HorizontalAlignment="Stretch" Appearance="Danger" IsEnabled="{Binding IsCustomCursorSetSelected}" Command="{Binding DeleteCustomCursorSetCommand}" />
+                            </Grid>
+
+                            <StackPanel Grid.RowSpan="2" Grid.Column="1" Margin="8,0,0,0" Visibility="{Binding IsCustomCursorSetSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center" FontWeight="Medium" Text="{Binding SelectedCursorSet.Name}" />
+                                    <ui:Button Grid.Column="1" Content="Rename" Icon="Edit16" Command="{Binding RenameCustomCursorSetCommand}" />
+                                </Grid>
+
+                                <UniformGrid Columns="4" Rows="1">
+                                    <StackPanel Margin="0,0,4,0">
+                                        <TextBlock Text="Shiftlock" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
+                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                            <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ShiftlockCursorPreview, TargetNullValue={x:Null}}" />
+                                        </Border>
+                                        <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="MouseLockedCursor.png" />
+                                        <ui:Button Margin="0,2,0,0" HorizontalAlignment="Stretch" Content="Remove" FontSize="11" Appearance="Danger" Command="{Binding RemoveCursorSetFileCommand}" CommandParameter="MouseLockedCursor.png" />
+                                    </StackPanel>
+                                    <StackPanel Margin="4,0,4,0">
+                                        <TextBlock Text="Arrow" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
+                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                            <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ArrowCursorPreview, TargetNullValue={x:Null}}" />
+                                        </Border>
+                                        <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="ArrowCursor.png" />
+                                        <ui:Button Margin="0,2,0,0" HorizontalAlignment="Stretch" Content="Remove" FontSize="11" Appearance="Danger" Command="{Binding RemoveCursorSetFileCommand}" CommandParameter="ArrowCursor.png" />
+                                    </StackPanel>
+                                    <StackPanel Margin="4,0,4,0">
+                                        <TextBlock Text="ArrowFar" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
+                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                            <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ArrowFarCursorPreview, TargetNullValue={x:Null}}" />
+                                        </Border>
+                                        <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="ArrowFarCursor.png" />
+                                        <ui:Button Margin="0,2,0,0" HorizontalAlignment="Stretch" Content="Remove" FontSize="11" Appearance="Danger" Command="{Binding RemoveCursorSetFileCommand}" CommandParameter="ArrowFarCursor.png" />
+                                    </StackPanel>
+                                    <StackPanel Margin="4,0,0,0">
+                                        <TextBlock Text="IBeam" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
+                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                            <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.IBeamCursorPreview, TargetNullValue={x:Null}}" />
+                                        </Border>
+                                        <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="IBeamCursor.png" />
+                                        <ui:Button Margin="0,2,0,0" HorizontalAlignment="Stretch" Content="Remove" FontSize="11" Appearance="Danger" Command="{Binding RemoveCursorSetFileCommand}" CommandParameter="IBeamCursor.png" />
+                                    </StackPanel>
+                                </UniformGrid>
+
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:Button Grid.Column="0" Margin="0,0,4,0" Height="32" Content="Apply" Icon="Checkmark20" ToolTip="Copy this set's images into your Mods folder." Command="{Binding ApplyCursorSetCommand}" />
+                                    <ui:Button Grid.Column="1" Margin="4,0,4,0" Height="32" Content="Fetch" Icon="CollectionsAdd24" ToolTip="Copy the currently applied cursors into this set." Command="{Binding GetCurrentCursorSetCommand}" />
+                                    <ui:Button Grid.Column="2" Margin="4,0,4,0" Height="32" Content="Import" Icon="FolderZip24" ToolTip="Import a cursor set from a .zip file." Command="{Binding ImportCursorSetCommand}" />
+                                    <ui:Button Grid.Column="3" Margin="4,0,0,0" Height="32" Content="Export" Icon="ArrowExportRtl24" ToolTip="Export this set to a .zip file." Command="{Binding ExportCursorSetCommand}" />
+                                </Grid>
+                            </StackPanel>
+
+                            <TextBlock Grid.RowSpan="2" Grid.Column="1" Text="No cursor set selected." FontWeight="Medium" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoCursorSetSelected, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </Grid>
+                    </ui:CardExpander>
                 </StackPanel>
-            </StackPanel>
-        </controls:OptionControl>
+            </TabItem>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}"
-            Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding OldAvatarBackgroundTask.NewState, Mode=TwoWay}" />
-        </controls:OptionControl>
+            <!-- ================= Mod Management ================= -->
+            <TabItem FontWeight="Medium">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Folder24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Tabs_ModManagement}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,16,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Mods_ModManagement_Title}" FontSize="20" FontWeight="Medium" />
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                            <TextBlock HorizontalAlignment="Right" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ManagedModsSummary}" />
+                            <ProgressBar Width="120" Height="3" Margin="0,8,0,0" IsIndeterminate="True" Visibility="{Binding ManagedModsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Margin="0,4,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Mods_ModManagement_Description}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
 
-        <controls:OptionControl 
-            Header="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Title}" 
-            Description="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding OldCharacterSoundsTask.NewState, Mode=TwoWay}" />
-        </controls:OptionControl>
+                    <Grid Margin="0,14,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+                        <ui:Button Appearance="Primary" Icon="Add24" Content="Add Mod" Command="{Binding AddManagedModCommand}" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="FolderOpen24" Content="Open Library" Command="{Binding OpenManagedModsRootCommand}" />
+                        <ui:Button Grid.Column="2" Margin="8,0,0,0" HorizontalAlignment="Left" Icon="ArrowSync24" Content="Refresh" Command="{Binding RefreshManagedModsCommand}" />
+                        <ui:TextBox Grid.Column="3" PlaceholderText="Search mods or identifiers" Text="{Binding ManagedModSearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
 
-        <controls:OptionControl 
-            Header="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Title}" 
-            Description="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Description}">
-            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="220" ItemsSource="{Binding EmojiFontTask.Selections, Mode=OneTime}" Text="{Binding EmojiFontTask.NewState, Mode=TwoWay}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </controls:OptionControl>
+                    <Border Padding="28" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ManagedMods.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock HorizontalAlignment="Center" FontSize="16" FontWeight="SemiBold" Text="{Binding ManagedModsEmptyTitle}" />
+                            <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ManagedModsEmptyDescription}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
 
-        <TextBlock Text="{x:Static resources:Strings.Common_Miscellaneous}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <ItemsControl x:Name="ManagedModsList" AllowDrop="True" DragOver="ManagedModsList_DragOver" Drop="ManagedModsList_Drop" ItemsSource="{Binding ManagedMods}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type dmodels:ManagedModItem}">
+                                <Border Margin="0,0,0,8" Padding="12" AllowDrop="True" CornerRadius="8" BorderThickness="1" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" DragEnter="ManagedModCard_DragEnter" DragLeave="ManagedModCard_DragLeave" DragOver="ManagedModCard_DragOver" Drop="ManagedModCard_Drop">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="30" Height="36" Margin="0,0,6,0" Cursor="SizeAll" AutomationProperties.Name="Drag mod to change apply order" PreviewMouseLeftButtonDown="ManagedModDragHandle_MouseLeftButtonDown" PreviewMouseMove="ManagedModDragHandle_MouseMove">
+                                            <ui:SymbolIcon Width="20" Height="20" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ReOrderDotsVertical24" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        </Border>
+                                        <ToggleButton Grid.Column="1" Width="36" Height="36" Margin="0,0,12,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Enabled, Mode=OneWay}" Command="{Binding DataContext.ToggleManagedModCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" AutomationProperties.Name="Enable or disable this mod">
+                                            <ui:SymbolIcon Width="20" Height="20" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="Power24" Filled="{Binding Enabled, Mode=OneWay}" />
+                                        </ToggleButton>
+                                        <StackPanel Grid.Column="2" Margin="0,0,14,0" VerticalAlignment="Center">
+                                            <TextBlock FontSize="15" FontWeight="SemiBold" Text="{Binding Name, Mode=OneWay}" />
+                                            <TextBlock Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                                <Run Text="{Binding FileSummary, Mode=OneWay}" /><Run Text="   ID: " /><Run Text="{Binding ShortId, Mode=OneWay}" />
+                                            </TextBlock>
+                                            <TextBlock Margin="0,4,0,0" Foreground="{DynamicResource SystemFillColorCautionBrush}" Text="{Binding ConflictText}" Visibility="{Binding HasConflicts, Converter={StaticResource BoolToVisibilityConverter}}" TextWrapping="Wrap" />
+                                            <TextBlock Margin="0,4,0,0" Foreground="{DynamicResource SystemFillColorCriticalBrush}" Text="{Binding ScanError, Mode=OneWay}" Visibility="{Binding HasScanError, Converter={StaticResource BoolToVisibilityConverter}}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Orientation="Horizontal">
+                                            <ui:Button Width="36" Height="36" Margin="0,0,6,0" Padding="0" Appearance="Secondary" Icon="FolderOpen24" AutomationProperties.Name="Open mod folder" Command="{Binding DataContext.OpenManagedModCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" />
+                                            <ui:Button Width="36" Height="36" Margin="0,0,6,0" Padding="0" Appearance="Secondary" Icon="Edit24" AutomationProperties.Name="Rename mod" Command="{Binding DataContext.RenameManagedModCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" />
+                                            <ui:Button Width="36" Height="36" Margin="0,0,6,0" Padding="0" Appearance="Secondary" Icon="Copy24" AutomationProperties.Name="Copy full mod identifier" Command="{Binding DataContext.CopyManagedModIdCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" />
+                                            <ui:Button Width="36" Height="36" Padding="0" Appearance="Danger" Icon="Delete24" AutomationProperties.Name="Remove mod" Command="{Binding DataContext.RemoveManagedModCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </TabItem>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Title}">
-            <StackPanel>
-                <ui:Button Margin="0,0,0,4" Icon="TextFont16" Content="{x:Static resources:Strings.Menu_Mods_Misc_GoogleFonts_Browse}" Command="{Binding BrowseGoogleFontsCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />
-                <ui:Button Icon="DocumentAdd16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Choose}" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />
-                <ui:Button Icon="Delete16" Content="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Remove}" Appearance="Danger" Command="{Binding ManageCustomFontCommand}" Visibility="{Binding DeleteCustomFontVisibility, Mode=OneWay}" />
-            </StackPanel>
-        </controls:OptionControl>
+            <!-- ================= Overlays (Roblox homepage background - NOT the in-game crosshair overlay on OverlaysPage) ================= -->
+            <TabItem FontWeight="Medium">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Image24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Tabs_Overlays}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,16,0,0">
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Overlays_Title}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Mods_Overlays_Description}" />
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Overlays_Enable_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Overlays_Enable_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding HomepageBackgroundEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Mods_Overlays_HomepageBackground_Title}"
+                        Description="{x:Static resources:Strings.Menu_Mods_Overlays_HomepageBackground_Description}">
+                        <StackPanel Width="360" IsEnabled="{Binding HomepageBackgroundEnabled}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Width="190" HorizontalAlignment="Left" Padding="10,5" ItemsSource="{Binding HomepageBackgroundModes, Mode=OneTime}" SelectedItem="{Binding SelectedHomepageBackgroundMode, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <ui:Button Grid.Column="1" Content="Preview" Icon="Eye16" IsEnabled="{Binding PreviewHomepageBackgroundEnabled}" Command="{Binding PreviewHomepageBackgroundCommand}" />
+                            </Grid>
+
+                            <StackPanel Margin="0,10,0,0" Visibility="{Binding ShowHomepageSolidColor, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <TextBlock Margin="0,0,0,5" Text="Background color" />
+                                <Button Width="120" HorizontalAlignment="Left" Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,10,0,0" Visibility="{Binding ShowHomepageGradient, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Margin="0,0,6,0">
+                                        <TextBlock Margin="0,0,0,5" Text="Start color" />
+                                        <Button Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                        <TextBlock Margin="0,0,0,5" Text="End color" />
+                                        <Button Content="{Binding HomepageBackgroundOverlayGradientColor}" Command="{Binding PickHomepageBackgroundGradientColorCommand}" />
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Margin="0,10,0,4" Text="Direction" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="48" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="360" TickFrequency="1" Value="{Binding HomepageBackgroundOverlayGradientAngle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding HomepageBackgroundOverlayGradientAngleDisplay}" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

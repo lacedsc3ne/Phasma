@@ -30,6 +30,15 @@ namespace PhasmaStrap.Models.Persistable
         public ChannelChangeMode ChannelChangeMode { get; set; } = ChannelChangeMode.Automatic;
         public string PreferredMirror { get; set; } = "";
 
+        // download tuning (Settings > Roblox > Installer, ported from Voidstrap's Installer tab),
+        // read directly by Bootstrapper.DownloadPackage/UpgradeRoblox. Defaults exactly reproduce
+        // PhasmaStrap's original hardcoded download behaviour - one package at a time, a 4KB read
+        // buffer, no segmentation - so raising any of these is opt-in only. See
+        // Utility/DownloadConfiguration.cs for the choice lists/normalization and caps.
+        public int DownloadBufferKb { get; set; } = 4;
+        public int MaxConcurrentDownloads { get; set; } = 1;
+        public int MaxDownloadSegments { get; set; } = 1;
+
         // performance tweaks
         public int CpuCoreLimit { get; set; } = 0;
         public bool FakeExclusiveFullscreen { get; set; } = false;
@@ -163,6 +172,23 @@ namespace PhasmaStrap.Models.Persistable
         // place IDs the matchmaker should never suggest as a candidate, regardless of MatchmakerAutoCandidates
         public List<string> MatchmakerExcludedPlaces { get; set; } = new();
 
+        // which Roblox gamejoin API version the matchmaker's join-instance probe/resolve requests use
+        // (see Matchmaker.BuildJoinRequest) - 1 is the long-stable endpoint, 2 is newer. Change only if
+        // joins stop resolving. Ported from Voidstrap's VoidstrapMatchmakerGamejoinApiVersion.
+        public int MatchmakerGamejoinApiVersion { get; set; } = 1;
+
+        // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
+        // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
+        public bool DisableRobloxCrashHandler { get; set; } = false;
+
+        // Roblox game window customization (ported from Voidstrap's WindowManipulation) - applied
+        // directly to the live Roblox game window via Win32 (SetWindowText/WM_SETICON), not a FastFlag.
+        // See Integrations/RobloxWindowCustomizer.cs. Blank RobloxTitle leaves Roblox's own title alone.
+        public string RobloxTitle { get; set; } = "";
+        public bool CycleTitleWithGameName { get; set; } = false;
+        public bool ShowServerInfoInTitle { get; set; } = false;
+        public bool UseGameIconForRobloxWindow { get; set; } = false;
+
         // per-game FastFlag profiles: a named bundle of flag overrides (real FFlag name -> value, same shape as
         // FastFlagManager's own Prop) merged on top of the global ClientAppSettings.json at launch, for
         // whichever places each profile's own scope (FastFlagProfileScopes below) says it applies to. See
@@ -282,5 +308,17 @@ namespace PhasmaStrap.Models.Persistable
         // editor (its full .exe path, from Utility.ExternalEditor.Detect) "Open in External Editor"
         // should launch directly next time, skipping the picker dialog. Empty means always ask.
         public string PreferredExternalEditorPath { get; set; } = "";
+
+        // ModsPage "Preset Mod" tab: which Roblox executable(s) file mods and Mod Management
+        // packages get applied to - see Bootstrapper.ApplyModifications
+        public ModApplyTarget ModApplyTarget { get; set; } = ModApplyTarget.Both;
+
+        // ModsPage "Overlays" tab - Roblox homepage background customization (distinct from the
+        // in-game crosshair HUD overlay on OverlaysPage/OverlayCompositor). Off by default.
+        public bool HomepageBackgroundEnabled { get; set; } = false;
+        public HomepageBackgroundMode HomepageBackgroundMode { get; set; } = HomepageBackgroundMode.None;
+        public string HomepageBackgroundColor { get; set; } = "#1A1A2E";
+        public string HomepageBackgroundGradientColor { get; set; } = "#16213E";
+        public double HomepageBackgroundGradientAngle { get; set; } = 45.0;
     }
 }

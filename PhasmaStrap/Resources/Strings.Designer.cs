@@ -9998,6 +9998,1193 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Appearance.VisualEffects.Title", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Application.
+        /// </summary>
+        public static string Menu_Appearance_Application_Title {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.Application.Title", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Blocks whole categories of asset from loading in-game, for a performance boost. Works by removing blocked asset types from the batch resolution request Roblox's client sends through PhasmaStrap's local proxy, before it ever learns a CDN URL to fetch them from - it does not intercept or substitute the actual asset content servers. Turning this on will start the local proxy automatically if it isn't already running..
+        /// </summary>
+        public static string Menu_AssetWarp_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removes animation entries from Roblox asset batches. This breaks games with no animation fallback..
+        /// </summary>
+        public static string Menu_AssetWarp_DisableAnimations_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableAnimations.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all animations.
+        /// </summary>
+        public static string Menu_AssetWarp_DisableAnimations_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableAnimations.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removes decal entries from Roblox asset batches..
+        /// </summary>
+        public static string Menu_AssetWarp_DisableDecals_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableDecals.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all decals.
+        /// </summary>
+        public static string Menu_AssetWarp_DisableDecals_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableDecals.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removes image entries from Roblox asset batches..
+        /// </summary>
+        public static string Menu_AssetWarp_DisableImages_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableImages.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all images.
+        /// </summary>
+        public static string Menu_AssetWarp_DisableImages_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableImages.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removes mesh and meshpart entries from Roblox asset batches. This makes all 3D geometry invisible..
+        /// </summary>
+        public static string Menu_AssetWarp_DisableMeshes_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableMeshes.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all meshes.
+        /// </summary>
+        public static string Menu_AssetWarp_DisableMeshes_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableMeshes.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Removes texture and texture pack entries from Roblox asset batches..
+        /// </summary>
+        public static string Menu_AssetWarp_DisableTextures_Description {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableTextures.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all textures.
+        /// </summary>
+        public static string Menu_AssetWarp_DisableTextures_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.DisableTextures.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Asset Warp.
+        /// </summary>
+        public static string Menu_AssetWarp_Enabled_Title {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Enabled.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Blocking selected asset type(s) through the local proxy.
+        /// </summary>
+        public static string Menu_AssetWarp_Status_Blocking {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Status.Blocking", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to On, but no asset types selected below - nothing is blocked yet.
+        /// </summary>
+        public static string Menu_AssetWarp_Status_NoneSelected {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Status.NoneSelected", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string Menu_AssetWarp_Status_Off {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Status.Off", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled, but the local proxy isn't confirmed running - check the log.
+        /// </summary>
+        public static string Menu_AssetWarp_Status_ProxyNotRunning {
+            get {
+                return ResourceManager.GetString("Menu.AssetWarp.Status.ProxyNotRunning", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configure Roblox engine FastFlags, NVIDIA driver tuning, and the Asset Warp asset-blocking proxy from one place..
+        /// </summary>
+        public static string Menu_FastFlagSettings_Description {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Asset Warp.
+        /// </summary>
+        public static string Menu_FastFlagSettings_Tab_AssetWarp {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.Tab.AssetWarp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to NVIDIA FFlags.
+        /// </summary>
+        public static string Menu_FastFlagSettings_Tab_NvidiaFFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.Tab.NvidiaFFlags", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox FFlags.
+        /// </summary>
+        public static string Menu_FastFlagSettings_Tab_RobloxFFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.Tab.RobloxFFlags", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to FastFlags.
+        /// </summary>
+        public static string Menu_FastFlagSettings_Title {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Interface.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Interface {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Interface", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Graphics.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Graphics {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Graphics", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Audio.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Audio {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Audio", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Input.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Input {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Input", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to VR.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_VR {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.VR", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Network.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Network {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Network", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_Advanced {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.Advanced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Raw Editor.
+        /// </summary>
+        public static string Menu_GBSEditor_Tab_RawEditor {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Tab.RawEditor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to User Interface.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Interface_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Interface.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Graphics and Rendering.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Graphics_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Graphics.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Audio.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Audio_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Audio.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Input and Controls.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Input_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Input.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Virtual Reality.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_VR_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.VR.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Network and Connectivity.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Network_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Network.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced and Developer.
+        /// </summary>
+        public static string Menu_GBSEditor_Section_Advanced_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Section.Advanced.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to UI Transparency.
+        /// </summary>
+        public static string Menu_GBSEditor_UITransparency_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.UITransparency.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sets your preferred interface transparency..
+        /// </summary>
+        public static string Menu_GBSEditor_UITransparency_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.UITransparency.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Text Size.
+        /// </summary>
+        public static string Menu_GBSEditor_PreferredTextSize_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.PreferredTextSize.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Controls the overall UI text size..
+        /// </summary>
+        public static string Menu_GBSEditor_PreferredTextSize_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.PreferredTextSize.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reduced Motion.
+        /// </summary>
+        public static string Menu_GBSEditor_ReducedMotion_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ReducedMotion.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Disables UI animations for accessibility..
+        /// </summary>
+        public static string Menu_GBSEditor_ReducedMotion_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ReducedMotion.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to HUD Visibility.
+        /// </summary>
+        public static string Menu_GBSEditor_HudVisible_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.HudVisible.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles the in-game HUD on or off..
+        /// </summary>
+        public static string Menu_GBSEditor_HudVisible_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.HudVisible.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Chat Visibility.
+        /// </summary>
+        public static string Menu_GBSEditor_ChatVisible_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ChatVisible.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles in-game chat visibility on or off..
+        /// </summary>
+        public static string Menu_GBSEditor_ChatVisible_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ChatVisible.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Player Names Visible.
+        /// </summary>
+        public static string Menu_GBSEditor_PlayerNamesEnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.PlayerNamesEnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows other players' names above their characters..
+        /// </summary>
+        public static string Menu_GBSEditor_PlayerNamesEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.PlayerNamesEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Badge Visible.
+        /// </summary>
+        public static string Menu_GBSEditor_BadgeVisible_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.BadgeVisible.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows badges earned in-game..
+        /// </summary>
+        public static string Menu_GBSEditor_BadgeVisible_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.BadgeVisible.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Framerate Cap.
+        /// </summary>
+        public static string Menu_GBSEditor_FramerateCap_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.FramerateCap.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Limits Roblox's maximum FPS. 0 leaves it uncapped..
+        /// </summary>
+        public static string Menu_GBSEditor_FramerateCap_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.FramerateCap.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Graphics Quality.
+        /// </summary>
+        public static string Menu_GBSEditor_GraphicsQuality_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.GraphicsQuality.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sets a manual graphics level (1-10) or Automatic. Only takes effect when graphics mode isn't set to Automatic in-game..
+        /// </summary>
+        public static string Menu_GBSEditor_GraphicsQuality_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.GraphicsQuality.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fullscreen.
+        /// </summary>
+        public static string Menu_GBSEditor_Fullscreen_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Fullscreen.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles Roblox's own fullscreen mode..
+        /// </summary>
+        public static string Menu_GBSEditor_Fullscreen_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.Fullscreen.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Master Volume.
+        /// </summary>
+        public static string Menu_GBSEditor_MasterVolume_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MasterVolume.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overall in-game volume..
+        /// </summary>
+        public static string Menu_GBSEditor_MasterVolume_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MasterVolume.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Voice Chat Volume.
+        /// </summary>
+        public static string Menu_GBSEditor_VoiceChatVolume_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VoiceChatVolume.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Volume for voice chat communication..
+        /// </summary>
+        public static string Menu_GBSEditor_VoiceChatVolume_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VoiceChatVolume.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mouse Sensitivity.
+        /// </summary>
+        public static string Menu_GBSEditor_MouseSensitivity_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MouseSensitivity.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Adjusts in-game mouse look sensitivity..
+        /// </summary>
+        public static string Menu_GBSEditor_MouseSensitivity_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MouseSensitivity.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invert Y-Axis.
+        /// </summary>
+        public static string Menu_GBSEditor_CameraYInverted_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.CameraYInverted.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reverses the vertical camera direction..
+        /// </summary>
+        public static string Menu_GBSEditor_CameraYInverted_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.CameraYInverted.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gamepad Sensitivity.
+        /// </summary>
+        public static string Menu_GBSEditor_GamepadSensitivity_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.GamepadSensitivity.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Adjusts joystick look sensitivity..
+        /// </summary>
+        public static string Menu_GBSEditor_GamepadSensitivity_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.GamepadSensitivity.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Controller Vibration.
+        /// </summary>
+        public static string Menu_GBSEditor_ControllerVibration_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ControllerVibration.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles haptic feedback on controllers..
+        /// </summary>
+        public static string Menu_GBSEditor_ControllerVibration_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ControllerVibration.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable VR.
+        /// </summary>
+        public static string Menu_GBSEditor_VREnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VREnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggles virtual reality mode..
+        /// </summary>
+        public static string Menu_GBSEditor_VREnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VREnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to VR Comfort Setting.
+        /// </summary>
+        public static string Menu_GBSEditor_VRComfortSetting_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VRComfortSetting.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Controls how the camera moves in VR..
+        /// </summary>
+        public static string Menu_GBSEditor_VRComfortSetting_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VRComfortSetting.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Vignette in VR.
+        /// </summary>
+        public static string Menu_GBSEditor_VignetteEnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VignetteEnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enables a vignette effect in VR to help reduce motion sickness..
+        /// </summary>
+        public static string Menu_GBSEditor_VignetteEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.VignetteEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Network Debug Stats.
+        /// </summary>
+        public static string Menu_GBSEditor_NetworkStatsVisible_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.NetworkStatsVisible.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows Roblox's built-in FPS/ping/memory overlay..
+        /// </summary>
+        public static string Menu_GBSEditor_NetworkStatsVisible_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.NetworkStatsVisible.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Chat Translation.
+        /// </summary>
+        public static string Menu_GBSEditor_ChatTranslationEnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ChatTranslationEnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically translates in-game chat messages..
+        /// </summary>
+        public static string Menu_GBSEditor_ChatTranslationEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ChatTranslationEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Microprofiler.
+        /// </summary>
+        public static string Menu_GBSEditor_MicroProfilerWebServerEnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MicroProfilerWebServerEnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enables Roblox's built-in microprofiler web server..
+        /// </summary>
+        public static string Menu_GBSEditor_MicroProfilerWebServerEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.MicroProfilerWebServerEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to On-Screen Profiler.
+        /// </summary>
+        public static string Menu_GBSEditor_OnScreenProfilerEnabled_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.OnScreenProfilerEnabled.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows an FPS and performance overlay..
+        /// </summary>
+        public static string Menu_GBSEditor_OnScreenProfilerEnabled_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.OnScreenProfilerEnabled.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reset to Default Settings.
+        /// </summary>
+        public static string Menu_GBSEditor_ResetToDefaults_Header {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ResetToDefaults.Header", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restores every curated setting on this page to its default value..
+        /// </summary>
+        public static string Menu_GBSEditor_ResetToDefaults_Description {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ResetToDefaults.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string Menu_GBSEditor_ResetToDefaults_Button {
+            get {
+                return ResourceManager.GetString("Menu.GBSEditor.ResetToDefaults.Button", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Activity.
+        /// </summary>
+        public static string Menu_Integrations_Tabs_Activity {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.Tabs.Activity", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discord.
+        /// </summary>
+        public static string Menu_Integrations_Tabs_Discord {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.Tabs.Discord", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox.
+        /// </summary>
+        public static string Menu_Integrations_Tabs_Roblox {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.Tabs.Roblox", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string Menu_Integrations_Tabs_Custom {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.Tabs.Custom", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Account Switcher.
+        /// </summary>
+        public static string Menu_Integrations_AccountSwitcher_Title {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.AccountSwitcher.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Save multiple Roblox accounts and switch between them without signing out each time. Your saved logins never leave this PC, and stay protected the same way Roblox&apos;s own client already protects your session..
+        /// </summary>
+        public static string Menu_Integrations_AccountSwitcher_Description {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.AccountSwitcher.Description", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string Menu_Behaviour_Tab_General {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Tab.General", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        public static string Menu_Behaviour_Tab_Advanced {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Tab.Advanced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Matchmaker.
+        /// </summary>
+        public static string Menu_Behaviour_Tab_Matchmaker {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Tab.Matchmaker", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox.
+        /// </summary>
+        public static string Menu_Behaviour_Tab_Roblox {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Tab.Roblox", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Disable RobloxCrashHandler.
+        /// </summary>
+        public static string Menu_Behaviour_DisableRobloxCrashHandler_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.DisableRobloxCrashHandler.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Closes the RobloxCrashHandler process shortly after Roblox launches..
+        /// </summary>
+        public static string Menu_Behaviour_DisableRobloxCrashHandler_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.DisableRobloxCrashHandler.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cache/log cleanup, CPU priority, and Roblox process memory tuning already live on the Performance page..
+        /// </summary>
+        public static string Menu_Behaviour_Advanced_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Advanced.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Customizes the live Roblox game window itself..
+        /// </summary>
+        public static string Menu_Behaviour_Roblox_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Roblox.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Window title.
+        /// </summary>
+        public static string Menu_Behaviour_RobloxTitle_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.RobloxTitle.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Leave blank to keep the title Roblox sets..
+        /// </summary>
+        public static string Menu_Behaviour_RobloxTitle_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.RobloxTitle.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add the game name.
+        /// </summary>
+        public static string Menu_Behaviour_CycleTitleWithGameName_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.CycleTitleWithGameName.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the experience you're playing in the title bar..
+        /// </summary>
+        public static string Menu_Behaviour_CycleTitleWithGameName_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.CycleTitleWithGameName.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add the player count.
+        /// </summary>
+        public static string Menu_Behaviour_ShowServerInfoInTitle_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.ShowServerInfoInTitle.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the current game's live player count in the title bar..
+        /// </summary>
+        public static string Menu_Behaviour_ShowServerInfoInTitle_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.ShowServerInfoInTitle.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Use the game icon.
+        /// </summary>
+        public static string Menu_Behaviour_UseGameIconForRobloxWindow_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.UseGameIconForRobloxWindow.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the experience's own icon on the Roblox window and taskbar button instead of the Roblox icon..
+        /// </summary>
+        public static string Menu_Behaviour_UseGameIconForRobloxWindow_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.UseGameIconForRobloxWindow.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Allow.
+        /// </summary>
+        public static string Menu_Behaviour_Matchmaker_Datacenters_AllowColumn {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Matchmaker.Datacenters.AllowColumn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Datacenter.
+        /// </summary>
+        public static string Menu_Behaviour_Matchmaker_Datacenters_DatacenterColumn {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Matchmaker.Datacenters.DatacenterColumn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Est. latency.
+        /// </summary>
+        public static string Menu_Behaviour_Matchmaker_Datacenters_LatencyColumn {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Matchmaker.Datacenters.LatencyColumn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Join API.
+        /// </summary>
+        public static string Menu_Behaviour_Matchmaker_JoinApi_Title {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Matchmaker.JoinApi.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Which Roblox join endpoint the matchmaker uses to resolve server locations..
+        /// </summary>
+        public static string Menu_Behaviour_Matchmaker_JoinApi_Description {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.Matchmaker.JoinApi.Description", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Save named cursor sets you can switch between, and import or export them to share..
+        /// </summary>
+        public static string Menu_Mods_Misc_CursorSetManager_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.CursorSetManager.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom cursor set manager.
+        /// </summary>
+        public static string Menu_Mods_Misc_CursorSetManager_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.CursorSetManager.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Replaces the death sound with your own audio file..
+        /// </summary>
+        public static string Menu_Mods_Misc_CustomDeathSound_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.CustomDeathSound.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom death sound.
+        /// </summary>
+        public static string Menu_Mods_Misc_CustomDeathSound_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.CustomDeathSound.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Replace Roblox's default skybox with your own image(s)..
+        /// </summary>
+        public static string Menu_Mods_Misc_Skybox_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.Skybox.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Skybox manager.
+        /// </summary>
+        public static string Menu_Mods_Misc_Skybox_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Misc.Skybox.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Keep several mods as separate, independently toggled packages instead of one flat folder. Drag a card to change apply order, or drop files here to create a new mod..
+        /// </summary>
+        public static string Menu_Mods_ModManagement_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.ModManagement.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Management.
+        /// </summary>
+        public static string Menu_Mods_ModManagement_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.ModManagement.Title", resourceCulture);
+            }
+        }
+
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Customize the background shown behind the Roblox homepage. This is unrelated to the in-game crosshair overlay found on the Overlays page..
+        /// </summary>
+        public static string Menu_Mods_Overlays_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Homepage Background.
+        /// </summary>
+        public static string Menu_Mods_Overlays_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Turns the homepage background customization on or off..
+        /// </summary>
+        public static string Menu_Mods_Overlays_Enable_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.Enable.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable homepage background.
+        /// </summary>
+        public static string Menu_Mods_Overlays_Enable_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.Enable.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a solid color or gradient to show behind the Roblox homepage..
+        /// </summary>
+        public static string Menu_Mods_Overlays_HomepageBackground_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.HomepageBackground.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Background style.
+        /// </summary>
+        public static string Menu_Mods_Overlays_HomepageBackground_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Overlays.HomepageBackground.Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose whether your mods are applied to the Roblox player, Roblox Studio, or both..
+        /// </summary>
+        public static string Menu_Mods_Presets_ModApplyTarget_Description {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Presets.ModApplyTarget.Description", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Apply mods to.
+        /// </summary>
+        public static string Menu_Mods_Presets_ModApplyTarget_Title {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Presets.ModApplyTarget.Title", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mod Management.
+        /// </summary>
+        public static string Menu_Mods_Tabs_ModManagement {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Tabs.ModManagement", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Overlays.
+        /// </summary>
+        public static string Menu_Mods_Tabs_Overlays {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Tabs.Overlays", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset Mod.
+        /// </summary>
+        public static string Menu_Mods_Tabs_PresetMod {
+            get {
+                return ResourceManager.GetString("Menu.Mods.Tabs.PresetMod", resourceCulture);
+            }
+        }
 
 
     }
