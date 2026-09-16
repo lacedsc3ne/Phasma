@@ -313,47 +313,45 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             if (e.EditingElement is not TextBox textbox)
                 return;
 
-            switch (e.Column.Header)
+            string? header = e.Column.Header as string;
+
+            if (header == Strings.Common_Name)
             {
-                case "Name":
-                    string oldName = entry.Name;
-                    string newName = textbox.Text;
+                string oldName = entry.Name;
+                string newName = textbox.Text;
 
-                    if (newName == oldName)
-                        return;
+                if (newName == oldName)
+                    return;
 
-                    if (App.FastFlags.GetValue(newName) is not null)
-                    {
-                        Frontend.ShowMessageBox(Strings.Menu_FastFlagEditor_AlreadyExists, MessageBoxImage.Information);
-                        e.Cancel = true;
-                        textbox.Text = oldName;
-                        return;
-                    }
+                if (App.FastFlags.GetValue(newName) is not null)
+                {
+                    Frontend.ShowMessageBox(Strings.Menu_FastFlagEditor_AlreadyExists, MessageBoxImage.Information);
+                    e.Cancel = true;
+                    textbox.Text = oldName;
+                    return;
+                }
 
-                    App.FastFlags.SetValue(oldName, null);
-                    App.FastFlags.SetValue(newName, entry.Value);
+                App.FastFlags.SetValue(oldName, null);
+                App.FastFlags.SetValue(newName, entry.Value);
 
-                    if (!newName.Contains(_searchFilter))
-                        ClearSearch();
+                if (!newName.Contains(_searchFilter))
+                    ClearSearch();
 
-                    entry.Name = newName;
+                entry.Name = newName;
+            }
+            else if (header == Strings.Common_Value)
+            {
+                string oldValue = entry.Value;
+                string newValue = textbox.Text;
 
-                    break;
+                if (!ValidateFlagEntry(entry.Name, newValue))
+                {
+                    e.Cancel = true;
+                    textbox.Text = oldValue;
+                    return;
+                }
 
-                case "Value":
-                    string oldValue = entry.Value;
-                    string newValue = textbox.Text;
-
-                    if (!ValidateFlagEntry(entry.Name, newValue))
-                    {
-                        e.Cancel = true;
-                        textbox.Text = oldValue;
-                        return;
-                    }
-
-                    App.FastFlags.SetValue(entry.Name, newValue);
-
-                    break;
+                App.FastFlags.SetValue(entry.Name, newValue);
             }
         }
 
