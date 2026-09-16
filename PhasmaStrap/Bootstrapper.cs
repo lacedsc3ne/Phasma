@@ -721,26 +721,24 @@ namespace PhasmaStrap
         // ClientAppSettings.json in the version folder, if the resolved place has one assigned. Runs after
         // ApplyModifications() has already copied the global flag set in, and before StartRoblox() - so this
         // only ever adjusts what's on disk in _latestVersionDirectory, never the user's global mod-folder flags.
+        //
+        // That version-folder file is a SINGLE file shared by every launch of this Roblox version, not
+        // something scoped per-session - and ApplyModifications() only resets it to the global baseline
+        // when UseFastFlagManager is on (it skips touching ClientAppSettings.json entirely when that's
+        // off). So a profile's flags added here for one place would otherwise sit there forever and leak
+        // into every later launch, including places with no profile assigned at all. To stay scoped
+        // correctly regardless of that setting, every run first strips out every flag name that belongs
+        // to ANY known profile, then re-adds only the flags for the place actually being launched into.
         private async Task TryApplyFastFlagProfileAsync(long? placeId)
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagProfileAsync";
 
-            // NOT gated on UseFastFlagManager - that toggle only controls whether the GLOBAL mod-folder
-            // ClientAppSettings.json gets copied in (see ApplyModifications). FastFlag Profiles write
-            // their own overrides on top regardless, so a place assignment should still apply even if
-            // the user never turned on the unrelated global Engine Settings/FastFlags feature - it used
-            // to silently no-op here with no indication anywhere on the Profiles page why.
-            if (placeId is null)
+            Dictionary<string, Dictionary<string, object>> allProfiles = App.Settings.Prop.FastFlagProfiles;
+            if (allProfiles.Count == 0)
                 return;
 
             try
             {
-                if (!App.Settings.Prop.FastFlagPlaceProfiles.TryGetValue(placeId.Value.ToString(), out string? profileName) || string.IsNullOrEmpty(profileName))
-                    return;
-
-                if (!App.Settings.Prop.FastFlagProfiles.TryGetValue(profileName, out Dictionary<string, object>? overrides) || overrides.Count == 0)
-                    return;
-
                 string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
 
                 Dictionary<string, object> flags = new();
@@ -752,15 +750,40 @@ namespace PhasmaStrap
                         flags = JsonSerializer.Deserialize<Dictionary<string, object>>(existing) ?? new();
                 }
 
-                foreach (var (flag, value) in overrides)
-                    flags[flag] = value;
+                int removed = 0;
+                foreach (string flagName in allProfiles.Values.SelectMany(p => p.Keys).Distinct())
+                {
+                    if (flags.Remove(flagName))
+                        removed++;
+                }
+
+                string? profileName = null;
+                int added = 0;
+
+                if (placeId is not null
+                    && App.Settings.Prop.FastFlagPlaceProfiles.TryGetValue(placeId.Value.ToString(), out profileName)
+                    && !string.IsNullOrEmpty(profileName)
+                    && allProfiles.TryGetValue(profileName, out Dictionary<string, object>? overrides)
+                    && overrides.Count > 0)
+                {
+                    foreach (var (flag, value) in overrides)
+                        flags[flag] = value;
+
+                    added = overrides.Count;
+                }
+
+                if (removed == 0 && added == 0)
+                    return;
 
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
                 Filesystem.AssertReadOnly(filePath);
                 await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true }));
                 Filesystem.AssertReadOnly(filePath);
 
-                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag profile '{profileName}' ({overrides.Count} override(s)) for place {placeId}");
+                if (added > 0)
+                    App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag profile '{profileName}' ({added} override(s)) for place {placeId}, cleared {removed} leftover flag(s) from other profiles");
+                else
+                    App.Logger.WriteLine(LOG_IDENT, $"No profile assigned to place {placeId?.ToString() ?? "unknown"}, cleared {removed} leftover flag(s) from other profiles");
             }
             catch (Exception ex)
             {
