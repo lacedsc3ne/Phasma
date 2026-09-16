@@ -12,6 +12,9 @@
       d:DesignHeight="1080" d:DesignWidth="800"
       Title="IntegrationsPage"
       Scrollable="True">
+    <ui:UiPage.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:UiPage.Resources>
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -108,19 +111,29 @@
                                 <ui:Button Grid.Column="1" Content="Preview" Appearance="Secondary" Command="{Binding CyclePreviewCommand, Mode=OneTime}" />
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding HasPreviewData, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <Border Width="52" Height="52" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}">
-                                    <Image Source="{Binding RobloxIconSource, Mode=OneTime}" Width="34" Height="34" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    <Image Source="{Binding PreviewIconUrl, IsAsync=True}" Width="52" Height="52" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
                                 </Border>
                                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                                     <TextBlock Text="Roblox" FontWeight="SemiBold" />
                                     <TextBlock Text="{Binding PreviewGame, Mode=OneWay}" FontSize="13" />
-                                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                        <Run Text="by " /><Run Text="{Binding PreviewCreator, Mode=OneWay}" /><Run Text=". | Public server" />
-                                    </TextBlock>
-                                    <TextBlock Text="{Binding PreviewElapsed, Mode=OneWay}" FontSize="12" Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                    <TextBlock Text="{Binding PreviewStateText, Mode=OneWay}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
                             </StackPanel>
+
+                            <TextBlock Margin="0,10,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="No games played yet - play something through PhasmaStrap to preview a real card here.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasPreviewData}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </StackPanel>
                     </ui:Card>
 
