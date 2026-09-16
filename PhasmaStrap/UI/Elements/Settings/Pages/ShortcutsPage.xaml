@@ -77,8 +77,8 @@
             </controls:OptionControl>
         </Grid>
 
-        <TextBlock Text="Studio companion" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock Text="Installs a Roblox Studio plugin that reports what you're working on back to PhasmaStrap." Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Shortcuts_StudioCompanion_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Shortcuts_StudioCompanion_Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <controls:OptionControl Header="Enable Studio companion" Description="{Binding StudioPluginStatus, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">
@@ -91,8 +91,8 @@
             <ui:ToggleSwitch IsChecked="{Binding StudioRichPresenceEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Game shortcuts" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Create a desktop shortcut that launches straight into one specific game, using that game's own icon. Enter a place ID or a roblox.com/games/... link." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Shortcuts_GameShortcuts_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Shortcuts_GameShortcuts_Description}" />
 
         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
             <ui:TextBox Width="260" PlaceholderText="Place ID or game link" Text="{Binding GameShortcutInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

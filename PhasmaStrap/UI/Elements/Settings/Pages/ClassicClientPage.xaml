@@ -45,9 +45,15 @@
             <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                        Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_Description}" />
 
+            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_EngineData_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_EngineData_Description}" />
+
             <ui:Button Margin="0,8,0,0" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_ClassicClient_InstallEngineDataPack}"
                        HorizontalAlignment="Stretch" IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
                        Command="{Binding InstallEngineCommand}" />
+
+            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_InstallUpdate_Title}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_InstallUpdate_Description}" />
 
             <Grid Margin="0,8,0,0">
                 <Grid.ColumnDefinitions>

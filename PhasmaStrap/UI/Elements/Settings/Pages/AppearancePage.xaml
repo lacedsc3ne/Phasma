@@ -51,6 +51,9 @@
             <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Common_Edit}" HorizontalAlignment="Stretch" Command="{Binding EditColorThemeCommand}" />
         </Grid>
 
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Title}"
             Description="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Description}">
@@ -209,9 +212,12 @@
             </Grid>
         </ui:CardExpander>
 
-        <controls:OptionControl 
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_IconSection_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_IconSection_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+        <controls:OptionControl
             x:Name="IconSelector"
-            Header="{x:Static resources:Strings.Menu_Appearance_Icon_Title}" 
+            Header="{x:Static resources:Strings.Menu_Appearance_Icon_Title}"
             Description="{x:Static resources:Strings.Menu_Appearance_Icon_Description}">
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding Icons, Mode=OneWay}" SelectedValuePath="IconType" SelectedValue="{Binding Icon, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>

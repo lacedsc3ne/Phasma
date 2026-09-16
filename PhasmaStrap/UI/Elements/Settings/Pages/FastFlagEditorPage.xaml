@@ -18,6 +18,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -26,7 +28,9 @@
 
         <ui:InfoBar Grid.Row="2" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_FastFlagEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_FastFlagEditor_BannerText}" Severity="Warning" IsClosable="False" />
 
-        <WrapPanel Grid.Row="3" Orientation="Horizontal">
+        <TextBlock Grid.Row="3" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Actions_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+
+        <WrapPanel Grid.Row="4" Orientation="Horizontal">
             <ui:Button Icon="ArrowLeft48" Content="{x:Static resources:Strings.Menu_FastFlagEditor_Back}" Click="BackButton_Click" Margin="0,0,12,16" />
             <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_FastFlagEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,16" />
             <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_FastFlagEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger"  Margin="0,0,12,16">
@@ -45,9 +49,11 @@
             <ui:Button Icon="Search24" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SearchDatabase}" Click="SearchDatabaseButton_Click" Margin="0,0,12,16" />
         </WrapPanel>
 
-        <ui:TextBox x:Name="SearchTextBox" Grid.Row="4" Margin="0,0,0,16" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />
+        <TextBlock Grid.Row="5" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Flags_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
 
-        <DataGrid Name="DataGrid" Grid.Row="5" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+        <ui:TextBox x:Name="SearchTextBox" Grid.Row="6" Margin="0,0,0,16" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />
+
+        <DataGrid Name="DataGrid" Grid.Row="7" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
             <DataGrid.Style>
                 <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                     <Setter Property="Background" Value="Transparent" />

@@ -204,16 +204,6 @@
             <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding GrassMovementOptions}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding SelectedGrassMovementFactor, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_IGMenuVersion_Title}">
-            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding IGMenuVersions.Keys, Mode=OneTime}" Text="{Binding SelectedIGMenuVersion, Mode=TwoWay}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </controls:OptionControl>
-
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_LightingMode_Title}">
             <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding LightingModes.Keys, Mode=OneTime}" Text="{Binding SelectedLightingMode, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -222,10 +212,6 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FullscreenTitlebarDelay_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FullscreenTitlebarDelay_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding FullscreenTitlebarDisabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_TextureSkipping_Title}">
@@ -258,16 +244,6 @@
             </ComboBox>
         </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RomarkStartGraphic_Title}">
-            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding RomarkStartMappings.Keys, Mode=OneTime}" Text="{Binding SelectedRomarkStart, Mode=TwoWay}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </controls:OptionControl>
-
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Title}">
             <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
@@ -280,10 +256,6 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisablePostFX_Title}">
             <ui:ToggleSwitch IsChecked="{Binding DisablePostFX, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_AvoidTaskSchedulerSleep_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_AvoidTaskSchedulerSleep_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding TaskSchedulerAvoidingSleep, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisablePlayerShadows_Title}">
@@ -300,10 +272,6 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_WhiteSky_Title}">
             <ui:ToggleSwitch IsChecked="{Binding WhiteSky, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RedFontDebugHighlight_Title}">
-            <ui:ToggleSwitch IsChecked="{Binding RedFont, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableLayeredClothing_Title}">
@@ -324,14 +292,6 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_BypassVulkan_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_BypassVulkan_Description}">
             <ui:TextBox Width="220" Text="{Binding BypassVulkan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChromeUI_Title}">
-            <ui:ToggleSwitch IsChecked="{Binding ChromeUI, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding OldChromeUI, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ShaderGlintLevel_Title}">
@@ -376,26 +336,6 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FramerateLimitFFlag_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FramerateLimitFFlag_Description}">
             <ui:NumberBox Width="140" Min="0" Max="2000" Value="{Binding FramerateLimit, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_Pseudolocalization_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_Pseudolocalization_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding Pseudolocalization, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisplayFpsFFlag_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisplayFpsFFlag_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding DisplayFps, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_GrayAvatarThumbnails_Title}">
-            <ui:ToggleSwitch IsChecked="{Binding GrayAvatar, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_UIFontSizePadding_Title}">
-            <ui:NumberBox Width="140" Min="1" Max="20" Value="{Binding FontSize, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Description}">
-            <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding HideGUI, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
@@ -532,6 +472,66 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MinimumCPUCoreThreadCount_Title}">
             <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="140" ItemsSource="{Binding CpuCoreMinThreadCount.Keys, Mode=OneTime}" Text="{Binding SelectedCpuCoreMinThreadCount, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_IGMenuVersion_Title}">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding IGMenuVersions.Keys, Mode=OneTime}" Text="{Binding SelectedIGMenuVersion, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FullscreenTitlebarDelay_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FullscreenTitlebarDelay_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding FullscreenTitlebarDisabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RomarkStartGraphic_Title}">
+            <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding RomarkStartMappings.Keys, Mode=OneTime}" Text="{Binding SelectedRomarkStart, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RedFontDebugHighlight_Title}">
+            <ui:ToggleSwitch IsChecked="{Binding RedFont, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChromeUI_Title}">
+            <ui:ToggleSwitch IsChecked="{Binding ChromeUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding OldChromeUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_Pseudolocalization_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_Pseudolocalization_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding Pseudolocalization, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisplayFpsFFlag_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisplayFpsFFlag_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding DisplayFps, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_GrayAvatarThumbnails_Title}">
+            <ui:ToggleSwitch IsChecked="{Binding GrayAvatar, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_UIFontSizePadding_Title}">
+            <ui:NumberBox Width="140" Min="1" Max="20" Value="{Binding FontSize, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Description}">
+            <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding HideGUI, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_AvoidTaskSchedulerSleep_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_AvoidTaskSchedulerSleep_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding TaskSchedulerAvoidingSleep, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <controls:OptionControl

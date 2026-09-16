@@ -17,7 +17,10 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Margin="0,0,0,8" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl 
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Description}" />
+
+        <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_Behaviour_AutoUpdate_Title}"
             Description="{x:Static resources:Strings.Menu_Behaviour_AutoUpdate_Description}">
             <ui:ToggleSwitch IsChecked="{Binding UpdateCheckingEnabled, Mode=TwoWay}" />
@@ -35,6 +38,9 @@
             <ui:ToggleSwitch IsChecked="{Binding MinimizeToTrayOnCloseEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Privacy_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Privacy_Description}" />
+
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_PhasmaStrap_Analytics_Title}"
             Description="{Binding Source={x:Static resources:Strings.Menu_PhasmaStrap_Analytics_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/info/privacy-policy/'}">
@@ -44,10 +50,13 @@
         <!-- This does not need i18n as this is locked behind "Developer Mode" -->
         <controls:OptionControl
             Visibility="{Binding Path=WebEnvironmentVisibility, Mode=OneTime}"
-            Header="Web environment" 
+            Header="Web environment"
             Description="Site to use for metrics">
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding WebEnvironments, Mode=OneWay}" SelectedValue="{Binding WebEnvironment, Mode=TwoWay}" />
         </controls:OptionControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Description}" />
 
         <ui:CardExpander Margin="0,8,0,0" IsExpanded="True">
             <ui:CardExpander.Header>
