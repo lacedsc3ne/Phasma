@@ -69,21 +69,6 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- Advanced: cache/CPU/memory tuning already lives on the Performance page in
-                 PhasmaStrap (Cleanup + Runtime optimizer sections), so this tab points there
-                 instead of duplicating the same toggles under a second binding path. -->
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="WrenchScrewdriver20" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Tab_Advanced}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel Margin="0,12,0,0">
-                    <ui:InfoBar Padding="8" IsClosable="False" IsOpen="True" Severity="Informational" Message="{x:Static resources:Strings.Menu_Behaviour_Advanced_Description}" />
-                </StackPanel>
-            </TabItem>
-
             <!-- Matchmaker: PhasmaStrap's own auto server-picker, moved here from the Server
                  Browser page to match Voidstrap's grouping - see BehaviourViewModel.Matchmaker,
                  which reuses ServerBrowserViewModel instead of duplicating this logic. The
