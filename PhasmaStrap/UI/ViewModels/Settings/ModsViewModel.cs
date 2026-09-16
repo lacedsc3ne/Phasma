@@ -14,6 +14,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using PhasmaStrap.Models.SettingTasks;
 using PhasmaStrap.AppData;
+using PhasmaStrap.Integrations;
 using PhasmaStrap.UI.Elements.Dialogs;
 using PhasmaStrap.Utility;
 
@@ -904,6 +905,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         #endregion
 
+        // Homepage background is still preview-only, not a live overlay - see the doc comments
+        // on HomepageBackgroundPreviewWindow and Integrations.Overlays.OverlayCompositor for why.
         #region Overlays - homepage background
 
         public bool HomepageBackgroundEnabled
@@ -958,21 +961,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public string HomepageBackgroundOverlayGradientAngleDisplay => $"{HomepageBackgroundOverlayGradientAngle:0}°";
 
-        private static Color ParseColorOrDefault(string hex, Color fallback)
-        {
-            try
-            {
-                return (Color)ColorConverter.ConvertFromString(hex)!;
-            }
-            catch
-            {
-                return fallback;
-            }
-        }
-
         private void PickHomepageBackgroundColor()
         {
-            var current = ParseColorOrDefault(HomepageBackgroundOverlayColor, Colors.Black);
+            var current = HomepageBackgroundRenderer.ParseColorOrDefault(HomepageBackgroundOverlayColor, Colors.Black);
 
             using var dialog = new System.Windows.Forms.ColorDialog
             {
@@ -988,7 +979,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void PickHomepageBackgroundGradientColor()
         {
-            var current = ParseColorOrDefault(HomepageBackgroundOverlayGradientColor, Colors.Black);
+            var current = HomepageBackgroundRenderer.ParseColorOrDefault(HomepageBackgroundOverlayGradientColor, Colors.Black);
 
             using var dialog = new System.Windows.Forms.ColorDialog
             {
@@ -1004,8 +995,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void PreviewHomepageBackground()
         {
-            var solid = ParseColorOrDefault(HomepageBackgroundOverlayColor, Colors.Black);
-            var gradient = ParseColorOrDefault(HomepageBackgroundOverlayGradientColor, Colors.DarkBlue);
+            var solid = HomepageBackgroundRenderer.ParseColorOrDefault(HomepageBackgroundOverlayColor, Colors.Black);
+            var gradient = HomepageBackgroundRenderer.ParseColorOrDefault(HomepageBackgroundOverlayGradientColor, Colors.DarkBlue);
 
             new HomepageBackgroundPreviewWindow(SelectedHomepageBackgroundMode, solid, gradient, HomepageBackgroundOverlayGradientAngle).Show();
         }
