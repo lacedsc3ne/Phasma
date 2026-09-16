@@ -9,7 +9,10 @@
       Title="NetworkingPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <controls:OptionControl Header="Enable local proxy" Description="{Binding StatusText, Mode=OneWay}">
+        <TextBlock Text="Networking" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Local proxy, certificate trust, presence spoofing, and other network-level tweaks for the Roblox client." />
+
+        <controls:OptionControl Margin="0,16,0,0" Header="Enable local proxy" Description="{Binding StatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
@@ -52,20 +55,31 @@
         <controls:OptionControl Header="Enable AssetWarp" Description="{Binding AssetWarpStatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding AssetWarpEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
-        <controls:OptionControl Header="Block textures">
-            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllTextures, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="Block decals">
-            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllDecals, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="Block images">
-            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllImages, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="Block animations">
-            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllAnimations, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="Block meshes">
-            <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllMeshes, Mode=TwoWay}" />
-        </controls:OptionControl>
+
+        <ui:CardExpander Margin="0,8,0,0">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Blocked asset types" />
+                    <TextBlock FontSize="12" Text="Choose which asset categories AssetWarp removes from the batch resolution request." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="Block textures">
+                    <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllTextures, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="Block decals">
+                    <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllDecals, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="Block images">
+                    <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllImages, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="Block animations">
+                    <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllAnimations, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="Block meshes">
+                    <ui:ToggleSwitch IsChecked="{Binding AssetWarpDisableAllMeshes, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
     </StackPanel>
 </ui:UiPage>

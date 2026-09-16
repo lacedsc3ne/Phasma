@@ -10,28 +10,37 @@
       Title="PerformancePage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="System-level tweaks and direct Roblox game settings." FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="Performance" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="System-level tweaks and direct Roblox game settings." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <TextBlock Text="System" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <ui:CardExpander Margin="0,16,0,0" Icon="Wrench24" IsExpanded="True">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="System" />
+                    <TextBlock FontSize="12" Text="Bootstrapper-level tweaks that don't touch Roblox itself." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="CPU core limit" Description="Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
+                    </StackPanel>
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="CPU core limit" Description="Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
+                <controls:OptionControl Header="Fake exclusive fullscreen" Description="Strips the Roblox window's border and resizes it to exactly cover its monitor for lower input latency than Roblox's own windowed fullscreen.">
+                    <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="Duck Roblox audio when unfocused" Description="Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.">
+                    <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="Headset loudness" Description="Boosts quiet sounds (footsteps, distant cues) without letting loud moments blow out your ears.">
+                    <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Fake exclusive fullscreen" Description="Strips the Roblox window's border and resizes it to exactly cover its monitor for lower input latency than Roblox's own windowed fullscreen.">
-            <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Duck Roblox audio when unfocused" Description="Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.">
-            <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Headset loudness" Description="Boosts quiet sounds (footsteps, distant cues) without letting loud moments blow out your ears.">
-            <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+        </ui:CardExpander>
 
         <TextBlock Text="Anti-Aliasing" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -61,158 +70,215 @@
         <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="Schedule">
-            <ComboBox Width="160" ItemsSource="{Binding CleanerScheduleOptions, Mode=OneTime}" SelectedItem="{Binding CleanerSchedule, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Broom24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="What to clean" />
+                    <TextBlock FontSize="12" Text="Choose a schedule, then pick which caches and logs it applies to." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="Schedule">
+                    <ComboBox Width="160" ItemsSource="{Binding CleanerScheduleOptions, Mode=OneTime}" SelectedItem="{Binding CleanerSchedule, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="PhasmaStrap logs">
-            <ui:ToggleSwitch IsChecked="{Binding CleanerLogsEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="PhasmaStrap logs">
+                    <ui:ToggleSwitch IsChecked="{Binding CleanerLogsEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="PhasmaStrap download cache">
-            <ui:ToggleSwitch IsChecked="{Binding CleanerCacheEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="PhasmaStrap download cache">
+                    <ui:ToggleSwitch IsChecked="{Binding CleanerCacheEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="Roblox logs">
-            <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxLogsEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="Roblox logs">
+                    <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxLogsEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="Roblox cache">
-            <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="Roblox cache">
+                    <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_RuntimeOptimizer_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_EnginePreset_Title}" Description="{x:Static resources:Strings.Menu_Performance_EnginePreset_Description}">
-            <ComboBox Padding="10,5,10,5" MinWidth="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Gauge24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Engine &amp; process" />
+                    <TextBlock FontSize="12" Text="Which optimization preset runs and how Roblox itself behaves while playing." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_EnginePreset_Title}" Description="{x:Static resources:Strings.Menu_Performance_EnginePreset_Description}">
+                    <ComboBox Padding="10,5,10,5" MinWidth="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Title}" Description="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding OptimizeRoblox, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Title}" Description="{x:Static resources:Strings.Menu_Performance_OptimizeRoblox_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding OptimizeRoblox, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding RobloxEfficiencyMode, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxEfficiencyMode_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding RobloxEfficiencyMode, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Title}" Description="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ReduceMemoryOutOfFocus, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Title}" Description="{x:Static resources:Strings.Menu_Performance_ReduceMemoryOutOfFocus_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding ReduceMemoryOutOfFocus, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CpuPriority_Title}" Description="{x:Static resources:Strings.Menu_Performance_CpuPriority_Description}">
-            <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding CpuPriorityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedCpuPriority, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Options24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Priority &amp; memory" />
+                    <TextBlock FontSize="12" Text="How CPU priority and memory usage are managed for Roblox and the launcher." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CpuPriority_Title}" Description="{x:Static resources:Strings.Menu_Performance_CpuPriority_Description}">
+                    <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding CpuPriorityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedCpuPriority, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Description}">
-            <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding RobloxPriorityLimitOptions, Mode=OneTime}" SelectedItem="{Binding RobloxPriorityLimit, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Title}" Description="{x:Static resources:Strings.Menu_Performance_RobloxPriorityLimit_Description}">
+                    <ComboBox Padding="10,5,10,5" MinWidth="140" ItemsSource="{Binding RobloxPriorityLimitOptions, Mode=OneTime}" SelectedItem="{Binding RobloxPriorityLimit, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Title}" Description="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding LauncherMemoryManagerEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Title}" Description="{x:Static resources:Strings.Menu_Performance_LauncherMemoryManager_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding LauncherMemoryManagerEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Title}" Description="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding SoftwareRenderingEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Title}" Description="{x:Static resources:Strings.Menu_Performance_SoftwareRendering_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding SoftwareRenderingEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Header}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Description}" />
+        <ui:CardExpander Margin="0,8,0,0" Icon="Games24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Header}" />
+                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Title}" FontSize="12" FontWeight="Medium" />
+                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Description}" />
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_PlaceholderText}" Text="{Binding EngineExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineExcludedPlaceCommand, Mode=OneTime}" />
+                </StackPanel>
+                <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineExcludedPlaces, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                                    <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Title}" FontSize="12" FontWeight="Medium" Margin="0,8,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Description}" />
-        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_PlaceholderText}" Text="{Binding EngineExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineExcludedPlaceCommand, Mode=OneTime}" />
-        </StackPanel>
-        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineExcludedPlaces, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
-                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Title}" FontSize="12" FontWeight="Medium" Margin="0,12,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Description}" />
-        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-            <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineAssignments_PlaceholderText}" Text="{Binding EngineAssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ComboBox Width="150" Margin="8,0,0,0" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" SelectedItem="{Binding EngineAssignPresetName, Mode=TwoWay}" />
-            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineProfileAssignmentCommand, Mode=OneTime}" />
-        </StackPanel>
-        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineProfileAssignments, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
-                            <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineProfileAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Title}" FontSize="12" FontWeight="Medium" Margin="0,12,0,0" />
+                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Description}" />
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineAssignments_PlaceholderText}" Text="{Binding EngineAssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox Width="150" Margin="8,0,0,0" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" SelectedItem="{Binding EngineAssignPresetName, Mode=TwoWay}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineProfileAssignmentCommand, Mode=OneTime}" />
+                </StackPanel>
+                <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineProfileAssignments, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                                    <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineProfileAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ui:CardExpander>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_SystemBoost_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_SystemBoost_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ForceHighPerformanceGpu, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Rocket24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Boost options" />
+                    <TextBlock FontSize="12" Text="GPU, timer, and power plan tweaks applied at the OS level while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding ForceHighPerformanceGpu, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Title}" Description="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding DisableGameDVR, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Title}" Description="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding DisableGameDVR, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding BoostTimerResolution, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding BoostTimerResolution, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Title}" Description="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding UseHighPerformancePowerPlan, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Title}" Description="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding UseHighPerformancePowerPlan, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_CleanRam_Description}">
-            <ui:Button Content="{x:Static resources:Strings.Menu_Performance_CleanRam_Button}" Icon="Broom28" Command="{Binding CleanRamCommand, Mode=OneTime}" />
-        </controls:OptionControl>
-        <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding CleanRamStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_CleanRam_Description}">
+                    <ui:Button Content="{x:Static resources:Strings.Menu_Performance_CleanRam_Button}" Icon="Broom28" Command="{Binding CleanRamCommand, Mode=OneTime}" />
+                </controls:OptionControl>
+                <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding CleanRamStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding AutoCleanRam, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding AutoCleanRam, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ForceInGameResolution, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Desktop24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Resolution" />
+                    <TextBlock FontSize="12" Text="Force a specific in-game resolution on a chosen monitor." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding ForceInGameResolution, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Description}">
-            <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding MonitorOptions, Mode=OneTime}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding SelectedMonitor, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Description}">
+                    <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding MonitorOptions, Mode=OneTime}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding SelectedMonitor, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Description}">
-            <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding ModeOptions, Mode=OneWay}" SelectedItem="{Binding SelectedMode, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Description}">
+                    <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding ModeOptions, Mode=OneWay}" SelectedItem="{Binding SelectedMode, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Title}" Description="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Description}">
-            <Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Command="{Binding IdentifyDisplaysCommand}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Title}" Description="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Description}">
+                    <Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Command="{Binding IdentifyDisplaysCommand}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
     </StackPanel>
 </ui:UiPage>

@@ -8,7 +8,10 @@
       Title="ExtensionsPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Rojo" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="Extensions" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Manage Rojo and locate third-party tools to launch alongside Roblox." />
+
+        <TextBlock Text="Rojo" FontSize="16" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Syncs external files into Roblox Studio for development. Unlike the tools below, PhasmaStrap downloads and manages Rojo itself." />
 
         <Border Margin="0,12,0,0" Padding="14" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlElevationBorderBrush}" BorderThickness="1" DataContext="{Binding Rojo}">
@@ -33,7 +36,7 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Text="Other Extensions" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
+        <TextBlock Text="Other Extensions" FontSize="16" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock Text="Locate and launch third-party tools alongside Roblox. PhasmaStrap doesn't bundle or download these - point it at an existing install." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <ItemsControl Margin="0,16,0,0" ItemsSource="{Binding Extensions}">

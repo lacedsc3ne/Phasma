@@ -27,12 +27,12 @@
             </StackPanel>
         </controls:OptionControl>
 
-        <TextBlock Margin="0,8,0,0" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Margin="0,12,0,0" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Servers, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="0,0,0,4" Padding="12,8" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                    <ui:Card Margin="0,0,0,6" Padding="12,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -45,7 +45,7 @@
                             <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="8,0" Text="{Binding PingText}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <ui:Button Grid.Column="3" Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Appearance="Primary" Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                         </Grid>
-                    </Border>
+                    </ui:Card>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

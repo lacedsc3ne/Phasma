@@ -10,141 +10,199 @@
       Title="RiShadePage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Description}" TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Enable_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Enable_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding RiShadeEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,16,0,0" Icon="Options24" IsExpanded="True">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="General" />
+                    <TextBlock FontSize="12" Text="Turn RiShade on and choose which preset it renders with." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Enable_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Enable_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding RiShadeEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Preset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Preset_Description}">
-            <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresetNames, Mode=OneTime}" Text="{Binding SelectedPreset, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Preset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Preset_Description}">
+                    <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresetNames, Mode=OneTime}" Text="{Binding SelectedPreset, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Description}">
-            <StackPanel Orientation="Horizontal">
-                <ui:Button Icon="ArrowExportRtl24" Content="{x:Static resources:Strings.Menu_RiShade_ExportPreset}" Command="{Binding ExportPresetCommand}" Margin="0,0,8,0" />
-                <ui:Button Icon="DocumentArrowUp16" Content="{x:Static resources:Strings.Menu_RiShade_ImportPreset}" Command="{Binding ImportPresetCommand}" />
-            </StackPanel>
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Description}">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:Button Icon="ArrowExportRtl24" Content="{x:Static resources:Strings.Menu_RiShade_ExportPreset}" Command="{Binding ExportPresetCommand}" Margin="0,0,8,0" />
+                        <ui:Button Icon="DocumentArrowUp16" Content="{x:Static resources:Strings.Menu_RiShade_ImportPreset}" Command="{Binding ImportPresetCommand}" />
+                    </StackPanel>
+                </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_RenderScale_Title}" Description="{x:Static resources:Strings.Menu_RiShade_RenderScale_Description}">
-            <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding RenderScaleNames, Mode=OneTime}" SelectedIndex="{Binding RenderScaleIndex, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_RenderScale_Title}" Description="{x:Static resources:Strings.Menu_RiShade_RenderScale_Description}">
+                    <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding RenderScaleNames, Mode=OneTime}" SelectedIndex="{Binding RenderScaleIndex, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_ColorGrade}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Brightness}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="-0.3" Maximum="0.3" Value="{Binding Brightness, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Brightness, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Gamma}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding Gamma, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Gamma, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_HueShift}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="-180" Maximum="180" Value="{Binding HueShift, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding HueShift, Mode=OneWay, StringFormat={}{0:0}}" />
-            </StackPanel>
-        </controls:OptionControl>
+        <TextBlock Text="Color &amp; tone" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Tonemap}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapOperator}">
-            <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding TonemapNames, Mode=OneTime}" SelectedIndex="{Binding TonemapMode, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapExposure}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0.2" Maximum="3.0" Value="{Binding TonemapExposure, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TonemapExposure, Mode=OneWay, StringFormat={}{0:0.00}}" />
+        <ui:CardExpander Margin="0,8,0,0" Icon="Color24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_ColorGrade}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Brightness}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="-0.3" Maximum="0.3" Value="{Binding Brightness, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Brightness, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Gamma}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding Gamma, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Gamma, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_HueShift}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="-180" Maximum="180" Value="{Binding HueShift, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding HueShift, Mode=OneWay, StringFormat={}{0:0}}" />
+                    </StackPanel>
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
+        </ui:CardExpander>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Vignette}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding VignetteStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding VignetteStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="WeatherSunny24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Tonemap}" />
+                    <TextBlock FontSize="12" Text="Tonemapping and edge vignette." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapOperator}">
+                    <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding TonemapNames, Mode=OneTime}" SelectedIndex="{Binding TonemapMode, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapExposure}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0.2" Maximum="3.0" Value="{Binding TonemapExposure, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TonemapExposure, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Sharpen}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding SharpenStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SharpenStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Vignette}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding VignetteStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding VignetteStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
+        </ui:CardExpander>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Bloom}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding BloomStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_BloomThreshold}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding BloomThreshold, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomThreshold, Mode=OneWay, StringFormat={}{0:0.00}}" />
-            </StackPanel>
-        </controls:OptionControl>
+        <TextBlock Text="Effects" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_ChromaticAberration}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="0.02" Value="{Binding ChromaStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ChromaStrength, Mode=OneWay, StringFormat={}{0:0.000}}" />
-            </StackPanel>
-        </controls:OptionControl>
+        <ui:CardExpander Margin="0,8,0,0" Icon="Sparkle24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Sharpen}" />
+                    <TextBlock FontSize="12" Text="Edge sharpening and glow bloom." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding SharpenStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SharpenStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_FilmGrain}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
-            <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="0.3" Value="{Binding GrainStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GrainStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Bloom}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding BloomStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_BloomThreshold}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding BloomThreshold, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomThreshold, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
+        </ui:CardExpander>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_DetailAndGlow}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Clarity}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding ClarityStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ClarityStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+        <ui:CardExpander Margin="0,8,0,0" Icon="PhotoFilter24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_ChromaticAberration}" />
+                    <TextBlock FontSize="12" Text="Color fringing and film grain." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="0.02" Value="{Binding ChromaStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ChromaStrength, Mode=OneWay, StringFormat={}{0:0.000}}" />
+                    </StackPanel>
+                </controls:OptionControl>
+
+                <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_FilmGrain}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                    <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="0.3" Value="{Binding GrainStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GrainStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Debanding}">
-            <ui:ToggleSwitch IsChecked="{Binding DebandEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_AmbientGlow}">
-            <StackPanel Orientation="Horizontal">
-                <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding AmbientStrength, Mode=TwoWay}" />
-                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding AmbientStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+        </ui:CardExpander>
+
+        <ui:CardExpander Margin="0,8,0,0" Icon="BrightnessHigh24">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_DetailAndGlow}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Clarity}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding ClarityStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ClarityStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Debanding}">
+                    <ui:ToggleSwitch IsChecked="{Binding DebandEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_AmbientGlow}">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding AmbientStrength, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding AmbientStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    </StackPanel>
+                </controls:OptionControl>
             </StackPanel>
-        </controls:OptionControl>
+        </ui:CardExpander>
 
         <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_CustomEffects}" TextWrapping="Wrap" Margin="0,16,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_NotPorted}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

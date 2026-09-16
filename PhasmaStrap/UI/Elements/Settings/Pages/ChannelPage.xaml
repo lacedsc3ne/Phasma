@@ -10,7 +10,8 @@
       Title="ChannelPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Choose which Roblox deployment channel PhasmaStrap installs and launches, tune how it downloads Roblox, and see which days an experience typically ships updates on." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="Channel" FontSize="20" FontWeight="Medium" />
+        <TextBlock Margin="0,4,0,0" Text="Choose which Roblox deployment channel PhasmaStrap installs and launches, tune how it downloads Roblox, and see which days an experience typically ships updates on." FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="App-level settings such as PhasmaStrap's own CPU limit, resolution/monitor changing, force-reinstall, background Roblox updates, hardware acceleration and notifications already live on their own dedicated Performance / Bootstrapper / Notifications pages, so they aren't duplicated here." />
 

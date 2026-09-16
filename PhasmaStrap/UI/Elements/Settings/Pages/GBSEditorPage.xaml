@@ -14,7 +14,8 @@
       Scrollable="True"
       Loaded="Page_Loaded">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Margin="0,0,0,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Title}" FontSize="20" FontWeight="Medium" />
+        <TextBlock Margin="0,4,0,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <ui:InfoBar Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_GBSEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_GBSEditor_BannerText}" Severity="Warning" IsClosable="False" />
 
@@ -66,21 +67,31 @@
                         <ui:ToggleSwitch IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding HudVisible, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="HUD &amp; visibility" />
+                                <TextBlock FontSize="12" Text="What's shown on screen while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_HudVisible_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding HudVisible, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding ChatVisible, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ChatVisible_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ChatVisible, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding PlayerNamesEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_PlayerNamesEnabled_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding PlayerNamesEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding BadgeVisible, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_BadgeVisible_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding BadgeVisible, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
                 </StackPanel>
             </TabItem>
 
@@ -203,27 +214,37 @@
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Input_Header}" />
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Description}">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="0.01" Maximum="10" TickFrequency="0.01" Value="{Binding MouseSensitivity, Mode=TwoWay}" />
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MouseSensitivity, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Sensitivity &amp; vibration" />
+                                <TextBlock FontSize="12" Text="Mouse, gamepad, and camera input tuning." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MouseSensitivity_Description}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0.01" Maximum="10" TickFrequency="0.01" Value="{Binding MouseSensitivity, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding MouseSensitivity, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding CameraYInverted, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Description}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0.1" Maximum="2.0" TickFrequency="0.1" Value="{Binding GamepadSensitivity, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GamepadSensitivity, Mode=OneWay, StringFormat={}{0:0.0}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ControllerVibration, Mode=TwoWay}" />
+                            </controls:OptionControl>
                         </StackPanel>
-                    </controls:OptionControl>
-
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_CameraYInverted_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding CameraYInverted, Mode=TwoWay}" />
-                    </controls:OptionControl>
-
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GamepadSensitivity_Description}">
-                        <StackPanel Orientation="Horizontal">
-                            <Slider Width="200" Minimum="0.1" Maximum="2.0" TickFrequency="0.1" Value="{Binding GamepadSensitivity, Mode=TwoWay}" />
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GamepadSensitivity, Mode=OneWay, StringFormat={}{0:0.0}}" />
-                        </StackPanel>
-                    </controls:OptionControl>
-
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ControllerVibration_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding ControllerVibration, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    </ui:CardExpander>
                 </StackPanel>
             </TabItem>
 

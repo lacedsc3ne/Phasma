@@ -20,7 +20,10 @@
     -->
     <Grid Margin="0,0,14,14">
         <DockPanel>
-            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagSettings_Description}" />
+            <StackPanel DockPanel.Dock="Top">
+                <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" FontSize="20" FontWeight="Medium" />
+                <TextBlock Margin="0,0,0,8" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagSettings_Description}" />
+            </StackPanel>
         <TabControl Padding="0,8,0,0">
             <TabItem>
                 <TabItem.Header>
@@ -70,35 +73,45 @@
                         </controls:OptionControl>
 
                         <StackPanel IsEnabled="{Binding AssetWarpEnabled, Mode=OneWay}">
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding DisableAllTextures, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                            <ui:CardExpander Margin="0,12,0,0">
+                                <ui:CardExpander.Header>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" Text="Asset blocking" />
+                                        <TextBlock FontSize="12" Text="Strip specific asset categories from downloading entirely." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                </ui:CardExpander.Header>
+                                <StackPanel>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_DisableTextures_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding DisableAllTextures, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding DisableAllDecals, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_DisableDecals_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding DisableAllDecals, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding DisableAllImages, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_DisableImages_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding DisableAllImages, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding DisableAllAnimations, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_DisableAnimations_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding DisableAllAnimations, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding DisableAllMeshes, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_DisableMeshes_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding DisableAllMeshes, Mode=TwoWay}" />
+                                    </controls:OptionControl>
+                                </StackPanel>
+                            </ui:CardExpander>
 
                             <controls:OptionControl
                                 Header="{x:Static resources:Strings.Menu_AssetWarp_PresenceSpoofer_Title}"
@@ -108,83 +121,113 @@
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_Preloading_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding PreloadEnabled, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                            <ui:CardExpander Margin="0,4,0,0">
+                                <ui:CardExpander.Header>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" Text="Preload behavior" />
+                                        <TextBlock FontSize="12" Text="Warms the asset cache ahead of time so games feel more responsive." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                </ui:CardExpander.Header>
+                                <StackPanel>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadEnabled_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding PreloadEnabled, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Description}">
-                                <StackPanel Width="250">
-                                    <Slider Minimum="256" Maximum="8192" TickFrequency="256" IsSnapToTickEnabled="True" Value="{Binding PreloadCacheMb, Mode=TwoWay}" />
-                                    <TextBlock HorizontalAlignment="Right" Text="{Binding PreloadCacheSizeDisplay, Mode=OneWay}" />
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCacheLimit_Description}">
+                                        <StackPanel Width="250">
+                                            <Slider Minimum="256" Maximum="8192" TickFrequency="256" IsSnapToTickEnabled="True" Value="{Binding PreloadCacheMb, Mode=TwoWay}" />
+                                            <TextBlock HorizontalAlignment="Right" Text="{Binding PreloadCacheSizeDisplay, Mode=OneWay}" />
+                                        </StackPanel>
+                                    </controls:OptionControl>
+
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding PreloadAvatar, Mode=TwoWay}" />
+                                    </controls:OptionControl>
+
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding PreloadCrossGame, Mode=TwoWay}" />
+                                    </controls:OptionControl>
                                 </StackPanel>
-                            </controls:OptionControl>
-
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadAvatar_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding PreloadAvatar, Mode=TwoWay}" />
-                            </controls:OptionControl>
-
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_PreloadCrossGame_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding PreloadCrossGame, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                            </ui:CardExpander>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
                             <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,4" />
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Description}">
-                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofOthersName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </controls:OptionControl>
+                            <ui:CardExpander Margin="0,4,0,0">
+                                <ui:CardExpander.Header>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" Text="Spoof other players" />
+                                        <TextBlock FontSize="12" Text="Overrides what you see for other players' names and status." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                </ui:CardExpander.Header>
+                                <StackPanel>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Description}">
+                                        <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofOthersName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding SpoofOthersApplyIngame, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding SpoofOthersApplyIngame, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding SpoofOthersVerified, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding SpoofOthersVerified, Mode=TwoWay}" />
+                                    </controls:OptionControl>
+                                </StackPanel>
+                            </ui:CardExpander>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Description}">
-                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofSelfName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </controls:OptionControl>
+                            <ui:CardExpander Margin="0,8,0,0">
+                                <ui:CardExpander.Header>
+                                    <StackPanel>
+                                        <TextBlock FontSize="14" Text="Spoof yourself" />
+                                        <TextBlock FontSize="12" Text="Overrides your own displayed name, verification, and Robux balance." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </StackPanel>
+                                </ui:CardExpander.Header>
+                                <StackPanel>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Description}">
+                                        <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofSelfName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfApplyIngame, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding SpoofSelfApplyIngame, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_RobuxAdjuster_Title}"
-                                Description="{Binding RobuxSpoofSummary, Mode=OneWay}">
-                                <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_RobuxAdjuster_Title}"
+                                        Description="{Binding RobuxSpoofSummary, Mode=OneWay}">
+                                        <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfVerified, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding SpoofSelfVerified, Mode=TwoWay}" />
+                                    </controls:OptionControl>
 
-                            <controls:OptionControl
-                                Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Title}"
-                                Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Description}">
-                                <ui:ToggleSwitch IsChecked="{Binding SpoofSelfGameCreator, Mode=TwoWay}" />
-                            </controls:OptionControl>
+                                    <controls:OptionControl
+                                        Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Title}"
+                                        Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Description}">
+                                        <ui:ToggleSwitch IsChecked="{Binding SpoofSelfGameCreator, Mode=TwoWay}" />
+                                    </controls:OptionControl>
+                                </StackPanel>
+                            </ui:CardExpander>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

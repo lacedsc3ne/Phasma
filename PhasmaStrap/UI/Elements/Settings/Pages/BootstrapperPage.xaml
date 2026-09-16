@@ -15,7 +15,8 @@
       Scrollable="True">
 
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Margin="0,0,0,8" Text="{x:Static resources:Strings.Menu_Behaviour_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Title}" FontSize="20" FontWeight="Medium" />
+        <TextBlock Margin="0,4,0,8" Text="{x:Static resources:Strings.Menu_Behaviour_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <TabControl>
             <!-- General: launching/update behaviour that was already on this page -->
@@ -103,23 +104,43 @@
                         <ui:ToggleSwitch IsChecked="{Binding MatchmakerEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding MatchmakerPreferEmpty, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding MatchmakerPreferEmpty, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Description}">
-                        <ComboBox Width="220" ItemsSource="{Binding DatacenterChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Key" SelectedValue="{Binding PreferredDatacenter, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Description}">
+                                <ComboBox Width="220" ItemsSource="{Binding DatacenterChoices, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Key" SelectedValue="{Binding PreferredDatacenter, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding MatchmakerAutoCandidates, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_AutoCandidateCount_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding MatchmakerAutoCandidates, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Description}">
-                        <ui:NumberBox Width="120" Min="8" Max="64" Value="{Binding MatchmakerMaxCandidates, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Title}" Description="{x:Static resources:Strings.Menu_ServerBrowser_MaxCandidates_Description}">
+                                <ui:NumberBox Width="120" Min="8" Max="64" Value="{Binding MatchmakerMaxCandidates, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Title}" Description="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Description}">
+                    <controls:OptionControl Margin="0,8,0,0" Header="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Title}" Description="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Description}">
                         <ComboBox Width="200" ItemsSource="{Binding GamejoinApiOptions, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding MatchmakerGamejoinApiVersion, Mode=TwoWay}" />
                     </controls:OptionControl>
 
@@ -180,30 +201,39 @@
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Behaviour_Roblox_Description}" />
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Title}"
-                        Description="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Description}"
-                        Margin="0,8,0,0">
-                        <ui:TextBox Width="220" PlaceholderText="Roblox" Text="{Binding RobloxTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Title}"
+                                Description="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Description}">
+                                <ui:TextBox Width="220" PlaceholderText="Roblox" Text="{Binding RobloxTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Behaviour_CycleTitleWithGameName_Title}"
-                        Description="{x:Static resources:Strings.Menu_Behaviour_CycleTitleWithGameName_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding CycleTitleWithGameName, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Behaviour_CycleTitleWithGameName_Title}"
+                                Description="{x:Static resources:Strings.Menu_Behaviour_CycleTitleWithGameName_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding CycleTitleWithGameName, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Behaviour_ShowServerInfoInTitle_Title}"
-                        Description="{x:Static resources:Strings.Menu_Behaviour_ShowServerInfoInTitle_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding ShowServerInfoInTitle, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Behaviour_ShowServerInfoInTitle_Title}"
+                                Description="{x:Static resources:Strings.Menu_Behaviour_ShowServerInfoInTitle_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowServerInfoInTitle, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Behaviour_UseGameIconForRobloxWindow_Title}"
-                        Description="{x:Static resources:Strings.Menu_Behaviour_UseGameIconForRobloxWindow_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding UseGameIconForRobloxWindow, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Behaviour_UseGameIconForRobloxWindow_Title}"
+                                Description="{x:Static resources:Strings.Menu_Behaviour_UseGameIconForRobloxWindow_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding UseGameIconForRobloxWindow, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
                 </StackPanel>
             </TabItem>
         </TabControl>

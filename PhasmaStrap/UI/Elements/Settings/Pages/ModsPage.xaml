@@ -15,6 +15,7 @@
       Title="ModsPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Mods_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <Grid Margin="0,16,0,0">
@@ -61,66 +62,86 @@
                 <StackPanel Margin="0,16,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Common_Presets}" FontSize="20" FontWeight="Medium" />
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Description}">
-                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding ModApplyTargets, Mode=OneTime}" SelectedItem="{Binding ModApplyTarget, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Description}">
-                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding CursorTypeTask.Selections, Mode=OneTime}" Text="{Binding CursorTypeTask.NewState, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
-                        Header="Custom Cursor Set (quick folder)"
-                        Description="Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.">
-                        <StackPanel>
-                            <TextBlock Margin="0,0,0,6" FontSize="12" Text="{Binding CustomCursorSetFolderDisplay, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" TextAlignment="Right" MaxWidth="260" HorizontalAlignment="Right" />
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <ui:Button Margin="0,0,4,0" Icon="Eye16" Content="Preview" Command="{Binding PreviewCustomCursorSetCommand}" Visibility="{Binding PreviewCustomCursorSetVisibility, Mode=OneWay}" />
-                                <ui:Button Icon="FolderAdd16" Content="Browse" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding ChooseCustomCursorSetVisibility, Mode=OneWay}" />
-                                <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding DeleteCustomCursorSetVisibility, Mode=OneWay}" />
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Cursor appearance" />
+                                <TextBlock FontSize="12" Text="Choose a bundled cursor preset, or apply your own custom cursor images." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Title}"
+                                Description="{x:Static resources:Strings.Menu_Mods_Presets_MouseCursor_Description}">
+                                <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding CursorTypeTask.Selections, Mode=OneTime}" Text="{Binding CursorTypeTask.NewState, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="Custom Cursor Set (quick folder)"
+                                Description="Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.">
+                                <StackPanel>
+                                    <TextBlock Margin="0,0,0,6" FontSize="12" Text="{Binding CustomCursorSetFolderDisplay, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" TextAlignment="Right" MaxWidth="260" HorizontalAlignment="Right" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <ui:Button Margin="0,0,4,0" Icon="Eye16" Content="Preview" Command="{Binding PreviewCustomCursorSetCommand}" Visibility="{Binding PreviewCustomCursorSetVisibility, Mode=OneWay}" />
+                                        <ui:Button Icon="FolderAdd16" Content="Browse" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding ChooseCustomCursorSetVisibility, Mode=OneWay}" />
+                                        <ui:Button Icon="Delete16" Content="Remove" Appearance="Danger" Command="{Binding ManageCustomCursorSetCommand}" Visibility="{Binding DeleteCustomCursorSetVisibility, Mode=OneWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </controls:OptionControl>
                         </StackPanel>
-                    </controls:OptionControl>
+                    </ui:CardExpander>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding OldAvatarBackgroundTask.NewState, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Client presets" />
+                                <TextBlock FontSize="12" Text="Additional visual and audio tweaks for the Roblox client." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Title}"
+                                Description="{x:Static resources:Strings.Menu_Mods_Presets_ModApplyTarget_Description}">
+                                <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding ModApplyTargets, Mode=OneTime}" SelectedItem="{Binding ModApplyTarget, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding OldCharacterSoundsTask.NewState, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Title}"
+                                Description="{x:Static resources:Strings.Menu_Mods_Presets_OldAvatarEditor_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding OldAvatarBackgroundTask.NewState, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Description}">
-                        <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="220" ItemsSource="{Binding EmojiFontTask.Selections, Mode=OneTime}" Text="{Binding EmojiFontTask.NewState, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Title}"
+                                Description="{x:Static resources:Strings.Menu_Mods_Presets_OldCharacterSounds_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding OldCharacterSoundsTask.NewState, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Title}"
+                                Description="{x:Static resources:Strings.Menu_Mods_Presets_EmojiType_Description}">
+                                <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="220" ItemsSource="{Binding EmojiFontTask.Selections, Mode=OneTime}" Text="{Binding EmojiFontTask.NewState, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
 
                     <TextBlock Text="{x:Static resources:Strings.Common_Miscellaneous}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
