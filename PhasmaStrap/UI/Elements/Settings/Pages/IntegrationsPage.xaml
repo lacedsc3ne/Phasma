@@ -13,6 +13,7 @@
       Title="IntegrationsPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <TabControl Margin="0,12,0,0">
@@ -21,29 +22,39 @@
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_ActivityTracking}" FontSize="20" FontWeight="Medium" />
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_EnableActivityTracking_Title}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_EnableActivityTracking_Description}"
-                        HelpLink="https://bloxstraplabs.com/wiki/features/activity-tracking/"
-                        x:Name="ActivityTrackingOption">
-                        <ui:ToggleSwitch IsChecked="{Binding ActivityTrackingEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Tracking settings" />
+                                <TextBlock FontSize="12" Text="Controls what PhasmaStrap can detect and share about your current session." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_EnableActivityTracking_Title}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_EnableActivityTracking_Description}"
+                                HelpLink="https://bloxstraplabs.com/wiki/features/activity-tracking/"
+                                x:Name="ActivityTrackingOption">
+                                <ui:ToggleSwitch IsChecked="{Binding ActivityTrackingEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Title}"
-                        Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://ipinfo.io'}"
-                        HelpLink="https://bloxstraplabs.com/wiki/features/server-location-hints/"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding ShowServerDetailsEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Title}"
+                                Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://ipinfo.io'}"
+                                HelpLink="https://bloxstraplabs.com/wiki/features/server-location-hints/"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowServerDetailsEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_DesktopApp_Title}"
-                        Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_DesktopApp_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/dont-exit-to-desktop-app/'}"
-                        HelpLink="https://bloxstraplabs.com/wiki/features/dont-exit-to-desktop-app/"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding DisableAppPatchEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_DesktopApp_Title}"
+                                Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_DesktopApp_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/dont-exit-to-desktop-app/'}"
+                                HelpLink="https://bloxstraplabs.com/wiki/features/dont-exit-to-desktop-app/"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableAppPatchEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
                 </StackPanel>
             </TabItem>
 
@@ -52,27 +63,37 @@
                     <TextBlock Text="{x:Static resources:Strings.Common_DiscordRichPresence}" FontSize="20" FontWeight="Medium" />
                     <controls:MarkdownTextBlock MarkdownText="{Binding Source={x:Static resources:Strings.Menu_Integrations_RequiresActivityTracking}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/discord-rich-presence/'}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Title}"
-                        Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/help/discord-rich-presence-not-working/'}"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}"
-                        x:Name="DiscordActivityOption">
-                        <ui:ToggleSwitch IsChecked="{Binding DiscordActivityEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                    <ui:CardExpander Margin="0,8,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Presence settings" />
+                                <TextBlock FontSize="12" Text="Configure what shows on your Discord profile while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Title}"
+                                Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_ShowGameActivity_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/help/discord-rich-presence-not-working/'}"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}"
+                                x:Name="DiscordActivityOption">
+                                <ui:ToggleSwitch IsChecked="{Binding DiscordActivityEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding DiscordActivityJoinEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding DiscordActivityJoinEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Title}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Description}"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Title}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_ShowAccountOnProfile_Description}"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
 
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}" />

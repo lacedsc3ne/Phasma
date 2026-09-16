@@ -12,7 +12,8 @@
       Title="AppearancePage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_Title}" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,0,8" />
 
         <TabControl Margin="0,12,0,0">
 
@@ -57,38 +58,45 @@
                         <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Common_Edit}" HorizontalAlignment="Stretch" Command="{Binding EditColorThemeCommand}" />
                     </Grid>
 
-                    <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ui:CardExpander Margin="0,16,0,0">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Title}"
+                                Description="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Description}">
+                                <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding BackdropStyles, Mode=OneTime}" Text="{Binding WindowBackdropStyle, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Title}"
-                        Description="{x:Static resources:Strings.Menu_Appearance_WindowBackdrop_Description}">
-                        <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding BackdropStyles, Mode=OneTime}" Text="{Binding WindowBackdropStyle, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Appearance_ThemeTransition_Title}"
+                                Description="{x:Static resources:Strings.Menu_Appearance_ThemeTransition_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ThemeTransitionEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Appearance_ThemeTransition_Title}"
-                        Description="{x:Static resources:Strings.Menu_Appearance_ThemeTransition_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding ThemeTransitionEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Appearance_SmoothProgressBars_Title}"
+                                Description="{x:Static resources:Strings.Menu_Appearance_SmoothProgressBars_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SmoothProgressBarsEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Appearance_SmoothProgressBars_Title}"
-                        Description="{x:Static resources:Strings.Menu_Appearance_SmoothProgressBars_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding SmoothProgressBarsEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Appearance_SnowEffect_Title}"
-                        Description="{x:Static resources:Strings.Menu_Appearance_SnowEffect_Description}">
-                        <ui:ToggleSwitch IsChecked="{Binding SnowEffectEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Appearance_SnowEffect_Title}"
+                                Description="{x:Static resources:Strings.Menu_Appearance_SnowEffect_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding SnowEffectEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
 
                     <ui:CardExpander Margin="0,8,0,0" IsExpanded="{Binding GlobalBackgroundEnabled, Mode=OneWay}" Style="{StaticResource NoUserExpansionCardExpanderStyle}">
                         <ui:CardExpander.Header>
