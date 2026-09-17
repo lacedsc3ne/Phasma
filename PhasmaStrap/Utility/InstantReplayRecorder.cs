@@ -12,14 +12,16 @@ namespace PhasmaStrap.Utility
     // hotkey AFTER something happens, not before).
     //
     // Frame rate, resolution and quality are three separate settings, all re-read live:
-    //   InstantReplayFps        target capture rate (15/24/30/60)
+    //   InstantReplayFps        target capture rate (15 ... 240)
     //   InstantReplayMaxHeight  0 = the game's own resolution, otherwise frames taller than this
     //                           are scaled down (1080/720/480)
     //   InstantReplayQuality    0-2, picks the H.264 bitrate and the buffer's JPEG quality
     //
     // Capture has two paths:
     //   - DXGI desktop duplication (DesktopDuplicationGrabber) while Roblox is the foreground
-    //     window: what is on screen is the game, and a grab costs a few ms, so 60fps is reachable.
+    //     window: what is on screen is the game, and a grab costs a few ms. It yields a frame
+    //     whenever the desktop is recomposed, so the ceiling is the monitor's refresh rate (and
+    //     the game's own frame rate) - 240fps needs a 240Hz screen and a game running that fast.
     //   - PrintWindow(PW_CLIENTONLY | PW_RENDERFULLCONTENT) otherwise: gets the game's own
     //     content even when something covers it, but takes ~25ms at 1080p, so it tops out around
     //     30fps. Also the fallback whenever duplication is unavailable (HDR desktop, other GPU).
@@ -40,8 +42,16 @@ namespace PhasmaStrap.Utility
         private const string LOG_IDENT = "InstantReplayRecorder";
 
         // hard ceiling on the compressed buffer; past it the oldest frames go first
-        private const long MaxBufferBytes = 1_200L * 1024 * 1024;
-        private const int EncodeWorkers = 3;
+        public const int MaxBufferMegabytes = 1200;
+        private const long MaxBufferBytes = MaxBufferMegabytes * 1024L * 1024;
+
+        // one JPEG takes ~8ms of CPU at 1080p, so 240fps needs about two cores' worth of workers.
+        // Idle workers just block on the queue, so the pool is sized for the top rate up front
+        // (the rate can be changed while recording) and leaves cores free for the game.
+        private static readonly int EncodeWorkers = Math.Clamp(Environment.ProcessorCount - 3, 2, 8);
+
+        // raw frames waiting for a worker - 8MB each at 1080p, so this is also a ~130MB cap
+        private const int QueueCapacity = 16;
 
         private readonly object _sync = new();
         private readonly List<BufferedFrame> _frames = new();
@@ -85,12 +95,14 @@ namespace PhasmaStrap.Utility
 
         // ------------------------------------------------------------------ settings
 
-        public static readonly int[] FpsOptions = { 15, 24, 30, 60 };
+        public static readonly int[] FpsOptions = { 15, 24, 30, 60, 90, 120, 144, 165, 240 };
+
+        public const int MaxFps = 240;
 
         // 0 = native
         public static readonly int[] MaxHeightOptions = { 0, 1080, 720, 480 };
 
-        private static int TargetFps => Math.Clamp(App.Settings.Prop.InstantReplayFps, 5, 60);
+        private static int TargetFps => Math.Clamp(App.Settings.Prop.InstantReplayFps, 5, MaxFps);
 
         private static int MaxHeight => Math.Max(0, App.Settings.Prop.InstantReplayMaxHeight);
 
@@ -101,8 +113,14 @@ namespace PhasmaStrap.Utility
         // bits per pixel per frame for the final H.264 encode
         private static double BitsPerPixel(int quality) => quality switch { 0 => 0.05, 2 => 0.13, _ => 0.085 };
 
+        // Linear in frame rate up to 60fps; above that consecutive frames are nearly identical and
+        // cost the encoder far less, so the budget grows with the square root instead (240fps gets
+        // twice the 60fps bitrate, not four times).
         public static int BitrateFor(int width, int height, int fps, int quality)
-            => (int)Math.Clamp((double)width * height * fps * BitsPerPixel(quality), 1_000_000, 40_000_000);
+        {
+            double effectiveFps = fps <= 60 ? fps : 60 * Math.Sqrt(fps / 60.0);
+            return (int)Math.Clamp((double)width * height * effectiveFps * BitsPerPixel(quality), 1_000_000, 40_000_000);
+        }
 
         // rough size of the rolling buffer for the settings page ("about X MB of RAM")
         public static long EstimateBufferBytes(int width, int height, int fps, int seconds, int quality)
@@ -124,7 +142,7 @@ namespace PhasmaStrap.Utility
 
             DesktopDuplicationGrabber.Log ??= message => App.Logger.WriteLine("DesktopDuplicationGrabber", message);
 
-            _queue = new BlockingCollection<RawFrame>(boundedCapacity: 6);
+            _queue = new BlockingCollection<RawFrame>(boundedCapacity: QueueCapacity);
 
             _workers = new Thread[EncodeWorkers];
             for (int i = 0; i < EncodeWorkers; i++)
@@ -136,7 +154,7 @@ namespace PhasmaStrap.Utility
             _captureThread = new Thread(CaptureLoop) { IsBackground = true, Name = "InstantReplayCapture" };
             _captureThread.Start(_queue);
 
-            App.Logger.WriteLine(LOG_IDENT, $"Started ({TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
+            App.Logger.WriteLine(LOG_IDENT, $"Started ({EncodeWorkers} compression workers, {TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
         }
 
         public void Stop()
@@ -198,7 +216,12 @@ namespace PhasmaStrap.Utility
 
                     try
                     {
-                        Bitmap? bitmap = CaptureOnce();
+                        // Sleep() below deliberately wakes a little early. On the duplication path the
+                        // rest of the wait is spent blocked inside AcquireNextFrame until the next
+                        // frame is actually presented - precise, frame-aligned and free, where a
+                        // spin-wait at 240fps would burn most of a core.
+                        double slackMs = Math.Max(0, nextMs - clock.Elapsed.TotalMilliseconds);
+                        Bitmap? bitmap = CaptureOnce((int)Math.Ceiling(slackMs + intervalMs));
 
                         if (bitmap is not null)
                         {
@@ -226,10 +249,10 @@ namespace PhasmaStrap.Utility
                     nextMs += intervalMs;
                     double waitMs = nextMs - clock.Elapsed.TotalMilliseconds;
 
-                    if (waitMs > 1)
-                        Thread.Sleep((int)waitMs);
-                    else if (waitMs < -intervalMs * 2)
+                    if (waitMs < -intervalMs * 2)
                         nextMs = clock.Elapsed.TotalMilliseconds; // fell behind - don't try to catch up in a burst
+                    else if (waitMs > 2)
+                        Thread.Sleep((int)(waitMs - 1.5)); // Sleep() is only good to about a millisecond
                 }
             }
             finally
@@ -238,7 +261,7 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        private Bitmap? CaptureOnce()
+        private Bitmap? CaptureOnce(int frameWaitMs)
         {
             IntPtr hwnd = ResolveWindow();
             if (hwnd == IntPtr.Zero || IsIconic(hwnd))
@@ -260,7 +283,7 @@ namespace PhasmaStrap.Utility
 
                 _duplication ??= new DesktopDuplicationGrabber();
 
-                switch (_duplication.TryGrab(origin.X, origin.Y, width, height, 0, out Bitmap? grabbed))
+                switch (_duplication.TryGrab(origin.X, origin.Y, width, height, Math.Clamp(frameWaitMs, 0, 100), out Bitmap? grabbed))
                 {
                     case DesktopDuplicationGrabber.GrabResult.Frame:
                         _statDuplication++;
@@ -507,7 +530,6 @@ namespace PhasmaStrap.Utility
                 }
 
                 writer = CreateSinkWriter(path, width, height, fps, bitrate, out int streamIndex);
-                writer.BeginWriting();
 
                 long nominalDuration = 10_000_000L / Math.Max(1, fps);
                 byte[] pixels = new byte[width * height * 4];
@@ -634,20 +656,48 @@ namespace PhasmaStrap.Utility
         [DllImport("mfreadwrite.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         private static extern int MFCreateSinkWriterFromURL(string pwszOutputURL, IntPtr pByteStream, IntPtr pAttributes, out IntPtr ppSinkWriter);
 
+        // Returns a writer that is already writing (BeginWriting done). A GPU encoder makes a 1080p
+        // clip save in a couple of seconds instead of ten, so it goes first. 1080p above ~170fps
+        // is outside every H.264 level, and an encoder that enforces levels refuses it - in that
+        // case the stream is declared as 60fps instead. Frames carry their real timestamps either
+        // way, so the clip still has every frame and plays at the right speed; only the nominal
+        // rate in the header differs.
         private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, int bitrate, out int streamIndex)
         {
-            // a GPU encoder makes a 1080p60 clip save in a couple of seconds instead of ten; if the
-            // driver's encoder rejects the format, fall back to Microsoft's software one
-            try
+            var attempts = new List<(bool Hardware, int DeclaredFps)> { (true, fps), (false, fps) };
+            if (fps > 60)
             {
-                return CreateSinkWriter(path, width, height, fps, bitrate, hardware: true, out streamIndex);
+                attempts.Add((true, 60));
+                attempts.Add((false, 60));
             }
-            catch (Exception ex)
+
+            Exception? last = null;
+
+            foreach ((bool hardware, int declaredFps) in attempts)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Hardware encoder unavailable ({ex.Message}) - using the software encoder");
-                try { if (File.Exists(path)) File.Delete(path); } catch { }
-                return CreateSinkWriter(path, width, height, fps, bitrate, hardware: false, out streamIndex);
+                IMFSinkWriter? writer = null;
+
+                try
+                {
+                    writer = CreateSinkWriter(path, width, height, declaredFps, bitrate, hardware, out streamIndex);
+                    writer.BeginWriting();
+
+                    if (last is not null)
+                        App.Logger.WriteLine(LOG_IDENT, $"Encoding with the {(hardware ? "hardware" : "software")} encoder, stream declared as {declaredFps}fps");
+
+                    return writer;
+                }
+                catch (Exception ex)
+                {
+                    last = ex;
+                    App.Logger.WriteLine(LOG_IDENT, $"{(hardware ? "Hardware" : "Software")} encoder refused {width}x{height}@{declaredFps}: {ex.Message}");
+                    writer?.Dispose();
+                    try { if (File.Exists(path)) File.Delete(path); } catch { }
+                }
             }
+
+            streamIndex = 0;
+            throw last ?? new InvalidOperationException("No H.264 encoder available");
         }
 
         private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, int bitrate, bool hardware, out int streamIndex)

@@ -222,7 +222,7 @@ namespace PhasmaStrap.Utility
                 if (outW < 64 || outH < 64)
                     throw new ArgumentException("The crop area is too small - it has to be at least 64 x 64 pixels.");
 
-                double outFps = Math.Clamp(info.Fps * speed, 1, 60);
+                double outFps = Math.Clamp(info.Fps * speed, 1, 240);
                 long sourceSpan = Math.Min(endTicks, info.Duration.Ticks) - startTicks;
 
                 // keep roughly the source's bits-per-pixel (plus headroom for the generation loss),
@@ -233,8 +233,22 @@ namespace PhasmaStrap.Utility
 
                 Log?.Invoke($"Export {source} -> {destination}: {startTicks / 1e7:0.00}s-{(endTicks == long.MaxValue ? info.Duration.TotalSeconds : endTicks / 1e7):0.00}s crop={cropX},{cropY} {outW}x{outH} speed={speed} fps={outFps:0.##} bitrate={bitrate}");
 
-                writer = CreateSinkWriter(destination, outW, outH, outFps, bitrate, out int streamIndex);
-                writer.BeginWriting();
+                int streamIndex;
+                try
+                {
+                    writer = CreateSinkWriter(destination, outW, outH, outFps, bitrate, out streamIndex);
+                    writer.BeginWriting();
+                }
+                catch (Exception ex) when (outFps > 60)
+                {
+                    // high-frame-rate 1080p is outside the H.264 levels some encoders enforce; declare
+                    // 60fps instead - samples keep their real timestamps, so nothing is lost
+                    Log?.Invoke($"Encoder refused {outW}x{outH}@{outFps:0.##} ({ex.Message}) - declaring 60fps");
+                    writer?.Dispose();
+                    try { if (File.Exists(destination)) File.Delete(destination); } catch { }
+                    writer = CreateSinkWriter(destination, outW, outH, 60, bitrate, out streamIndex);
+                    writer.BeginWriting();
+                }
 
                 byte[] frame = new byte[outW * outH * 4];
                 long defaultDuration = (long)(10_000_000 / Math.Max(1, info.Fps));
