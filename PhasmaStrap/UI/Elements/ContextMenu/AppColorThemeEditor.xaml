@@ -172,7 +172,7 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </StackPanel.Style>
-                                                <Slider Width="90" Minimum="0" Maximum="100" VerticalAlignment="Center" Value="{Binding OpacityPercent, Mode=TwoWay}" />
+                                                <Slider Width="110" Minimum="0" Maximum="100" SmallChange="1" LargeChange="10" TickFrequency="1" IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" VerticalAlignment="Center" Value="{Binding OpacityPercent, Mode=TwoWay}" />
                                                 <TextBlock Width="36" Margin="6,0,0,0" VerticalAlignment="Center" TextAlignment="Right" FontSize="12"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding OpacityPercent, StringFormat={}{0:0}%}" />
                                             </StackPanel>

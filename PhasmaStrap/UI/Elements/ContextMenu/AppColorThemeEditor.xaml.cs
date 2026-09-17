@@ -105,9 +105,14 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             foreach (ThemeKeyInfo info in AppColorTheme.Schema)
             {
-                Color color = existing.TryGetValue(info.Key, out Color found)
-                    ? found
-                    : (AppColorTheme.TryParseColor(info.Fallback, out Color fb) ? fb : Colors.Black);
+                Color fallback = AppColorTheme.TryParseColor(info.Fallback, out Color fb) ? fb : Colors.Black;
+                Color color = existing.TryGetValue(info.Key, out Color found) ? found : fallback;
+
+                // a fully transparent colour carries no visible hue, so start the row from the schema's
+                // (it may have been saved as transparent black, which stays invisible at any opacity
+                // over a dark window)
+                if (info.AllowAlpha && color.A == 0)
+                    color = Color.FromArgb(0, fallback.R, fallback.G, fallback.B);
 
                 ThemeColorItem item = new(info.Key, info.Label, color, info.Group, info.AllowAlpha);
                 item.Changed += SchedulePreview;
@@ -319,8 +324,12 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 return;
             // the Windows colour dialog has no alpha and always answers fully opaque - keep the row's
             // own opacity (its slider), or a translucent glow/sidebar would turn solid on every pick
+            // ...except when the row is fully transparent: someone choosing a colour wants to see it
             if (TryPickColor(item.Color, out Color picked))
-                item.SetColor(Color.FromArgb(item.AllowAlpha ? item.Color.A : (byte)255, picked.R, picked.G, picked.B));
+            {
+                byte alpha = item.AllowAlpha && item.Color.A > 0 ? item.Color.A : (byte)255;
+                item.SetColor(Color.FromArgb(alpha, picked.R, picked.G, picked.B));
+            }
         }
 
         private static bool TryPickColor(Color initial, out Color picked)

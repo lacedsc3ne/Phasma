@@ -10,8 +10,8 @@
     <SolidColorBrush x:Key="BackgroundGlowSecondaryBrush" Color="#FFCF3B32" />
 
     <!--  panel behind the settings window's sidebar - nothing by default, AppColorTheme can give it a colour  -->
-    <Color x:Key="SidebarBackgroundColor">#00000000</Color>
-    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#00000000" />
+    <Color x:Key="SidebarBackgroundColor">#002C2C38</Color>
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#002C2C38" />
 
     <!--  Phasma warm-dark palette overrides (mirrors PhasmaMacro's index.html design tokens)  -->
     <Color x:Key="ApplicationBackgroundColor">#0E0E12</Color>
