@@ -196,6 +196,22 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (item is not null && File.Exists(item.Path))
                 Process.Start(new ProcessStartInfo(item.Path) { UseShellExecute = true });
         });
+        public ICommand EditScreenshotCommand => new RelayCommand<ScreenshotItem>(item =>
+        {
+            if (item is null || !File.Exists(item.Path))
+                return;
+
+            var editor = new PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow(item.Path)
+            {
+                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault()
+            };
+
+            editor.ShowDialog();
+
+            if (editor.Saved)
+                RefreshGallery();
+        });
+
         public ICommand DeleteScreenshotCommand => new RelayCommand<ScreenshotItem>(item =>
         {
             if (item is null)
