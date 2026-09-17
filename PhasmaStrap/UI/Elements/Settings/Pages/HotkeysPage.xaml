@@ -1,0 +1,48 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.HotkeysPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance dmodels:HotkeysViewModel, IsDesignTimeCreatable=True}"
+      Title="HotkeysPage"
+      Scrollable="True">
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Hotkeys" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Global shortcuts that work while a Roblox game session is running, no matter which window has focus. Click a box below and press a key combination to bind it - these only listen during an active game session, not from this Settings window." />
+
+        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding Hotkeys, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ui:Card Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <TextBlock FontSize="14" Text="{Binding DisplayName}" />
+                                <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding Description}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:TextBox Width="180" IsReadOnly="True" Focusable="True"
+                                            PlaceholderText="Click to set..."
+                                            Text="{Binding GestureText, Mode=OneWay}"
+                                            Tag="{Binding}"
+                                            PreviewKeyDown="HotkeyBox_PreviewKeyDown" />
+                                <ui:Button Margin="8,0,0,0" Content="Clear" Appearance="Secondary"
+                                           IsEnabled="{Binding HasGesture}"
+                                           Tag="{Binding}"
+                                           Click="ClearButton_Click" />
+                            </StackPanel>
+                        </Grid>
+                    </ui:Card>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ui:UiPage>

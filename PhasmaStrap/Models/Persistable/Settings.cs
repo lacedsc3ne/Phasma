@@ -296,6 +296,10 @@ namespace PhasmaStrap.Models.Persistable
         public Dictionary<string, string> EnginePlaceProfiles { get; set; } = new();
         public List<string> EngineExcludedPlaces { get; set; } = new();
 
+        // global hotkey bindings: HotkeyActions.Id -> a WPF gesture string ("Ctrl+Alt+R"), parsed
+        // by GlobalHotkeyManager.TryParseGesture. Unbound (missing/empty) actions register nothing.
+        public Dictionary<string, string> HotkeyBindings { get; set; } = new();
+
         // scope for FastFlagsPage's curated toggle set ("Engine Settings" - the ~83-toggle panel,
         // not to be confused with the runtime optimizer above despite the similar name). All (the
         // default) applies those flags everywhere as before; the other two modes restrict them to

@@ -3,6 +3,7 @@ using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
 using PhasmaStrap.Models;
+using PhasmaStrap.Utility;
 
 namespace PhasmaStrap
 {
@@ -11,7 +12,7 @@ namespace PhasmaStrap
         private readonly InterProcessLock _lock = new("Watcher");
 
         private readonly WatcherData? _watcherData;
-        
+
         private readonly NotifyIconWrapper? _notifyIcon;
 
         public readonly ActivityWatcher? ActivityWatcher;
@@ -23,6 +24,8 @@ namespace PhasmaStrap
         public readonly PlayTimeWatcher? PlayTimeWatcher;
 
         public readonly GameChatIntegration? GameChat;
+
+        private readonly GlobalHotkeyManager? _hotkeys;
 
         private RobloxProcessOptimizer? _processOptimizer;
 
@@ -144,6 +147,25 @@ namespace PhasmaStrap
             if (RobloxWindowCustomizer.IsEnabled)
                 RobloxWindowCustomizer.Start(ActivityWatcher);
 
+            _hotkeys = new GlobalHotkeyManager();
+            _hotkeys.RegisterAction(HotkeyActions.CleanRamNow, () =>
+            {
+                SystemMemoryCleaner.TrimAllProcessWorkingSets();
+                SystemMemoryCleaner.PurgeStandbyListElevated();
+            });
+            _hotkeys.RegisterAction(HotkeyActions.ToggleHeadsetAudio, () =>
+            {
+                bool enabled = !App.Settings.Prop.HeadsetAudioEnabled;
+                App.Settings.Prop.HeadsetAudioEnabled = enabled;
+                App.Settings.Save();
+
+                if (enabled)
+                    HeadsetAudio.Start();
+                else
+                    HeadsetAudio.Stop();
+            });
+            _hotkeys.ApplyBindings();
+
             _notifyIcon = new(this);
         }
 
@@ -236,6 +258,7 @@ namespace PhasmaStrap
             RobloxWindowCustomizer.Shutdown();
             StopProcessOptimizer();
             MemoryManager.Shutdown();
+            _hotkeys?.Dispose();
 
             GC.SuppressFinalize(this);
         }
