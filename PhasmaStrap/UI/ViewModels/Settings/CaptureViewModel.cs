@@ -42,7 +42,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int InstantReplayClipSeconds
         {
             get => App.Settings.Prop.InstantReplayClipSeconds;
-            set => App.Settings.Prop.InstantReplayClipSeconds = value;
+            set { App.Settings.Prop.InstantReplayClipSeconds = value; OnPropertyChanged(nameof(InstantReplayClipSeconds)); }
         }
 
         public string[] QualityOptions { get; } = { "Low", "Medium", "High" };

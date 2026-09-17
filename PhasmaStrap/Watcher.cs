@@ -127,11 +127,16 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameLeave += (_, _) => HeadsetAudio.Stop();
                 }
 
-                if (App.Settings.Prop.InstantReplayEnabled)
+                // checked live (not gated at startup like most handlers here) so turning Instant
+                // Replay on from the Capture page takes effect on the very next game join - Roblox
+                // is very often already running by the time someone finds this toggle, and gating
+                // this at Watcher startup like the others would silently require a relaunch first
+                ActivityWatcher.OnGameJoin += (_, _) =>
                 {
-                    ActivityWatcher.OnGameJoin += (_, _) => _instantReplay.Start();
-                    ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
-                }
+                    if (App.Settings.Prop.InstantReplayEnabled)
+                        _instantReplay.Start();
+                };
+                ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
                 if (App.Settings.Prop.ForceInGameResolution)
                 {
@@ -169,8 +174,15 @@ namespace PhasmaStrap
             _hotkeys = new GlobalHotkeyManager();
             _hotkeys.RegisterAction(HotkeyActions.CleanRamNow, () =>
             {
-                SystemMemoryCleaner.TrimAllProcessWorkingSets();
-                SystemMemoryCleaner.PurgeStandbyListElevated();
+                // deliberately the unelevated trim only - the standby list purge needs an elevated
+                // relaunch (a UAC prompt), which would interrupt whatever's in focus (a game) every
+                // single time this hotkey is pressed. That part stays a manual, explicit action from
+                // the Performance page's Clean RAM button, same reasoning as AutoRamCleaner.
+                SystemMemoryCleaner.TrimResult result = SystemMemoryCleaner.TrimAllProcessWorkingSets();
+                NotificationCenter.Notify(
+                    "RAM cleaned",
+                    $"Trimmed {result.ProcessesTrimmed} processes (~{result.BytesFreed / 1048576.0:0.#} MB).",
+                    NotificationCategory.General);
             });
             _hotkeys.RegisterAction(HotkeyActions.ToggleHeadsetAudio, () =>
             {
@@ -290,7 +302,15 @@ namespace PhasmaStrap
             bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
 
             if (possibleCrash && App.Settings.Prop.AutoRejoinOnCrash)
+            {
                 await TryAutoRejoinAsync();
+
+                // LaunchHandler.LaunchWatcher tears this whole process down (Dispose + App.Terminate)
+                // the instant Run() returns - without this, the final "rejoin succeeded/failed" toast
+                // never gets a chance to render, since NotificationCenter.Notify only queues it onto
+                // the dispatcher and returns immediately rather than waiting for the animation
+                await Task.Delay(TimeSpan.FromSeconds(6));
+            }
 
             if (_watcherData.AutoclosePids is not null)
             {

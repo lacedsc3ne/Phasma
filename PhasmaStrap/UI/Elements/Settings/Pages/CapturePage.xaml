@@ -51,12 +51,12 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,10,10" Padding="0" Cursor="Hand">
-                        <ui:Card.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.OpenScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                        </ui:Card.InputBindings>
+                    <ui:Card Margin="0,0,10,10" Padding="0">
                         <StackPanel>
-                            <Border Height="140" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <Border Height="140" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}" Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.OpenScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </Border.InputBindings>
                                 <Image Source="{Binding Path}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
                             </Border>
                             <Grid Margin="10,8,10,10">
@@ -132,22 +132,27 @@
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Replays, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,0,6" Padding="12,10" Cursor="Hand">
-                        <ui:Card.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.OpenReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                        </ui:Card.InputBindings>
+                    <ui:Card Margin="0,0,0,6" Padding="12,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <ui:SymbolIcon Grid.Column="0" Symbol="VideoClip24" VerticalAlignment="Center" Margin="0,0,10,0" />
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock FontSize="13" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TakenDisplay}" />
-                            </StackPanel>
-                            <ui:Button Grid.Column="2" Padding="4" Appearance="Transparent" Icon="Delete16"
+                            <Grid Grid.Column="0" Cursor="Hand">
+                                <Grid.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.OpenReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </Grid.InputBindings>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:SymbolIcon Grid.Column="0" Symbol="VideoClip24" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock FontSize="13" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TakenDisplay}" />
+                                </StackPanel>
+                            </Grid>
+                            <ui:Button Grid.Column="1" Padding="4" Appearance="Transparent" Icon="Delete16"
                                        Command="{Binding DataContext.DeleteReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                        CommandParameter="{Binding}" />
                         </Grid>
