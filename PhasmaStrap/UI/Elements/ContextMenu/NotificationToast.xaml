@@ -19,7 +19,7 @@
         <Grid.RenderTransform>
             <TranslateTransform x:Name="RootTranslate" X="440" Y="0" />
         </Grid.RenderTransform>
-        <Border x:Name="NotificationBorder" CornerRadius="12" Opacity="0"
+        <Border x:Name="NotificationBorder" CornerRadius="12" Opacity="0" MouseLeftButtonUp="NotificationBorder_MouseLeftButtonUp"
                 Background="{DynamicResource ApplicationBackgroundBrush}"
                 BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 ClipToBounds="False">
