@@ -22,6 +22,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e) => _viewModel.Load();
 
+        private void Page_Unloaded(object sender, RoutedEventArgs e) => _viewModel.FlushPending();
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             string name = NewNameTextBox.Text.Trim();

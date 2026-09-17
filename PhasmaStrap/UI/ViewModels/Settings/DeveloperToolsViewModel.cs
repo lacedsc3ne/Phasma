@@ -128,9 +128,28 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 ProxyTraffic.Add(entry);
         }
 
+        // the proxy raises Changed for every single request; rebuilding a 200-row list per request
+        // stalled the window during gameplay, so refreshes are coalesced to a few per second
+        private readonly System.Windows.Threading.DispatcherTimer _trafficRefreshTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
+        private bool _trafficRefreshHooked;
+
         private void OnProxyTrafficChanged(object? sender, EventArgs e)
         {
-            Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshProxyTraffic));
+            Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (!_trafficRefreshHooked)
+                {
+                    _trafficRefreshTimer.Tick += (_, _) =>
+                    {
+                        _trafficRefreshTimer.Stop();
+                        RefreshProxyTraffic();
+                    };
+                    _trafficRefreshHooked = true;
+                }
+
+                if (!_trafficRefreshTimer.IsEnabled)
+                    _trafficRefreshTimer.Start();
+            }));
         }
 
         // --- unified log viewer ---
@@ -156,6 +175,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         });
 
         private void RefreshLogs()
+        {
+            LogText = BuildLogText();
+        }
+
+        private static string BuildLogText()
         {
             const int MaxCharsPerLog = 100_000;
             var sb = new System.Text.StringBuilder();
@@ -195,9 +219,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 if (Directory.Exists(Paths.RobloxLogs))
                 {
-                    string? latest = Directory.GetFiles(Paths.RobloxLogs)
-                        .OrderByDescending(File.GetLastWriteTimeUtc)
-                        .FirstOrDefault();
+                    // FileInfo already carries the timestamp from the enumeration - the Roblox log
+                    // folder routinely holds thousands of files, so no per-file stat calls here
+                    string? latest = new DirectoryInfo(Paths.RobloxLogs).GetFiles()
+                        .OrderByDescending(f => f.LastWriteTimeUtc)
+                        .FirstOrDefault()?.FullName;
 
                     AppendTail(sb, latest, MaxCharsPerLog);
                 }
@@ -207,7 +233,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 sb.AppendLine($"(could not read Roblox logs: {ex.Message})");
             }
 
-            LogText = sb.ToString();
+            return sb.ToString();
         }
 
         private static void AppendTail(System.Text.StringBuilder sb, string? path, int maxChars)
@@ -221,9 +247,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             try
             {
                 using FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream);
-                string content = reader.ReadToEnd();
 
+                // only read the tail - these logs are routinely multi-megabyte
+                long start = Math.Max(0, stream.Length - (long)maxChars * 2);
+                stream.Seek(start, SeekOrigin.Begin);
+
+                using var reader = new StreamReader(stream);
+                if (start > 0)
+                    reader.ReadLine(); // drop the partial first line
+
+                string content = reader.ReadToEnd();
                 sb.AppendLine(content.Length > maxChars ? content[^maxChars..] : content);
             }
             catch (Exception ex)
@@ -293,9 +326,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             RefreshSnapshots();
             RefreshProxyTraffic();
-            RefreshLogs();
+
+            // the log tails are the slow part (several files, disk reads) - keep them off the
+            // UI thread so opening the page doesn't hang the window
+            LogText = "Loading logs...";
+            _ = Task.Run(() =>
+            {
+                string text = BuildLogText();
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() => LogText = text));
+            });
 
             ProxyTrafficLog.Changed += OnProxyTrafficChanged;
+        }
+
+        // the page instance is cached by the navigation, so Detach/Attach bracket each visit
+        public void Attach()
+        {
+            ProxyTrafficLog.Changed -= OnProxyTrafficChanged;
+            ProxyTrafficLog.Changed += OnProxyTrafficChanged;
+            RefreshProxyTraffic();
         }
 
         public void Detach()

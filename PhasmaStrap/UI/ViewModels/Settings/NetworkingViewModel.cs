@@ -156,13 +156,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string RobuxSpoofAmount
         {
             get => App.Settings.Prop.RobuxSpoofAmount;
-            set { App.Settings.Prop.RobuxSpoofAmount = value; App.Settings.Save(); OnPropertyChanged(nameof(RobuxSpoofAmount)); }
+            set { App.Settings.Prop.RobuxSpoofAmount = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(RobuxSpoofAmount)); }
         }
 
         public string UsernameSpoofName
         {
             get => App.Settings.Prop.UsernameSpoofName;
-            set { App.Settings.Prop.UsernameSpoofName = value; App.Settings.Save(); OnPropertyChanged(nameof(UsernameSpoofName)); }
+            set { App.Settings.Prop.UsernameSpoofName = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(UsernameSpoofName)); }
         }
 
         // the Asset Warp controls themselves live on FastFlag Settings > Asset Warp; this just

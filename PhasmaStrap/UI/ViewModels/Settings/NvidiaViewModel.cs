@@ -102,6 +102,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             NvidiaFlagHistory.Changed -= OnFlagHistoryChanged;
         }
 
+        public void Attach()
+        {
+            NvidiaFlagHistory.Changed -= OnFlagHistoryChanged;
+            NvidiaFlagHistory.Changed += OnFlagHistoryChanged;
+            RefreshFlagHistory();
+        }
+
         public bool IsAvailable { get; }
 
         public string UnavailableReason { get; }

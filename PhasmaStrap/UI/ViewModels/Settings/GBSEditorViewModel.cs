@@ -261,9 +261,39 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private void Write(string name, object value, string propertyName)
         {
             _gbs.SetProperty(name, value);
+            OnPropertyChanged(propertyName);
+            ScheduleFlush();
+        }
+
+        // a TwoWay slider writes on every pixel of a drag; saving the XML (temp file + replace)
+        // and rebuilding the raw-editor grid per tick made the sliders stutter, so the write is
+        // coalesced into one flush shortly after the last change (and on page unload)
+        private readonly System.Windows.Threading.DispatcherTimer _flushTimer = new() { Interval = TimeSpan.FromMilliseconds(350) };
+        private bool _flushHooked;
+        private bool _flushPending;
+
+        private void ScheduleFlush()
+        {
+            if (!_flushHooked)
+            {
+                _flushTimer.Tick += (_, _) => FlushPending();
+                _flushHooked = true;
+            }
+
+            _flushPending = true;
+            _flushTimer.Stop();
+            _flushTimer.Start();
+        }
+
+        public void FlushPending()
+        {
+            _flushTimer.Stop();
+            if (!_flushPending)
+                return;
+
+            _flushPending = false;
             _gbs.Save();
             RefreshEntriesFromDocument();
-            OnPropertyChanged(propertyName);
         }
 
         private void RefreshEntriesFromDocument()

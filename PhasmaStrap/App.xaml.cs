@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Shell;
@@ -301,7 +301,11 @@ namespace PhasmaStrap
             AppDomain.CurrentDomain.ProcessExit += (_, _) => Integrations.ClassicServerManager.Stop();
 
             // if a previous session left the redirect behind (crash/kill), clear it now if it's safe to do so
-            Integrations.ClassicHostRedirect.CleanStaleRedirect();
+            _ = Task.Run(() =>
+            {
+                try { Integrations.ClassicHostRedirect.CleanStaleRedirect(); }
+                catch (Exception ex) { Logger.WriteLine("App::OnStartup", $"Stale classic redirect cleanup failed: {ex.Message}"); }
+            });
 
             // these only ever run as a short-lived elevated relaunch triggered by
             // Networking.HostsFileManager, never as part of the normal app flow
@@ -530,23 +534,29 @@ namespace PhasmaStrap
                     Logger.WriteLine(LOG_IDENT, $"Friend activity monitor startup failed: {ex.Message}");
                 }
 
-                try
+                // both read the hosts file / open the cert store / may need an elevated helper -
+                // none of which anything later in startup depends on, so keep them off the path
+                // that gates the first window appearing
+                _ = Task.Run(() =>
                 {
-                    Networking.NetworkingController.ReconcileOnStartup();
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
-                }
+                    try
+                    {
+                        Networking.NetworkingController.ReconcileOnStartup();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
+                    }
 
-                try
-                {
-                    Integrations.TelemetryBlocker.ReconcileOnStartup();
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLine(LOG_IDENT, $"Telemetry blocker reconciliation failed: {ex.Message}");
-                }
+                    try
+                    {
+                        Integrations.TelemetryBlocker.ReconcileOnStartup();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLine(LOG_IDENT, $"Telemetry blocker reconciliation failed: {ex.Message}");
+                    }
+                });
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))
                 {

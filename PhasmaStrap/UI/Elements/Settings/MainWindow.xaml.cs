@@ -383,8 +383,29 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         #endregion INavigationWindow methods
 
-        private void MainWindow_MistLoaded(object sender, RoutedEventArgs e) =>
-            ((Storyboard)Resources["MistDrift"]).Begin(this);
+        private Storyboard? _mist;
+
+        // the drifting mist is two large blurred ellipses animated forever - a real per-frame
+        // compositing cost, so it only runs while the window is actually the active one
+        private void MainWindow_MistLoaded(object sender, RoutedEventArgs e)
+        {
+            _mist = (Storyboard)Resources["MistDrift"];
+            _mist.Begin(this, true);
+
+            Activated += (_, _) => { try { _mist?.Resume(this); } catch (Exception) { } };
+            Deactivated += (_, _) => { try { _mist?.Pause(this); } catch (Exception) { } };
+            StateChanged += (_, _) =>
+            {
+                try
+                {
+                    if (WindowState == System.Windows.WindowState.Minimized)
+                        _mist?.Pause(this);
+                    else if (IsActive)
+                        _mist?.Resume(this);
+                }
+                catch (Exception) { }
+            };
+        }
 
         private void WpfUiWindow_Closing(object sender, CancelEventArgs e)
         {
@@ -424,6 +445,7 @@ namespace PhasmaStrap.UI.Elements.Settings
         private void MinimizeToTray()
         {
             Hide();
+            try { _mist?.Pause(this); } catch (Exception) { }
 
             if (_trayIcon is not null)
                 return;
@@ -465,6 +487,8 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void WpfUiWindow_Closed(object sender, EventArgs e)
         {
+            try { _mist?.Stop(this); } catch (Exception) { }
+            _searchDebounce.Stop();
             _trayIcon?.Dispose();
 
             ControllerService.Shutdown();

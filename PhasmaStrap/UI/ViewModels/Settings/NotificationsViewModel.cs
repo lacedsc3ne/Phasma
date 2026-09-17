@@ -76,6 +76,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             NotificationCenter.HistoryChanged -= OnHistoryChanged;
         }
 
+        public void Attach()
+        {
+            NotificationCenter.HistoryChanged -= OnHistoryChanged;
+            NotificationCenter.HistoryChanged += OnHistoryChanged;
+            RefreshHistory();
+        }
+
         private void OnHistoryChanged(object? sender, EventArgs e)
         {
             System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshHistory));
