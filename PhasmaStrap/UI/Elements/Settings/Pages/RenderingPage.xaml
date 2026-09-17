@@ -1,0 +1,554 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.RenderingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:models="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      d:DataContext="{d:DesignInstance Type=models:RenderingViewModel}"
+      mc:Ignorable="d"
+      Title="RenderingPage"
+      Scrollable="True">
+
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Rendering" FontSize="20" FontWeight="Medium" />
+        <TextBlock Margin="0,4,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="Everything that tunes what the game actually looks like and how smoothly it runs - system/GPU tweaks, the stats HUD and crosshair overlay, and RiShade's post-processing." />
+
+        <TabControl>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Gauge24" Margin="0,0,6,0" />
+                        <TextBlock Text="Performance" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0" DataContext="{Binding Performance}">
+                    <ui:CardExpander Margin="0,0,0,0" Icon="Wrench24" IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="System" />
+                                <TextBlock FontSize="12" Text="Bootstrapper-level tweaks that don't touch Roblox itself." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="CPU core limit" Description="Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="Fake exclusive fullscreen" Description="Strips the Roblox window's border and resizes it to exactly cover its monitor for lower input latency than Roblox's own windowed fullscreen.">
+                                <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="Duck Roblox audio when unfocused" Description="Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.">
+                                <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="Headset loudness" Description="Boosts quiet sounds (footsteps, distant cues) without letting loud moments blow out your ears.">
+                                <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="Anti-Aliasing" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <controls:OptionControl Header="Enable Anti-Aliasing overlay" Description="Off by default, since this is an extra rendering pass on top of Roblox.">
+                        <ui:ToggleSwitch IsChecked="{Binding AntiAliasingEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Anti-Aliasing method" Description="Which shader technique to apply once the overlay is enabled.">
+                        <ComboBox Padding="10,5,10,5" MinWidth="160" IsEnabled="{Binding AntiAliasingEnabled}" ItemsSource="{Binding AntiAliasingMethodNames, Mode=OneTime}" SelectedIndex="{Binding AntiAliasingMethodIndex, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <TextBlock Text="Frame generation" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="Shader-based motion interpolation drawn in a click-through overlay above the game window. This does not improve actual FPS or reduce input lag - it only makes motion look smoother, mainly useful on low end PCs. Leave it off on mid range or high end systems." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <controls:OptionControl Header="Enable frame generation" Description="Interpolates an extra frame between real captured frames while you're in game.">
+                        <ui:ToggleSwitch IsChecked="{Binding FrameGenEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Frame generation quality" Description="Higher quality costs more GPU time per interpolated frame. 0 = Fast, 1 = Balanced, 2 = Quality.">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Width="200" Minimum="0" Maximum="2" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding FrameGenQuality, Mode=TwoWay}" />
+                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding FrameGenQualityDisplay, Mode=OneWay}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+
+                    <ui:CardExpander Margin="0,16,0,0" Icon="Games24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Header}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Performance_EnginePerGame_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Title}" FontSize="12" FontWeight="Medium" />
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_Description}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineExcludedPlaces_PlaceholderText}" Text="{Binding EngineExcludePlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineExcludedPlaceCommand, Mode=OneTime}" />
+                            </StackPanel>
+                            <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineExcludedPlaces, Mode=OneWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding}" FontFamily="Consolas" FontSize="12" />
+                                                <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineExcludedPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Title}" FontSize="12" FontWeight="Medium" Margin="0,12,0,0" />
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Performance_EngineAssignments_Description}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Performance_EngineAssignments_PlaceholderText}" Text="{Binding EngineAssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ComboBox Width="150" Margin="8,0,0,0" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" SelectedItem="{Binding EngineAssignPresetName, Mode=TwoWay}" />
+                                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddEngineProfileAssignmentCommand, Mode=OneTime}" />
+                            </StackPanel>
+                            <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding EngineProfileAssignments, Mode=OneWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                                                <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemoveEngineProfileAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_SystemBoost_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_SystemBoost_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Rocket24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Boost options" />
+                                <TextBlock FontSize="12" Text="GPU, timer, and power plan tweaks applied at the OS level while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceHighPerformanceGpu_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ForceHighPerformanceGpu, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Title}" Description="{x:Static resources:Strings.Menu_Performance_DisableGameDVR_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding DisableGameDVR, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_BoostTimerResolution_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding BoostTimerResolution, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Title}" Description="{x:Static resources:Strings.Menu_Performance_UseHighPerformancePowerPlan_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding UseHighPerformancePowerPlan, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_CleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_CleanRam_Description}">
+                                <ui:Button Content="{x:Static resources:Strings.Menu_Performance_CleanRam_Button}" Icon="Broom28" Command="{Binding CleanRamCommand, Mode=OneTime}" />
+                            </controls:OptionControl>
+                            <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding CleanRamStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Title}" Description="{x:Static resources:Strings.Menu_Performance_AutoCleanRam_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding AutoCleanRam, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Performance_Display_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Desktop24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Resolution" />
+                                <TextBlock FontSize="12" Text="Force a specific in-game resolution on a chosen monitor." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Title}" Description="{x:Static resources:Strings.Menu_Performance_ForceInGameResolution_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding ForceInGameResolution, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMonitor_Description}">
+                                <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding MonitorOptions, Mode=OneTime}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding SelectedMonitor, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" Description="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Description}">
+                                <ComboBox Padding="10,5,10,5" MinWidth="220" IsEnabled="{Binding ForceInGameResolution}" ItemsSource="{Binding ModeOptions, Mode=OneWay}" SelectedItem="{Binding SelectedMode, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Title}" Description="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Description}">
+                                <Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Command="{Binding IdentifyDisplaysCommand}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Layer24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_Title}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0" DataContext="{Binding Overlays}">
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_StatsHud_Title}" FontSize="20" FontWeight="Medium" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_ShowFps_Title}" Description="{x:Static resources:Strings.Menu_Overlays_ShowFps_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding HudEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_Diagnostics_Title}" Description="{x:Static resources:Strings.Menu_Overlays_Diagnostics_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding DiagnosticsEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="DataBarVertical24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Extra HUD rows" />
+                                <TextBlock FontSize="12" Text="Add more stat rows below FPS - each is shown as its own line on the same HUD panel." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="Frame time" Description="Milliseconds per frame, alongside FPS.">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowFrameTime, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="CPU usage" Description="Total system CPU usage, all cores.">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowCpu, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="RAM usage" Description="Physical memory currently in use.">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowRam, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="Server ping" Description="Round-trip time to the current game server. Shows -- if the server's address isn't known yet.">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowPing, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="Focus mode" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Instantly hides the HUD and crosshair without turning them off - handy right before a screenshot or clip. Bind the Toggle Overlay Focus Mode hotkey on the Hotkeys page to flip this during a game session." />
+
+                    <controls:OptionControl Header="Overlay Focus Mode" Description="While on, the HUD and crosshair are hidden regardless of their own toggles above.">
+                        <ui:ToggleSwitch IsChecked="{Binding FocusModeEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <TextBlock Text="Per-game overlay profiles" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Override whether the HUD and crosshair show up in specific games, regardless of the global toggles above." />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Games24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="Game overrides" />
+                                <TextBlock FontSize="12" Text="Add a place ID with its own HUD/crosshair state." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <ui:TextBox Width="140" PlaceholderText="Place ID" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Margin="12,0,0,0" Content="HUD" VerticalAlignment="Center" IsChecked="{Binding AssignHudEnabled, Mode=TwoWay}" />
+                                <CheckBox Margin="12,0,0,0" Content="Crosshair" VerticalAlignment="Center" IsChecked="{Binding AssignCrosshairEnabled, Mode=TwoWay}" />
+                                <ui:Button Margin="12,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddPlaceProfileCommand, Mode=OneTime}" />
+                            </StackPanel>
+                            <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding PlaceProfiles, Mode=OneWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                                                <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemovePlaceProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Overlays_Crosshair_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairEnabled_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairEnabled_Description}">
+                        <ui:ToggleSwitch IsChecked="{Binding CrosshairEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Description}">
+                        <ComboBox Width="140" SelectedIndex="{Binding CrosshairShapeIndex, Mode=TwoWay}">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Cross}" />
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Dot}" />
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_Overlays_CrosshairShape_Ring}" />
+                        </ComboBox>
+                    </controls:OptionControl>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Target24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Overlays_CrosshairAppearance_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Overlays_CrosshairAppearance_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairSize_Title}">
+                                <ui:NumberBox Width="140" Min="2" Max="60" Value="{Binding CrosshairSize, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairLineThickness_Title}">
+                                <ui:NumberBox Width="140" Min="1" Max="16" Value="{Binding CrosshairLineThickness, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairGap_Title}">
+                                <ui:NumberBox Width="140" Min="0" Max="40" Value="{Binding CrosshairGap, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairOpacity_Title}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0.05" Maximum="1" TickFrequency="0.05" Value="{Binding CrosshairOpacity, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CrosshairOpacity, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairColor_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairColor_Description}">
+                                <TextBox Width="140" Text="{Binding CrosshairColorHex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Overlays_CrosshairOutlineColor_Title}" Description="{x:Static resources:Strings.Menu_Overlays_CrosshairOutlineColor_Description}">
+                                <TextBox Width="140" Text="{Binding CrosshairOutlineColorHex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Sparkle24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Title}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0" DataContext="{Binding RiShade}">
+                    <ui:CardExpander Margin="0,0,0,0" Icon="Options24" IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="General" />
+                                <TextBlock FontSize="12" Text="Turn RiShade on and choose which preset it renders with." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Enable_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Enable_Description}">
+                                <ui:ToggleSwitch IsChecked="{Binding RiShadeEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Preset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_Preset_Description}">
+                                <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresetNames, Mode=OneTime}" Text="{Binding SelectedPreset, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Title}" Description="{x:Static resources:Strings.Menu_RiShade_SaveOrLoadPreset_Description}">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:Button Icon="ArrowExportRtl24" Content="{x:Static resources:Strings.Menu_RiShade_ExportPreset}" Command="{Binding ExportPresetCommand}" Margin="0,0,8,0" />
+                                    <ui:Button Icon="DocumentArrowUp16" Content="{x:Static resources:Strings.Menu_RiShade_ImportPreset}" Command="{Binding ImportPresetCommand}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_RenderScale_Title}" Description="{x:Static resources:Strings.Menu_RiShade_RenderScale_Description}">
+                                <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding RenderScaleNames, Mode=OneTime}" SelectedIndex="{Binding RenderScaleIndex, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="Color &amp; tone" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Color24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_ColorGrade}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Brightness}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="-0.3" Maximum="0.3" Value="{Binding Brightness, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Brightness, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Gamma}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0.5" Maximum="2.0" Value="{Binding Gamma, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding Gamma, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_HueShift}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="-180" Maximum="180" Value="{Binding HueShift, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding HueShift, Mode=OneWay, StringFormat={}{0:0}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="WeatherSunny24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Tonemap}" />
+                                <TextBlock FontSize="12" Text="Tonemapping and edge vignette." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapOperator}">
+                                <ComboBox Width="160" Padding="10,5,10,5" ItemsSource="{Binding TonemapNames, Mode=OneTime}" SelectedIndex="{Binding TonemapMode, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapExposure}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0.2" Maximum="3.0" Value="{Binding TonemapExposure, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding TonemapExposure, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Vignette}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding VignetteStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding VignetteStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="Effects" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Sparkle24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Sharpen}" />
+                                <TextBlock FontSize="12" Text="Edge sharpening and glow bloom." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding SharpenStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding SharpenStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Bloom}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding BloomStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_BloomThreshold}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1.5" Value="{Binding BloomThreshold, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding BloomThreshold, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="PhotoFilter24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_ChromaticAberration}" />
+                                <TextBlock FontSize="12" Text="Color fringing and film grain." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="0.02" Value="{Binding ChromaStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ChromaStrength, Mode=OneWay, StringFormat={}{0:0.000}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+
+                            <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_FilmGrain}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                                <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="0.3" Value="{Binding GrainStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding GrainStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="BrightnessHigh24">
+                        <ui:CardExpander.Header>
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_DetailAndGlow}" />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Clarity}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding ClarityStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding ClarityStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Debanding}">
+                                <ui:ToggleSwitch IsChecked="{Binding DebandEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_AmbientGlow}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider Width="200" Minimum="0" Maximum="1" Value="{Binding AmbientStrength, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding AmbientStrength, Mode=OneWay, StringFormat={}{0:0.00}}" />
+                                </StackPanel>
+                            </controls:OptionControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_CustomEffects}" TextWrapping="Wrap" Margin="0,16,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_NotPorted}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+</ui:UiPage>

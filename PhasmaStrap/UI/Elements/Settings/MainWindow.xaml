@@ -170,10 +170,8 @@
                     <ui:NavigationItem Content="Manager" PageType="{x:Type installerpages:ManagerPage}" Icon="ArrowDownload24" PageTag="manager" />
 
                     <ui:NavigationHeader Text="Advanced" Icon="Wrench24" />
-                    <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Overlays_Title}" PageType="{x:Type pages:OverlaysPage}" Icon="Layer24" PageTag="overlays" />
+                    <ui:NavigationItem Content="Rendering" PageType="{x:Type pages:RenderingPage}" Icon="Gauge24" PageTag="rendering" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
                     <ui:NavigationItem Content="Hotkeys" PageType="{x:Type pages:HotkeysPage}" Icon="Keyboard24" PageTag="hotkeys" />
                     <ui:NavigationItem Content="Developer Tools" PageType="{x:Type pages:DeveloperToolsPage}" Icon="Code24" PageTag="developertools" />
