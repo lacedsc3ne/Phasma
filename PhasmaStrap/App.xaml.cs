@@ -522,6 +522,16 @@ namespace PhasmaStrap
 
                 try
                 {
+                    if (Settings.Prop.FriendActivityAlertsEnabled)
+                        Utility.FriendActivityMonitor.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Friend activity monitor startup failed: {ex.Message}");
+                }
+
+                try
+                {
                     Networking.NetworkingController.ReconcileOnStartup();
                 }
                 catch (Exception ex)

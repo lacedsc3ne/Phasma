@@ -299,6 +299,12 @@ namespace PhasmaStrap.Models.Persistable
         // handling for PhasmaStrap's own process while it's backgrounded, not Roblox's
         public bool LauncherMemoryManagerEnabled { get; set; } = false;
 
+        // toasts when a friend comes online or starts a game (see Utility.FriendActivityMonitor) -
+        // runs for the lifetime of any "normal" PhasmaStrap process, same as AutoCleanRam above,
+        // since friends can come online regardless of whether Roblox itself is running
+        public bool FriendActivityAlertsEnabled { get; set; } = false;
+        public int FriendActivityPollSeconds { get; set; } = 60;
+
         // forced in-game resolution + multi-monitor targeting (ported from Voidstrap
         // InGameResolutionApplier/DisplaySystem)
         public bool ForceInGameResolution { get; set; } = false;
