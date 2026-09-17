@@ -119,6 +119,11 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <!-- themable panel behind the sidebar (search box + navigation); transparent unless a custom
+                 colour theme sets SidebarBackgroundBrush -->
+            <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="-6,-6,6,8" CornerRadius="10"
+                    Background="{DynamicResource SidebarBackgroundBrush}" IsHitTestVisible="False" />
+
             <!-- Settings search: every option/group/tab/section on every page is indexed (generated
                  from the pages' XAML - see tools/gen_settings_search_index.py). Results open in the
                  popup below; choosing one navigates, switches tab, expands the group and highlights

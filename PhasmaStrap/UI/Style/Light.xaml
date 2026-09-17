@@ -8,4 +8,8 @@
     <SolidColorBrush x:Key="BackgroundGlowPrimaryBrush" Color="#FFF4554B" />
     <Color x:Key="BackgroundGlowSecondaryColor">#FFCF3B32</Color>
     <SolidColorBrush x:Key="BackgroundGlowSecondaryBrush" Color="#FFCF3B32" />
+
+    <!--  panel behind the settings window's sidebar - nothing by default, AppColorTheme can give it a colour  -->
+    <Color x:Key="SidebarBackgroundColor">#00000000</Color>
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#00000000" />
 </ResourceDictionary>

@@ -36,6 +36,12 @@ namespace PhasmaStrap.Utility
         public string? BrushKey { get; init; }
 
         public string Fallback { get; init; } = "#FF202020";
+
+        /// <summary>
+        /// True for colours whose transparency is part of the look (glows, the sidebar panel,
+        /// secondary text). The editor gives these rows an opacity slider.
+        /// </summary>
+        public bool AllowAlpha { get; init; }
     }
 
     public sealed class ThemeValidationResult
@@ -77,14 +83,32 @@ namespace PhasmaStrap.Utility
             ["SolidColorBrush"] = new HashSet<string>(StringComparer.Ordinal) { "Key", "Color", "Opacity" },
         };
 
-        // Only resource keys that PhasmaStrap's own UI/Style/Dark.xaml and Light.xaml define.
+        public const string AccentColorKey = "PhasmaAccentColor";
+
+        // Resource keys that PhasmaStrap's own UI/Style/Dark.xaml and Light.xaml define, plus the
+        // Wpf.Ui text colours and the accent (see AccentColorKey).
         public static IReadOnlyList<ThemeKeyInfo> Schema { get; } = new List<ThemeKeyInfo>
         {
             new() { Label = "App background", Group = "Window", ColorKey = "ApplicationBackgroundColor", BrushKey = "ApplicationBackgroundBrush", Fallback = "#FF0E0E12" },
             // the two drifting, pulsing glows behind the settings window (the red mist by default).
             // Lower the alpha (first two hex digits) to make one fainter, or 00 to hide it.
-            new() { Label = "Background glow (top left)", Group = "Window", ColorKey = "BackgroundGlowPrimaryColor", BrushKey = "BackgroundGlowPrimaryBrush", Fallback = "#FFF4554B" },
-            new() { Label = "Background glow (right)", Group = "Window", ColorKey = "BackgroundGlowSecondaryColor", BrushKey = "BackgroundGlowSecondaryBrush", Fallback = "#FFCF3B32" },
+            new() { Label = "Background glow (top left)", Group = "Window", ColorKey = "BackgroundGlowPrimaryColor", BrushKey = "BackgroundGlowPrimaryBrush", Fallback = "#FFF4554B", AllowAlpha = true },
+            new() { Label = "Background glow (right)", Group = "Window", ColorKey = "BackgroundGlowSecondaryColor", BrushKey = "BackgroundGlowSecondaryBrush", Fallback = "#FFCF3B32", AllowAlpha = true },
+
+            // A panel behind the search box and navigation list. Fully transparent by default (the
+            // sidebar has no background of its own); raise the opacity for a solid or frosted look.
+            new() { Label = "Sidebar background", Group = "Window", ColorKey = "SidebarBackgroundColor", BrushKey = "SidebarBackgroundBrush", Fallback = "#00000000", AllowAlpha = true },
+
+            // Not an ordinary resource: Wpf.Ui derives a whole family of accent colours and brushes
+            // from one colour and writes them straight into Application.Resources, where a merged
+            // dictionary can't override them. WpfUiWindow.ApplyAccentFrom reads this key and feeds
+            // it to Wpf.Ui instead (buttons, toggles, sliders, the selected page marker, links...).
+            new() { Label = "Accent colour", Group = "Accent", ColorKey = AccentColorKey, Fallback = "#FFF4554B" },
+
+            new() { Label = "Text", Group = "Text", ColorKey = "TextFillColorPrimary", BrushKey = "TextFillColorPrimaryBrush", Fallback = "#FFFFFFFF" },
+            new() { Label = "Text (secondary - descriptions)", Group = "Text", ColorKey = "TextFillColorSecondary", BrushKey = "TextFillColorSecondaryBrush", Fallback = "#C5FFFFFF", AllowAlpha = true },
+            new() { Label = "Text (tertiary - hints)", Group = "Text", ColorKey = "TextFillColorTertiary", BrushKey = "TextFillColorTertiaryBrush", Fallback = "#87FFFFFF", AllowAlpha = true },
+            new() { Label = "Text (disabled)", Group = "Text", ColorKey = "TextFillColorDisabled", BrushKey = "TextFillColorDisabledBrush", Fallback = "#5DFFFFFF", AllowAlpha = true },
             new() { Label = "Base surface", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorBase", BrushKey = "SolidBackgroundFillColorBaseBrush", Fallback = "#FF16161B" },
             new() { Label = "Base surface (alt)", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorBaseAlt", BrushKey = "SolidBackgroundFillColorBaseAltBrush", Fallback = "#FF0A0A0D" },
             new() { Label = "Secondary surface", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorSecondary", BrushKey = "SolidBackgroundFillColorSecondaryBrush", Fallback = "#FF121216" },

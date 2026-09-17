@@ -99,6 +99,24 @@ namespace PhasmaStrap.UI.Elements.Base
         // called repeatedly as the base skin is swapped out.
         private const int AppColorThemeIndex = 4;
 
+        /// <summary>
+        /// Applies the accent colour a colour theme asks for, or PhasmaStrap's own red when the
+        /// theme is null / doesn't set one. Also used by the theme editor for its live preview.
+        /// </summary>
+        public static void ApplyAccentFrom(ResourceDictionary? theme)
+        {
+            Color accent = PhasmaAccent;
+
+            if (theme is not null && theme.Contains(PhasmaStrap.Utility.AppColorTheme.AccentColorKey)
+                && theme[PhasmaStrap.Utility.AppColorTheme.AccentColorKey] is Color custom)
+            {
+                // an accent nobody can see would make every toggle and button invisible
+                accent = Color.FromRgb(custom.R, custom.G, custom.B);
+            }
+
+            Wpf.Ui.Appearance.Accent.Apply(accent, Wpf.Ui.Appearance.Theme.GetAppTheme());
+        }
+
         private void ApplyAppColorTheme()
         {
             var dictionaries = Application.Current.Resources.MergedDictionaries;
@@ -111,6 +129,7 @@ namespace PhasmaStrap.UI.Elements.Base
             }
 
             var overrides = PhasmaStrap.Utility.AppColorTheme.LoadForApp();
+            ApplyAccentFrom(overrides);
 
             if (dictionaries.Count > AppColorThemeIndex)
                 dictionaries[AppColorThemeIndex] = overrides;

@@ -109,7 +109,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     ? found
                     : (AppColorTheme.TryParseColor(info.Fallback, out Color fb) ? fb : Colors.Black);
 
-                ThemeColorItem item = new(info.Key, info.Label, color, info.Group);
+                ThemeColorItem item = new(info.Key, info.Label, color, info.Group, info.AllowAlpha);
                 item.Changed += SchedulePreview;
                 _items.Add(item);
             }
@@ -201,6 +201,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     merged.Remove(_previewDict);
                 _previewDict = dict;
                 merged.Add(dict);
+
+                // the accent isn't a plain resource - see AppColorTheme.AccentColorKey
+                Base.WpfUiWindow.ApplyAccentFrom(dict);
             }
             catch (Exception ex)
             {
@@ -214,6 +217,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             {
                 if (_previewDict != null)
                     Application.Current.Resources.MergedDictionaries.Remove(_previewDict);
+
+                // back to whatever is actually saved
+                Base.WpfUiWindow.ApplyAccentFrom(App.Settings.Prop.CustomColorThemeEnabled ? AppColorTheme.LoadForApp() : null);
             }
             catch
             {
@@ -311,8 +317,10 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         {
             if (sender is not FrameworkElement fe || fe.DataContext is not ThemeColorItem item)
                 return;
+            // the Windows colour dialog has no alpha and always answers fully opaque - keep the row's
+            // own opacity (its slider), or a translucent glow/sidebar would turn solid on every pick
             if (TryPickColor(item.Color, out Color picked))
-                item.SetColor(picked);
+                item.SetColor(Color.FromArgb(item.AllowAlpha ? item.Color.A : (byte)255, picked.R, picked.G, picked.B));
         }
 
         private static bool TryPickColor(Color initial, out Color picked)
