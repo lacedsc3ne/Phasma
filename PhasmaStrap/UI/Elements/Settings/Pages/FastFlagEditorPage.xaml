@@ -80,6 +80,10 @@
                 <ui:ToggleSwitch IsChecked="{Binding RemoveFromGlobal, Mode=TwoWay}" />
             </controls:OptionControl>
 
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlagEditor_RestartRobloxWhenPresetCouldnT}" Description="{x:Static resources:Strings.Menu_FastFlagEditor_RobloxOnlyReadsFastFlagsWhenStarts}">
+                <ui:ToggleSwitch IsChecked="{Binding RestartRobloxForPresets, Mode=TwoWay}" />
+            </controls:OptionControl>
+
             <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PresetStatus, Mode=OneWay}" />
 
             <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Presets, Mode=OneWay}">

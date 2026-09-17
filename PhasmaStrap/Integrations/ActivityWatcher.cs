@@ -27,6 +27,14 @@ namespace PhasmaStrap.Integrations
         private int _logEntriesRead = 0;
         private bool _teleportMarker = false;
         private bool _reservedTeleportMarker = false;
+
+        // The next server's join lines, when Roblox logged them BEFORE the current server's
+        // disconnect line. On a server switch the order of "! Joining game" and "Time to disconnect
+        // replication data" is a race between two Roblox threads; when the join won, it used to be
+        // ignored (we were still "in game"), then the late disconnect wiped the state, and the
+        // following "Replicator created" had nothing to confirm - the watcher sat at "not in a
+        // game" for the whole session (no tray info, no presence, no replay, no overlays).
+        private ActivityData? _pendingJoin;
         
         public event EventHandler<string>? OnLogEntry;
         public event EventHandler? OnGameJoin;
@@ -158,6 +166,9 @@ namespace PhasmaStrap.Integrations
                 
                 OnAppClose?.Invoke(this, EventArgs.Empty);
 
+                // back on the app's home screen - whatever server was queued up is not happening
+                _pendingJoin = null;
+
                 if (Data.PlaceId != 0 && !InGame)
                 {
                     App.Logger.WriteLine(LOG_IDENT, "User appears to be leaving from a cancelled/errored join");
@@ -173,34 +184,12 @@ namespace PhasmaStrap.Integrations
                 
                 if (logMessage.StartsWith(GameJoiningEntry))
                 {
-                    Match match = Regex.Match(logMessage, GameJoiningEntryPattern);
-
-                    if (match.Groups.Count != 4)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, $"Failed to assert format for game join entry");
-                        App.Logger.WriteLine(LOG_IDENT, logMessage);
+                    ActivityData? joining = ParseJoining(logMessage);
+                    if (joining is null)
                         return;
-                    }
 
                     InGame = false;
-                    Data.PlaceId = long.Parse(match.Groups[2].Value);
-                    Data.JobId = match.Groups[1].Value;
-                    Data.MachineAddress = match.Groups[3].Value;
-
-                    if (App.Settings.Prop.ShowServerDetails && Data.MachineAddressValid)
-                        _ = Data.QueryServerLocation();
-
-                    if (_teleportMarker)
-                    {
-                        Data.IsTeleport = true;
-                        _teleportMarker = false;
-                    }
-
-                    if (_reservedTeleportMarker)
-                    {
-                        Data.ServerType = ServerType.Reserved;
-                        _reservedTeleportMarker = false;
-                    }
+                    Data = joining;
 
                     App.Logger.WriteLine(LOG_IDENT, $"Joining Game ({Data})");
                 }
@@ -211,53 +200,23 @@ namespace PhasmaStrap.Integrations
 
                 if (logMessage.StartsWith(GameJoiningUniverseEntry))
                 {
-                    var match = Regex.Match(logMessage, GameJoiningUniversePattern);
-
-                    if (match.Groups.Count != 3)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join universe entry");
-                        App.Logger.WriteLine(LOG_IDENT, logMessage);
-                        return;
-                    }
-
-                    Data.UniverseId = Int64.Parse(match.Groups[1].Value);
-                    Data.UserId = Int64.Parse(match.Groups[2].Value);
-
-                    var loadTimeMatch = Regex.Match(logMessage, GameJoinReferralPattern);
-
-                    if (loadTimeMatch.Groups.Count == 2)
-                    {
-                        string referral = loadTimeMatch.Groups[1].Value;
-
-                        if (referral.Contains("RequestPrivateGame", StringComparison.OrdinalIgnoreCase) || referral.Contains("GameDetailPageJSHybridEvent", StringComparison.OrdinalIgnoreCase))
-                            Data.ServerType = ServerType.Private;
-                    }
-
-                    if (History.Any())
-                    {
-                        var lastActivity = History.First();
-
-                        if (Data.UniverseId == lastActivity.UniverseId && Data.IsTeleport)
-                            Data.RootActivity = lastActivity.RootActivity ?? lastActivity;
-                    }
+                    ApplyUniverse(Data, logMessage, previous: History.FirstOrDefault());
                 }
                 else if (logMessage.StartsWith(GameJoiningUDMUXEntry))
                 {
-                    var match = Regex.Match(logMessage, GameJoiningUDMUXPattern);
-
-                    if (match.Groups.Count != 3 || match.Groups[2].Value != Data.MachineAddress)
+                    ApplyUdmux(Data, logMessage);
+                }
+                else if (logMessage.StartsWith(GameJoiningEntry))
+                {
+                    // a second join before the first was confirmed (the first one failed or was
+                    // redirected) - the newest one is the one that can still happen
+                    ActivityData? joining = ParseJoining(logMessage);
+                    if (joining is not null && joining.JobId != Data.JobId)
                     {
-                        App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join UDMUX entry");
-                        App.Logger.WriteLine(LOG_IDENT, logMessage);
-                        return;
+                        App.Logger.WriteLine(LOG_IDENT, $"Join to ({Data}) was superseded");
+                        Data = joining;
+                        App.Logger.WriteLine(LOG_IDENT, $"Joining Game ({Data})");
                     }
-
-                    Data.MachineAddress = match.Groups[1].Value;
-
-                    if (App.Settings.Prop.ShowServerDetails)
-                        _ = Data.QueryServerLocation();
-
-                    App.Logger.WriteLine(LOG_IDENT, $"Server is UDMUX protected ({Data})");
                 }
                 else if (logMessage.StartsWith(GameJoinedEntry))
                 {
@@ -275,15 +234,48 @@ namespace PhasmaStrap.Integrations
 
                 if (logMessage.StartsWith(GameDisconnectedEntry))
                 {
-                    App.Logger.WriteLine(LOG_IDENT, $"Disconnected from Game ({Data})");
+                    LeaveCurrentGame(LOG_IDENT);
 
-                    Data.TimeLeft = DateTime.Now;
-                    History.Insert(0, Data);
+                    // the next server was already announced (see _pendingJoin) - carry on joining it
+                    if (_pendingJoin is not null)
+                    {
+                        Data = _pendingJoin;
+                        _pendingJoin = null;
+                        App.Logger.WriteLine(LOG_IDENT, $"Joining Game ({Data}) - announced before the previous server disconnected");
+                    }
+                }
+                else if (logMessage.StartsWith(GameJoiningEntry))
+                {
+                    ActivityData? joining = ParseJoining(logMessage);
+                    if (joining is not null && joining.JobId != Data.JobId)
+                    {
+                        _pendingJoin = joining;
+                        App.Logger.WriteLine(LOG_IDENT, $"Next server announced while still connected ({joining})");
+                    }
+                }
+                else if (_pendingJoin is not null && logMessage.StartsWith(GameJoiningUniverseEntry))
+                {
+                    // the game being left is what the next one is compared against
+                    ApplyUniverse(_pendingJoin, logMessage, previous: Data);
+                }
+                else if (_pendingJoin is not null && logMessage.StartsWith(GameJoiningUDMUXEntry))
+                {
+                    ApplyUdmux(_pendingJoin, logMessage);
+                }
+                else if (_pendingJoin is not null && logMessage.StartsWith(GameJoinedEntry))
+                {
+                    // the new server is up and the old one never logged its disconnect
+                    LeaveCurrentGame(LOG_IDENT);
 
-                    InGame = false;
-                    Data = new();
+                    Data = _pendingJoin;
+                    _pendingJoin = null;
 
-                    OnGameLeave?.Invoke(this, EventArgs.Empty);
+                    App.Logger.WriteLine(LOG_IDENT, $"Joined Game ({Data})");
+
+                    InGame = true;
+                    Data.TimeJoined = DateTime.Now;
+
+                    OnGameJoin?.Invoke(this, EventArgs.Empty);
                 }
                 else if (logMessage.StartsWith(GameTeleportingEntry))
                 {
@@ -381,6 +373,110 @@ namespace PhasmaStrap.Integrations
                     LastRPCRequest = DateTime.Now;
                 }
             }
+        }
+
+        private void LeaveCurrentGame(string logIdent)
+        {
+            App.Logger.WriteLine(logIdent, $"Disconnected from Game ({Data})");
+
+            Data.TimeLeft = DateTime.Now;
+            History.Insert(0, Data);
+
+            InGame = false;
+            Data = new();
+
+            OnGameLeave?.Invoke(this, EventArgs.Empty);
+        }
+
+        // "! Joining game '<job>' place <id> at <address>" -> a fresh ActivityData, or null if the
+        // line doesn't have that shape. Consumes the teleport markers set by a preceding doTeleport.
+        private ActivityData? ParseJoining(string logMessage)
+        {
+            const string LOG_IDENT = "ActivityWatcher::ParseJoining";
+
+            Match match = Regex.Match(logMessage, GameJoiningEntryPattern);
+
+            if (match.Groups.Count != 4)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to assert format for game join entry");
+                App.Logger.WriteLine(LOG_IDENT, logMessage);
+                return null;
+            }
+
+            var data = new ActivityData
+            {
+                PlaceId = long.Parse(match.Groups[2].Value),
+                JobId = match.Groups[1].Value,
+                MachineAddress = match.Groups[3].Value,
+            };
+
+            if (App.Settings.Prop.ShowServerDetails && data.MachineAddressValid)
+                _ = data.QueryServerLocation();
+
+            if (_teleportMarker)
+            {
+                data.IsTeleport = true;
+                _teleportMarker = false;
+            }
+
+            if (_reservedTeleportMarker)
+            {
+                data.ServerType = ServerType.Reserved;
+                _reservedTeleportMarker = false;
+            }
+
+            return data;
+        }
+
+        private static void ApplyUniverse(ActivityData data, string logMessage, ActivityData? previous)
+        {
+            const string LOG_IDENT = "ActivityWatcher::ApplyUniverse";
+
+            var match = Regex.Match(logMessage, GameJoiningUniversePattern);
+
+            if (match.Groups.Count != 3)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join universe entry");
+                App.Logger.WriteLine(LOG_IDENT, logMessage);
+                return;
+            }
+
+            data.UniverseId = Int64.Parse(match.Groups[1].Value);
+            data.UserId = Int64.Parse(match.Groups[2].Value);
+
+            var loadTimeMatch = Regex.Match(logMessage, GameJoinReferralPattern);
+
+            if (loadTimeMatch.Groups.Count == 2)
+            {
+                string referral = loadTimeMatch.Groups[1].Value;
+
+                if (referral.Contains("RequestPrivateGame", StringComparison.OrdinalIgnoreCase) || referral.Contains("GameDetailPageJSHybridEvent", StringComparison.OrdinalIgnoreCase))
+                    data.ServerType = ServerType.Private;
+            }
+
+            if (previous is not null && data.UniverseId == previous.UniverseId && data.IsTeleport)
+                data.RootActivity = previous.RootActivity ?? previous;
+        }
+
+        private static void ApplyUdmux(ActivityData data, string logMessage)
+        {
+            const string LOG_IDENT = "ActivityWatcher::ApplyUdmux";
+
+            var match = Regex.Match(logMessage, GameJoiningUDMUXPattern);
+
+            if (match.Groups.Count != 3 || match.Groups[2].Value != data.MachineAddress)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Failed to assert format for game join UDMUX entry");
+                App.Logger.WriteLine(LOG_IDENT, logMessage);
+                return;
+            }
+
+            data.MachineAddress = match.Groups[1].Value;
+
+            if (App.Settings.Prop.ShowServerDetails)
+                _ = data.QueryServerLocation();
+
+            App.Logger.WriteLine(LOG_IDENT, $"Server is UDMUX protected ({data})");
         }
 
         public void Dispose()
