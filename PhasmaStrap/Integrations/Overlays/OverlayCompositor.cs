@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using PhasmaStrap.Utility;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
@@ -462,7 +464,7 @@ namespace PhasmaStrap.Integrations.Overlays
             _psOverlay = CompilePs("PSOverlay");
 
             _hudBlend = _device!.CreateBlendState(new BlendDescription(Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha));
-            _hud.Init(_device!);
+            _hud.Init(_device!, CountHudRows());
             _crosshair.Init(_device!);
 
             _sampler = _device!.CreateSamplerState(new SamplerDescription
@@ -1058,9 +1060,22 @@ namespace PhasmaStrap.Integrations.Overlays
             return targetSrv;
         }
 
+        // how many rows the HUD texture needs to be sized for - checked once at Init() time (see
+        // the comment on OverlayHud.TexWidth/TexHeight), matching the same row set UpdateHudIfDue
+        // builds below
+        private static int CountHudRows()
+        {
+            int rows = 1; // FPS is always the first row whenever the HUD is on at all
+            if (App.Settings.Prop.OverlayHudShowFrameTime) rows++;
+            if (App.Settings.Prop.OverlayHudShowCpu) rows++;
+            if (App.Settings.Prop.OverlayHudShowRam) rows++;
+            if (App.Settings.Prop.OverlayHudShowPing) rows++;
+            return rows;
+        }
+
         private void UpdateHudIfDue()
         {
-            bool enabled = App.Settings.Prop.OverlayHudEnabled;
+            bool enabled = OverlaySettings.HudEnabled;
             if (!enabled)
             {
                 _hudPainted = false;
@@ -1084,7 +1099,36 @@ namespace PhasmaStrap.Integrations.Overlays
             double fps = frames / window;
             try
             {
-                _hud.Update(_context!, new[] { "FPS" }, new[] { $"{fps:0}/s" });
+                var labels = new List<string> { "FPS" };
+                var values = new List<string> { $"{fps:0}/s" };
+
+                if (App.Settings.Prop.OverlayHudShowFrameTime)
+                {
+                    double frameMs = fps > 0 ? 1000.0 / fps : 0;
+                    labels.Add("FRAME");
+                    values.Add($"{frameMs:0.0}ms");
+                }
+
+                if (App.Settings.Prop.OverlayHudShowCpu)
+                {
+                    labels.Add("CPU");
+                    values.Add($"{SystemStatsSampler.SampleCpuPercent():0}%");
+                }
+
+                if (App.Settings.Prop.OverlayHudShowRam)
+                {
+                    labels.Add("RAM");
+                    values.Add($"{SystemStatsSampler.SampleRamPercent():0}%");
+                }
+
+                if (App.Settings.Prop.OverlayHudShowPing)
+                {
+                    int ping = ServerPingMonitor.LatestMs;
+                    labels.Add("PING");
+                    values.Add(ping >= 0 ? $"{ping}ms" : "--");
+                }
+
+                _hud.Update(_context!, labels.ToArray(), values.ToArray());
                 _hudPainted = true;
             }
             catch (Exception ex)
@@ -1104,7 +1148,7 @@ namespace PhasmaStrap.Integrations.Overlays
             _context.PSSetSampler(0, _sampler);
             _context.IASetInputLayout(null);
             _context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            _context.RSSetViewport(new Viewport(HudX, HudY, OverlayHud.TexWidth, OverlayHud.TexHeight, 0, 1));
+            _context.RSSetViewport(new Viewport(HudX, HudY, _hud.TexWidth, _hud.TexHeight, 0, 1));
             _context.PSSetShaderResources(0, _nullSrvs);
             _context.PSSetShaderResource(0, _hud.Srv);
             _context.Draw(3, 0);

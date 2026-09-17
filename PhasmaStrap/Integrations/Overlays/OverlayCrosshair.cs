@@ -53,7 +53,7 @@ namespace PhasmaStrap.Integrations.Overlays
         {
             try
             {
-                return OverlayHub.InGame && App.Settings?.Prop?.Crosshair == true && App.Settings.Prop.CrosshairShapeIndex != 3;
+                return OverlayHub.InGame && OverlaySettings.CrosshairEnabled && App.Settings?.Prop?.CrosshairShapeIndex != 3;
             }
             catch
             {
