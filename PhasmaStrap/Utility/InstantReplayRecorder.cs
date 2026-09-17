@@ -286,6 +286,40 @@ namespace PhasmaStrap.Utility
         // hand instead.
         private static ulong PackAttribute(uint high, uint low) => ((ulong)high << 32) | low;
 
+        // --- two Vortice.MediaFoundation 2.1.0 defects worked around here (verified with a
+        // standalone test - see the git history of this file):
+        //  1. IMFAttributes.Set<ulong>/<long> recurses into itself until the stack overflows,
+        //     which took the whole game-session process down the first time a clip was saved.
+        //     UINT64 attributes go through IMFAttributes::SetUINT64 on the raw COM vtable instead
+        //     (slot 22: IUnknown x3, GetItem..GetUnknown x15, SetItem, DeleteItem,
+        //     DeleteAllItems, SetUINT32, SetUINT64).
+        //  2. MediaFactory.MFCreateSinkWriterFromURL is bound to Mfplat.dll, but the export lives
+        //     in mfreadwrite.dll - EntryPointNotFoundException every time.
+
+        [System.Runtime.InteropServices.UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.StdCall)]
+        private delegate int SetUInt64Fn(IntPtr self, ref Guid key, ulong value);
+
+        private static void SetUInt64(IMFAttributes attributes, Guid key, ulong value)
+        {
+            IntPtr self = attributes.NativePointer;
+            IntPtr vtable = System.Runtime.InteropServices.Marshal.ReadIntPtr(self);
+            IntPtr fn = System.Runtime.InteropServices.Marshal.ReadIntPtr(vtable, 22 * IntPtr.Size);
+            int hr = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<SetUInt64Fn>(fn)(self, ref key, value);
+            if (hr < 0)
+                System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(hr);
+        }
+
+        [System.Runtime.InteropServices.DllImport("mfreadwrite.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling = true)]
+        private static extern int MFCreateSinkWriterFromURL(string pwszOutputURL, IntPtr pByteStream, IntPtr pAttributes, out IntPtr ppSinkWriter);
+
+        private static IMFSinkWriter CreateSinkWriterFromUrl(string path)
+        {
+            int hr = MFCreateSinkWriterFromURL(path, IntPtr.Zero, IntPtr.Zero, out IntPtr ptr);
+            if (hr < 0)
+                System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(hr);
+            return new IMFSinkWriter(ptr);
+        }
+
         private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, out int streamIndex)
         {
             IMFMediaType outputType = MediaFactory.MFCreateMediaType();
@@ -293,18 +327,21 @@ namespace PhasmaStrap.Utility
             outputType.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.H264);
             outputType.Set(MediaTypeAttributeKeys.AvgBitrate, (uint)BitrateForQuality());
             outputType.Set(MediaTypeAttributeKeys.InterlaceMode, (uint)VideoInterlaceMode.Progressive);
-            outputType.Set(MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
-            outputType.Set(MediaTypeAttributeKeys.FrameRate, PackAttribute((uint)fps, 1));
-            outputType.Set(MediaTypeAttributeKeys.PixelAspectRatio, PackAttribute(1, 1));
+            SetUInt64(outputType, MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
+            SetUInt64(outputType, MediaTypeAttributeKeys.FrameRate, PackAttribute((uint)fps, 1));
+            SetUInt64(outputType, MediaTypeAttributeKeys.PixelAspectRatio, PackAttribute(1, 1));
 
             IMFMediaType inputType = MediaFactory.MFCreateMediaType();
             inputType.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video);
             inputType.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Rgb32);
-            inputType.Set(MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
-            inputType.Set(MediaTypeAttributeKeys.FrameRate, PackAttribute((uint)fps, 1));
-            inputType.Set(MediaTypeAttributeKeys.PixelAspectRatio, PackAttribute(1, 1));
+            SetUInt64(inputType, MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
+            SetUInt64(inputType, MediaTypeAttributeKeys.FrameRate, PackAttribute((uint)fps, 1));
+            SetUInt64(inputType, MediaTypeAttributeKeys.PixelAspectRatio, PackAttribute(1, 1));
+            // GDI bitmaps are top-down; without a positive default stride MF assumes RGB32 is
+            // bottom-up and the clip comes out vertically flipped
+            inputType.Set(MediaTypeAttributeKeys.DefaultStride, (uint)(width * 4));
 
-            IMFSinkWriter writer = MediaFactory.MFCreateSinkWriterFromURL(path, null, null);
+            IMFSinkWriter writer = CreateSinkWriterFromUrl(path);
             streamIndex = writer.AddStream(outputType);
             writer.SetInputMediaType(streamIndex, inputType, null);
 

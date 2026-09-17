@@ -205,8 +205,35 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void UpdatePosition()
         {
-            Rect workArea = SystemParameters.WorkArea;
             _slideDistance = ActualWidth > 0 ? ActualWidth : Width;
+
+            // SystemParameters.WorkArea is cached by WPF and goes stale when a fullscreen game
+            // switches the display resolution - the toast then lands off the right edge of the
+            // (now smaller) screen. Ask Windows for the live work area of the monitor the game
+            // (or the cursor) is on, and convert device pixels to WPF units for this window's DPI.
+            Rect workArea = SystemParameters.WorkArea;
+            try
+            {
+                System.Windows.Forms.Screen screen = System.Windows.Forms.Screen.FromPoint(System.Windows.Forms.Cursor.Position);
+                foreach (Process process in Process.GetProcessesByName(App.RobloxPlayerAppName))
+                {
+                    if (process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        screen = System.Windows.Forms.Screen.FromHandle(process.MainWindowHandle);
+                        break;
+                    }
+                }
+
+                var area = screen.WorkingArea;
+                Matrix fromDevice = PresentationSource.FromVisual(this)?.CompositionTarget?.TransformFromDevice ?? Matrix.Identity;
+                Point topLeft = fromDevice.Transform(new Point(area.Left, area.Top));
+                Point bottomRight = fromDevice.Transform(new Point(area.Right, area.Bottom));
+                workArea = new Rect(topLeft, bottomRight);
+            }
+            catch (Exception)
+            {
+            }
+
             Left = workArea.Right - _slideDistance - EdgeMargin;
             Top = workArea.Top + EdgeMargin;
         }
