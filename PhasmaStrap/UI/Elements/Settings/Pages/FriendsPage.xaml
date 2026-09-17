@@ -83,7 +83,7 @@
                                 <TextBlock FontSize="11" Opacity="0.7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
 
-                            <ui:Button Grid.Column="2" Content="Join" Icon="ArrowEnter24" Appearance="Primary" VerticalAlignment="Center"
+                            <ui:Button Grid.Column="2" Content="Join" Icon="ArrowRight24" Appearance="Primary" VerticalAlignment="Center"
                                        Visibility="{Binding Joinable, Converter={StaticResource BooleanToVisibilityConverter}}"
                                        Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                         </Grid>
