@@ -73,8 +73,18 @@ namespace PhasmaStrap
                 // OverlayHub is the single lifecycle owner for the whole GPU overlay compositor -
                 // RiShade/Anti-Aliasing/Frame Generation all run as stages inside it (see
                 // OverlayCompositor.RenderFrame) rather than having their own game-join/leave wiring.
-                ActivityWatcher.OnGameJoin += delegate { OverlayHub.OnGameJoin(); };
+                ActivityWatcher.OnGameJoin += (sender, _) => OverlayHub.OnGameJoin((sender as ActivityWatcher)?.Data.PlaceId ?? 0);
                 ActivityWatcher.OnGameLeave += delegate { OverlayHub.OnGameLeave(); };
+
+                // the HUD's "Show ping" row - checked live (not gated at startup like most of the
+                // handlers below) since it costs nothing to subscribe and this way toggling it on
+                // the Overlays page takes effect on the very next game join, no relaunch needed
+                ActivityWatcher.OnGameJoin += (sender, _) =>
+                {
+                    if (App.Settings.Prop.OverlayHudShowPing)
+                        ServerPingMonitor.Start((sender as ActivityWatcher)?.Data.MachineAddress);
+                };
+                ActivityWatcher.OnGameLeave += (_, _) => ServerPingMonitor.Stop();
 
                 if (App.Settings.Prop.UseDisableAppPatch)
                 {
@@ -193,6 +203,18 @@ namespace PhasmaStrap
                 NotificationCenter.Notify(
                     path is not null ? "Replay saved" : "Replay failed",
                     path is not null ? Path.GetFileName(path) : "Nothing was buffered yet.",
+                    NotificationCategory.General);
+            });
+            _hotkeys.RegisterAction(HotkeyActions.ToggleOverlayFocusMode, () =>
+            {
+                bool enabled = !App.Settings.Prop.OverlayFocusModeEnabled;
+                App.Settings.Prop.OverlayFocusModeEnabled = enabled;
+                App.Settings.Save();
+                OverlayHub.Refresh();
+
+                NotificationCenter.Notify(
+                    enabled ? "Overlay Focus Mode on" : "Overlay Focus Mode off",
+                    enabled ? "HUD and crosshair are hidden until you toggle this again." : "HUD and crosshair are back.",
                     NotificationCategory.General);
             });
             _hotkeys.ApplyBindings();
@@ -340,6 +362,7 @@ namespace PhasmaStrap
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
 
             OverlayHub.Shutdown();
+            ServerPingMonitor.Stop();
 
             _notifyIcon?.Dispose();
             RichPresence?.Dispose();

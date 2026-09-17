@@ -17,9 +17,15 @@ namespace PhasmaStrap.Integrations.Overlays
     /// </summary>
     internal sealed class OverlayHud
     {
-        public const int TexWidth = 220;
-        public const int TexHeight = 40;
+        // sized dynamically by Init() based on how many rows will actually be shown (FPS alone vs.
+        // FPS + frame time + CPU + RAM + ping), rather than a single fixed size - a texture sized
+        // for 5 rows would leave a mostly-empty panel when only FPS is enabled, and one sized for 1
+        // row would clip the rest.
+        public int TexWidth { get; private set; } = 240;
+        public int TexHeight { get; private set; } = 40;
 
+        private const int RowHeight = 22;
+        private const int Padding = 12;
         private const int LabelCols = 8;
 
         private ID3D11Device _device = null!;
@@ -38,10 +44,11 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public ID3D11ShaderResourceView? Srv => _srv;
 
-        public void Init(ID3D11Device device)
+        public void Init(ID3D11Device device, int maxRows = 1)
         {
             Dispose();
             _device = device;
+            TexHeight = Padding + RowHeight * Math.Max(1, maxRows);
             _tex = _device.CreateTexture2D(new Texture2DDescription
             {
                 Width = TexWidth,

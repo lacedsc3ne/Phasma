@@ -162,6 +162,24 @@ namespace PhasmaStrap.Models.Persistable
         public string CrosshairColorHex { get; set; } = "#00FF00";
         public string CrosshairOutlineColorHex { get; set; } = "#000000";
 
+        // extra HUD rows on top of FPS - each is an opt-in addition, off by default so the HUD
+        // looks exactly as it always has unless the user turns these on individually
+        public bool OverlayHudShowFrameTime { get; set; } = false;
+        public bool OverlayHudShowCpu { get; set; } = false;
+        public bool OverlayHudShowRam { get; set; } = false;
+        public bool OverlayHudShowPing { get; set; } = false;
+
+        // manual "hide overlays for a moment" switch - toggled from the Overlays page or a global
+        // hotkey (HotkeyActions.ToggleOverlayFocusMode). Only suppresses the informational HUD/
+        // crosshair, not the RiShade/Anti-Aliasing/Frame Generation render effects, since those
+        // aren't "overlay UI" in the same sense.
+        public bool OverlayFocusModeEnabled { get; set; } = false;
+
+        // per-game overlay profile: places with an entry here override the HUD/crosshair enabled
+        // state whenever that place is joined, without touching the global toggles above. Keyed by
+        // placeId (string, matching EnginePlaceProfiles' convention).
+        public Dictionary<string, OverlayPlaceProfile> OverlayPlaceProfiles { get; set; } = new();
+
         // RiShade shader post-processing (ported from Voidstrap, screen-space effects only)
         // defaults to off: this is GPU shader injection and is a significant perf/behaviour change
         public bool RiShadeEnabled { get; set; } = false;

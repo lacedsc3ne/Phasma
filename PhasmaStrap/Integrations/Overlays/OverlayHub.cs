@@ -26,8 +26,15 @@ namespace PhasmaStrap.Integrations.Overlays
         private static volatile bool _shutdown;
         private static volatile bool _inGame;
         private static volatile bool _compositorLive;
+        private static long _currentPlaceId;
 
         public static bool InGame => _inGame;
+
+        // the place currently joined, if any - lets OverlaySettings resolve per-game overlay
+        // profile overrides (Settings.OverlayPlaceProfiles) without OverlayCompositor needing its
+        // own reference to ActivityWatcher, which lives in a different subsystem entirely. long
+        // isn't a valid `volatile` type in C#, so this uses Interlocked instead.
+        public static long CurrentPlaceId => Interlocked.Read(ref _currentPlaceId);
 
         internal static void SetCompositorLive(bool live) => _compositorLive = live;
 
@@ -47,8 +54,9 @@ namespace PhasmaStrap.Integrations.Overlays
             Refresh();
         }
 
-        public static void OnGameJoin()
+        public static void OnGameJoin(long placeId = 0)
         {
+            Interlocked.Exchange(ref _currentPlaceId, placeId);
             _inGame = true;
             Refresh();
         }
@@ -56,6 +64,7 @@ namespace PhasmaStrap.Integrations.Overlays
         public static void OnGameLeave()
         {
             _inGame = false;
+            Interlocked.Exchange(ref _currentPlaceId, 0);
             Refresh();
         }
 
