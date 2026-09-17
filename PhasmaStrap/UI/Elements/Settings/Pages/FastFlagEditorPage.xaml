@@ -95,7 +95,10 @@
                                     <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" />
                                     <TextBlock FontSize="11" Opacity="0.7" Text="{Binding FlagCount, StringFormat='{}{0} flag(s)'}" />
                                 </StackPanel>
-                                <ui:Button Grid.Column="1" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="Edit flags" ToolTip="Change, add or remove the flags inside this preset" Command="{Binding DataContext.EditPresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="Delete this preset" Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>

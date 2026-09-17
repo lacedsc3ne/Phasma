@@ -37,6 +37,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand SavePresetCommand => new RelayCommand(SavePreset);
         public ICommand DeletePresetCommand => new RelayCommand<FastFlagPresetRow>(DeletePreset);
 
+        public ICommand EditPresetCommand => new RelayCommand<FastFlagPresetRow>(EditPreset);
+
+        private void EditPreset(FastFlagPresetRow? row)
+        {
+            if (row is null)
+                return;
+
+            var dialog = new UI.Elements.Dialogs.PresetEditorDialog(row.Snapshot)
+            {
+                Owner = System.Windows.Application.Current.Windows.OfType<UI.Elements.Settings.MainWindow>().FirstOrDefault()
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                PresetStatus = $"Saved changes to '{row.Name}'.";
+                RefreshPresets();
+            }
+        }
+
         // When building a preset from the flags selected in the grid: take them OUT of the global
         // list so they only apply where the preset is assigned. This is the whole point of a
         // per-place preset - a flag left in the global list still applies to every game.
