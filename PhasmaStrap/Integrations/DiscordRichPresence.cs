@@ -28,7 +28,17 @@ namespace PhasmaStrap.Integrations
 
     public class DiscordRichPresence : IDisposable
     {
-        private readonly DiscordRpcClient _rpcClient = new("1005469189907173486");
+        // Bloxstrap's shared Discord application ("Roblox") unless the user registered their own -
+        // see Settings.DiscordApplicationId
+        public const string DefaultApplicationId = "1005469189907173486";
+
+        public static string ResolveApplicationId()
+        {
+            string custom = (App.Settings.Prop.DiscordApplicationId ?? "").Trim();
+            return custom.Length >= 15 && custom.All(char.IsDigit) ? custom : DefaultApplicationId;
+        }
+
+        private readonly DiscordRpcClient _rpcClient = new(ResolveApplicationId());
         private readonly ActivityWatcher _activityWatcher;
         private readonly Queue<Message> _messageQueue = new();
 

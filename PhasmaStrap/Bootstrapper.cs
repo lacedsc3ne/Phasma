@@ -1,4 +1,4 @@
-﻿// To debug the automatic updater:
+// To debug the automatic updater:
 // - Uncomment the definition below
 // - Publish the executable
 // - Launch the executable (click no when it asks you to upgrade)
@@ -797,12 +797,34 @@ namespace PhasmaStrap
             {
                 string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
 
+                // the preset goes ON TOP of the global flags ApplyModifications already wrote - a
+                // preset only holds the place-specific flags, so replacing the file would silently
+                // drop every global flag for that session
+                var merged = new Dictionary<string, object>();
+                try
+                {
+                    if (File.Exists(filePath))
+                    {
+                        var existing = JsonSerializer.Deserialize<Dictionary<string, object>>(await File.ReadAllTextAsync(filePath));
+                        if (existing is not null)
+                            foreach (var kv in existing)
+                                merged[kv.Key] = kv.Value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Could not read the existing flag file, preset will be applied alone: {ex.Message}");
+                }
+
+                foreach (var kv in snapshot.Flags)
+                    merged[kv.Key] = kv.Value;
+
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
                 Filesystem.AssertReadOnly(filePath);
-                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(snapshot.Flags, new JsonSerializerOptions { WriteIndented = true }));
+                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(merged, new JsonSerializerOptions { WriteIndented = true }));
                 Filesystem.AssertReadOnly(filePath);
 
-                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag preset '{presetName}' ({snapshot.Flags.Count} flag(s)) for place {placeId}");
+                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag preset '{presetName}' ({snapshot.Flags.Count} flag(s) on top of {merged.Count - snapshot.Flags.Count} global) for place {placeId}");
             }
             catch (Exception ex)
             {

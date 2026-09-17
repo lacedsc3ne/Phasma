@@ -85,7 +85,10 @@ namespace PhasmaStrap.Utility
                 int id = nextId++;
 
                 if (RegisterHotKey(_window.Handle, id, modifiers, vk))
+                {
                     _registered[id] = (actionId, callback);
+                    App.Logger.WriteLine(LOG_IDENT, $"Registered '{gestureText}' for '{actionId}'");
+                }
                 else
                     App.Logger.WriteLine(LOG_IDENT, $"Failed to register '{gestureText}' for '{actionId}' - likely already bound by another app");
             }
@@ -97,6 +100,8 @@ namespace PhasmaStrap.Utility
 
             if (!_registered.TryGetValue(id, out var entry))
                 return;
+
+            App.Logger.WriteLine(LOG_IDENT, $"'{entry.ActionId}' pressed");
 
             try
             {

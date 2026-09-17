@@ -25,7 +25,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private readonly Queue<NotificationQueueItem> _queue = new();
         private readonly CancellationTokenSource _lifetimeCts = new();
-        private double _slideDistance = 360;
+        private double _slideDistance = 420;
 
         private bool _isProcessing;
         private bool _closed;
@@ -84,6 +84,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
                     TitleText.Text = item.Title;
                     MessageText.Text = item.Message;
+                    MessageText.Visibility = string.IsNullOrWhiteSpace(item.Message) ? Visibility.Collapsed : Visibility.Visible;
                     ApplyCategoryStyle(item.Category);
 
                     ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
@@ -96,6 +97,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     if (!IsVisible)
                         Show();
 
+                    // SizeToContent="Height": let the new text measure before we place the window
+                    InvalidateMeasure();
                     UpdateLayout();
                     UpdatePosition();
 
@@ -174,19 +177,22 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void ApplyCategoryStyle(NotificationCategory category)
         {
-            (Wpf.Ui.Common.SymbolRegular symbol, string accentKey) = category switch
+            (Wpf.Ui.Common.SymbolRegular symbol, string accentKey, string source) = category switch
             {
-                NotificationCategory.GameJoin => (Wpf.Ui.Common.SymbolRegular.PlayCircle24, "SystemFillColorSuccessBrush"),
-                NotificationCategory.GameLeave => (Wpf.Ui.Common.SymbolRegular.DoorArrowRight20, "SystemFillColorCautionBrush"),
-                _ => (Wpf.Ui.Common.SymbolRegular.Info24, "SystemAccentColorPrimaryBrush"),
+                NotificationCategory.GameJoin => (Wpf.Ui.Common.SymbolRegular.PlayCircle24, "SystemFillColorSuccessBrush", "Game session"),
+                NotificationCategory.GameLeave => (Wpf.Ui.Common.SymbolRegular.DoorArrowRight20, "SystemFillColorCautionBrush", "Game session"),
+                _ => (Wpf.Ui.Common.SymbolRegular.Info24, "SystemAccentColorPrimaryBrush", "PhasmaStrap"),
             };
 
             CategoryIcon.Symbol = symbol;
+            SourceText.Text = source;
 
-            if (Application.Current.TryFindResource(accentKey) is Brush brush)
+            if (Application.Current.TryFindResource(accentKey) is SolidColorBrush brush)
             {
-                CategoryBadge.Fill = brush;
+                AccentBar.Background = brush;
                 ProgressBar.Fill = brush;
+                CategoryIcon.Foreground = brush;
+                IconBackground.Color = brush.Color;
             }
         }
 

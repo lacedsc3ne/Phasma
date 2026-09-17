@@ -9,7 +9,7 @@
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:HistoryViewModel, IsDesignTimeCreatable=True}"
       Title="HistoryPage"
-      Scrollable="True">
+      Scrollable="False">
     <StackPanel Margin="0,0,14,14">
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_History_EveryGameYouVePlayedThrough}" />
 

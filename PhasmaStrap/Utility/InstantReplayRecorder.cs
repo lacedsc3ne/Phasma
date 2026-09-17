@@ -218,6 +218,8 @@ namespace PhasmaStrap.Utility
             Directory.CreateDirectory(ClipsDir);
             string path = Path.Combine(ClipsDir, $"Replay_{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
 
+            App.Logger.WriteLine(LOG_IDENT, $"Encoding {frames.Count} buffered frame(s) ({width}x{height} @ {fps}fps) to {path}");
+
             bool startedHere = false;
 
             try
@@ -230,6 +232,7 @@ namespace PhasmaStrap.Utility
                 }
 
                 IMFSinkWriter writer = CreateSinkWriter(path, width, height, fps, out int streamIndex);
+                App.Logger.WriteLine(LOG_IDENT, "Sink writer created, writing samples");
 
                 writer.BeginWriting();
 
@@ -255,6 +258,7 @@ namespace PhasmaStrap.Utility
                     timestamp += frameDurationTicks;
                 }
 
+                App.Logger.WriteLine(LOG_IDENT, "All samples written, finalizing");
                 writer.Finalize();
 
                 App.Logger.WriteLine(LOG_IDENT, $"Saved {frames.Count} frame(s) ({width}x{height} @ {fps}fps) to {path}");

@@ -142,6 +142,17 @@ namespace PhasmaStrap
                 // (SettingsHotReload) - so flipping it mid-game starts/stops the buffer right away
                 Utility.SettingsHotReload.Reloaded += (_, _) =>
                 {
+                    // hotkeys bound/changed while the game runs - RegisterHotKey must run on the
+                    // thread that owns the message window, so marshal back
+                    try
+                    {
+                        App.Current.Dispatcher.BeginInvoke(() => _hotkeys?.ApplyBindings());
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine("Watcher::SettingsReloaded", $"Hotkey re-apply failed: {ex.Message}");
+                    }
+
                     try
                     {
                         bool wanted = App.Settings.Prop.InstantReplayEnabled && ActivityWatcher.InGame;
@@ -260,8 +271,12 @@ namespace PhasmaStrap
                 NotificationCategory.General);
         }
 
+        private int _replaySaving;
+
         public void SaveInstantReplay()
         {
+            const string LOG_IDENT = "Watcher::SaveInstantReplay";
+
             if (!App.Settings.Prop.InstantReplayEnabled)
             {
                 NotificationCenter.Notify("Instant Replay is off", "Turn it on under Capture > Instant Replay - it starts buffering as soon as you're in a game.", NotificationCategory.General);
@@ -283,11 +298,45 @@ namespace PhasmaStrap
                 return;
             }
 
-            string? path = _instantReplay.SaveClip();
-            NotificationCenter.Notify(
-                path is not null ? "Replay saved" : "Replay failed",
-                path is not null ? Path.GetFileName(path) : "Nothing was buffered yet.",
-                NotificationCategory.General);
+            if (Interlocked.CompareExchange(ref _replaySaving, 1, 0) != 0)
+            {
+                NotificationCenter.Notify("Still saving the last clip", "Give it a few seconds before pressing the hotkey again.", NotificationCategory.General);
+                return;
+            }
+
+            // encoding takes a few seconds - it must never run on this thread (the hotkey/message
+            // thread), or every later hotkey press and tray interaction queues up behind it
+            int seconds = App.Settings.Prop.InstantReplayClipSeconds;
+            NotificationCenter.Notify("Saving replay...", $"Encoding the last {seconds}s to MP4 - this takes a few seconds.", NotificationCategory.General, 4);
+            App.Logger.WriteLine(LOG_IDENT, "Encoding clip on a background thread");
+
+            _ = Task.Run(() =>
+            {
+                string? path = null;
+                string? error = null;
+
+                try
+                {
+                    path = _instantReplay.SaveClip();
+                }
+                catch (Exception ex)
+                {
+                    error = ex.Message;
+                    App.Logger.WriteException(LOG_IDENT, ex);
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref _replaySaving, 0);
+                }
+
+                App.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    NotificationCenter.Notify(
+                        path is not null ? "Replay saved" : "Replay failed",
+                        path is not null ? $"{Path.GetFileName(path)} - open it from the Capture page." : (error ?? "Nothing was buffered yet - check the log for details."),
+                        NotificationCategory.General, 6);
+                });
+            });
         }
 
         public void ToggleOverlayFocusMode()

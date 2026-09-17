@@ -37,14 +37,81 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand SavePresetCommand => new RelayCommand(SavePreset);
         public ICommand DeletePresetCommand => new RelayCommand<FastFlagPresetRow>(DeletePreset);
 
+        // When building a preset from the flags selected in the grid: take them OUT of the global
+        // list so they only apply where the preset is assigned. This is the whole point of a
+        // per-place preset - a flag left in the global list still applies to every game.
+        private bool _removeFromGlobal = true;
+        public bool RemoveFromGlobal
+        {
+            get => _removeFromGlobal;
+            set { _removeFromGlobal = value; OnPropertyChanged(nameof(RemoveFromGlobal)); }
+        }
+
+        private string _presetStatus = "";
+        public string PresetStatus
+        {
+            get => _presetStatus;
+            private set { _presetStatus = value; OnPropertyChanged(nameof(PresetStatus)); }
+        }
+
         private void SavePreset()
         {
             if (string.IsNullOrWhiteSpace(NewPresetName))
+            {
+                PresetStatus = "Give the preset a name first.";
                 return;
+            }
 
             FastFlagSnapshotManager.Save(NewPresetName.Trim());
+            PresetStatus = $"Saved '{NewPresetName.Trim()}' with every flag currently in the list ({App.FastFlags.Prop.Count}). Those flags are still global - use 'Preset from selected flags' to make place-only flags.";
             NewPresetName = "";
             RefreshPresets();
+        }
+
+        /// <summary>
+        /// Saves only the given flags as a preset and (optionally) removes them from the global
+        /// flag list, so they take effect only for places the preset is assigned to. Returns true
+        /// when the editor's flag list changed and should be reloaded.
+        /// </summary>
+        public bool SavePresetFromFlags(IReadOnlyList<string> flagNames)
+        {
+            if (string.IsNullOrWhiteSpace(NewPresetName))
+            {
+                PresetStatus = "Give the preset a name first.";
+                return false;
+            }
+
+            if (flagNames.Count == 0)
+            {
+                PresetStatus = "Select one or more flags in the list below first (Ctrl+click for several).";
+                return false;
+            }
+
+            var flags = new List<KeyValuePair<string, object>>();
+            foreach (string name in flagNames)
+            {
+                if (App.FastFlags.Prop.TryGetValue(name, out object? value) && value is not null)
+                    flags.Add(new KeyValuePair<string, object>(name, value));
+            }
+
+            string presetName = NewPresetName.Trim();
+            FastFlagSnapshotManager.Save(presetName, flags);
+
+            bool changedGlobal = false;
+            if (RemoveFromGlobal)
+            {
+                foreach (var flag in flags)
+                    App.FastFlags.SetValue(flag.Key, null);
+                changedGlobal = flags.Count > 0;
+            }
+
+            PresetStatus = RemoveFromGlobal
+                ? $"Saved '{presetName}' with {flags.Count} flag(s) and removed them from your global flags - they now apply only to places you assign this preset to. Press Save to keep the change."
+                : $"Saved '{presetName}' with {flags.Count} flag(s). They're still in your global flags too.";
+
+            NewPresetName = "";
+            RefreshPresets();
+            return changedGlobal;
         }
 
         private void DeletePreset(FastFlagPresetRow? row)

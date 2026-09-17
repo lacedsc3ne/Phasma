@@ -52,7 +52,9 @@ namespace PhasmaStrap.Utility
             return result.OrderByDescending(s => s.CreatedUtc).ToList();
         }
 
-        public static void Save(string name)
+        public static void Save(string name) => Save(name, App.FastFlags.Prop);
+
+        public static void Save(string name, IEnumerable<KeyValuePair<string, object>> flags)
         {
             Directory.CreateDirectory(SnapshotDir);
 
@@ -60,7 +62,7 @@ namespace PhasmaStrap.Utility
             {
                 Name = name,
                 CreatedUtc = DateTime.UtcNow,
-                Flags = new Dictionary<string, object>(App.FastFlags.Prop),
+                Flags = flags.ToDictionary(kv => kv.Key, kv => kv.Value),
             };
 
             File.WriteAllText(SnapshotPath(name), JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true }));

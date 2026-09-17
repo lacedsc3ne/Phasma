@@ -8,7 +8,7 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="GameChatPage"
-      Scrollable="True">
+      Scrollable="False">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
         <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_KeyboardHookNotice}" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />

@@ -4388,7 +4388,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Presets &amp; per-place assignment</value>
   </data>
   <data name="Menu.FastFlagEditor.SaveFlagSetBelowAsNamed" xml:space="preserve">
-    <value>Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched.</value>
+    <value>Select flags in the list, name a preset and create it - the flags move out of your global list and apply on top of it only for the places you assign the preset to. Your global flags always apply everywhere; a preset adds to (or overrides) them for its assigned places.</value>
   </data>
   <data name="Menu.FastFlagEditor.PresetName" xml:space="preserve">
     <value>Preset name</value>
@@ -4400,7 +4400,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Per-place assignment</value>
   </data>
   <data name="Menu.FastFlagEditor.PlacesAssignmentLaunchPresetSFlags" xml:space="preserve">
-    <value>Places with an assignment launch with that preset's flags instead of your normal saved ones.</value>
+    <value>Places with an assignment launch with your global flags plus that preset's flags on top. Unassigned places launch with the global flags only.</value>
   </data>
   <data name="Menu.FastFlagSettings.AssetBlocking" xml:space="preserve">
     <value>Asset blocking</value>

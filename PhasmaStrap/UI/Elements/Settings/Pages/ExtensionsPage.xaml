@@ -7,7 +7,7 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="ExtensionsPage"
-      Scrollable="True">
+      Scrollable="False">
     <StackPanel Margin="0,0,14,14">
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Extensions_ManageRojoLocateThirdPartyTools}" />
 
