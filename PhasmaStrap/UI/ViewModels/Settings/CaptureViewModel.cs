@@ -198,7 +198,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 double bufferMb = InstantReplayRecorder.EstimateBufferBytes(width, height, fps, seconds, quality) / 1048576.0;
                 double clipMb = InstantReplayRecorder.BitrateFor(width, height, fps, quality) / 8.0 * seconds / 1048576.0;
 
-                return $"With these settings a fullscreen game records at {width} × {height}, {fps} fps. The rolling buffer uses about {bufferMb:0} MB of RAM, and a full {seconds}s clip is about {clipMb:0} MB on disk.";
+                string text = $"With these settings a fullscreen game records at {width} × {height}, {fps} fps. The rolling buffer uses about {Math.Min(bufferMb, InstantReplayRecorder.MaxBufferMegabytes):0} MB of RAM, and a full {seconds}s clip is about {clipMb:0} MB on disk.";
+
+                if (bufferMb > InstantReplayRecorder.MaxBufferMegabytes)
+                    text += $" That is over the {InstantReplayRecorder.MaxBufferMegabytes} MB buffer limit, so clips will come out at roughly {seconds * InstantReplayRecorder.MaxBufferMegabytes / bufferMb:0}s - lower the frame rate, resolution or clip length to keep the full {seconds}s.";
+
+                if (fps > 60)
+                    text += " High frame rates use noticeably more CPU while you play.";
+
+                return text;
             }
         }
 

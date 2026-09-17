@@ -5114,7 +5114,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Frame rate</value>
   </data>
   <data name="Menu.Capture.HowManyFramesPerSecondClip" xml:space="preserve">
-    <value>How many frames per second the clip records. 60 fps is only reached while Roblox is the window you are playing in. If the PC cannot keep up, the clip simply has fewer frames - it never plays too fast.</value>
+    <value>How many frames per second the clip records. Anything above 30 fps needs Roblox to be the window you are playing in, and tops out at your monitor's refresh rate and the game's own frame rate. If the PC cannot keep up, the clip simply has fewer frames - it never plays too fast.</value>
   </data>
   <data name="Menu.Capture.NativeRecordsGameAtExactlySize" xml:space="preserve">
     <value>Native records the game at exactly the size it is running at (1920 x 1080 on a 1080p screen). Pick a lower option to scale clips down and save memory and disk space.</value>
