@@ -59,6 +59,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand ClearHistoryCommand => new RelayCommand(NotificationCenter.ClearHistory);
 
+        // Most real notifications (auto-rejoin, screenshot/replay hotkeys, friend activity while a
+        // game's running) fire from the Watcher process, not Settings - NotificationCenter's history
+        // is in-memory and per-process, so none of those ever show up here. This lets Do Not Disturb
+        // and the history list actually be tested from Settings alone, without needing Roblox running.
+        public ICommand SendTestNotificationCommand => new RelayCommand(() =>
+            NotificationCenter.Notify("Test notification", "This is what a PhasmaStrap toast looks like.", NotificationCategory.General));
+
         /// <summary>
         /// Called from the page's Unloaded handler so this viewmodel doesn't keep
         /// <see cref="NotificationCenter"/> subscribed for the lifetime of the process after the page

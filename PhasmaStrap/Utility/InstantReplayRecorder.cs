@@ -3,6 +3,8 @@ using System.Drawing.Imaging;
 using Vortice.MediaFoundation;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.Storage.Xps;
 
 namespace PhasmaStrap.Utility
 {
@@ -11,9 +13,10 @@ namespace PhasmaStrap.Utility
     // once Start() is called (mirrors how Medal/ShadowPlay-style instant replay works: press the
     // hotkey AFTER something happens, not before).
     //
-    // Capture reuses the same plain GDI approach as ScreenshotCapture (Graphics.CopyFromScreen
-    // over the window's GetWindowRect), not OverlayCompositor's DXGI desktop-duplication - same
-    // reasoning as screenshots: this needs to work independent of whether overlays are enabled.
+    // Capture reuses the same PrintWindow(PW_RENDERFULLCONTENT) approach as ScreenshotCapture
+    // (see its header comment), not OverlayCompositor's DXGI desktop-duplication - same reasoning
+    // as screenshots: this needs to work independent of whether overlays are enabled, and needs
+    // the game's actual content even if something else happens to be on top of it on screen.
     // Frames are downscaled before buffering (capped resolution) since the buffer is held raw,
     // uncompressed, in memory for the whole clip length - buffering at full 1080p+ for 30s+ would
     // be multiple GB of RAM.
@@ -111,8 +114,26 @@ namespace PhasmaStrap.Utility
                 int height = Math.Max(2, (int)(srcHeight * scale)) & ~1;
 
                 using var full = new Bitmap(srcWidth, srcHeight, PixelFormat.Format32bppRgb);
+
                 using (Graphics g = Graphics.FromImage(full))
-                    g.CopyFromScreen(rect.left, rect.top, 0, 0, new Size(srcWidth, srcHeight));
+                {
+                    // PrintWindow(PW_RENDERFULLCONTENT), not CopyFromScreen - see ScreenshotCapture's
+                    // header comment for why: CopyFromScreen grabs whatever's visually on top of that
+                    // screen region, which during a real session is often something other than the
+                    // game (Settings, another monitor's window, a notification toast) rather than
+                    // Roblox's own content.
+                    IntPtr hdc = g.GetHdc();
+                    try
+                    {
+                        // PW_RENDERFULLCONTENT (0x2) - see ScreenshotCapture.Capture's comment on
+                        // the same cast for why this isn't a named enum member here.
+                        PInvoke.PrintWindow(hwnd, new HDC(hdc), (PRINT_WINDOW_FLAGS)2);
+                    }
+                    finally
+                    {
+                        g.ReleaseHdc(hdc);
+                    }
+                }
 
                 using Bitmap scaled = scale < 1.0
                     ? ResizeBitmap(full, width, height)

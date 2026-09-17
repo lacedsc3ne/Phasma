@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using CommunityToolkit.Mvvm.Input;
 
@@ -52,6 +53,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand FocusCommand { get; }
         public ICommand CloseCommand { get; }
 
+        private readonly DispatcherTimer _autoRefreshTimer;
+
         public InstancesViewModel()
         {
             RefreshCommand = new RelayCommand(Refresh);
@@ -60,7 +63,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             CloseCommand = new RelayCommand<RobloxInstanceRow?>(Close);
 
             Refresh();
+
+            // uptime/memory are only ever computed at Refresh() time, not live-bound - without
+            // this they'd sit frozen at whatever they read on the last manual Refresh click
+            _autoRefreshTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromSeconds(2),
+            };
+            _autoRefreshTimer.Tick += (_, _) => Refresh();
+            _autoRefreshTimer.Start();
         }
+
+        public void Detach() => _autoRefreshTimer.Stop();
 
         private void Refresh()
         {

@@ -156,7 +156,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public double CrosshairOpacity
         {
             get => App.Settings.Prop.CrosshairOpacity;
-            set => App.Settings.Prop.CrosshairOpacity = value;
+            set { App.Settings.Prop.CrosshairOpacity = value; OnPropertyChanged(nameof(CrosshairOpacity)); }
         }
 
         public string CrosshairColorHex

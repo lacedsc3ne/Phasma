@@ -10,3 +10,5 @@ GetWindowRect
 GetForegroundWindow
 IsWindow
 GetWindowThreadProcessId
+PrintWindow
+IsIconic

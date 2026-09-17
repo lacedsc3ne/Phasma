@@ -9,5 +9,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DataContext = new InstancesViewModel();
             InitializeComponent();
         }
+
+        private void Page_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ((InstancesViewModel)DataContext).Detach();
+        }
     }
 }

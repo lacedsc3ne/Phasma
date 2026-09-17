@@ -47,9 +47,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<FastFlagDiffEntry> DiffEntries { get; } = new();
 
-        public string DiffSummary => DiffEntries.Count == 0
-            ? "Pick two snapshots above to compare them."
-            : $"{DiffEntries.Count} difference(s).";
+        public string DiffSummary => (SelectedSnapshotA, SelectedSnapshotB) switch
+        {
+            (null, _) or (_, null) => "Pick two snapshots above to compare them.",
+            _ when DiffEntries.Count == 0 => "No differences - these two snapshots have identical flags.",
+            _ => $"{DiffEntries.Count} difference(s).",
+        };
 
         public ICommand SaveSnapshotCommand => new RelayCommand(SaveSnapshot);
         public ICommand ApplySnapshotCommand => new RelayCommand<SnapshotRow>(ApplySnapshot);
@@ -227,10 +230,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             PluginInstallStatus = "Downloading...";
 
-            byte[]? bytes = await RobloxAssetDownloader.DownloadAssetAsync(assetId);
-            if (bytes is null || bytes.Length == 0)
+            AssetDownloadResult result = await RobloxAssetDownloader.DownloadAssetAsync(assetId);
+            if (!result.Success || result.Bytes is null)
             {
-                PluginInstallStatus = "Download failed - check the asset ID and your connection.";
+                PluginInstallStatus = result.Error ?? "Download failed.";
                 return;
             }
 
@@ -240,7 +243,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Directory.CreateDirectory(pluginsFolder);
 
                 string destination = Path.Combine(pluginsFolder, $"Plugin_{assetId}.rbxm");
-                File.WriteAllBytes(destination, bytes);
+                File.WriteAllBytes(destination, result.Bytes);
 
                 PluginInstallStatus = $"Installed to {destination}. Restart Studio to load it.";
             }
