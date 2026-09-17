@@ -3,6 +3,12 @@
     <SolidColorBrush x:Key="NewTextEditorForeground" Color="#F2F2F5" />
     <SolidColorBrush x:Key="NewTextEditorLink" Color="#F4554B" />
 
+    <!--  the two drifting glows behind the settings window (MainWindow.xaml); AppColorTheme can override them  -->
+    <Color x:Key="BackgroundGlowPrimaryColor">#FFF4554B</Color>
+    <SolidColorBrush x:Key="BackgroundGlowPrimaryBrush" Color="#FFF4554B" />
+    <Color x:Key="BackgroundGlowSecondaryColor">#FFCF3B32</Color>
+    <SolidColorBrush x:Key="BackgroundGlowSecondaryBrush" Color="#FFCF3B32" />
+
     <!--  Phasma warm-dark palette overrides (mirrors PhasmaMacro's index.html design tokens)  -->
     <Color x:Key="ApplicationBackgroundColor">#0E0E12</Color>
     <SolidColorBrush x:Key="ApplicationBackgroundBrush" Color="#0E0E12" />

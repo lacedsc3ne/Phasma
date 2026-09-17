@@ -81,6 +81,10 @@ namespace PhasmaStrap.Utility
         public static IReadOnlyList<ThemeKeyInfo> Schema { get; } = new List<ThemeKeyInfo>
         {
             new() { Label = "App background", Group = "Window", ColorKey = "ApplicationBackgroundColor", BrushKey = "ApplicationBackgroundBrush", Fallback = "#FF0E0E12" },
+            // the two drifting, pulsing glows behind the settings window (the red mist by default).
+            // Lower the alpha (first two hex digits) to make one fainter, or 00 to hide it.
+            new() { Label = "Background glow (top left)", Group = "Window", ColorKey = "BackgroundGlowPrimaryColor", BrushKey = "BackgroundGlowPrimaryBrush", Fallback = "#FFF4554B" },
+            new() { Label = "Background glow (right)", Group = "Window", ColorKey = "BackgroundGlowSecondaryColor", BrushKey = "BackgroundGlowSecondaryBrush", Fallback = "#FFCF3B32" },
             new() { Label = "Base surface", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorBase", BrushKey = "SolidBackgroundFillColorBaseBrush", Fallback = "#FF16161B" },
             new() { Label = "Base surface (alt)", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorBaseAlt", BrushKey = "SolidBackgroundFillColorBaseAltBrush", Fallback = "#FF0A0A0D" },
             new() { Label = "Secondary surface", Group = "Surfaces", ColorKey = "SolidBackgroundFillColorSecondary", BrushKey = "SolidBackgroundFillColorSecondaryBrush", Fallback = "#FF121216" },

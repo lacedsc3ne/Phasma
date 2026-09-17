@@ -67,27 +67,27 @@
 
         <!--  drifting red mist behind the glass, matches the bootstrapper splash's style  -->
         <Canvas Grid.RowSpan="2" ClipToBounds="True" IsHitTestVisible="False">
-            <Ellipse x:Name="Mist1" Width="480" Height="480" Canvas.Left="-160" Canvas.Top="-200" Opacity="0.12" Effect="{StaticResource MistBlurLarge}">
+            <Ellipse x:Name="Mist1" Width="480" Height="480" Canvas.Left="-160" Canvas.Top="-200" Opacity="0.12" Effect="{StaticResource MistBlurLarge}" Fill="{DynamicResource BackgroundGlowPrimaryBrush}">
                 <Ellipse.RenderTransform>
                     <TranslateTransform x:Name="MistTranslate1" X="-80" Y="30" />
                 </Ellipse.RenderTransform>
-                <Ellipse.Fill>
+                <Ellipse.OpacityMask>
                     <RadialGradientBrush>
-                        <GradientStop Color="#8FF4554B" Offset="0" />
-                        <GradientStop Color="#00F4554B" Offset="1" />
+                        <GradientStop Color="#8F000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
                     </RadialGradientBrush>
-                </Ellipse.Fill>
+                </Ellipse.OpacityMask>
             </Ellipse>
-            <Ellipse x:Name="Mist2" Width="420" Height="420" Canvas.Left="620" Canvas.Top="120" Opacity="0.15" Effect="{StaticResource MistBlurLarge}">
+            <Ellipse x:Name="Mist2" Width="420" Height="420" Canvas.Left="620" Canvas.Top="120" Opacity="0.15" Effect="{StaticResource MistBlurLarge}" Fill="{DynamicResource BackgroundGlowSecondaryBrush}">
                 <Ellipse.RenderTransform>
                     <TranslateTransform x:Name="MistTranslate2" X="90" Y="-40" />
                 </Ellipse.RenderTransform>
-                <Ellipse.Fill>
+                <Ellipse.OpacityMask>
                     <RadialGradientBrush>
-                        <GradientStop Color="#80CF3B32" Offset="0" />
-                        <GradientStop Color="#00CF3B32" Offset="1" />
+                        <GradientStop Color="#80000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
                     </RadialGradientBrush>
-                </Ellipse.Fill>
+                </Ellipse.OpacityMask>
             </Ellipse>
         </Canvas>
 
