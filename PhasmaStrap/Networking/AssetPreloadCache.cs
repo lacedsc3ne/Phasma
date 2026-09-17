@@ -2,6 +2,20 @@ using System.Security.Cryptography;
 
 namespace PhasmaStrap.Networking
 {
+    public sealed class AssetCacheEntry
+    {
+        public string FileName { get; init; } = "";
+        public long SizeBytes { get; init; }
+        public DateTime LastAccessedUtc { get; init; }
+
+        public string SizeDisplay => SizeBytes >= 1024 * 1024
+            ? $"{SizeBytes / 1048576.0:0.#} MB"
+            : $"{SizeBytes / 1024.0:0.#} KB";
+
+        public string LastAccessedDisplay => LastAccessedUtc.ToLocalTime().ToString("g");
+    }
+
+
     // AssetWarp "Preloading" - a disk cache for the batch asset-resolution/thumbnail-lookup
     // responses that flow through AssetWarpPolicy/AssetWarpThumbnailPolicy.
     //
@@ -148,6 +162,35 @@ namespace PhasmaStrap.Networking
             {
                 if (Directory.Exists(CacheDir))
                     Directory.Delete(CacheDir, recursive: true);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException(LOG_IDENT, ex);
+            }
+        }
+
+        // Entries are keyed on a SHA256 hash of host+path+body (see CacheFilePath), so there's no
+        // real asset/game name to show per entry - this is a size/age browser, not a content
+        // browser. Still genuinely useful: see how much space preloading is using and clear
+        // specific stale entries without wiping the whole cache.
+        public static List<AssetCacheEntry> ListEntries()
+        {
+            if (!Directory.Exists(CacheDir))
+                return new List<AssetCacheEntry>();
+
+            return new DirectoryInfo(CacheDir).GetFiles("*.json")
+                .Select(f => new AssetCacheEntry { FileName = f.Name, SizeBytes = f.Length, LastAccessedUtc = f.LastAccessTimeUtc })
+                .OrderByDescending(e => e.LastAccessedUtc)
+                .ToList();
+        }
+
+        public static void DeleteEntry(string fileName)
+        {
+            try
+            {
+                string path = Path.Combine(CacheDir, fileName);
+                if (File.Exists(path))
+                    File.Delete(path);
             }
             catch (Exception ex)
             {

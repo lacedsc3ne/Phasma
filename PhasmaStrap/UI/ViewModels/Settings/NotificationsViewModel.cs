@@ -43,6 +43,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool DoNotDisturbEnabled
+        {
+            get => App.Settings.Prop.DoNotDisturbEnabled;
+            set
+            {
+                App.Settings.Prop.DoNotDisturbEnabled = value;
+                OnPropertyChanged(nameof(DoNotDisturbEnabled));
+            }
+        }
+
         public ObservableCollection<NotificationRecord> History { get; } = new();
 
         public bool HasHistory => History.Count > 0;

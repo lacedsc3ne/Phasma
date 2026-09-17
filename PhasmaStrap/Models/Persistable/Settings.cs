@@ -215,6 +215,10 @@ namespace PhasmaStrap.Models.Persistable
         public bool NotificationsJoinToastEnabled { get; set; } = false;
         public bool NotificationsLeaveToastEnabled { get; set; } = false;
 
+        // suppresses the toast popup only (NotificationCenter.ShowToast) while still recording
+        // history, so nothing's lost - just not popped up on screen during the session
+        public bool DoNotDisturbEnabled { get; set; } = false;
+
         // UI polish (ported from Voidstrap): window backdrop material for wpfui-based windows.
         // Default preserves WpfUiWindow's existing hardcoded Acrylic behaviour.
         public BackdropStyle WindowBackdropStyle { get; set; } = BackdropStyle.Default;

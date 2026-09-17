@@ -109,6 +109,85 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Process.Start("explorer.exe", $"/select,\"{dialog.FileName}\"");
         }
 
+        // Restores whatever "Config/" entries an export made with ExportData above contains -
+        // matched back to their real target file by name, not by hardcoding the 3 filenames
+        // twice, so this can never drift out of sync with what export actually writes.
+        public ICommand ImportDataCommand => new RelayCommand(ImportData);
+
+        private void ImportData()
+        {
+            const string LOG_IDENT = "PhasmaStrapViewModel::ImportData";
+
+            var dialog = new OpenFileDialog
+            {
+                Filter = $"{Strings.FileTypes_ZipArchive}|*.zip"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            MessageBoxResult confirm = Frontend.ShowMessageBox(
+                "This overwrites your current PhasmaStrap settings, saved state, and FastFlags with whatever's in this export. This cannot be undone.\n\nContinue?",
+                MessageBoxImage.Warning,
+                MessageBoxButton.YesNo,
+                MessageBoxResult.No);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            var targets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                [Path.GetFileName(App.Settings.FileLocation)] = App.Settings.FileLocation,
+                [Path.GetFileName(App.State.FileLocation)] = App.State.FileLocation,
+                [Path.GetFileName(App.FastFlags.FileLocation)] = App.FastFlags.FileLocation,
+            };
+
+            int imported = 0;
+
+            try
+            {
+                using var zip = new ZipFile(dialog.FileName);
+
+                foreach (ZipEntry entry in zip)
+                {
+                    if (!entry.IsFile || !entry.Name.StartsWith("Config/", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    string fileName = Path.GetFileName(entry.Name);
+                    if (!targets.TryGetValue(fileName, out string? destination))
+                        continue;
+
+                    using Stream zipStream = zip.GetInputStream(entry);
+                    using FileStream outStream = File.Create(destination);
+                    zipStream.CopyTo(outStream);
+                    imported++;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Import failed: {ex.Message}");
+                App.Logger.WriteException(LOG_IDENT, ex);
+                Frontend.ShowMessageBox($"Import failed: {ex.Message}", MessageBoxImage.Error);
+                return;
+            }
+
+            if (imported == 0)
+            {
+                Frontend.ShowMessageBox("No PhasmaStrap config files were found in that archive.", MessageBoxImage.Warning);
+                return;
+            }
+
+            // Load() reassigns each manager's Prop backing field, so every already-open settings
+            // page picks up the new values on its next read - no restart needed for the values
+            // themselves (some derived UI state, like which page is currently displayed, may
+            // still look stale until you navigate away and back).
+            App.Settings.Load(alertFailure: false);
+            App.State.Load(alertFailure: false);
+            App.FastFlags.Load(alertFailure: false);
+
+            Frontend.ShowMessageBox($"Imported {imported} config file(s).", MessageBoxImage.Information);
+        }
+
         private void AddFilesToZipStream(ZipOutputStream zipStream, IEnumerable<string> files, string directory)
         {
             const string LOG_IDENT = "PhasmaStrapViewModel::AddFilesToZipStream";

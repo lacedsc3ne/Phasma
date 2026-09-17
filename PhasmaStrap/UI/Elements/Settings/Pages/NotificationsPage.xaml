@@ -38,6 +38,13 @@
             <ui:ToggleSwitch IsChecked="{Binding NotificationsLeaveToastEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
+        <controls:OptionControl
+            Header="Do Not Disturb"
+            Description="Suppresses the on-screen toast popup for the rest of this session. Nothing is lost - suppressed notifications still show up in History below."
+            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
+            <ui:ToggleSwitch IsChecked="{Binding DoNotDisturbEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <Grid Margin="0,16,0,0">
             <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Title}" FontSize="20" FontWeight="Medium" HorizontalAlignment="Left" />
             <ui:Button Content="{x:Static resources:Strings.Menu_Notifications_History_Clear}" Icon="Delete24" Appearance="Secondary" HorizontalAlignment="Right" Command="{Binding ClearHistoryCommand, Mode=OneTime}" IsEnabled="{Binding HasHistory}" />

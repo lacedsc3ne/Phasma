@@ -81,5 +81,73 @@
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
+
+        <ui:CardExpander Margin="0,8,0,0" Icon="Folder24">
+            <ui:CardExpander.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock FontSize="14" Text="Preload cache" />
+                        <TextBlock FontSize="12" Text="{Binding PreloadCacheSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <ui:Button Margin="0,0,8,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshPreloadCacheCommand, Mode=OneTime}" />
+                        <ui:Button Content="Clear all" Icon="Delete24" Appearance="Danger" Command="{Binding ClearPreloadCacheCommand, Mode=OneTime}" />
+                    </StackPanel>
+                </Grid>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <TextBlock Text="Each entry is a cached asset-resolution response, keyed by a hash of the request - not an asset name, so there's nothing more specific to show per entry than size and when it was last used." TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding PreloadCacheEntries, Mode=OneWay}" MaxHeight="240">
+                    <ItemsControl.Template>
+                        <ControlTemplate TargetType="ItemsControl">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,4" Padding="8,6" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" FontSize="11" FontFamily="Consolas" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="8,0" VerticalAlignment="Center">
+                                        <Run Text="{Binding SizeDisplay, Mode=OneWay}" /><Run Text=" • " /><Run Text="{Binding LastAccessedDisplay, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <ui:Button Grid.Column="2" Padding="4" Appearance="Transparent" Icon="Delete16"
+                                               Command="{Binding DataContext.DeletePreloadCacheEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                               CommandParameter="{Binding}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ui:CardExpander>
+
+        <TextBlock Text="Panic Wipe" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Immediately signs you out of Roblox and clears every cache/log directory and the AssetWarp preload cache in one action. Different from the Cleanup schedule on the Deployment page, which only runs after Roblox closes and only for whichever directories you've opted into - this runs right now, always covers everything, and always signs you out too." />
+
+        <ui:Card Margin="0,8,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock FontSize="14" Text="Wipe everything now" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding WipeStatus, Mode=OneWay}" />
+                </StackPanel>
+                <ui:Button Grid.Column="1" Content="Wipe" Icon="Delete24" Appearance="Danger" Command="{Binding WipeAllCommand, Mode=OneTime}" />
+            </Grid>
+        </ui:Card>
     </StackPanel>
 </ui:UiPage>
