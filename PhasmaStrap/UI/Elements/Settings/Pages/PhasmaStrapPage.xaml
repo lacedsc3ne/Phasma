@@ -78,6 +78,7 @@
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding ElementName=ShouldExportConfig, Path=IsChecked}" Value="False" />
                                             <Condition Binding="{Binding ElementName=ShouldExportLogs, Path=IsChecked}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=ShouldExportSystemInfo, Path=IsChecked}" Value="False" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="IsEnabled" Value="False" />
                                     </MultiDataTrigger>
@@ -92,9 +93,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <CheckBox Grid.Column="0" Name="ShouldExportConfig" Content="{x:Static resources:Strings.Menu_PhasmaStrap_ExportData_ExportConfig}" IsChecked="{Binding ShouldExportConfig}" />
                 <CheckBox Grid.Column="1" Name="ShouldExportLogs" Content="{x:Static resources:Strings.Menu_PhasmaStrap_ExportData_ExportLogs}" IsChecked="{Binding ShouldExportLogs}" />
+                <CheckBox Grid.Column="2" Name="ShouldExportSystemInfo" Content="System info" IsChecked="{Binding ShouldExportSystemInfo}" />
             </Grid>
         </ui:CardExpander>
 
