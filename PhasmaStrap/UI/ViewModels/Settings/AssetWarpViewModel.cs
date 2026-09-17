@@ -155,7 +155,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string SpoofOthersName
         {
             get => App.Settings.Prop.SpoofOthersName;
-            set { App.Settings.Prop.SpoofOthersName = value; App.Settings.Save(); OnPropertyChanged(nameof(SpoofOthersName)); }
+            set { App.Settings.Prop.SpoofOthersName = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(SpoofOthersName)); }
         }
 
         public bool SpoofOthersApplyIngame
@@ -173,7 +173,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string SpoofSelfName
         {
             get => App.Settings.Prop.SpoofSelfName;
-            set { App.Settings.Prop.SpoofSelfName = value; App.Settings.Save(); OnPropertyChanged(nameof(SpoofSelfName)); }
+            set { App.Settings.Prop.SpoofSelfName = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(SpoofSelfName)); }
         }
 
         public bool SpoofSelfApplyIngame
@@ -221,7 +221,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 }
 
                 App.Settings.Prop.RobuxSpoofAmount = value;
-                App.Settings.Save();
+                App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(RobuxSpoofAmount));
                 OnPropertyChanged(nameof(RobuxSpoofSummary));
             }

@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap
+namespace PhasmaStrap
 {
     // https://stackoverflow.com/a/53873141/11852173
 
@@ -118,6 +118,10 @@
             WriteToLog(outlog);
 
             History.Add(outlog);
+
+            // keep the in-memory copy bounded - it only backs the crash-report bundler/log viewer
+            if (History.Count > 6000)
+                History.RemoveRange(0, History.Count - 5000);
         }
 
         public void WriteLine(string identifier, string message) => WriteLine($"[{identifier}] {message}");

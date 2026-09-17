@@ -104,12 +104,23 @@ namespace PhasmaStrap.Networking
             }
         }
 
+        // the status texts on the Networking/Asset Warp pages evaluate this on every binding
+        // refresh - opening the user's root store each time is slow, so cache until we change it
+        private static bool? _trustStoreCached;
+
         public static bool IsInstalledInTrustStore()
         {
-            using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly);
-            X509Certificate2 root = GetOrCreateRootCertificate();
-            return store.Certificates.Find(X509FindType.FindByThumbprint, root.Thumbprint, false).Count > 0;
+            lock (Sync)
+            {
+                if (_trustStoreCached.HasValue)
+                    return _trustStoreCached.Value;
+
+                using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly);
+                X509Certificate2 root = GetOrCreateRootCertificate();
+                _trustStoreCached = store.Certificates.Find(X509FindType.FindByThumbprint, root.Thumbprint, false).Count > 0;
+                return _trustStoreCached.Value;
+            }
         }
 
         // installs the root CA into the CURRENT USER'S trust store only (not machine-wide,
@@ -123,6 +134,7 @@ namespace PhasmaStrap.Networking
                 using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadWrite);
                 store.Add(root);
+                lock (Sync) _trustStoreCached = true;
                 App.Logger.WriteLine(LOG_IDENT, "Root CA installed to CurrentUser trust store");
                 return true;
             }
@@ -141,6 +153,7 @@ namespace PhasmaStrap.Networking
                 using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadWrite);
                 store.Remove(root);
+                lock (Sync) _trustStoreCached = false;
                 App.Logger.WriteLine(LOG_IDENT, "Root CA removed from CurrentUser trust store");
                 return true;
             }
@@ -162,18 +175,31 @@ namespace PhasmaStrap.Networking
 
         private const string BundleMarker = "# PhasmaStrap Local Proxy CA - added automatically, removed when the proxy is disabled";
 
+        private static string? _rootPemCached;
+
         private static string RootPem()
         {
-            X509Certificate2 root = GetOrCreateRootCertificate();
-            string base64 = Convert.ToBase64String(root.Export(X509ContentType.Cert));
+            lock (Sync)
+            {
+                if (_rootPemCached is not null)
+                    return _rootPemCached;
 
-            var sb = new StringBuilder();
-            sb.AppendLine("-----BEGIN CERTIFICATE-----");
-            for (int i = 0; i < base64.Length; i += 64)
-                sb.AppendLine(base64.Substring(i, Math.Min(64, base64.Length - i)));
-            sb.Append("-----END CERTIFICATE-----");
-            return sb.ToString();
+                X509Certificate2 root = GetOrCreateRootCertificate();
+                string base64 = Convert.ToBase64String(root.Export(X509ContentType.Cert));
+
+                var sb = new StringBuilder();
+                sb.AppendLine("-----BEGIN CERTIFICATE-----");
+                for (int i = 0; i < base64.Length; i += 64)
+                    sb.AppendLine(base64.Substring(i, Math.Min(64, base64.Length - i)));
+                sb.Append("-----END CERTIFICATE-----");
+                _rootPemCached = sb.ToString();
+                return _rootPemCached;
+            }
         }
+
+        // IsRobloxTrustBundlePatched is bound from status text getters; re-reading every ~200 KB
+        // bundle per binding refresh is wasteful, so results are cached per bundle by write time
+        private static readonly Dictionary<string, (DateTime WriteTimeUtc, bool Patched)> BundleStateCache = new(StringComparer.OrdinalIgnoreCase);
 
         private static IEnumerable<string> FindTrustBundles()
         {
@@ -293,7 +319,24 @@ namespace PhasmaStrap.Networking
                 foreach (string bundle in FindTrustBundles())
                 {
                     any = true;
-                    if (!File.ReadAllText(bundle).Replace("\r\n", "\n").Contains(pem, StringComparison.Ordinal))
+
+                    DateTime writeTime = File.GetLastWriteTimeUtc(bundle);
+                    bool patched;
+
+                    lock (Sync)
+                    {
+                        if (BundleStateCache.TryGetValue(bundle, out var cached) && cached.WriteTimeUtc == writeTime)
+                        {
+                            patched = cached.Patched;
+                        }
+                        else
+                        {
+                            patched = File.ReadAllText(bundle).Replace("\r\n", "\n").Contains(pem, StringComparison.Ordinal);
+                            BundleStateCache[bundle] = (writeTime, patched);
+                        }
+                    }
+
+                    if (!patched)
                         return false;
                 }
 

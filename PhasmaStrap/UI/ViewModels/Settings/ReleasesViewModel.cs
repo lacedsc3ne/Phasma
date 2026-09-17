@@ -70,8 +70,27 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 _searchText = value ?? "";
                 OnPropertyChanged(nameof(SearchText));
-                ApplyFilter();
+                ScheduleFilter();
             }
+        }
+
+        private readonly System.Windows.Threading.DispatcherTimer _filterDebounce = new() { Interval = TimeSpan.FromMilliseconds(150) };
+        private bool _filterDebounceHooked;
+
+        private void ScheduleFilter()
+        {
+            if (!_filterDebounceHooked)
+            {
+                _filterDebounce.Tick += (_, _) =>
+                {
+                    _filterDebounce.Stop();
+                    ApplyFilter();
+                };
+                _filterDebounceHooked = true;
+            }
+
+            _filterDebounce.Stop();
+            _filterDebounce.Start();
         }
 
         public ICommand RefreshCommand => new AsyncRelayCommand(LoadAsync);

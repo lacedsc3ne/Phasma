@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -437,8 +437,29 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 App.Settings.Prop.GlobalBackgroundOverlayOpacity = value;
                 OnPropertyChanged(nameof(GlobalBackgroundOverlayOpacity));
-                Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
+                ScheduleBackgroundRefresh();
             }
+        }
+
+        // the slider fires per pixel and a refresh re-decodes the background image, so apply once
+        // shortly after the drag settles instead of on every tick
+        private readonly System.Windows.Threading.DispatcherTimer _backgroundRefreshTimer = new() { Interval = TimeSpan.FromMilliseconds(150) };
+        private bool _backgroundRefreshHooked;
+
+        private void ScheduleBackgroundRefresh()
+        {
+            if (!_backgroundRefreshHooked)
+            {
+                _backgroundRefreshTimer.Tick += (_, _) =>
+                {
+                    _backgroundRefreshTimer.Stop();
+                    Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
+                };
+                _backgroundRefreshHooked = true;
+            }
+
+            _backgroundRefreshTimer.Stop();
+            _backgroundRefreshTimer.Start();
         }
 
         public bool SnowEffectEnabled

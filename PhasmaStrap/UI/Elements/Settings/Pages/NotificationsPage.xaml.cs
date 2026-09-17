@@ -32,6 +32,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // the page instance is cached by the navigation, so re-attach after every Unloaded
+            _viewModel.Attach();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

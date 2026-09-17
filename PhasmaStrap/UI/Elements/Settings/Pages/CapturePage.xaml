@@ -57,7 +57,7 @@
                                 <Border.InputBindings>
                                     <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.OpenScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                                 </Border.InputBindings>
-                                <Image Source="{Binding Path}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
                             </Border>
                             <Grid Margin="10,8,10,10">
                                 <Grid.ColumnDefinitions>

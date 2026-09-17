@@ -36,6 +36,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             _viewModel.CustomSettings.CollectionChanged += (_, _) => ReloadGridList();
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            _viewModel.Attach();
+        }
+
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             _viewModel.Detach();

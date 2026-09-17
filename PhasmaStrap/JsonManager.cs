@@ -101,6 +101,32 @@
             }
         }
 
+        private System.Threading.Timer? _deferredSaveTimer;
+
+        /// <summary>
+        /// Coalesces a burst of saves (a TextBox bound with UpdateSourceTrigger=PropertyChanged
+        /// fires once per keystroke) into a single write shortly after the last one.
+        /// </summary>
+        public void SaveDeferred(int delayMs = 500)
+        {
+            lock (this)
+            {
+                _deferredSaveTimer ??= new System.Threading.Timer(_ =>
+                {
+                    try
+                    {
+                        Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteException($"{LOG_IDENT_CLASS}::SaveDeferred", ex);
+                    }
+                }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+
+                _deferredSaveTimer.Change(delayMs, System.Threading.Timeout.Infinite);
+            }
+        }
+
         public virtual void Save()
         {
             string LOG_IDENT = $"{LOG_IDENT_CLASS}::Save";

@@ -13,6 +13,37 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string FileName => System.IO.Path.GetFileName(Path);
         public DateTime Taken { get; init; }
         public string TakenDisplay => Taken.ToString("g");
+
+        private System.Windows.Media.Imaging.BitmapImage? _thumbnail;
+
+        // binding the raw path made WPF decode every full-resolution screenshot (tens of MB each)
+        // just to draw a 140px card; decode at card size instead, once, and keep the file unlocked
+        public System.Windows.Media.Imaging.BitmapImage? Thumbnail
+        {
+            get
+            {
+                if (_thumbnail is not null)
+                    return _thumbnail;
+
+                try
+                {
+                    var image = new System.Windows.Media.Imaging.BitmapImage();
+                    image.BeginInit();
+                    image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                    image.DecodePixelHeight = 160;
+                    image.UriSource = new Uri(Path, UriKind.Absolute);
+                    image.EndInit();
+                    image.Freeze();
+                    _thumbnail = image;
+                }
+                catch (Exception)
+                {
+                    _thumbnail = null;
+                }
+
+                return _thumbnail;
+            }
+        }
     }
 
     public sealed class ReplayClipItem

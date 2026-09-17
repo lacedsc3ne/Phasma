@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Collections.ObjectModel;
@@ -51,14 +51,12 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             _fastFlagList.Clear();
 
-            var presetFlags = FastFlagManager.PresetFlags.Values;
-
             foreach (var pair in App.FastFlags.Prop.OrderBy(x => x.Key))
             {
-                if (!_showPresets && presetFlags.Contains(pair.Key))
+                if (!_showPresets && PresetFlagNames.Contains(pair.Key))
                     continue;
 
-                if (!pair.Key.ToLower().Contains(_searchFilter.ToLower()))
+                if (_searchFilter.Length > 0 && !pair.Key.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 var entry = new FastFlag
@@ -479,13 +477,31 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             return sb.ToString();
         }
 
+        // preset membership used to be a linear scan of ~250 values per flag per keystroke
+        private static readonly HashSet<string> PresetFlagNames = new(FastFlagManager.PresetFlags.Values, StringComparer.Ordinal);
+
+        private readonly System.Windows.Threading.DispatcherTimer _searchDebounce = new() { Interval = TimeSpan.FromMilliseconds(120) };
+        private bool _searchDebounceHooked;
+
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is not TextBox textbox)
                 return;
 
             _searchFilter = textbox.Text;
-            ReloadList();
+
+            if (!_searchDebounceHooked)
+            {
+                _searchDebounce.Tick += (_, _) =>
+                {
+                    _searchDebounce.Stop();
+                    ReloadList();
+                };
+                _searchDebounceHooked = true;
+            }
+
+            _searchDebounce.Stop();
+            _searchDebounce.Start();
         }
     }
 }

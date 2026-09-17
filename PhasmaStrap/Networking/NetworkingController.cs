@@ -12,6 +12,8 @@ namespace PhasmaStrap.Networking
 
         private static int _keeperBusy;
 
+        private static DateTime _lastSettingsWriteUtc = DateTime.MinValue;
+
         public static bool IsActive => AssetProxyServer.IsRunning && HostsFileManager.IsBlockPresent();
 
         // Two trust boundaries have to be satisfied for Roblox to accept the proxy's leaf certs:
@@ -140,7 +142,7 @@ namespace PhasmaStrap.Networking
         {
             lock (typeof(NetworkingController))
             {
-                _keeper ??= new System.Threading.Timer(_ => KeeperTick(), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
+                _keeper ??= new System.Threading.Timer(_ => KeeperTick(), null, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5));
             }
         }
 
@@ -166,7 +168,12 @@ namespace PhasmaStrap.Networking
                 {
                     try
                     {
-                        if (App.Settings.HasFileOnDiskChanged())
+                        // cheap timestamp check first; only hash the file when it actually moved
+                        DateTime writeTime = File.Exists(App.Settings.FileLocation) ? File.GetLastWriteTimeUtc(App.Settings.FileLocation) : DateTime.MinValue;
+                        bool timestampMoved = writeTime != _lastSettingsWriteUtc;
+                        _lastSettingsWriteUtc = writeTime;
+
+                        if (timestampMoved && App.Settings.HasFileOnDiskChanged())
                         {
                             App.Logger.WriteLine(LOG_IDENT, "Settings changed on disk, reloading so the live session picks them up");
                             App.Settings.Load(alertFailure: false);
