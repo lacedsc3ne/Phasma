@@ -165,6 +165,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.UsernameSpoofName = value; App.Settings.Save(); OnPropertyChanged(nameof(UsernameSpoofName)); }
         }
 
+        // the Asset Warp controls themselves live on FastFlag Settings > Asset Warp; this just
+        // jumps there (and switches to that tab) so the Networking page isn't a second copy of them
+        public ICommand OpenAssetWarpCommand => new RelayCommand(() =>
+        {
+            var window = System.Windows.Application.Current.Windows.OfType<UI.Elements.Settings.MainWindow>().FirstOrDefault();
+            if (window is null)
+                return;
+
+            var entry = new UI.Elements.Settings.Search.SettingsSearchEntry(
+                UI.Elements.Settings.Search.SettingsSearchEntryKind.Tab,
+                Strings.Menu_FastFlagSettings_Tab_AssetWarp, "",
+                typeof(UI.Elements.Settings.Pages.FastFlagSettingsPage), Strings.Menu_FastFlagSettings_Title,
+                Strings.Menu_FastFlagSettings_Tab_AssetWarp, "", "", null);
+
+            UI.Elements.Settings.Search.SettingsSearchNavigator.Reveal(window.GetNavigation(), window.GetFrame(), entry);
+        });
+
         public ICommand InstallCertificateCommand => new RelayCommand(() =>
         {
             AssetProxyCA.InstallToTrustStore();

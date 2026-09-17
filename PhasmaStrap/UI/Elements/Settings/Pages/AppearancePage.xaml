@@ -58,7 +58,7 @@
                         <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Common_Edit}" HorizontalAlignment="Stretch" Command="{Binding EditColorThemeCommand}" />
                     </Grid>
 
-                    <ui:CardExpander Margin="0,16,0,0">
+                    <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
                             <StackPanel>
                                 <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Appearance_VisualEffects_Title}" />
@@ -122,13 +122,14 @@
                                 <ColumnDefinition Width="180" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Image file" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <Grid Grid.Row="0" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <ui:TextBox Grid.Column="0" Margin="0,0,4,0" Text="{Binding GlobalBackgroundFilePath, Mode=TwoWay}" />
-                                <ui:Button Grid.Column="1" Margin="4,0,0,0" Height="35" Icon="Folder24" Content="{x:Static resources:Strings.Menu_Appearance_GlobalBackground_Browse}" Command="{Binding BrowseGlobalBackgroundFileCommand}" />
+                                <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Menu_Appearance_GlobalBackground_Browse}" Command="{Binding BrowseGlobalBackgroundFileCommand}" />
                             </Grid>
                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,0,0" Text="{x:Static resources:Strings.Menu_Appearance_GlobalBackground_OpacityTitle}" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <Slider Grid.Row="1" Grid.Column="1" Margin="0,12,0,0" Minimum="0" Maximum="1" Value="{Binding GlobalBackgroundOverlayOpacity, Mode=TwoWay}" />
@@ -221,7 +222,7 @@
                                     <Style>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsCustomThemeSelected}" Value="False">
-                                                <Setter Property="StackPanel.Visibility" Value="Hidden"></Setter>
+                                                <Setter Property="StackPanel.Visibility" Value="Collapsed"></Setter>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -245,7 +246,7 @@
                                     <Style>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsCustomThemeSelected}" Value="True">
-                                                <Setter Property="TextBlock.Visibility" Value="Hidden"></Setter>
+                                                <Setter Property="TextBlock.Visibility" Value="Collapsed"></Setter>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -302,16 +303,16 @@
                         </ui:CardExpander.Header>
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="180" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static resources:Strings.Menu_Appearance_CustomisationTitle_Title}" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static resources:Strings.Menu_Appearance_CustomisationTitle_Title}" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <ui:TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=TwoWay}" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,4,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Appearance_CustomisationTitle_Description}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,12,0,0"  Text="{x:Static resources:Strings.Menu_Appearance_CustomisationIcon_Title}" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -321,7 +322,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <ui:TextBox Grid.Column="0" Margin="0,0,4,0" Text="{Binding CustomIconLocation, Mode=TwoWay}" />
-                                <ui:Button Grid.Column="1" Margin="4,0,0,0" Height="35" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseCustomIconLocationCommand}" />
+                                <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseCustomIconLocationCommand}" />
                             </Grid>
                             <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,4,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Appearance_CustomisationIcon_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                         </Grid>

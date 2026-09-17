@@ -1929,7 +1929,7 @@ Defaulting to {1}.</value>
     <value>Overlay diagnostics</value>
   </data>
   <data name="Menu.Overlays.Diagnostics.Description" xml:space="preserve">
-    <value>Keeps track of overlay windows so the compositor doesn't hide itself behind its own UI, and powers the diagnostics report.</value>
+    <value>Shows a "Can't see overlays?" item in the tray menu that explains why an overlay might not be visible (exclusive fullscreen, nothing turned on, not in a game).</value>
   </data>
   <data name="Menu.Overlays.Crosshair.Title" xml:space="preserve">
     <value>Crosshair</value>
@@ -3969,19 +3969,19 @@ Example:
     <value>Mod Management</value>
   </data>
   <data name="Menu.Mods.Overlays.Description" xml:space="preserve">
-    <value>Customize the background shown behind the Roblox homepage. This is unrelated to the in-game crosshair overlay found on the Overlays page.</value>
+    <value>Customize the background of PhasmaStrap's own Home page with a solid color or gradient. This is unrelated to the in-game overlays on the Rendering page.</value>
   </data>
   <data name="Menu.Mods.Overlays.Title" xml:space="preserve">
-    <value>Homepage Background</value>
+    <value>Home page background</value>
   </data>
   <data name="Menu.Mods.Overlays.Enable.Description" xml:space="preserve">
-    <value>Turns the homepage background customization on or off.</value>
+    <value>Paints the chosen color or gradient behind the Home page. Turn it off to go back to the normal window background.</value>
   </data>
   <data name="Menu.Mods.Overlays.Enable.Title" xml:space="preserve">
-    <value>Enable homepage background</value>
+    <value>Enable Home page background</value>
   </data>
   <data name="Menu.Mods.Overlays.HomepageBackground.Description" xml:space="preserve">
-    <value>Choose a solid color or gradient to show behind the Roblox homepage.</value>
+    <value>Choose a solid color or gradient to show behind the Home page.</value>
   </data>
   <data name="Menu.Mods.Overlays.HomepageBackground.Title" xml:space="preserve">
     <value>Background style</value>

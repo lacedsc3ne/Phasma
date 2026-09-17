@@ -20,7 +20,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool DiagnosticsEnabled
         {
             get => App.Settings.Prop.OverlayDiagnosticsEnabled;
-            set => App.Settings.Prop.OverlayDiagnosticsEnabled = value;
+            set { App.Settings.Prop.OverlayDiagnosticsEnabled = value; OnPropertyChanged(nameof(DiagnosticsEnabled)); }
         }
 
         // --- extra HUD rows (Phase 7). The recorder for these only runs inside an active Watcher

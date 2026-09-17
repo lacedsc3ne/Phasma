@@ -119,7 +119,7 @@
                                 <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_Preloading_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
+                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_Preloading_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,2" />
 
                             <ui:CardExpander Margin="0,4,0,0">
                                 <ui:CardExpander.Header>
@@ -158,7 +158,7 @@
                                 </StackPanel>
                             </ui:CardExpander>
 
-                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Header}" FontSize="18" FontWeight="SemiBold" Margin="0,16,0,2" />
+                            <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,2" />
                             <TextBlock Text="{x:Static resources:Strings.Menu_AssetWarp_ClientSpoofer_Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,4" />
                             <TextBlock Text="{Binding SpooferStatusText, Mode=OneWay}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,0,0,4" />
 

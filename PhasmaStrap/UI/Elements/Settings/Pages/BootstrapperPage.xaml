@@ -58,7 +58,7 @@
                         <controls:OptionControl.Style>
                             <Style TargetType="controls:OptionControl">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsRobloxInstallationMissing, Mode=OneTime}" Value="True">
+                                    <DataTrigger Binding="{Binding IsRobloxInstallationMissing}" Value="True">
                                         <Setter Property="IsEnabled" Value="False" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -186,7 +186,7 @@
                     <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_Matchmaker_Title}" FontSize="20" FontWeight="Medium" />
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ServerBrowser_Matchmaker_Description}" />
 
-                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_EnableMatchmaker_Title}" Margin="0,8,0,0">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_ServerBrowser_EnableMatchmaker_Title}">
                         <ui:ToggleSwitch IsChecked="{Binding MatchmakerEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
 
@@ -194,7 +194,7 @@
                         <ui:CardExpander.Header>
                             <StackPanel>
                                 <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Title}" />
-                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_ServerBrowser_PreferEmptyServers_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_ServerBrowser_PreferredDatacenter_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -226,7 +226,7 @@
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <controls:OptionControl Margin="0,8,0,0" Header="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Title}" Description="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Description}">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Title}" Description="{x:Static resources:Strings.Menu_Behaviour_Matchmaker_JoinApi_Description}">
                         <ComboBox Width="200" ItemsSource="{Binding GamejoinApiOptions, Mode=OneTime}" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding MatchmakerGamejoinApiVersion, Mode=TwoWay}" />
                     </controls:OptionControl>
 
@@ -275,7 +275,7 @@
                     <TextBlock Text="Auto-rejoin" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="If Roblox's process disappears without a clean disconnect ever being logged (the closest honest signal available for &quot;it crashed&quot;), relaunch into the same server if possible." />
 
-                    <controls:OptionControl Header="Rejoin after a crash" Margin="0,8,0,0" x:Name="AutoRejoinOption">
+                    <controls:OptionControl Header="Rejoin after a crash" x:Name="AutoRejoinOption">
                         <ui:ToggleSwitch IsChecked="{Binding AutoRejoinOnCrash, Mode=TwoWay}" />
                     </controls:OptionControl>
 
@@ -300,6 +300,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Tab_Roblox}" FontSize="20" FontWeight="Medium" />
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Behaviour_Roblox_Description}" />
 
                     <ui:CardExpander Margin="0,8,0,0">
