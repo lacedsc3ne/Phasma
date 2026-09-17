@@ -76,7 +76,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             // the overlay-related items only make sense when the HUD/crosshair are actually on
             bool overlaysOn = App.Settings.Prop.OverlayHudEnabled || App.Settings.Prop.Crosshair;
             OverlayFocusModeMenuItem.Visibility = overlaysOn ? Visibility.Visible : Visibility.Collapsed;
-            CantSeeOverlaysMenuItem.Visibility = overlaysOn ? Visibility.Visible : Visibility.Collapsed;
+            CantSeeOverlaysMenuItem.Visibility = overlaysOn && App.Settings.Prop.OverlayDiagnosticsEnabled ? Visibility.Visible : Visibility.Collapsed;
 
             TakeScreenshotMenuItem.Visibility = Visibility.Visible;
             SaveReplayMenuItem.Visibility = App.Settings.Prop.InstantReplayEnabled ? Visibility.Visible : Visibility.Collapsed;

@@ -1,4 +1,4 @@
-﻿<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagEditorPage"
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagEditorPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -59,9 +59,14 @@
             <ui:Button Icon="Search24" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SearchDatabase}" Click="SearchDatabaseButton_Click" Margin="0,0,12,16" />
         </WrapPanel>
 
-        <StackPanel x:Name="PresetsRoot" Grid.Row="5" Margin="0,0,0,16">
-            <TextBlock Text="Presets" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched." />
+        <ui:CardExpander x:Name="PresetsRoot" Grid.Row="5" Margin="0,0,0,16" IsExpanded="False">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Presets &amp; per-place assignment" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched." />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                 <ui:TextBox Width="220" PlaceholderText="Preset name" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -112,7 +117,8 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </StackPanel>
+            </StackPanel>
+        </ui:CardExpander>
 
         <TextBlock Grid.Row="6" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Flags_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
 
@@ -166,7 +172,7 @@
             </DataGrid.CellStyle>
             
             <DataGrid.Columns>
-                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="{x:Static resources:Strings.Common_Name}" Binding="{Binding Name}" Width="2*" />
                 <DataGridTextColumn Header="{x:Static resources:Strings.Common_Value}" Binding="{Binding Value}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>

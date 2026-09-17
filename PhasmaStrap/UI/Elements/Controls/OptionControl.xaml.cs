@@ -58,9 +58,51 @@ namespace PhasmaStrap.UI.Elements.Controls
             set { SetValue(InnerContentProperty, value); }
         }
 
+        public static readonly DependencyProperty FlatProperty =
+            DependencyProperty.Register(nameof(Flat), typeof(bool), typeof(OptionControl), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Renders as a borderless row instead of a standalone card. Set automatically when the
+        /// control is placed inside a CardExpander/Card (so groups don't show nested card borders);
+        /// can be set explicitly in XAML to force either look.
+        /// </summary>
+        public bool Flat
+        {
+            get { return (bool)GetValue(FlatProperty); }
+            set { SetValue(FlatProperty, value); }
+        }
+
+        private bool _flatExplicitlySet;
+
         public OptionControl()
         {
             InitializeComponent();
+            Loaded += OnLoaded;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (_flatExplicitlySet || ReadLocalValue(FlatProperty) != DependencyProperty.UnsetValue)
+            {
+                _flatExplicitlySet = true;
+                return;
+            }
+
+            DependencyObject? parent = VisualTreeHelper.GetParent(this);
+            while (parent is not null)
+            {
+                if (parent is Wpf.Ui.Controls.CardExpander || parent is Wpf.Ui.Controls.Card || parent is Expander)
+                {
+                    Flat = true;
+                    return;
+                }
+
+                // stop at the page boundary - anything above it is window chrome
+                if (parent is Page)
+                    return;
+
+                parent = VisualTreeHelper.GetParent(parent);
+            }
         }
     }
 }

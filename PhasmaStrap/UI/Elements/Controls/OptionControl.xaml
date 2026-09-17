@@ -11,6 +11,23 @@
              x:Name="Control"
              d:DesignHeight="450" d:DesignWidth="800">
     <ui:Card Margin="0,8,0,0">
+        <ui:Card.Style>
+            <!-- "Flat" rows: when an OptionControl sits inside a CardExpander (or another Card) it
+                 drops its own border/background so the group reads as one card with rows, instead
+                 of a card full of nested cards. Set automatically in code-behind - see Flat. -->
+            <Style TargetType="ui:Card" BasedOn="{StaticResource {x:Type ui:Card}}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Flat, ElementName=Control}" Value="True">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0,1,0,0" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                        <Setter Property="Border.CornerRadius" Value="0" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Padding" Value="2,10,2,10" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ui:Card.Style>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -20,10 +37,10 @@
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" MaxWidth="9999" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" FontSize="14" Text="{Binding Header, ElementName=Control}" />
+                    <TextBlock Grid.Column="0" FontSize="14" TextWrapping="Wrap" Text="{Binding Header, ElementName=Control}" />
                     <TextBlock Grid.Column="1" Margin="4,0,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">

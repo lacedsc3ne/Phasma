@@ -201,7 +201,7 @@
                             </controls:OptionControl>
 
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Title}" Description="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Description}">
-                                <Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Command="{Binding IdentifyDisplaysCommand}" />
+                                <ui:Button Content="{x:Static resources:Strings.Menu_Performance_IdentifyDisplays_Button}" Icon="Desktop24" Command="{Binding IdentifyDisplaysCommand}" />
                             </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
@@ -392,7 +392,7 @@
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn color grading on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Brightness}">
@@ -424,7 +424,7 @@
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn tonemapping on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapOperator}">
@@ -438,7 +438,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Vignette}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn the vignette on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -460,7 +460,7 @@
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn sharpening on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -471,7 +471,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Bloom}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn bloom on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -497,7 +497,7 @@
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn chromatic aberration on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -508,7 +508,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_FilmGrain}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn film grain on or off.">
                                 <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">

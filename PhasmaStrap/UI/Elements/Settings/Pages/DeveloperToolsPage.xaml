@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:DeveloperToolsViewModel, IsDesignTimeCreatable=True}"
@@ -66,7 +67,7 @@
                 <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding DiffEntries, Mode=OneWay}">
                     <ItemsControl.Template>
                         <ControlTemplate TargetType="ItemsControl">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220" controls:ScrollBubbling.Enabled="True">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </ControlTemplate>
@@ -111,7 +112,7 @@
             <ItemsControl ItemsSource="{Binding ProxyTraffic, Mode=OneWay}">
                 <ItemsControl.Template>
                     <ControlTemplate TargetType="ItemsControl">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="240">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="240" controls:ScrollBubbling.Enabled="True">
                             <ItemsPresenter />
                         </ScrollViewer>
                     </ControlTemplate>
@@ -148,7 +149,7 @@
                 </Grid>
             </ui:CardExpander.Header>
             <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Padding="8">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="300">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="300" controls:ScrollBubbling.Enabled="True">
                     <TextBlock FontFamily="Consolas" FontSize="11" Text="{Binding LogText, Mode=OneWay}" TextWrapping="NoWrap" />
                 </ScrollViewer>
             </Border>

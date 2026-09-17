@@ -55,85 +55,193 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         #region Settings search
 
-        private readonly Dictionary<string, SettingsSearchEntry> _settingsSearchEntries = new(StringComparer.OrdinalIgnoreCase);
+        private readonly System.Windows.Threading.DispatcherTimer _searchDebounce = new() { Interval = TimeSpan.FromMilliseconds(60) };
+
+        private bool _suppressSearchClose;
 
         private void InitializeSettingsSearch()
         {
-            var items = new List<string>();
-
-            foreach (var entry in SettingsSearchCatalog.Entries)
+            _searchDebounce.Tick += (_, _) =>
             {
-                string display = entry.DisplayText;
+                _searchDebounce.Stop();
+                RunSettingsSearch();
+            };
 
-                // Duplicate display text can occur if two options share the exact same header text
-                // on the same page (e.g. a page-level fallback entry) - keep the first one found.
-                if (_settingsSearchEntries.ContainsKey(display))
-                    continue;
+            // warm the index on a background thread so the first keystroke is instant
+            _ = Task.Run(() => Search.SettingsSearchIndex.Entries);
 
-                _settingsSearchEntries[display] = entry;
-                items.Add(display);
+            PreviewKeyDown += MainWindow_SearchShortcut;
+            Deactivated += (_, _) => CloseSearchPopup();
+            LocationChanged += (_, _) => CloseSearchPopup();
+            SizeChanged += (_, _) => CloseSearchPopup();
+        }
+
+        private void MainWindow_SearchShortcut(object sender, KeyEventArgs e)
+        {
+            bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+            if (ctrl && (e.Key == Key.F || e.Key == Key.K))
+            {
+                SettingsSearchBox.Focus();
+                SettingsSearchBox.SelectAll();
+                e.Handled = true;
+            }
+        }
+
+        private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _searchDebounce.Stop();
+            _searchDebounce.Start();
+        }
+
+        private void RunSettingsSearch()
+        {
+            string query = SettingsSearchBox.Text ?? "";
+
+            if (query.Trim().Length == 0)
+            {
+                CloseSearchPopup();
+                return;
             }
 
-            SettingsSearchBox.ItemsSource = items;
-        }
+            List<Search.SettingsSearchResult> results = Search.SettingsSearchEngine.Search(query);
 
-        private void NavigateToSettingsSearchEntry(SettingsSearchEntry entry)
-        {
-            SettingsSearchBox.Text = "";
-            SettingsSearchBox.IsSuggestionListOpen = false;
-
-            // Simplification vs. Voidstrap's version: Voidstrap walks the target page's live visual
-            // tree after navigating to scroll/highlight the exact matched control. PhasmaStrap's nav
-            // framework (Wpf.Ui's NavigationFluent/Frame) doesn't expose an easy hook for that, so this
-            // only navigates to the option's page - the page is short enough that finding the option
-            // after landing on it is not a real burden.
-            RootNavigation.Navigate(entry.PageType);
-        }
-
-        private void SettingsSearchBox_SuggestionChosen(object sender, RoutedEventArgs e)
-        {
-            string chosen = SettingsSearchBox.Text?.Trim() ?? "";
-
-            if (chosen.Length == 0 || !_settingsSearchEntries.TryGetValue(chosen, out var entry))
-                return;
-
-            NavigateToSettingsSearchEntry(entry);
-        }
-
-        private void SettingsSearchBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter)
-                return;
-
-            string query = SettingsSearchBox.Text?.Trim() ?? "";
-
-            if (query.Length == 0)
-                return;
-
-            SettingsSearchEntry? match = null;
-
-            if (_settingsSearchEntries.TryGetValue(query, out var exact))
+            SettingsSearchResults.ItemsSource = results;
+            SettingsSearchResults.SelectedIndex = results.Count > 0 ? 0 : -1;
+            SettingsSearchFooter.Text = results.Count switch
             {
-                match = exact;
+                0 => "No matching settings",
+                1 => "1 result  ·  Enter to open",
+                _ => $"{results.Count} results  ·  ↑↓ to move, Enter to open",
+            };
+
+            SettingsSearchPopup.IsOpen = true;
+        }
+
+        private void CloseSearchPopup()
+        {
+            if (_suppressSearchClose)
+                return;
+
+            SettingsSearchPopup.IsOpen = false;
+        }
+
+        private void SettingsSearchBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if ((SettingsSearchBox.Text ?? "").Trim().Length > 0 && SettingsSearchResults.Items.Count > 0)
+                SettingsSearchPopup.IsOpen = true;
+        }
+
+        private void SettingsSearchBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            // focus moving into the popup (clicking a result) must not close it before the click lands
+            if (e.NewFocus is DependencyObject target && IsInsidePopup(target))
+                return;
+
+            CloseSearchPopup();
+        }
+
+        private bool IsInsidePopup(DependencyObject element)
+        {
+            DependencyObject? current = element;
+            while (current is not null)
+            {
+                if (ReferenceEquals(current, SettingsSearchPopup.Child))
+                    return true;
+
+                current = current is System.Windows.Media.Visual ? System.Windows.Media.VisualTreeHelper.GetParent(current) : LogicalTreeHelper.GetParent(current);
             }
-            else if (SettingsSearchBox.FilteredItemsSource is not null)
+
+            return false;
+        }
+
+        private void SettingsSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            int count = SettingsSearchResults.Items.Count;
+
+            switch (e.Key)
             {
-                // Fall back to whatever is currently the top result in the (already-filtered) dropdown.
-                foreach (string text in SettingsSearchBox.FilteredItemsSource)
-                {
-                    if (_settingsSearchEntries.TryGetValue(text, out var found))
+                case Key.Down when count > 0:
+                    if (!SettingsSearchPopup.IsOpen)
+                        SettingsSearchPopup.IsOpen = true;
+                    SettingsSearchResults.SelectedIndex = Math.Min(SettingsSearchResults.SelectedIndex + 1, count - 1);
+                    SettingsSearchResults.ScrollIntoView(SettingsSearchResults.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case Key.Up when count > 0:
+                    SettingsSearchResults.SelectedIndex = Math.Max(SettingsSearchResults.SelectedIndex - 1, 0);
+                    SettingsSearchResults.ScrollIntoView(SettingsSearchResults.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case Key.PageDown when count > 0:
+                    SettingsSearchResults.SelectedIndex = Math.Min(SettingsSearchResults.SelectedIndex + 8, count - 1);
+                    SettingsSearchResults.ScrollIntoView(SettingsSearchResults.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case Key.PageUp when count > 0:
+                    SettingsSearchResults.SelectedIndex = Math.Max(SettingsSearchResults.SelectedIndex - 8, 0);
+                    SettingsSearchResults.ScrollIntoView(SettingsSearchResults.SelectedItem);
+                    e.Handled = true;
+                    break;
+
+                case Key.Enter:
+                    if (_searchDebounce.IsEnabled)
                     {
-                        match = found;
-                        break;
+                        _searchDebounce.Stop();
+                        RunSettingsSearch();
                     }
+
+                    if (SettingsSearchResults.SelectedItem is Search.SettingsSearchResult selected)
+                        ActivateSearchResult(selected);
+                    else if (SettingsSearchResults.Items.Count > 0 && SettingsSearchResults.Items[0] is Search.SettingsSearchResult first)
+                        ActivateSearchResult(first);
+
+                    e.Handled = true;
+                    break;
+
+                case Key.Escape:
+                    if (SettingsSearchPopup.IsOpen)
+                        CloseSearchPopup();
+                    else
+                        SettingsSearchBox.Text = "";
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void SettingsSearchResults_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source)
+            {
+                DependencyObject? current = source;
+                while (current is not null && current is not ListBoxItem)
+                    current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+
+                if (current is ListBoxItem item && item.DataContext is Search.SettingsSearchResult result)
+                {
+                    ActivateSearchResult(result);
+                    e.Handled = true;
                 }
             }
+        }
 
-            if (match is null)
-                return;
+        private void ActivateSearchResult(Search.SettingsSearchResult result)
+        {
+            _suppressSearchClose = true;
+            try
+            {
+                SettingsSearchPopup.IsOpen = false;
+                SettingsSearchBox.Text = "";
+                SettingsSearchResults.ItemsSource = null;
+            }
+            finally
+            {
+                _suppressSearchClose = false;
+            }
 
-            e.Handled = true;
-            NavigateToSettingsSearchEntry(match);
+            Search.SettingsSearchNavigator.Reveal(RootNavigation, RootFrame, result.Entry);
         }
 
         #endregion Settings search

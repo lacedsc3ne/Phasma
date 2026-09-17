@@ -22,7 +22,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string RobloxChannel
         {
             get => App.Settings.Prop.RobloxChannel;
-            set => App.Settings.Prop.RobloxChannel = value?.Trim().ToLowerInvariant() ?? "";
+            set
+            {
+                App.Settings.Prop.RobloxChannel = value?.Trim().ToLowerInvariant() ?? "";
+                OnPropertyChanged(nameof(RobloxChannel));
+            }
         }
 
         public IEnumerable<ChannelChangeMode> ChannelChangeModes { get; } = Enum.GetValues(typeof(ChannelChangeMode)).Cast<ChannelChangeMode>();

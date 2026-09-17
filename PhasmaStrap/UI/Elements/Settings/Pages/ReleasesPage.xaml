@@ -46,7 +46,7 @@
                                     <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
                                     <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="{DynamicResource AccentFillColorDefaultBrush}"
                                             VerticalAlignment="Center" Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVisibilityConverter}}">
-                                        <TextBlock Text="{x:Static resources:Strings.Menu_Releases_Installed}" FontSize="11" Foreground="White" />
+                                        <TextBlock Text="{x:Static resources:Strings.Menu_Releases_Installed}" FontSize="11" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
                                     </Border>
                                 </StackPanel>
 

@@ -81,9 +81,7 @@
         <TextBlock Text="Instant Replay" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Continuously buffers the last several seconds of gameplay while enabled. Press the Save Instant Replay hotkey (set one on the Hotkeys page) after something happens to save that buffer as a real MP4 clip - there's no separate start/stop for recording, it's always running once enabled." />
 
-        <ui:Card Margin="0,8,0,0">
-            <StackPanel>
-                <controls:OptionControl Header="Enable Instant Replay" x:Name="InstantReplayOption">
+        <controls:OptionControl Header="Enable Instant Replay" x:Name="InstantReplayOption">
                     <ui:ToggleSwitch IsChecked="{Binding InstantReplayEnabled, Mode=TwoWay}" />
                 </controls:OptionControl>
 
@@ -99,8 +97,6 @@
                 <controls:OptionControl Header="Quality" Description="Higher quality captures at a larger resolution/frame rate and higher bitrate - uses more RAM while buffering and more disk space per clip." IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
                     <ComboBox Width="140" ItemsSource="{Binding QualityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
-            </StackPanel>
-        </ui:Card>
 
         <Grid Margin="0,12,0,0">
             <Grid.ColumnDefinitions>

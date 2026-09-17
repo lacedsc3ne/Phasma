@@ -13,7 +13,7 @@
       Scrollable="True"
       Loaded="Page_Loaded">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Menu_FastFlags_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Margin="0,0,0,16" Text="{x:Static resources:Strings.Menu_FastFlags_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_FastFlags_ManagerEnabled_Title}"
@@ -35,7 +35,7 @@
 
         <TextBlock Text="{x:Static resources:Strings.Common_Presets}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Presets_Categories_Rendering}" FontSize="16" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Presets_Categories_Rendering}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <controls:MarkdownTextBlock MarkdownText="{Binding Source={x:Static resources:Strings.Menu_FastFlags_Presets_D3DExclusiveFullscreenInfo}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/engine-settings/#exclusive-fullscreen'}"  Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <controls:OptionControl
@@ -688,7 +688,7 @@
 
         <!-- ================= Reset ================= -->
         <controls:OptionControl
-            Margin="0,24,0,0"
+            Margin="0,16,0,0"
             Header="{x:Static resources:Strings.Menu_FastFlags_Reset_Title}">
             <ui:ToggleSwitch IsChecked="{Binding ResetConfiguration, Mode=TwoWay}" />
         </controls:OptionControl>

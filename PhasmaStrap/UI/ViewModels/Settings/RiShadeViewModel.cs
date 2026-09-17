@@ -104,43 +104,43 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private void RefreshAll() => OnPropertyChanged(string.Empty);
 
         // color grade
-        public bool GradeEnabled { get => Prop.GradeEnabled; set => Prop.GradeEnabled = value; }
-        public float Brightness { get => Prop.Brightness; set => Prop.Brightness = value; }
-        public float Gamma { get => Prop.Gamma; set => Prop.Gamma = value; }
-        public float HueShift { get => Prop.HueShift; set => Prop.HueShift = value; }
+        public bool GradeEnabled { get => Prop.GradeEnabled; set { Prop.GradeEnabled = value; OnPropertyChanged(nameof(GradeEnabled)); } }
+        public float Brightness { get => Prop.Brightness; set { Prop.Brightness = value; OnPropertyChanged(nameof(Brightness)); } }
+        public float Gamma { get => Prop.Gamma; set { Prop.Gamma = value; OnPropertyChanged(nameof(Gamma)); } }
+        public float HueShift { get => Prop.HueShift; set { Prop.HueShift = value; OnPropertyChanged(nameof(HueShift)); } }
 
         // tonemap
-        public bool TonemapEnabled { get => Prop.TonemapEnabled; set => Prop.TonemapEnabled = value; }
+        public bool TonemapEnabled { get => Prop.TonemapEnabled; set { Prop.TonemapEnabled = value; OnPropertyChanged(nameof(TonemapEnabled)); } }
         public IEnumerable<string> TonemapNames { get; } = RiShadeSettings.TonemapNames;
-        public int TonemapMode { get => Prop.TonemapMode; set => Prop.TonemapMode = value; }
-        public float TonemapExposure { get => Prop.TonemapExposure; set => Prop.TonemapExposure = value; }
-        public float TonemapWhitepoint { get => Prop.TonemapWhitepoint; set => Prop.TonemapWhitepoint = value; }
+        public int TonemapMode { get => Prop.TonemapMode; set { Prop.TonemapMode = value; OnPropertyChanged(nameof(TonemapMode)); } }
+        public float TonemapExposure { get => Prop.TonemapExposure; set { Prop.TonemapExposure = value; OnPropertyChanged(nameof(TonemapExposure)); } }
+        public float TonemapWhitepoint { get => Prop.TonemapWhitepoint; set { Prop.TonemapWhitepoint = value; OnPropertyChanged(nameof(TonemapWhitepoint)); } }
 
         // vignette
-        public bool VignetteEnabled { get => Prop.VignetteEnabled; set => Prop.VignetteEnabled = value; }
-        public float VignetteStrength { get => Prop.VignetteStrength; set => Prop.VignetteStrength = value; }
+        public bool VignetteEnabled { get => Prop.VignetteEnabled; set { Prop.VignetteEnabled = value; OnPropertyChanged(nameof(VignetteEnabled)); } }
+        public float VignetteStrength { get => Prop.VignetteStrength; set { Prop.VignetteStrength = value; OnPropertyChanged(nameof(VignetteStrength)); } }
 
         // sharpen
-        public bool SharpenEnabled { get => Prop.SharpenEnabled; set => Prop.SharpenEnabled = value; }
-        public float SharpenStrength { get => Prop.SharpenStrength; set => Prop.SharpenStrength = value; }
+        public bool SharpenEnabled { get => Prop.SharpenEnabled; set { Prop.SharpenEnabled = value; OnPropertyChanged(nameof(SharpenEnabled)); } }
+        public float SharpenStrength { get => Prop.SharpenStrength; set { Prop.SharpenStrength = value; OnPropertyChanged(nameof(SharpenStrength)); } }
 
         // bloom
-        public bool BloomEnabled { get => Prop.BloomEnabled; set => Prop.BloomEnabled = value; }
-        public float BloomStrength { get => Prop.BloomStrength; set => Prop.BloomStrength = value; }
-        public float BloomThreshold { get => Prop.BloomThreshold; set => Prop.BloomThreshold = value; }
+        public bool BloomEnabled { get => Prop.BloomEnabled; set { Prop.BloomEnabled = value; OnPropertyChanged(nameof(BloomEnabled)); } }
+        public float BloomStrength { get => Prop.BloomStrength; set { Prop.BloomStrength = value; OnPropertyChanged(nameof(BloomStrength)); } }
+        public float BloomThreshold { get => Prop.BloomThreshold; set { Prop.BloomThreshold = value; OnPropertyChanged(nameof(BloomThreshold)); } }
 
         // chromatic aberration
-        public bool ChromaEnabled { get => Prop.ChromaEnabled; set => Prop.ChromaEnabled = value; }
-        public float ChromaStrength { get => Prop.ChromaStrength; set => Prop.ChromaStrength = value; }
+        public bool ChromaEnabled { get => Prop.ChromaEnabled; set { Prop.ChromaEnabled = value; OnPropertyChanged(nameof(ChromaEnabled)); } }
+        public float ChromaStrength { get => Prop.ChromaStrength; set { Prop.ChromaStrength = value; OnPropertyChanged(nameof(ChromaStrength)); } }
 
         // film grain
-        public bool GrainEnabled { get => Prop.GrainEnabled; set => Prop.GrainEnabled = value; }
-        public float GrainStrength { get => Prop.GrainStrength; set => Prop.GrainStrength = value; }
+        public bool GrainEnabled { get => Prop.GrainEnabled; set { Prop.GrainEnabled = value; OnPropertyChanged(nameof(GrainEnabled)); } }
+        public float GrainStrength { get => Prop.GrainStrength; set { Prop.GrainStrength = value; OnPropertyChanged(nameof(GrainStrength)); } }
 
         // clarity / debanding / ambient glow
-        public float ClarityStrength { get => Prop.ClarityStrength; set => Prop.ClarityStrength = value; }
-        public bool DebandEnabled { get => Prop.DebandEnabled; set => Prop.DebandEnabled = value; }
-        public float DebandStrength { get => Prop.DebandStrength; set => Prop.DebandStrength = value; }
-        public float AmbientStrength { get => Prop.AmbientStrength; set => Prop.AmbientStrength = value; }
+        public float ClarityStrength { get => Prop.ClarityStrength; set { Prop.ClarityStrength = value; OnPropertyChanged(nameof(ClarityStrength)); } }
+        public bool DebandEnabled { get => Prop.DebandEnabled; set { Prop.DebandEnabled = value; OnPropertyChanged(nameof(DebandEnabled)); } }
+        public float DebandStrength { get => Prop.DebandStrength; set { Prop.DebandStrength = value; OnPropertyChanged(nameof(DebandStrength)); } }
+        public float AmbientStrength { get => Prop.AmbientStrength; set { Prop.AmbientStrength = value; OnPropertyChanged(nameof(AmbientStrength)); } }
     }
 }

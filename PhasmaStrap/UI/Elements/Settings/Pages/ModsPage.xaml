@@ -20,8 +20,8 @@
 
         <Grid Margin="0,16,0,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -162,18 +162,14 @@
                         </StackPanel>
                     </controls:OptionControl>
 
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Title}"
-                        Description="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Description}">
-                        <StackPanel Width="360">
-                            <ui:CardExpander Margin="0,0,0,8" IsExpanded="False">
+                    <ui:CardExpander Margin="0,8,0,0" IsExpanded="False">
                                 <HeaderedContentControl.Header>
                                     <StackPanel>
-                                        <TextBlock FontSize="14" Text="Custom skybox" />
-                                        <TextBlock Margin="0,2,0,0" FontSize="12" Text="Use one image for every side, or choose each face." Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Title}" />
+                                        <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Mods_Misc_Skybox_Description}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
                                 </HeaderedContentControl.Header>
-                                <StackPanel>
+                                <StackPanel MaxWidth="560" HorizontalAlignment="Left">
                                     <ui:Button HorizontalAlignment="Stretch" Content="Use one image for every side" Icon="ImageAdd24" Command="{Binding ChooseSingleSkyboxImageCommand}" />
                                     <Grid Margin="0,8,0,0">
                                         <Grid.ColumnDefinitions>
@@ -228,9 +224,7 @@
                                         <ui:Button Appearance="Primary" Content="Save and use" Command="{Binding ApplyCustomSkyboxCommand}" IsEnabled="{Binding CustomSkyboxCanApply}" />
                                     </WrapPanel>
                                 </StackPanel>
-                            </ui:CardExpander>
-                        </StackPanel>
-                    </controls:OptionControl>
+                    </ui:CardExpander>
 
                     <ui:CardExpander Margin="0,8,0,0" IsExpanded="False">
                         <HeaderedContentControl.Header>
@@ -239,7 +233,7 @@
                                 <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Mods_Misc_CursorSetManager_Description}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </HeaderedContentControl.Header>
-                        <Grid Margin="-8,4,-8,0" MinHeight="280">
+                        <Grid Margin="0,4,0,0" MinHeight="280">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="260" />
                                 <RowDefinition Height="Auto" />
@@ -272,7 +266,7 @@
                                 <UniformGrid Columns="4" Rows="1">
                                     <StackPanel Margin="0,0,4,0">
                                         <TextBlock Text="Shiftlock" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
-                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                        <Border Height="64" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
                                             <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ShiftlockCursorPreview, TargetNullValue={x:Null}}" />
                                         </Border>
                                         <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="MouseLockedCursor.png" />
@@ -280,7 +274,7 @@
                                     </StackPanel>
                                     <StackPanel Margin="4,0,4,0">
                                         <TextBlock Text="Arrow" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
-                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                        <Border Height="64" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
                                             <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ArrowCursorPreview, TargetNullValue={x:Null}}" />
                                         </Border>
                                         <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="ArrowCursor.png" />
@@ -288,7 +282,7 @@
                                     </StackPanel>
                                     <StackPanel Margin="4,0,4,0">
                                         <TextBlock Text="ArrowFar" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
-                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                        <Border Height="64" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
                                             <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.ArrowFarCursorPreview, TargetNullValue={x:Null}}" />
                                         </Border>
                                         <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="ArrowFarCursor.png" />
@@ -296,7 +290,7 @@
                                     </StackPanel>
                                     <StackPanel Margin="4,0,0,0">
                                         <TextBlock Text="IBeam" FontSize="12" TextAlignment="Center" Margin="0,0,0,4" />
-                                        <Border Height="64" Background="#33000000" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                        <Border Height="64" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
                                             <Image Stretch="Uniform" Margin="6" Source="{Binding SelectedCursorSet.IBeamCursorPreview, TargetNullValue={x:Null}}" />
                                         </Border>
                                         <ui:Button Margin="0,4,0,0" HorizontalAlignment="Stretch" Content="Browse" FontSize="11" Command="{Binding BrowseCursorSetFileCommand}" CommandParameter="IBeamCursor.png" />
@@ -387,7 +381,7 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Width="30" Height="36" Margin="0,0,6,0" Cursor="SizeAll" AutomationProperties.Name="Drag mod to change apply order" PreviewMouseLeftButtonDown="ManagedModDragHandle_MouseLeftButtonDown" PreviewMouseMove="ManagedModDragHandle_MouseMove">
+                                        <Border Width="30" Height="36" Margin="0,0,6,0" Background="Transparent" Cursor="SizeAll" AutomationProperties.Name="Drag mod to change apply order" PreviewMouseLeftButtonDown="ManagedModDragHandle_MouseLeftButtonDown" PreviewMouseMove="ManagedModDragHandle_MouseMove">
                                             <ui:SymbolIcon Width="20" Height="20" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ReOrderDotsVertical24" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                         </Border>
                                         <ToggleButton Grid.Column="1" Width="36" Height="36" Margin="0,0,12,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Enabled, Mode=OneWay}" Command="{Binding DataContext.ToggleManagedModCommand, RelativeSource={RelativeSource AncestorType={x:Type pages:ModsPage}}}" CommandParameter="{Binding}" AutomationProperties.Name="Enable or disable this mod">
@@ -454,7 +448,7 @@
 
                             <StackPanel Margin="0,10,0,0" Visibility="{Binding ShowHomepageSolidColor, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <TextBlock Margin="0,0,0,5" Text="Background color" />
-                                <Button Width="120" HorizontalAlignment="Left" Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
+                                <ui:Button Width="120" HorizontalAlignment="Left" Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
                             </StackPanel>
 
                             <StackPanel Margin="0,10,0,0" Visibility="{Binding ShowHomepageGradient, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -465,11 +459,11 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Margin="0,0,6,0">
                                         <TextBlock Margin="0,0,0,5" Text="Start color" />
-                                        <Button Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
+                                        <ui:Button HorizontalAlignment="Stretch" Content="{Binding HomepageBackgroundOverlayColor}" Command="{Binding PickHomepageBackgroundColorCommand}" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Margin="6,0,0,0">
                                         <TextBlock Margin="0,0,0,5" Text="End color" />
-                                        <Button Content="{Binding HomepageBackgroundOverlayGradientColor}" Command="{Binding PickHomepageBackgroundGradientColorCommand}" />
+                                        <ui:Button HorizontalAlignment="Stretch" Content="{Binding HomepageBackgroundOverlayGradientColor}" Command="{Binding PickHomepageBackgroundGradientColorCommand}" />
                                     </StackPanel>
                                 </Grid>
                                 <TextBlock Margin="0,10,0,4" Text="Direction" />

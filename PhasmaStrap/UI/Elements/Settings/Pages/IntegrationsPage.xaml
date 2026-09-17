@@ -17,11 +17,17 @@
     </ui:UiPage.Resources>
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Title}" FontSize="20" FontWeight="Medium" />
-        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <TabControl Margin="0,12,0,0">
 
-            <TabItem Header="{x:Static resources:Strings.Menu_Integrations_Tabs_Activity}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Play24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Activity}" />
+                    </StackPanel>
+                </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_ActivityTracking}" FontSize="20" FontWeight="Medium" />
 
@@ -61,7 +67,13 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="{x:Static resources:Strings.Menu_Integrations_Tabs_Discord}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Chat24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Discord}" />
+                    </StackPanel>
+                </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Common_DiscordRichPresence}" FontSize="20" FontWeight="Medium" />
 
@@ -146,7 +158,13 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="{x:Static resources:Strings.Menu_Integrations_Tabs_Roblox}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Games24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Roblox}" />
+                    </StackPanel>
+                </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Roblox}" FontSize="20" FontWeight="Medium" />
 
@@ -158,7 +176,13 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="{x:Static resources:Strings.Menu_Integrations_Tabs_Custom}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Apps24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Custom}" />
+                    </StackPanel>
+                </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Custom_Title}" FontSize="20" FontWeight="Medium" />
                     <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Custom_Description}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -171,7 +195,7 @@
                             <ColumnDefinition Width="250" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <ListBox x:Name="CustomIntegrationsListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" ItemsSource="{Binding CustomIntegrations, Mode=OneWay}" DisplayMemberPath="Name" SelectionChanged="CustomIntegrationSelection" SelectedIndex="{Binding SelectedCustomIntegrationIndex, Mode=TwoWay}" />
+                        <ListBox x:Name="CustomIntegrationsListBox" Grid.Row="0" Grid.Column="0" Height="265" Margin="0,0,4,0" ItemsSource="{Binding CustomIntegrations, Mode=OneWay}" DisplayMemberPath="Name" SelectionChanged="CustomIntegrationSelection" SelectedIndex="{Binding SelectedCustomIntegrationIndex, Mode=TwoWay}" />
                         <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -185,7 +209,7 @@
                                 <Style>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsCustomIntegrationSelected}" Value="False">
-                                            <Setter Property="StackPanel.Visibility" Value="Hidden"></Setter>
+                                            <Setter Property="StackPanel.Visibility" Value="Collapsed"></Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -199,7 +223,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <ui:TextBox Grid.Column="0" Margin="0,0,0,0" PlaceholderText="C:\Windows\System32\cmd.exe" Text="{Binding SelectedCustomIntegration.Location}" />
-                                <ui:Button Grid.Column="1" Margin="8,0,0,0" Height="34" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseIntegrationLocationCommand}" />
+                                <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseIntegrationLocationCommand}" />
                             </Grid>
                             <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <ui:TextBox Margin="0,4,0,0" PlaceholderText="{Binding Source='/k echo {0}', Converter={StaticResource StringFormatConverter}, ConverterParameter={x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs_Placeholder}}" Text="{Binding SelectedCustomIntegration.LaunchArgs}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
@@ -220,7 +244,7 @@
                                 <Style>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsCustomIntegrationSelected}" Value="True">
-                                            <Setter Property="TextBlock.Visibility" Value="Hidden"></Setter>
+                                            <Setter Property="TextBlock.Visibility" Value="Collapsed"></Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
