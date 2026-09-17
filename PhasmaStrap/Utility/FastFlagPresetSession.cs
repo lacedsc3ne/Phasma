@@ -15,12 +15,14 @@ namespace PhasmaStrap.Utility
     //     join over, so the freshly written flags are never read.
     // In all three the running client simply keeps the flags it started with.
     //
-    // So this keeps a small marker of which preset the RUNNING client was started with, and:
-    //   - the Bootstrapper closes a running client first when the launch needs a different preset;
-    //   - the Watcher, on a confirmed join to a place whose preset doesn't match the marker,
-    //     restarts Roblox straight back into the same server through a normal PhasmaStrap launch,
-    //     which then applies the right flags.
-    // The same check removes a preset's flags again when a different game is joined.
+    // So this keeps a small marker of which preset the RUNNING client was started with. Nothing is
+    // ever restarted automatically - being thrown out of a game you just joined is worse than
+    // missing a few flags. Instead:
+    //   - the Watcher, on a confirmed join to a place whose preset isn't the one Roblox started
+    //     with, shows a toast saying so; clicking it restarts Roblox straight back into the same
+    //     server through a normal PhasmaStrap launch, which then applies the right flags;
+    //   - optionally (off by default) the Bootstrapper closes an already running Roblox when a
+    //     launch needs a different preset, so a browser "Play" picks the new flags up.
     internal static class FastFlagPresetSession
     {
         private const string LOG_IDENT = "FastFlagPresetSession";
@@ -62,7 +64,10 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        public static bool Enabled => App.Settings.Prop.UseFastFlagManager && App.Settings.Prop.FastFlagPresetRestartRoblox;
+        private static bool CloseRunningOnLaunch => App.Settings.Prop.UseFastFlagManager && App.Settings.Prop.FastFlagPresetCloseRunningRoblox;
+
+        // places already mentioned this session - one toast per game, not one per server hop
+        private static readonly HashSet<long> _notifiedPlaces = new();
 
         // true for a short while after this class restarted Roblox - the Watcher uses it so its
         // "Roblox vanished mid-game, must have crashed" auto-rejoin doesn't fire on top
@@ -129,7 +134,7 @@ namespace PhasmaStrap.Utility
 
             // a link without a place ID (follow a friend, open the app): nothing to compare yet -
             // the Watcher sorts it out once the join shows which place it was
-            if (launchPlaceId is null || !Enabled)
+            if (launchPlaceId is null || !CloseRunningOnLaunch)
                 return false;
 
             string desired = DesiredFor(launchPlaceId.Value);
@@ -159,54 +164,55 @@ namespace PhasmaStrap.Utility
 
         public static void OnGameJoined(ActivityData data)
         {
-            if (!Enabled || data.PlaceId <= 0)
+            if (!App.Settings.Prop.UseFastFlagManager || data.PlaceId <= 0)
                 return;
 
-            // a teleport inside one experience (lobby -> match, sub-places): leave it alone, a
-            // restart would drop the teleport data and the party
-            if (data.RootActivity is not null)
+            string desired = DesiredFor(data.PlaceId);
+
+            // only worth a mention when this game HAS a preset that isn't running; a preset left
+            // over from the previous game is harmless enough not to nag about
+            if (desired.Length == 0)
                 return;
 
             Marker marker = Read();
-            string desired = DesiredFor(data.PlaceId);
-
             if (string.Equals(desired, marker.Preset, StringComparison.Ordinal))
                 return;
 
-            if ((DateTime.UtcNow - marker.RestartUtc).TotalSeconds < 45)
+            lock (_notifiedPlaces)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Place {data.PlaceId} wants {Describe(desired)} but Roblox was only just restarted - not restarting again");
-                return;
+                if (!_notifiedPlaces.Add(data.PlaceId))
+                    return;
             }
 
-            if (data.ServerType != ServerType.Public || string.IsNullOrEmpty(data.JobId))
-            {
-                App.Logger.WriteLine(LOG_IDENT, $"Place {data.PlaceId} wants {Describe(desired)}, but a {data.ServerType} server can't be rejoined by ID - leaving it running with {Describe(marker.Preset)}");
+            App.Logger.WriteLine(LOG_IDENT, $"Joined place {data.PlaceId} with {Describe(marker.Preset)}; its preset \"{desired}\" is not active because Roblox was already running");
 
-                if (desired.Length > 0)
-                    NotificationCenter.Notify("FastFlag preset not applied", $"\"{desired}\" couldn't be applied: private and reserved servers can't be rejoined automatically. Close Roblox and join from the link to get it.");
-
-                return;
-            }
-
-            if (Interlocked.Exchange(ref _restarting, 1) != 0)
-                return;
-
+            bool canRejoin = data.ServerType == ServerType.Public && !string.IsNullOrEmpty(data.JobId);
             long placeId = data.PlaceId;
             string jobId = data.JobId;
+
+            NotificationCenter.Notify(
+                $"Preset \"{desired}\" is not active",
+                canRejoin
+                    ? "Roblox was already running, and it only reads FastFlags when it starts. Click here to restart it into this same server with the preset."
+                    : "Roblox was already running, and it only reads FastFlags when it starts. Close Roblox and join this game again to get the preset.",
+                NotificationCategory.General,
+                durationSeconds: 10,
+                onClick: canRejoin ? () => RestartInto(placeId, jobId) : null);
+        }
+
+        // only ever runs because the toast was clicked
+        private static void RestartInto(long placeId, string jobId)
+        {
+            if (Interlocked.Exchange(ref _restarting, 1) != 0)
+                return;
 
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    App.Logger.WriteLine(LOG_IDENT, $"Joined place {placeId} with {Describe(marker.Preset)}, it needs {Describe(desired)} - restarting Roblox into the same server");
+                    App.Logger.WriteLine(LOG_IDENT, $"Restarting Roblox into place {placeId} / {jobId} on request");
 
-                    NotificationCenter.Notify(
-                        desired.Length > 0 ? $"Applying \"{desired}\"" : "Removing FastFlag preset",
-                        desired.Length > 0
-                            ? "Restarting Roblox into the same server so this game's FastFlag preset takes effect."
-                            : "Restarting Roblox into the same server so the previous game's preset no longer applies.");
-
+                    Marker marker = Read();
                     marker.RestartUtc = DateTime.UtcNow;
                     Write(marker);
 

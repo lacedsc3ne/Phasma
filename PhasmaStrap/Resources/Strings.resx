@@ -5177,9 +5177,9 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Remove this background</value>
   </data>
   <data name="Menu.FastFlagEditor.RestartRobloxWhenPresetCouldnT" xml:space="preserve">
-    <value>Restart Roblox when a preset couldn't be applied</value>
+    <value>Close Roblox first when pressing Play needs a different preset</value>
   </data>
   <data name="Menu.FastFlagEditor.RobloxOnlyReadsFastFlagsWhenStarts" xml:space="preserve">
-    <value>Roblox only reads FastFlags when it starts. If you join a game from inside the Roblox app, follow a friend from their profile, or press Play while Roblox is already open, the game's preset can't take effect. With this on, PhasmaStrap restarts Roblox straight back into the same server so it does - and again when you move on to a different game, so the preset doesn't stick. Teleports inside one game and private servers are left alone.</value>
+    <value>Roblox only reads FastFlags when it starts. If it is already open when you press Play in the browser, it takes the join over and the game's preset is never read. With this on, PhasmaStrap closes the running Roblox first in that case, so the game starts with its preset. Off by default. PhasmaStrap never restarts Roblox on its own: when you join a game whose preset isn't active (from inside the Roblox app, or by following a friend), you only get a notification - click it if you want to restart into the same server with the preset.</value>
   </data>
 </root>

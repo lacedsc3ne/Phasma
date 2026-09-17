@@ -66,14 +66,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { _removeFromGlobal = value; OnPropertyChanged(nameof(RemoveFromGlobal)); }
         }
 
-        public bool RestartRobloxForPresets
+        public bool CloseRunningRobloxForPresets
         {
-            get => App.Settings.Prop.FastFlagPresetRestartRoblox;
+            get => App.Settings.Prop.FastFlagPresetCloseRunningRoblox;
             set
             {
-                App.Settings.Prop.FastFlagPresetRestartRoblox = value;
+                App.Settings.Prop.FastFlagPresetCloseRunningRoblox = value;
                 App.Settings.SaveDeferred();
-                OnPropertyChanged(nameof(RestartRobloxForPresets));
+                OnPropertyChanged(nameof(CloseRunningRobloxForPresets));
             }
         }
 
