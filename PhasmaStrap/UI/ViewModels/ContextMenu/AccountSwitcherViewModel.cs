@@ -10,6 +10,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 
 using PhasmaStrap.Integrations;
+using PhasmaStrap.UI.Elements.ContextMenu;
 using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
@@ -953,6 +954,65 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
 
             throw new IOException("Could not write the Roblox cookie file. Make sure Roblox is fully closed.");
+        }
+
+        // --- login with a real embedded browser (BrowserLoginWindow, WebView2) instead of pasting
+        // a raw cookie value - the cookie is read straight out of that window's own isolated
+        // browser session after a successful login, then saved through the same
+        // verify-and-synthesize-a-dat path as the manual cookie import above. ---
+
+        public ICommand LoginWithBrowserCommand => new AsyncRelayCommand(LoginWithBrowserAsync);
+
+        private async Task LoginWithBrowserAsync()
+        {
+            if (_busy)
+                return;
+
+            string template = ResolveTemplate();
+
+            if (string.IsNullOrEmpty(template))
+            {
+                Frontend.ShowMessageBox("Sign into any Roblox account once (or add the current account) before using this. PhasmaStrap needs an existing login as a template.", MessageBoxImage.Warning);
+                return;
+            }
+
+            string? cookie = await BrowserLoginWindow.ShowAndWaitForCookieAsync(Application.Current?.MainWindow).ConfigureAwait(true);
+
+            if (string.IsNullOrEmpty(cookie))
+                return;
+
+            _busy = true;
+            OnPropertyChanged(nameof(AddCurrentEnabled));
+            await _opLock.WaitAsync().ConfigureAwait(true);
+
+            try
+            {
+                Status = "Verifying account...";
+                (bool success, string? username, string? error) = await ImportOneCookieAsync(cookie, template).ConfigureAwait(true);
+
+                if (!success)
+                {
+                    Status = error ?? "Could not add this account.";
+                    Frontend.ShowMessageBox(error ?? "Could not add this account.", MessageBoxImage.Warning);
+                    return;
+                }
+
+                SaveMeta();
+                ApplyFilter();
+                Status = $"Added account: {username}";
+
+                await FetchAvatarsSafeAsync().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                Status = $"Login failed: {ex.Message}";
+            }
+            finally
+            {
+                _opLock.Release();
+                _busy = false;
+                OnPropertyChanged(nameof(AddCurrentEnabled));
+            }
         }
 
         // --- running instances (merged in from what was a separate Instances page) + launching a
