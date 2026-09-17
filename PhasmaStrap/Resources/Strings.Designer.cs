@@ -14696,5 +14696,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Appearance.RemoveBackground", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart Roblox when a preset couldn't be applied.
+        /// </summary>
+        public static string Menu_FastFlagEditor_RestartRobloxWhenPresetCouldnT {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.RestartRobloxWhenPresetCouldnT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox only reads FastFlags when it starts. If you join a game from inside the Roblox app, follow a friend from their pr.
+        /// </summary>
+        public static string Menu_FastFlagEditor_RobloxOnlyReadsFastFlagsWhenStarts {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.RobloxOnlyReadsFastFlagsWhenStarts", resourceCulture);
+            }
+        }
     }
 }

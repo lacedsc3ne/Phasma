@@ -5176,4 +5176,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Appearance.RemoveBackground" xml:space="preserve">
     <value>Remove this background</value>
   </data>
+  <data name="Menu.FastFlagEditor.RestartRobloxWhenPresetCouldnT" xml:space="preserve">
+    <value>Restart Roblox when a preset couldn't be applied</value>
+  </data>
+  <data name="Menu.FastFlagEditor.RobloxOnlyReadsFastFlagsWhenStarts" xml:space="preserve">
+    <value>Roblox only reads FastFlags when it starts. If you join a game from inside the Roblox app, follow a friend from their profile, or press Play while Roblox is already open, the game's preset can't take effect. With this on, PhasmaStrap restarts Roblox straight back into the same server so it does - and again when you move on to a different game, so the preset doesn't stick. Teleports inside one game and private servers are left alone.</value>
+  </data>
 </root>

@@ -351,7 +351,15 @@ namespace PhasmaStrap
                         await TryApplyMatchmakingAsync();
 
                     long? launchPlaceId = TryResolveLaunchPlaceId();
-                    await TryApplyFastFlagPlacePresetAsync(launchPlaceId);
+
+                    // if Roblox is already open with different flags it has to go first - otherwise it
+                    // just takes this join over and never reads what is about to be written
+                    bool startsNewClient = await Utility.FastFlagPresetSession.PrepareLaunchAsync(launchPlaceId);
+
+                    string appliedPreset = await TryApplyFastFlagPlacePresetAsync(launchPlaceId);
+
+                    if (startsNewClient)
+                        Utility.FastFlagPresetSession.RecordLaunch(appliedPreset);
 
                     // fire-and-forget: warms the AssetWarp preload cache ahead of the game
                     // actually asking, never something a launch should wait on or fail over
@@ -776,21 +784,22 @@ namespace PhasmaStrap
         // un-scoped saved flags afterward. Replaced the old per-game "Engine Settings" scope
         // (strip curated toggles for/except listed places) with this more general place-to-preset
         // mechanism instead.
-        private async Task TryApplyFastFlagPlacePresetAsync(long? placeId)
+        // returns the name of the preset that was written, or "" when the launch uses the global flags
+        private async Task<string> TryApplyFastFlagPlacePresetAsync(long? placeId)
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagPlacePresetAsync";
 
             if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
-                return;
+                return "";
 
             if (!App.Settings.Prop.FastFlagPlacePresets.TryGetValue(placeId.Value.ToString(), out string? presetName) || string.IsNullOrEmpty(presetName))
-                return;
+                return "";
 
             Utility.FastFlagSnapshot? snapshot = Utility.FastFlagSnapshotManager.List().FirstOrDefault(s => s.Name == presetName);
             if (snapshot is null)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} is assigned preset '{presetName}', but that snapshot no longer exists");
-                return;
+                return "";
             }
 
             try
@@ -825,10 +834,12 @@ namespace PhasmaStrap
                 Filesystem.AssertReadOnly(filePath);
 
                 App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag preset '{presetName}' ({snapshot.Flags.Count} flag(s) on top of {merged.Count - snapshot.Flags.Count} global) for place {placeId}");
+                return presetName;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag preset '{presetName}', launching with the global flag set: {ex.Message}");
+                return "";
             }
         }
 

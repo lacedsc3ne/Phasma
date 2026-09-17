@@ -138,6 +138,14 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
+                // a game joined from inside the Roblox app (or by following a friend) never went
+                // through a launch that could apply its FastFlag preset - see FastFlagPresetSession
+                ActivityWatcher.OnGameJoin += (sender, _) =>
+                {
+                    if (sender is ActivityWatcher watcher)
+                        Utility.FastFlagPresetSession.OnGameJoined(watcher.Data);
+                };
+
                 // the Capture page saves the toggle immediately and this process reloads the file
                 // (SettingsHotReload) - so flipping it mid-game starts/stops the buffer right away
                 Utility.SettingsHotReload.Reloaded += (_, _) =>
@@ -400,6 +408,10 @@ namespace PhasmaStrap
             // normally, so this is the closest honest signal for "Roblox crashed" available without
             // reading process exit codes (which Roblox's own client doesn't set meaningfully anyway).
             bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
+
+            // not a crash if FastFlagPresetSession just closed Roblox on purpose to restart it
+            if (possibleCrash && Utility.FastFlagPresetSession.RestartedRecently)
+                possibleCrash = false;
 
             if (possibleCrash && App.Settings.Prop.AutoRejoinOnCrash)
             {
