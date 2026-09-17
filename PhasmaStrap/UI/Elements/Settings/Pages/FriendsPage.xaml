@@ -1,0 +1,100 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FriendsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance dmodels:FriendsViewModel, IsDesignTimeCreatable=False}"
+      Title="FriendsPage"
+      Scrollable="True">
+    <ui:UiPage.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:UiPage.Resources>
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="Friends" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Who's online and what they're playing, with one-click join. Ranked by online status and current game - Roblox's API never exposes another user's playtime, only your own, so a real hours-played leaderboard isn't something this can honestly show." />
+
+        <ui:Card Margin="0,12,0,0">
+            <StackPanel>
+                <controls:OptionControl Header="Friend Activity Alerts" Description="Toast when a friend comes online or starts a game. Runs in the background even when Roblox isn't running." x:Name="AlertsOption">
+                    <ui:ToggleSwitch IsChecked="{Binding AlertsEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+                <controls:OptionControl Header="Check every" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:NumberBox Width="100" Min="20" Max="600" Value="{Binding PollSeconds, Mode=TwoWay}" />
+                        <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="seconds" />
+                    </StackPanel>
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:Card>
+
+        <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Text="{Binding Status}" />
+            <ui:Button Grid.Column="1" Content="Refresh" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
+        </Grid>
+
+        <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Friends, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="8" Padding="10" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Width="38" Height="38" VerticalAlignment="Center">
+                                <Ellipse Fill="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                <Image Source="{Binding AvatarUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
+                                    <Image.Clip>
+                                        <EllipseGeometry Center="19,19" RadiusX="19" RadiusY="19" />
+                                    </Image.Clip>
+                                </Image>
+                                <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" StrokeThickness="2" Stroke="{DynamicResource ControlFillColorDefaultBrush}">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="Gray" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="Online">
+                                                    <Setter Property="Fill" Value="#2ECC71" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Type}" Value="InGame">
+                                                    <Setter Property="Fill" Value="#2ECC71" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Type}" Value="InStudio">
+                                                    <Setter Property="Fill" Value="#3498DB" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                            </Grid>
+
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" />
+                                <TextBlock FontSize="11" Opacity="0.7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+
+                            <ui:Button Grid.Column="2" Content="Join" Icon="ArrowEnter24" Appearance="Primary" VerticalAlignment="Center"
+                                       Visibility="{Binding Joinable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel HorizontalAlignment="Center" Margin="0,24,0,24" Visibility="{Binding EmptyStateVisibility}">
+            <ui:SymbolIcon Symbol="People24" FontSize="40" Opacity="0.25" HorizontalAlignment="Center" />
+            <TextBlock Text="No friends to show yet" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
+        </StackPanel>
+    </StackPanel>
+</ui:UiPage>
