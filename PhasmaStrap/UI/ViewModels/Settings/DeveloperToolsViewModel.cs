@@ -1,0 +1,267 @@
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Input;
+
+using CommunityToolkit.Mvvm.Input;
+
+using PhasmaStrap.Networking;
+using PhasmaStrap.Utility;
+
+namespace PhasmaStrap.UI.ViewModels.Settings
+{
+    public sealed class SnapshotRow
+    {
+        public FastFlagSnapshot Snapshot { get; init; } = null!;
+        public string Name => Snapshot.Name;
+        public string CreatedDisplay => Snapshot.CreatedUtc.ToLocalTime().ToString("g");
+        public int FlagCount => Snapshot.Flags.Count;
+    }
+
+    public class DeveloperToolsViewModel : NotifyPropertyChangedViewModel
+    {
+        // --- FastFlag snapshots: live A/B toggle + diff viewer, both built on the same
+        // save/apply/diff primitives in FastFlagSnapshotManager ---
+
+        public ObservableCollection<SnapshotRow> Snapshots { get; } = new();
+
+        private string _newSnapshotName = "";
+        public string NewSnapshotName
+        {
+            get => _newSnapshotName;
+            set { _newSnapshotName = value; OnPropertyChanged(nameof(NewSnapshotName)); }
+        }
+
+        private SnapshotRow? _selectedSnapshotA;
+        public SnapshotRow? SelectedSnapshotA
+        {
+            get => _selectedSnapshotA;
+            set { _selectedSnapshotA = value; OnPropertyChanged(nameof(SelectedSnapshotA)); RefreshDiff(); }
+        }
+
+        private SnapshotRow? _selectedSnapshotB;
+        public SnapshotRow? SelectedSnapshotB
+        {
+            get => _selectedSnapshotB;
+            set { _selectedSnapshotB = value; OnPropertyChanged(nameof(SelectedSnapshotB)); RefreshDiff(); }
+        }
+
+        public ObservableCollection<FastFlagDiffEntry> DiffEntries { get; } = new();
+
+        public string DiffSummary => DiffEntries.Count == 0
+            ? "Pick two snapshots above to compare them."
+            : $"{DiffEntries.Count} difference(s).";
+
+        public ICommand SaveSnapshotCommand => new RelayCommand(SaveSnapshot);
+        public ICommand ApplySnapshotCommand => new RelayCommand<SnapshotRow>(ApplySnapshot);
+        public ICommand DeleteSnapshotCommand => new RelayCommand<SnapshotRow>(DeleteSnapshot);
+
+        private void SaveSnapshot()
+        {
+            if (string.IsNullOrWhiteSpace(NewSnapshotName))
+                return;
+
+            FastFlagSnapshotManager.Save(NewSnapshotName.Trim());
+            NewSnapshotName = "";
+            RefreshSnapshots();
+        }
+
+        private void ApplySnapshot(SnapshotRow? row)
+        {
+            if (row is null)
+                return;
+
+            MessageBoxResult confirm = Frontend.ShowMessageBox(
+                $"Replace your current FastFlags entirely with the '{row.Name}' snapshot ({row.FlagCount} flag(s))? Anything not in this snapshot will be cleared.",
+                MessageBoxImage.Warning, MessageBoxButton.YesNo, MessageBoxResult.No);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            FastFlagSnapshotManager.Apply(row.Snapshot);
+        }
+
+        private void DeleteSnapshot(SnapshotRow? row)
+        {
+            if (row is null)
+                return;
+
+            FastFlagSnapshotManager.Delete(row.Name);
+            RefreshSnapshots();
+        }
+
+        private void RefreshSnapshots()
+        {
+            Snapshots.Clear();
+            foreach (FastFlagSnapshot snapshot in FastFlagSnapshotManager.List())
+                Snapshots.Add(new SnapshotRow { Snapshot = snapshot });
+
+            OnPropertyChanged(nameof(Snapshots));
+        }
+
+        private void RefreshDiff()
+        {
+            DiffEntries.Clear();
+
+            if (SelectedSnapshotA is not null && SelectedSnapshotB is not null)
+            {
+                foreach (FastFlagDiffEntry entry in FastFlagSnapshotManager.Diff(SelectedSnapshotA.Snapshot.Flags, SelectedSnapshotB.Snapshot.Flags))
+                    DiffEntries.Add(entry);
+            }
+
+            OnPropertyChanged(nameof(DiffSummary));
+        }
+
+        // --- live proxy traffic log ---
+
+        public ObservableCollection<ProxyTrafficEntry> ProxyTraffic { get; } = new();
+
+        public ICommand RefreshProxyTrafficCommand => new RelayCommand(RefreshProxyTraffic);
+        public ICommand ClearProxyTrafficCommand => new RelayCommand(() => { ProxyTrafficLog.Clear(); RefreshProxyTraffic(); });
+
+        private void RefreshProxyTraffic()
+        {
+            ProxyTraffic.Clear();
+            foreach (ProxyTrafficEntry entry in ProxyTrafficLog.Recent)
+                ProxyTraffic.Add(entry);
+        }
+
+        private void OnProxyTrafficChanged(object? sender, EventArgs e)
+        {
+            Application.Current?.Dispatcher.BeginInvoke(new Action(RefreshProxyTraffic));
+        }
+
+        // --- unified log viewer ---
+
+        private string _logText = "";
+        public string LogText
+        {
+            get => _logText;
+            private set { _logText = value; OnPropertyChanged(nameof(LogText)); }
+        }
+
+        public ICommand RefreshLogsCommand => new RelayCommand(RefreshLogs);
+
+        private void RefreshLogs()
+        {
+            const int MaxCharsPerLog = 100_000;
+            var sb = new System.Text.StringBuilder();
+
+            sb.AppendLine("=== PhasmaStrap log ===");
+            AppendTail(sb, App.Logger.FileLocation, MaxCharsPerLog);
+
+            sb.AppendLine();
+            sb.AppendLine("=== Most recent Roblox log ===");
+
+            try
+            {
+                if (Directory.Exists(Paths.RobloxLogs))
+                {
+                    string? latest = Directory.GetFiles(Paths.RobloxLogs)
+                        .OrderByDescending(File.GetLastWriteTimeUtc)
+                        .FirstOrDefault();
+
+                    AppendTail(sb, latest, MaxCharsPerLog);
+                }
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine($"(could not read Roblox logs: {ex.Message})");
+            }
+
+            LogText = sb.ToString();
+        }
+
+        private static void AppendTail(System.Text.StringBuilder sb, string? path, int maxChars)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                sb.AppendLine("(not found)");
+                return;
+            }
+
+            try
+            {
+                using FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                string content = reader.ReadToEnd();
+
+                sb.AppendLine(content.Length > maxChars ? content[^maxChars..] : content);
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine($"(could not read '{path}': {ex.Message})");
+            }
+        }
+
+        // --- Studio plugin installer (by asset ID - see RobloxAssetDownloader's doc comment for
+        // why this doesn't curate/endorse a specific plugin list) ---
+
+        private string _pluginAssetId = "";
+        public string PluginAssetId
+        {
+            get => _pluginAssetId;
+            set { _pluginAssetId = value; OnPropertyChanged(nameof(PluginAssetId)); }
+        }
+
+        private string _pluginInstallStatus = "";
+        public string PluginInstallStatus
+        {
+            get => _pluginInstallStatus;
+            private set { _pluginInstallStatus = value; OnPropertyChanged(nameof(PluginInstallStatus)); }
+        }
+
+        public ICommand InstallPluginCommand => new AsyncRelayCommand(InstallPluginAsync);
+        public ICommand OpenPluginsFolderCommand => new RelayCommand(() =>
+        {
+            Directory.CreateDirectory(Paths.LocalAppData + @"\Roblox\Plugins");
+            Process.Start("explorer.exe", Path.Combine(Paths.LocalAppData, "Roblox", "Plugins"));
+        });
+
+        private async Task InstallPluginAsync()
+        {
+            if (!long.TryParse(PluginAssetId.Trim(), out long assetId) || assetId <= 0)
+            {
+                PluginInstallStatus = "Enter a valid numeric asset ID first.";
+                return;
+            }
+
+            PluginInstallStatus = "Downloading...";
+
+            byte[]? bytes = await RobloxAssetDownloader.DownloadAssetAsync(assetId);
+            if (bytes is null || bytes.Length == 0)
+            {
+                PluginInstallStatus = "Download failed - check the asset ID and your connection.";
+                return;
+            }
+
+            try
+            {
+                string pluginsFolder = Path.Combine(Paths.LocalAppData, "Roblox", "Plugins");
+                Directory.CreateDirectory(pluginsFolder);
+
+                string destination = Path.Combine(pluginsFolder, $"Plugin_{assetId}.rbxm");
+                File.WriteAllBytes(destination, bytes);
+
+                PluginInstallStatus = $"Installed to {destination}. Restart Studio to load it.";
+            }
+            catch (Exception ex)
+            {
+                PluginInstallStatus = $"Install failed: {ex.Message}";
+            }
+        }
+
+        public DeveloperToolsViewModel()
+        {
+            RefreshSnapshots();
+            RefreshProxyTraffic();
+            RefreshLogs();
+
+            ProxyTrafficLog.Changed += OnProxyTrafficChanged;
+        }
+
+        public void Detach()
+        {
+            ProxyTrafficLog.Changed -= OnProxyTrafficChanged;
+        }
+    }
+}

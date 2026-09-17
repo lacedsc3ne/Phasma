@@ -173,6 +173,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_RiShade_Title}" PageType="{x:Type pages:RiShadePage}" Icon="Sparkle24" PageTag="rishade" />
                     <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
                     <ui:NavigationItem Content="Hotkeys" PageType="{x:Type pages:HotkeysPage}" Icon="Keyboard24" PageTag="hotkeys" />
+                    <ui:NavigationItem Content="Developer Tools" PageType="{x:Type pages:DeveloperToolsPage}" Icon="Code24" PageTag="developertools" />
                 </ui:NavigationFluent.Items>
                 <ui:NavigationFluent.Footer>
                     <!-- Footer isn't pinned to the bottom of the window in this narrow sidebar - it

@@ -171,6 +171,8 @@ namespace PhasmaStrap.Networking
                         response = response with { Body = transformed };
                 }
 
+                ProxyTrafficLog.Record(request.Host, request.Method, request.Path, response.StatusCode, servedFromCache, response.Body.Length);
+
                 await WriteResponseAsync(sslStream, response, token);
             }
             catch (Exception ex)

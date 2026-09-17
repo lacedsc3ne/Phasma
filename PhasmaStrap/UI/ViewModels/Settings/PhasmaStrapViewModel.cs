@@ -61,6 +61,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public bool ShouldExportLogs { get; set; } = true;
 
+        // for bug reports: OS/.NET/GPU/PhasmaStrap version, not personal data - reuses
+        // GpuInventory.Summary (already computed for the Overlays/RiShade/NVIDIA pages) rather
+        // than querying WMI a second time here
+        public bool ShouldExportSystemInfo { get; set; } = true;
+
         public ICommand ExportDataCommand => new RelayCommand(ExportData);
 
         private void ExportData()
@@ -97,6 +102,21 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     .Where(x => !x.Equals(App.Logger.FileLocation, StringComparison.OrdinalIgnoreCase));
 
                 AddFilesToZipStream(zipStream, files, "Logs/");
+            }
+
+            if (ShouldExportSystemInfo)
+            {
+                string specs = string.Join(Environment.NewLine,
+                    $"PhasmaStrap {App.Version}",
+                    $"OS: {Environment.OSVersion.VersionString} ({(Environment.Is64BitOperatingSystem ? "64" : "32")}-bit)",
+                    $".NET: {Environment.Version}",
+                    $"GPU(s): {PhasmaStrap.Utility.GpuInventory.Summary}",
+                    $"Generated: {DateTime.UtcNow:u}");
+
+                var entry = new ZipEntry("SystemInfo.txt") { DateTime = DateTime.Now };
+                zipStream.PutNextEntry(entry);
+                byte[] bytes = Encoding.UTF8.GetBytes(specs);
+                zipStream.Write(bytes, 0, bytes.Length);
             }
 
             zipStream.CloseEntry();
