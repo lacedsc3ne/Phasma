@@ -17,11 +17,19 @@ namespace PhasmaStrap.UI
 {
     public static class GifImageBehavior
     {
-        private const long MaxEncodedBytes = 16L * 1024L * 1024L;
+        // GIF wallpapers are routinely 20-60 MB with a few hundred frames - the original limits
+        // (16 MB / 120 frames / 48 MB decoded) silently fell back to a static first frame for
+        // most of them, which looked exactly like "GIFs don't animate". Frames are downscaled to
+        // the window's size before counting against the decoded budget.
+        private const long MaxEncodedBytes = 96L * 1024L * 1024L;
 
-        private const long MaxDecodedBytes = 48L * 1024L * 1024L;
+        private const long MaxDecodedBytes = 640L * 1024L * 1024L;
 
-        private const int MaxAnimationFrames = 120;
+        private const int MaxAnimationFrames = 600;
+
+        private const int MaxFrameWidth = 1920;
+
+        private const string LOG_IDENT = "GifImageBehavior";
 
         public static readonly DependencyProperty SourcePathProperty =
             DependencyProperty.RegisterAttached(
@@ -56,8 +64,9 @@ namespace PhasmaStrap.UI
                     AnimateGif(image, path);
                     return;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    App.Logger.WriteLine(LOG_IDENT, $"GIF animation failed for '{path}', showing it as a still image: {ex.Message}");
                 }
             }
 
@@ -87,6 +96,7 @@ namespace PhasmaStrap.UI
         {
             if (new FileInfo(path).Length > MaxEncodedBytes)
             {
+                App.Logger.WriteLine(LOG_IDENT, $"'{path}' is over {MaxEncodedBytes / 1024 / 1024} MB - showing it as a still image");
                 image.Source = LoadStatic(path);
                 return;
             }
@@ -110,12 +120,25 @@ namespace PhasmaStrap.UI
                 return;
             }
 
+            if (decoder.Frames.Count > MaxAnimationFrames)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"'{path}' has {decoder.Frames.Count} frames (limit {MaxAnimationFrames}) - showing it as a still image");
+                var first = decoder.Frames[0];
+                first.Freeze();
+                image.Source = first;
+                return;
+            }
+
+            // downscale oversized frames so a 4K GIF doesn't need gigabytes of decoded bitmaps
+            double scale = decoder.Frames[0].PixelWidth > MaxFrameWidth ? (double)MaxFrameWidth / decoder.Frames[0].PixelWidth : 1.0;
+
             long decodedBytes = 0;
             foreach (BitmapFrame frame in decoder.Frames)
             {
-                long frameBytes = (long)frame.PixelWidth * frame.PixelHeight * 4;
+                long frameBytes = (long)(frame.PixelWidth * scale) * (long)(frame.PixelHeight * scale) * 4;
                 if (frame.PixelWidth < 1 || frame.PixelHeight < 1 || frameBytes > MaxDecodedBytes || decodedBytes > MaxDecodedBytes - frameBytes)
                 {
+                    App.Logger.WriteLine(LOG_IDENT, $"'{path}' would need more than {MaxDecodedBytes / 1024 / 1024} MB decoded - showing it as a still image");
                     var first = decoder.Frames[0];
                     first.Freeze();
                     image.Source = first;
@@ -124,21 +147,24 @@ namespace PhasmaStrap.UI
                 decodedBytes += frameBytes;
             }
 
-            if (decoder.Frames.Count > MaxAnimationFrames)
-            {
-                var first = decoder.Frames[0];
-                first.Freeze();
-                image.Source = first;
-                return;
-            }
-
             var animation = new ObjectAnimationUsingKeyFrames { RepeatBehavior = RepeatBehavior.Forever };
             var time = TimeSpan.Zero;
 
             foreach (var frame in decoder.Frames)
             {
-                frame.Freeze();
-                animation.KeyFrames.Add(new DiscreteObjectKeyFrame(frame, KeyTime.FromTimeSpan(time)));
+                BitmapSource keyframe = frame;
+                if (scale < 1.0)
+                {
+                    var scaled = new TransformedBitmap(frame, new ScaleTransform(scale, scale));
+                    scaled.Freeze();
+                    keyframe = scaled;
+                }
+                else
+                {
+                    frame.Freeze();
+                }
+
+                animation.KeyFrames.Add(new DiscreteObjectKeyFrame(keyframe, KeyTime.FromTimeSpan(time)));
 
                 int delayCentiseconds = 10;
                 try
@@ -158,8 +184,27 @@ namespace PhasmaStrap.UI
             }
 
             animation.Duration = new Duration(time);
-            image.Source = decoder.Frames[0];
-            image.BeginAnimation(Image.SourceProperty, animation);
+            animation.Freeze();
+            image.Source = (ImageSource)animation.KeyFrames[0].Value;
+
+            // the background Image is created before it's in the visual tree - start the clock
+            // once it's actually loaded so it can't be dropped before the element is rendered
+            if (image.IsLoaded)
+            {
+                image.BeginAnimation(Image.SourceProperty, animation);
+            }
+            else
+            {
+                RoutedEventHandler? onLoaded = null;
+                onLoaded = (_, _) =>
+                {
+                    image.Loaded -= onLoaded;
+                    image.BeginAnimation(Image.SourceProperty, animation);
+                };
+                image.Loaded += onLoaded;
+            }
+
+            App.Logger.WriteLine(LOG_IDENT, $"Animating '{Path.GetFileName(path)}': {decoder.Frames.Count} frames, {time.TotalSeconds:0.0}s loop{(scale < 1.0 ? $", scaled x{scale:0.00}" : "")}");
         }
     }
 }

@@ -64,16 +64,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // similar notes. This page only edits Settings.Prop; InstantReplayRecorder itself lives
         // in Watcher.cs.) ---
 
+        // saved immediately (not just on the Save button) so the running game session's watcher
+        // picks it up through SettingsHotReload and starts/stops buffering without a relaunch
         public bool InstantReplayEnabled
         {
             get => App.Settings.Prop.InstantReplayEnabled;
-            set => App.Settings.Prop.InstantReplayEnabled = value;
+            set
+            {
+                App.Settings.Prop.InstantReplayEnabled = value;
+                App.Settings.Save();
+                OnPropertyChanged(nameof(InstantReplayEnabled));
+            }
         }
 
         public int InstantReplayClipSeconds
         {
             get => App.Settings.Prop.InstantReplayClipSeconds;
-            set { App.Settings.Prop.InstantReplayClipSeconds = value; OnPropertyChanged(nameof(InstantReplayClipSeconds)); }
+            set { App.Settings.Prop.InstantReplayClipSeconds = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(InstantReplayClipSeconds)); }
         }
 
         public string[] QualityOptions { get; } = { "Low", "Medium", "High" };
