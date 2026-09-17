@@ -4628,7 +4628,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Hotkeys</value>
   </data>
   <data name="Menu.Hotkeys.GlobalShortcutsWorkWhileRobloxGame" xml:space="preserve">
-    <value>Global shortcuts that work while a Roblox game session is running, no matter which window has focus. Click a box below and press the key (or key combination) you want - a single key like F9 or a numpad key works too. Escape clears a box. These only listen during an active game session, not from this Settings window; a plain letter key will also fire while you're typing in game, so prefer F-keys or combinations for those.</value>
+    <value>Shortcuts that work while a Roblox game session is running. Click a button and press the key or combination you want - a single key such as F9 works too. Esc cancels and keeps the current hotkey; Clear removes it. A hotkey fires even if you are holding other keys, like Shift to sprint. Combinations and keys like F9 work from any window and are not passed on to the game. Plain typing keys (letters, numbers, Space...) only fire while Roblox is the active window, and still type in chat - so F-keys or combinations are the better choice.</value>
   </data>
   <data name="Menu.Hotkeys.ClickSet" xml:space="preserve">
     <value>Click to set...</value>
