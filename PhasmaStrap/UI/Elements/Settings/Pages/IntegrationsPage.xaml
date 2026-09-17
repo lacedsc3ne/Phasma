@@ -99,21 +99,12 @@
                         <ui:ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <ui:CardExpander Margin="0,8,0,0" IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                        <ui:CardExpander.Header>
-                            <StackPanel>
-                                <TextBlock FontSize="14" Text="Discord application (advanced)" />
-                                <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Your profile shows &quot;Playing PhasmaStrap&quot; with the logo, and the game, server and account details underneath. Only change this if you want the activity to appear under a different name/icon of your own." />
-                            </StackPanel>
-                        </ui:CardExpander.Header>
-                        <StackPanel>
-                            <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       Text="To use your own: create an application at discord.com/developers/applications, give it the name and icon you want, and paste its Application ID here. Leave empty for PhasmaStrap's own. No bot, OAuth or asset setup is needed." />
-                            <controls:OptionControl Header="Application ID override" Description="{Binding DiscordApplicationStatus, Mode=OneWay}">
-                                <ui:TextBox Width="240" PlaceholderText="Leave empty for PhasmaStrap" Text="{Binding DiscordApplicationId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </controls:OptionControl>
-                        </StackPanel>
-                    </ui:CardExpander>
+                    <controls:OptionControl
+                        Header="Show as &quot;Playing PhasmaStrap&quot;"
+                        Description="Puts the PhasmaStrap name and logo at the top of your Discord activity, with the game, server and account details underneath. Off shows it as &quot;Playing Roblox&quot; instead. Applies to the next game session."
+                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                        <ui:ToggleSwitch IsChecked="{Binding DiscordShowAsPhasmaStrap, Mode=TwoWay}" />
+                    </controls:OptionControl>
 
                     <controls:OptionControl
                         Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"

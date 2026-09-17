@@ -170,28 +170,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.ShowAccountOnRichPresence = value;
         }
 
-        public string DiscordApplicationId
+        public bool DiscordShowAsPhasmaStrap
         {
-            get => App.Settings.Prop.DiscordApplicationId;
-            set
-            {
-                App.Settings.Prop.DiscordApplicationId = (value ?? "").Trim();
-                OnPropertyChanged(nameof(DiscordApplicationId));
-                OnPropertyChanged(nameof(DiscordApplicationStatus));
-            }
-        }
-
-        public string DiscordApplicationStatus
-        {
-            get
-            {
-                string id = App.Settings.Prop.DiscordApplicationId?.Trim() ?? "";
-                if (id.Length == 0)
-                    return "Using PhasmaStrap's own application - your profile says \"Playing PhasmaStrap\" with the logo.";
-                if (id.Length < 15 || !id.All(char.IsDigit))
-                    return "That doesn't look like a Discord application ID (it's a long number) - PhasmaStrap's own application will be used.";
-                return "Your own application will be used instead - the name and icon you gave it on the Discord developer portal show on your profile. Applies to the next game session.";
-            }
+            get => App.Settings.Prop.DiscordShowAsPhasmaStrap;
+            set { App.Settings.Prop.DiscordShowAsPhasmaStrap = value; OnPropertyChanged(nameof(DiscordShowAsPhasmaStrap)); }
         }
 
         public bool DisableAppPatchEnabled
