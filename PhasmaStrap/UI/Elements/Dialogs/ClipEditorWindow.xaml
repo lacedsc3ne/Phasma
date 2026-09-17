@@ -1,0 +1,138 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.ClipEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        mc:Ignorable="d"
+        Title="Edit clip"
+        Width="1100"
+        Height="780"
+        MinWidth="820"
+        MinHeight="560"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Closing="Window_Closing">
+    <base:WpfUiWindow.Resources>
+        <Style x:Key="ToolButton" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Appearance" Value="Secondary" />
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+    </base:WpfUiWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" x:Name="RootTitleBar" Title="Edit clip" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <!-- video -->
+        <Border Grid.Row="1" Margin="12,4,12,0" CornerRadius="8" Background="#FF000000" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" ClipToBounds="True">
+            <Grid>
+                <Viewbox Stretch="Uniform" Margin="4">
+                    <Grid x:Name="Surface" Width="1280" Height="720">
+                        <MediaElement x:Name="Player" Stretch="Fill" LoadedBehavior="Manual" UnloadedBehavior="Close" ScrubbingEnabled="True" IsMuted="True"
+                                      MediaOpened="Player_MediaOpened" MediaFailed="Player_MediaFailed" />
+                        <Image x:Name="StillImage" Stretch="Fill" Visibility="Collapsed" />
+                        <Canvas x:Name="CropCanvas" Background="Transparent" ClipToBounds="True"
+                                MouseLeftButtonDown="CropCanvas_MouseLeftButtonDown" MouseMove="CropCanvas_MouseMove" MouseLeftButtonUp="CropCanvas_MouseLeftButtonUp" />
+                    </Grid>
+                </Viewbox>
+                <TextBlock x:Name="VideoMessage" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Padding="10,4" Background="#AA000000" Foreground="White" FontSize="12" />
+            </Grid>
+        </Border>
+
+        <!-- timeline -->
+        <Grid Grid.Row="2" Margin="12,10,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="PositionText" Grid.Column="0" Text="0:00.00" VerticalAlignment="Center" Width="62" FontFamily="Consolas" />
+            <Grid x:Name="Timeline" Grid.Column="1" Height="58" Background="Transparent" Cursor="Hand" ClipToBounds="True"
+                  SizeChanged="Timeline_SizeChanged"
+                  MouseLeftButtonDown="Timeline_MouseLeftButtonDown" MouseMove="Timeline_MouseMove" MouseLeftButtonUp="Timeline_MouseLeftButtonUp">
+                <Border Margin="8,6" CornerRadius="4" Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" ClipToBounds="True">
+                    <UniformGrid x:Name="ThumbStrip" Rows="1" />
+                </Border>
+                <Canvas x:Name="TimelineCanvas" IsHitTestVisible="False">
+                    <Rectangle x:Name="DimLeft" Fill="#B0000000" />
+                    <Rectangle x:Name="DimRight" Fill="#B0000000" />
+                    <Rectangle x:Name="RangeOutline" Stroke="{DynamicResource SystemAccentColorSecondaryBrush}" StrokeThickness="2" RadiusX="3" RadiusY="3" />
+                    <Border x:Name="StartHandle" Width="10" CornerRadius="3,0,0,3" Background="{DynamicResource SystemAccentColorSecondaryBrush}">
+                        <Rectangle Width="2" Height="16" Fill="White" Opacity="0.85" />
+                    </Border>
+                    <Border x:Name="EndHandle" Width="10" CornerRadius="0,3,3,0" Background="{DynamicResource SystemAccentColorSecondaryBrush}">
+                        <Rectangle Width="2" Height="16" Fill="White" Opacity="0.85" />
+                    </Border>
+                    <Rectangle x:Name="Playhead" Width="2" Fill="White" />
+                </Canvas>
+            </Grid>
+            <TextBlock x:Name="DurationText" Grid.Column="2" Text="0:00.00" VerticalAlignment="Center" Width="62" TextAlignment="Right" FontFamily="Consolas" />
+        </Grid>
+
+        <!-- transport + tools -->
+        <Border Grid.Row="3" Margin="12,8,12,0" Padding="10,8" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
+            <WrapPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Margin="0,0,14,0">
+                    <ui:Button x:Name="PlayButton" Style="{StaticResource ToolButton}" Icon="Play24" Content="Play" Appearance="Primary" Click="Play_Click" ToolTip="Play / pause the selection (Space)" />
+                    <ui:Button Style="{StaticResource ToolButton}" Icon="Previous24" AutomationProperties.Name="Back one frame" Click="StepBack_Click" ToolTip="Back one frame (Left arrow)" />
+                    <ui:Button Style="{StaticResource ToolButton}" Icon="Next24" AutomationProperties.Name="Forward one frame" Click="StepForward_Click" ToolTip="Forward one frame (Right arrow)" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,14,0">
+                    <ui:Button Style="{StaticResource ToolButton}" Icon="ArrowPrevious24" Content="Set start" Click="SetStart_Click" ToolTip="Start the clip at the current position (I or [)" />
+                    <ui:Button Style="{StaticResource ToolButton}" Icon="ArrowNext24" Content="Set end" Click="SetEnd_Click" ToolTip="End the clip at the current position (O or ])" />
+                    <ui:Button Style="{StaticResource ToolButton}" Icon="ArrowRepeatAll24" Content="Reset trim" Click="ResetTrim_Click" ToolTip="Select the whole clip again" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,14,0">
+                    <ui:Button x:Name="CropButton" Style="{StaticResource ToolButton}" Icon="Crop24" Content="Crop" Click="Crop_Click" ToolTip="Drag a rectangle over the video to keep only that area (C)" />
+                    <ui:Button x:Name="ClearCropButton" Style="{StaticResource ToolButton}" Icon="DismissCircle24" Content="Clear crop" Click="ClearCrop_Click" Visibility="Collapsed" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="TopSpeed24" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Text="Speed" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ComboBox x:Name="SpeedBox" Width="96" SelectionChanged="SpeedBox_SelectionChanged" ToolTip="Slow motion or fast forward - the preview plays at this speed and the saved clip keeps it">
+                        <ComboBoxItem Content="0.25×" Tag="0.25" />
+                        <ComboBoxItem Content="0.5×" Tag="0.5" />
+                        <ComboBoxItem Content="1×" Tag="1" IsSelected="True" />
+                        <ComboBoxItem Content="1.5×" Tag="1.5" />
+                        <ComboBoxItem Content="2×" Tag="2" />
+                        <ComboBoxItem Content="4×" Tag="4" />
+                    </ComboBox>
+                </StackPanel>
+            </WrapPanel>
+        </Border>
+
+        <!-- footer -->
+        <Grid Grid.Row="4" Margin="12,10,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock x:Name="StatusText" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                <ProgressBar x:Name="ExportProgress" Height="4" Margin="0,6,16,0" Minimum="0" Maximum="1" Visibility="Collapsed" />
+            </StackPanel>
+            <StackPanel x:Name="FooterButtons" Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Margin="0,0,8,0" Focusable="False" Content="Save frame" Icon="Camera24" ToolTip="Save the frame on screen as a screenshot - it shows up in the gallery above, where you can edit it" Click="SaveFrame_Click" />
+                <ui:Button Margin="0,0,8,0" Focusable="False" Content="Save as copy" Icon="Save24" ToolTip="Keep the original and write the edited clip next to it (Ctrl+S)" Click="SaveCopy_Click" />
+                <ui:Button Margin="0,0,8,0" Focusable="False" Content="Save" Icon="Save24" Appearance="Primary" ToolTip="Replace the original clip with the edited one" Click="Save_Click" />
+                <ui:Button Focusable="False" Content="Close" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>
