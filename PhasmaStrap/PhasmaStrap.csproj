@@ -93,6 +93,9 @@
     <PackageReference Include="Vortice.DirectComposition" Version="2.1.0" />
     <PackageReference Include="Vortice.D3DCompiler" Version="2.1.0" />
     <PackageReference Include="Vortice.Mathematics" Version="1.4.25" />
+    <!-- Pinned to 2.1.0 for the same reason as the other Vortice.* packages above - newer
+         releases silently fail to compile on this net6.0-windows target. -->
+    <PackageReference Include="Vortice.MediaFoundation" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

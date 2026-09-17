@@ -205,6 +205,14 @@ namespace PhasmaStrap.Models.Persistable
         public int AutoRejoinMaxAttempts { get; set; } = 3;
         public int AutoRejoinDelaySeconds { get; set; } = 5;
 
+        // Instant Replay: an always-on rolling capture buffer (see InstantReplayRecorder), saved
+        // to a real MP4 clip on demand. Quality: 0=Low (854px wide, 8fps, 2Mbps), 1=Medium
+        // (1280px, 12fps, 4Mbps), 2=High (1600px, 20fps, 8Mbps) - see
+        // InstantReplayRecorder.CaptureFps/MaxCaptureWidth/BitrateForQuality for the exact values.
+        public bool InstantReplayEnabled { get; set; } = false;
+        public int InstantReplayClipSeconds { get; set; } = 20;
+        public int InstantReplayQuality { get; set; } = 1;
+
         // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
         // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
         public bool DisableRobloxCrashHandler { get; set; } = false;

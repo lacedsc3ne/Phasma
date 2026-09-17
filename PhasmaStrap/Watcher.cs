@@ -28,6 +28,8 @@ namespace PhasmaStrap
 
         private readonly GlobalHotkeyManager? _hotkeys;
 
+        private readonly InstantReplayRecorder _instantReplay = new();
+
         private RobloxProcessOptimizer? _processOptimizer;
 
         public Watcher()
@@ -115,6 +117,12 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameLeave += (_, _) => HeadsetAudio.Stop();
                 }
 
+                if (App.Settings.Prop.InstantReplayEnabled)
+                {
+                    ActivityWatcher.OnGameJoin += (_, _) => _instantReplay.Start();
+                    ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
+                }
+
                 if (App.Settings.Prop.ForceInGameResolution)
                 {
                     ActivityWatcher.OnGameJoin += (_, _) => ForcedResolution.OnGameJoin();
@@ -171,6 +179,20 @@ namespace PhasmaStrap
                 NotificationCenter.Notify(
                     path is not null ? "Screenshot saved" : "Screenshot failed",
                     path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
+                    NotificationCategory.General);
+            });
+            _hotkeys.RegisterAction(HotkeyActions.SaveInstantReplay, () =>
+            {
+                if (!App.Settings.Prop.InstantReplayEnabled || !_instantReplay.IsRunning)
+                {
+                    NotificationCenter.Notify("Instant Replay is off", "Enable it on the Capture page first.", NotificationCategory.General);
+                    return;
+                }
+
+                string? path = _instantReplay.SaveClip();
+                NotificationCenter.Notify(
+                    path is not null ? "Replay saved" : "Replay failed",
+                    path is not null ? Path.GetFileName(path) : "Nothing was buffered yet.",
                     NotificationCategory.General);
             });
             _hotkeys.ApplyBindings();
@@ -333,6 +355,7 @@ namespace PhasmaStrap
             StopProcessOptimizer();
             MemoryManager.Shutdown();
             _hotkeys?.Dispose();
+            _instantReplay.Dispose();
 
             GC.SuppressFinalize(this);
         }
