@@ -351,7 +351,7 @@ namespace PhasmaStrap.Models.Persistable
         public List<string> EngineExcludedPlaces { get; set; } = new();
 
         // global hotkey bindings: HotkeyActions.Id -> a WPF gesture string ("Ctrl+Alt+R"), parsed
-        // by GlobalHotkeyManager.TryParseGesture. Unbound (missing/empty) actions register nothing.
+        // by HotkeyGesture.TryParse. Unbound (missing/empty) actions register nothing.
         public Dictionary<string, string> HotkeyBindings { get; set; } = new();
 
         // per-place FastFlag presets (Fast Flag Editor page): places with an entry here get that

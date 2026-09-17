@@ -50,6 +50,65 @@ namespace PhasmaStrap.Utility
             return TryParseKey(tokens[^1], out key) && key != Key.None;
         }
 
+        // Builds the stored gesture text from what the keyboard hook reports. False when the key
+        // can't be used (no WPF equivalent, or a modifier on its own).
+        public static bool TryFromVirtualKey(ModifierKeys modifiers, int virtualKey, out string text)
+        {
+            text = "";
+
+            Key key = KeyInterop.KeyFromVirtualKey(virtualKey);
+            if (key == Key.None || IsModifierKey(key))
+                return false;
+
+            text = Format(modifiers, key);
+
+            // must survive the round trip, or the listener could never match it
+            return TryParse(text, out ModifierKeys parsedModifiers, out Key parsedKey) && parsedModifiers == modifiers && parsedKey == key;
+        }
+
+        // A key that types something when pressed with at most Shift held. The listener lets these
+        // through to the game (so chat keeps working) and only fires them while Roblox is active.
+        public static bool IsTypingGesture(ModifierKeys modifiers, Key key)
+        {
+            if ((modifiers & (ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Windows)) != 0)
+                return false;
+
+            return (key >= Key.A && key <= Key.Z)
+                || (key >= Key.D0 && key <= Key.D9)
+                || (key >= Key.NumPad0 && key <= Key.NumPad9)
+                || key is Key.Space or Key.Return or Key.Back or Key.Tab
+                    or Key.Multiply or Key.Add or Key.Subtract or Key.Divide or Key.Decimal
+                    or Key.OemPlus or Key.OemMinus or Key.OemComma or Key.OemPeriod or Key.OemQuestion or Key.OemTilde
+                    or Key.OemOpenBrackets or Key.OemCloseBrackets or Key.OemPipe or Key.OemSemicolon or Key.OemQuotes
+                    or Key.Oem8 or Key.OemBackslash;
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern uint MapVirtualKeyW(uint code, uint mapType);
+
+        // What to show on screen. The stored text names punctuation keys by their US-layout
+        // character; on any other layout (AZERTY, QWERTZ...) that is the wrong label, so ask Windows
+        // what the key actually prints on this keyboard.
+        public static string ToDisplay(string? text)
+        {
+            if (!TryParse(text, out ModifierKeys modifiers, out Key key))
+                return text ?? "";
+
+            bool punctuation = key is Key.OemPlus or Key.OemMinus or Key.OemComma or Key.OemPeriod or Key.OemQuestion or Key.OemTilde
+                or Key.OemOpenBrackets or Key.OemCloseBrackets or Key.OemPipe or Key.OemSemicolon or Key.OemQuotes or Key.Oem8 or Key.OemBackslash;
+
+            if (!punctuation)
+                return text!;
+
+            // MAPVK_VK_TO_CHAR; the top bit flags a dead key (^, ¨ ...)
+            uint mapped = MapVirtualKeyW((uint)KeyInterop.VirtualKeyFromKey(key), 2) & 0x7FFFFFFF;
+            if (mapped < 0x21 || mapped > 0xFFFF)
+                return text!;
+
+            string prefix = Format(modifiers, Key.A);
+            return prefix[..^1] + char.ToUpperInvariant((char)mapped);
+        }
+
         public static bool IsModifierKey(Key key) =>
             key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt
                 or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin or Key.System;

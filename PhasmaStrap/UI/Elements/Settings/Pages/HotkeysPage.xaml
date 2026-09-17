@@ -23,6 +23,10 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
                             <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
                                 <TextBlock FontSize="14" Text="{Binding DisplayName}" />
@@ -30,16 +34,46 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <ui:TextBox Width="180" IsReadOnly="True" Focusable="True"
-                                            PlaceholderText="{x:Static resources:Strings.Menu_Hotkeys_ClickSet}"
-                                            Text="{Binding GestureText, Mode=OneWay}"
-                                            Tag="{Binding}"
-                                            PreviewKeyDown="HotkeyBox_PreviewKeyDown" />
-                                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Appearance="Secondary"
+                                <!-- a button, not a text box: nothing to type into, no caret, no built-in clear
+                                     button, and it never keeps keyboard focus, so a later key press can't rebind it -->
+                                <ui:Button Uid="Capture" Width="220" Focusable="False" HorizontalContentAlignment="Center"
+                                           Content="{Binding ButtonText}"
+                                           Tag="{Binding}"
+                                           Click="CaptureButton_Click">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Appearance" Value="Secondary" />
+                                            <Setter Property="ToolTip" Value="Click, then press the key or combination. Esc cancels and keeps the current hotkey." />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsListening}" Value="True">
+                                                    <Setter Property="Appearance" Value="Primary" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+                                <ui:Button Margin="8,0,0,0" Focusable="False" Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Appearance="Secondary"
                                            IsEnabled="{Binding HasGesture}"
                                            Tag="{Binding}"
                                            Click="ClearButton_Click" />
                             </StackPanel>
+
+                            <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Text="{Binding StatusText}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasStatus}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding StatusIsWarning}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </ui:Card>
                 </DataTemplate>
