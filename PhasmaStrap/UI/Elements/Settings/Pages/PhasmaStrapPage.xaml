@@ -97,5 +97,19 @@
                 <CheckBox Grid.Column="1" Name="ShouldExportLogs" Content="{x:Static resources:Strings.Menu_PhasmaStrap_ExportData_ExportLogs}" IsChecked="{Binding ShouldExportLogs}" />
             </Grid>
         </ui:CardExpander>
+
+        <ui:Card Margin="0,8,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock FontSize="14" Text="Import config" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Restore settings, saved state, and FastFlags from a config export made above. Overwrites what you currently have." />
+                </StackPanel>
+                <ui:Button Grid.Column="1" MinWidth="100" Icon="ArrowImport20" Content="Import" Command="{Binding ImportDataCommand, Mode=OneTime}" />
+            </Grid>
+        </ui:Card>
     </StackPanel>
 </ui:UiPage>

@@ -104,7 +104,10 @@ namespace PhasmaStrap.UI
 
             HistoryChanged?.Invoke(null, EventArgs.Empty);
 
-            ShowToast(title, message, durationSeconds);
+            // Do Not Disturb suppresses only the on-screen popup - history above is recorded
+            // either way, so nothing's lost, it just doesn't interrupt the session
+            if (!App.Settings.Prop.DoNotDisturbEnabled)
+                ShowToast(title, message, durationSeconds);
         }
 
         public static void ClearHistory()
