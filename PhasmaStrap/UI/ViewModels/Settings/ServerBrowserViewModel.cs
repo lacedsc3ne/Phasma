@@ -226,6 +226,45 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ServerBrowser.JoinServer(placeId, server.JobId);
         });
 
+        // Roblox's own server-list API already reports a real per-server ping (ServerBrowser.cs
+        // parses it straight from the response, verified against a live call - it isn't a
+        // placeholder/zero field), so this just joins whichever of the current search results has
+        // the lowest one, instead of making the user scan the list by eye.
+        public ICommand JoinFastestCommand => new RelayCommand(() =>
+        {
+            if (!long.TryParse(PlaceId.Trim(), out long placeId))
+                return;
+
+            ServerListItem? fastest = Servers.Where(s => s.Ping > 0).OrderBy(s => s.Ping).FirstOrDefault();
+            if (fastest is null)
+                return;
+
+            ServerBrowser.JoinServer(placeId, fastest.JobId);
+        });
+
+        public bool HasPingedServers => Servers.Any(s => s.Ping > 0);
+
+        // --- auto-rejoin on crash (see Watcher.Run/TryAutoRejoinAsync for the actual heuristic
+        // and relaunch logic - this tab only edits the 3 Settings.Prop fields it reads) ---
+
+        public bool AutoRejoinOnCrash
+        {
+            get => App.Settings.Prop.AutoRejoinOnCrash;
+            set => App.Settings.Prop.AutoRejoinOnCrash = value;
+        }
+
+        public int AutoRejoinMaxAttempts
+        {
+            get => App.Settings.Prop.AutoRejoinMaxAttempts;
+            set => App.Settings.Prop.AutoRejoinMaxAttempts = value;
+        }
+
+        public int AutoRejoinDelaySeconds
+        {
+            get => App.Settings.Prop.AutoRejoinDelaySeconds;
+            set => App.Settings.Prop.AutoRejoinDelaySeconds = value;
+        }
+
         private async Task SearchAsync()
         {
             if (!long.TryParse(PlaceId.Trim(), out long placeId) || placeId <= 0)
@@ -256,6 +295,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             finally
             {
                 IsSearching = false;
+                OnPropertyChanged(nameof(HasPingedServers));
             }
         }
     }

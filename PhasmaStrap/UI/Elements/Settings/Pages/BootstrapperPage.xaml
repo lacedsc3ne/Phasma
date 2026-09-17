@@ -271,6 +271,21 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <TextBlock Text="Auto-rejoin" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="If Roblox's process disappears without a clean disconnect ever being logged (the closest honest signal available for &quot;it crashed&quot;), relaunch into the same server if possible." />
+
+                    <controls:OptionControl Header="Rejoin after a crash" Margin="0,8,0,0" x:Name="AutoRejoinOption">
+                        <ui:ToggleSwitch IsChecked="{Binding AutoRejoinOnCrash, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Max attempts" Description="How many times to retry before giving up." IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
+                        <ui:NumberBox Width="120" Min="1" Max="10" Value="{Binding AutoRejoinMaxAttempts, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="Delay between attempts" Description="Seconds to wait before each rejoin attempt." IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
+                        <ui:NumberBox Width="120" Min="1" Max="60" Value="{Binding AutoRejoinDelaySeconds, Mode=TwoWay}" />
+                    </controls:OptionControl>
                 </StackPanel>
             </TabItem>
 
