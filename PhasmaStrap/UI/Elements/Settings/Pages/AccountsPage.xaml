@@ -12,7 +12,7 @@
       Unloaded="Page_Unloaded">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="Accounts" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Save multiple Roblox logins and switch between them with one click. Switching swaps Roblox's own login file, so it only works while every Roblox window is closed - the next time you press Play, Roblox signs in as whichever account is currently live. See Integrations for the popup version of this same list." />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Save multiple Roblox logins, switch between them, and run several at once. Switch swaps Roblox's own login file and needs every window closed first - the next Play signs in as that account. Launch New Instance is different: it frees Roblox's own single-instance lock and opens another window alongside whatever's already running, optionally signed into a specific saved account. See Integrations for the popup version of the account list." />
 
         <Border Margin="0,12,0,0" Padding="14" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <Grid>
@@ -40,6 +40,7 @@
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <ui:Button Content="Add this account" Icon="PersonAdd24" Appearance="Primary" IsEnabled="{Binding AddCurrentEnabled}" Command="{Binding AddCurrentCommand}" />
+                    <ui:Button Content="Launch new instance" Icon="WindowNew24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding LaunchNewInstanceCommand, Mode=OneTime}" />
                     <ui:Button Content="Sign out" Icon="SignOut24" Appearance="Danger" Margin="8,0,0,0" Visibility="{Binding LoggedInVisibility}" Command="{Binding LogoutCommand}" />
                     <ui:Button Icon="ArrowClockwise24" ToolTip="Refresh" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding RefreshCommand}" />
                 </StackPanel>
@@ -69,6 +70,16 @@
                     <ui:TextBox Grid.Column="0" PlaceholderText="_|WARNING:-DO-NOT-SHARE-THIS..." Text="{Binding NewCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ui:Button Grid.Column="1" Content="Import" Icon="ArrowImport24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding ImportCookieCommand}" />
                 </Grid>
+                <ui:Button Margin="0,8,0,0" Content="Import several at once instead" Appearance="Transparent" HorizontalAlignment="Left" Padding="0" Command="{Binding ToggleBulkImportCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}" Visibility="{Binding BulkImportVisibility}">
+            <StackPanel>
+                <TextBlock FontWeight="SemiBold" Text="Bulk import from cookies" />
+                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="Paste one .ROBLOSECURITY value per line. Each is verified and saved the same way as a single import - only paste cookies you own." />
+                <ui:TextBox Text="{Binding BulkCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="10" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11" />
+                <ui:Button Margin="0,8,0,0" Content="Import all" Icon="ArrowImport24" Appearance="Primary" HorizontalAlignment="Left" Command="{Binding BulkImportCookiesCommand, Mode=OneTime}" />
             </StackPanel>
         </Border>
 
@@ -107,7 +118,8 @@
                             <ui:TextBox Grid.Column="2" VerticalAlignment="Center" Margin="10,0" PlaceholderText="Add a note" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                <ui:Button Content="Switch" Icon="ArrowSwap24" Appearance="Primary" Command="{Binding DataContext.SwitchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Content="Switch" Icon="ArrowSwap24" Appearance="Primary" ToolTip="Sign in as this account for the next Play - needs Roblox fully closed" Command="{Binding DataContext.SwitchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Icon="WindowNew24" ToolTip="Launch a new instance signed in as this account" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding DataContext.LaunchInstanceForAccountCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                                 <ui:Button Icon="Copy24" ToolTip="Copy user ID" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding DataContext.CopyUserIdCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                                 <ui:Button Icon="Delete24" ToolTip="Remove saved account" Appearance="Danger" Margin="6,0,0,0" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                             </StackPanel>
@@ -125,5 +137,50 @@
         </Border>
 
         <TextBlock Margin="0,10,0,0" FontSize="12" Opacity="0.7" Text="{Binding Accounts.Count, StringFormat=Saved accounts: {0}}" />
+
+        <TextBlock Text="Running instances" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Every Roblox window currently open. Only the first one in a session gets Discord Rich Presence/hotkeys/overlays/auto-rejoin - PhasmaStrap's own single-Watcher limit, not a Roblox one." />
+
+        <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Instances, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="8" Padding="12" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock FontSize="13" FontWeight="SemiBold">
+                                    <Run Text="PID " /><Run Text="{Binding ProcessId, Mode=OneWay}" />
+                                </TextBlock>
+                                <TextBlock FontSize="11" Opacity="0.7">
+                                    <Run Text="{Binding UptimeDisplay, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{Binding MemoryDisplay, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="Focus" Icon="WindowArrowUp24" Appearance="Secondary" Command="{Binding DataContext.FocusInstanceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Content="Close" Icon="Dismiss24" Appearance="Danger" Margin="8,0,0,0" Command="{Binding DataContext.CloseInstanceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel HorizontalAlignment="Center" Margin="0,16,16,16">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasInstances}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <ui:SymbolIcon Symbol="WindowMultiple20" FontSize="36" Opacity="0.25" HorizontalAlignment="Center" />
+            <TextBlock Text="No Roblox windows are running" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="13" Opacity="0.5" Margin="0,8,0,0" HorizontalAlignment="Center" />
+        </StackPanel>
     </StackPanel>
 </ui:UiPage>

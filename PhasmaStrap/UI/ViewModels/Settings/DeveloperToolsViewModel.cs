@@ -143,6 +143,17 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         public ICommand RefreshLogsCommand => new RelayCommand(RefreshLogs);
+        public ICommand CopyLogsCommand => new RelayCommand(() =>
+        {
+            try
+            {
+                Clipboard.SetText(LogText);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Copy logs failed: {ex.Message}");
+            }
+        });
 
         private void RefreshLogs()
         {

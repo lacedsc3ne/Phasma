@@ -29,6 +29,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private bool _isProcessing;
         private bool _closed;
+        private CancellationTokenSource? _currentItemCts;
 
         public bool IsUsable => !_closed;
 
@@ -38,14 +39,14 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Closed += Window_Closed;
         }
 
-        public void ShowNotification(string title, string message, double durationSeconds = 5)
+        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5)
         {
             if (_closed)
                 return;
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, durationSeconds)));
+                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds)));
                 return;
             }
 
@@ -56,6 +57,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             {
                 Title = title,
                 Message = message,
+                Category = category,
                 Duration = durationSeconds
             });
 
@@ -74,8 +76,15 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     NotificationQueueItem item = _queue.Dequeue();
                     double duration = double.IsFinite(item.Duration) ? Math.Clamp(item.Duration, 0.5, 60) : 5;
 
+                    // a queued item of the same category as one still animating almost always means
+                    // the user is rapidly re-pressing a toggle hotkey and wants to see the LATEST
+                    // state now, not wait out the previous toast's full hold time first
+                    if (_queue.Count > 0 && _queue.Peek().Category == item.Category)
+                        continue;
+
                     TitleText.Text = item.Title;
                     MessageText.Text = item.Message;
+                    ApplyCategoryStyle(item.Category);
 
                     ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
                     ProgressScale.ScaleX = 0;
@@ -110,7 +119,19 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     };
                     ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty, progressAnim);
 
-                    await Task.Delay(TimeSpan.FromSeconds(duration), _lifetimeCts.Token);
+                    using (_currentItemCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token))
+                    {
+                        try
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(duration), _currentItemCts.Token);
+                        }
+                        catch (OperationCanceledException) when (!_lifetimeCts.IsCancellationRequested)
+                        {
+                            // dismissed early via the close button - fall through to the slide-out
+                            // below instead of the outer catch tearing down the whole queue
+                        }
+                    }
+                    _currentItemCts = null;
 
                     var slideOut = new DoubleAnimation(0, _slideDistance, TimeSpan.FromMilliseconds(320))
                     {
@@ -151,6 +172,31 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             }
         }
 
+        private void ApplyCategoryStyle(NotificationCategory category)
+        {
+            (Wpf.Ui.Common.SymbolRegular symbol, string accentKey) = category switch
+            {
+                NotificationCategory.GameJoin => (Wpf.Ui.Common.SymbolRegular.PlayCircle24, "SystemFillColorSuccessBrush"),
+                NotificationCategory.GameLeave => (Wpf.Ui.Common.SymbolRegular.DoorArrowRight20, "SystemFillColorCautionBrush"),
+                _ => (Wpf.Ui.Common.SymbolRegular.Info24, "SystemAccentColorPrimaryBrush"),
+            };
+
+            CategoryIcon.Symbol = symbol;
+
+            if (Application.Current.TryFindResource(accentKey) is Brush brush)
+            {
+                CategoryBadge.Fill = brush;
+                ProgressBar.Fill = brush;
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            // cancel just the current item's hold delay, not the whole toast lifetime - lets the
+            // queue continue normally to whatever's next
+            _currentItemCts?.Cancel();
+        }
+
         private void UpdatePosition()
         {
             Rect workArea = SystemParameters.WorkArea;
@@ -175,6 +221,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         {
             public string Title { get; set; } = "";
             public string Message { get; set; } = "";
+            public NotificationCategory Category { get; set; }
             public double Duration { get; set; } = 5;
         }
     }
