@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.AppData;
+using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
@@ -138,6 +138,24 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
+                // the Capture page saves the toggle immediately and this process reloads the file
+                // (SettingsHotReload) - so flipping it mid-game starts/stops the buffer right away
+                Utility.SettingsHotReload.Reloaded += (_, _) =>
+                {
+                    try
+                    {
+                        bool wanted = App.Settings.Prop.InstantReplayEnabled && ActivityWatcher.InGame;
+                        if (wanted && !_instantReplay.IsRunning)
+                            _instantReplay.Start();
+                        else if (!App.Settings.Prop.InstantReplayEnabled && _instantReplay.IsRunning)
+                            _instantReplay.Stop();
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine("Watcher::SettingsReloaded", $"Instant Replay state update failed: {ex.Message}");
+                    }
+                };
+
                 if (App.Settings.Prop.ForceInGameResolution)
                 {
                     ActivityWatcher.OnGameJoin += (_, _) => ForcedResolution.OnGameJoin();
@@ -244,9 +262,24 @@ namespace PhasmaStrap
 
         public void SaveInstantReplay()
         {
-            if (!App.Settings.Prop.InstantReplayEnabled || !_instantReplay.IsRunning)
+            if (!App.Settings.Prop.InstantReplayEnabled)
             {
-                NotificationCenter.Notify("Instant Replay is off", "Enable it on the Capture page first.", NotificationCategory.General);
+                NotificationCenter.Notify("Instant Replay is off", "Turn it on under Capture > Instant Replay - it starts buffering as soon as you're in a game.", NotificationCategory.General);
+                return;
+            }
+
+            if (!_instantReplay.IsRunning)
+            {
+                if (ActivityWatcher?.InGame == true)
+                {
+                    // enabled but never started (e.g. enabled before this build) - start now
+                    _instantReplay.Start();
+                    NotificationCenter.Notify("Instant Replay just started", "It's buffering now - press the hotkey again in a few seconds to save a clip.", NotificationCategory.General);
+                }
+                else
+                {
+                    NotificationCenter.Notify("Not in a game yet", "Instant Replay only buffers while you're in a Roblox game.", NotificationCategory.General);
+                }
                 return;
             }
 

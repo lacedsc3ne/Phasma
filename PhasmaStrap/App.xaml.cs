@@ -572,6 +572,10 @@ namespace PhasmaStrap
                 if (!LaunchSettings.BypassUpdateCheck)
                     Installer.HandleUpgrade();
 
+                // non-settings processes (watcher/bootstrapper) follow Settings.json edits made in
+                // the settings window while they run - no-op in the settings window itself
+                Utility.SettingsHotReload.Start();
+
                 LaunchHandler.ProcessLaunchArgs();
             }
 
