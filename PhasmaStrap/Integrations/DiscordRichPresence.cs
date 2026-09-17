@@ -35,8 +35,8 @@ namespace PhasmaStrap.Integrations
 
         public const string RobloxApplicationId = "1005469189907173486";
 
-        // the repo's logo (Images/PhasmaStrap.png on the main branch) - shown as the small badge
-        public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/Phasma/main/Images/PhasmaStrap.png";
+        // the real PhasmaStrap mark (Resources/PhasmaStrapLogo.png on the main branch) - shown as the small badge
+        public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/Phasma/main/PhasmaStrap/Resources/PhasmaStrapLogo.png";
 
         public static string ResolveApplicationId() =>
             App.Settings.Prop.DiscordShowAsPhasmaStrap ? PhasmaStrapApplicationId : RobloxApplicationId;
