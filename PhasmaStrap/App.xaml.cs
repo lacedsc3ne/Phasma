@@ -309,6 +309,12 @@ namespace PhasmaStrap
 
             // these only ever run as a short-lived elevated relaunch triggered by
             // Networking.HostsFileManager, never as part of the normal app flow
+            if (LaunchSettings.ApplyHostsFlag.Active)
+            {
+                Shutdown(Networking.HostsElevation.ApplyElevated(LaunchSettings.ApplyHostsFlag.Data) ? 0 : 1);
+                return;
+            }
+
             if (LaunchSettings.WriteProxyHostsFlag.Active)
             {
                 Shutdown(Networking.HostsFileManager.WriteBlockElevated() ? 0 : 1);
@@ -548,14 +554,8 @@ namespace PhasmaStrap
                         Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
                     }
 
-                    try
-                    {
-                        Integrations.TelemetryBlocker.ReconcileOnStartup();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.WriteLine(LOG_IDENT, $"Telemetry blocker reconciliation failed: {ex.Message}");
-                    }
+                    // (the telemetry block is reconciled together with the proxy block inside
+                    // NetworkingController.ReconcileOnStartup -> HostsElevation, one prompt at most)
                 });
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))

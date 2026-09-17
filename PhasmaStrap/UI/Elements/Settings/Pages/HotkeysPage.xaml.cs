@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 
 using PhasmaStrap.UI.ViewModels.Settings;
+using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
@@ -13,11 +14,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             InitializeComponent();
         }
 
-        // Captures a key combination directly from the box the user clicked into, rather than
-        // using a separate "record" button/dialog - matches the simplest common pattern for this
-        // kind of control. Escape clears the binding; a lone modifier press is ignored (waits for
-        // the real key); a key with no modifier at all is ignored too, so this can never bind a
-        // single ordinary key as a system-wide hotkey.
+        // Captures a key (or key combination) directly from the box the user clicked into.
+        // Escape clears the binding; a lone modifier press waits for the real key. A key on its
+        // own (F9, Numpad 5, Pause...) is a valid binding - the settings window's own shortcuts
+        // (Ctrl+F for search etc.) are suppressed while one of these boxes has focus, see
+        // MainWindow.MainWindow_SearchShortcut.
         private void HotkeyBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
@@ -33,19 +34,17 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 return;
             }
 
-            if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt
-                    or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin or Key.System)
+            if (key == Key.Tab && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                // let Tab keep moving focus
+                e.Handled = false;
+                return;
+            }
+
+            if (HotkeyGesture.IsModifierKey(key) || key == Key.None || key == Key.ImeProcessed || key == Key.DeadCharProcessed)
                 return;
 
-            ModifierKeys modifiers = Keyboard.Modifiers;
-            if (modifiers == ModifierKeys.None)
-                return;
-
-            string? gesture = new KeyGestureConverter().ConvertToString(new KeyGesture(key, modifiers));
-            if (string.IsNullOrEmpty(gesture))
-                return;
-
-            row.GestureText = gesture;
+            row.GestureText = HotkeyGesture.Format(Keyboard.Modifiers, key);
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)

@@ -61,7 +61,8 @@ namespace PhasmaStrap.Networking
                 return false;
             }
 
-            bool hostsOk = HostsFileManager.IsBlockCurrent() || HostsFileManager.RequestInstall();
+            // one elevated run syncs the telemetry block too, so enabling both never costs two prompts
+            bool hostsOk = HostsFileManager.IsBlockCurrent() || HostsElevation.Apply(true, App.Settings.Prop.BlockRobloxTelemetry);
             if (!hostsOk)
             {
                 App.Logger.WriteLine(LOG_IDENT, "Hosts file install was declined or failed, rolling back");
@@ -84,7 +85,7 @@ namespace PhasmaStrap.Networking
             // remove the hosts entries FIRST, so Roblox stops routing through us before we
             // stop listening - otherwise there's a window where those hostnames resolve to
             // a dead local port
-            HostsFileManager.RequestRemoval();
+            HostsElevation.Apply(false, App.Settings.Prop.BlockRobloxTelemetry);
             AssetProxyServer.Stop();
 
             try
@@ -105,27 +106,18 @@ namespace PhasmaStrap.Networking
         // otherwise leave Roblox unable to reach the real servers at all
         public static void ReconcileOnStartup()
         {
-            bool blockPresent = HostsFileManager.IsBlockPresent();
-
             if (App.Settings.Prop.NetworkingProxyEnabled)
             {
                 RegisterHosts();
                 AssetProxyServer.Start();
                 EnsureCertificateInstalled();
-
-                // a block from an older build lists different hostnames - rewrite it so every
-                // policy in THIS build is actually routed through the proxy
-                if (!blockPresent || !HostsFileManager.IsBlockCurrent())
-                    HostsFileManager.RequestInstall();
-
                 UsernameSpoofer.WarmUpIdentity();
                 StartKeeper();
             }
-            else if (blockPresent)
-            {
-                App.Logger.WriteLine(LOG_IDENT, "Found leftover proxy hosts entries from a previous session, removing");
-                HostsFileManager.RequestRemoval();
-            }
+
+            // hosts-file state (stale/missing/leftover blocks for BOTH the proxy and the telemetry
+            // blocker) is reconciled in one elevated run by HostsElevation.ReconcileOnStartup
+            HostsElevation.ReconcileOnStartup();
         }
 
         // The proxy is hosted by whichever PhasmaStrap process managed to bind port 443 first -

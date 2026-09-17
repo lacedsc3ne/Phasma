@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -4056,5 +4056,1052 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   </data>
   <data name="Menu.Nvidia.Editor.History.ClearButton" xml:space="preserve">
     <value>Clear</value>
+  </data>
+  <data name="Menu.Accounts.Accounts" xml:space="preserve">
+    <value>Accounts</value>
+  </data>
+  <data name="Menu.Accounts.SaveMultipleRobloxLoginsSwitchBetween" xml:space="preserve">
+    <value>Save multiple Roblox logins and switch between them with one click. Switching swaps Roblox's own login file, so it only works while every Roblox window is closed - the next time you press Play, Roblox signs in as whichever account is currently live. See Integrations for the popup version of this same list.</value>
+  </data>
+  <data name="Menu.Accounts.SignedAs" xml:space="preserve">
+    <value>Signed in as</value>
+  </data>
+  <data name="Menu.Accounts.AddAccount" xml:space="preserve">
+    <value>Add this account</value>
+  </data>
+  <data name="Menu.Accounts.SignOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="Menu.Accounts.SearchSavedAccountsByNameNote" xml:space="preserve">
+    <value>Search saved accounts by name, note, or user ID</value>
+  </data>
+  <data name="Menu.Accounts.LogBrowser" xml:space="preserve">
+    <value>Log in with browser</value>
+  </data>
+  <data name="Menu.Accounts.ImportByCookie" xml:space="preserve">
+    <value>Import by cookie</value>
+  </data>
+  <data name="Menu.Accounts.Folder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="Menu.Accounts.ImportAccountFromItsROBLOSECURITYCookie" xml:space="preserve">
+    <value>Import an account from its .ROBLOSECURITY cookie</value>
+  </data>
+  <data name="Menu.Accounts.PasteFullROBLOSECURITYValueOnlyPaste" xml:space="preserve">
+    <value>Paste a full .ROBLOSECURITY value. Only paste cookies you own.</value>
+  </data>
+  <data name="Menu.Accounts.WARNINGDONOTSHARE" xml:space="preserve">
+    <value>_|WARNING:-DO-NOT-SHARE-THIS...</value>
+  </data>
+  <data name="Menu.Accounts.ImportSeveralAtOnceInstead" xml:space="preserve">
+    <value>Import several at once instead</value>
+  </data>
+  <data name="Menu.Accounts.BulkImportFromCookies" xml:space="preserve">
+    <value>Bulk import from cookies</value>
+  </data>
+  <data name="Menu.Accounts.PasteOneROBLOSECURITYValuePerLine" xml:space="preserve">
+    <value>Paste one .ROBLOSECURITY value per line. Each is verified and saved the same way as a single import - only paste cookies you own.</value>
+  </data>
+  <data name="Menu.Accounts.ImportAll" xml:space="preserve">
+    <value>Import all</value>
+  </data>
+  <data name="Menu.Accounts.CURRENT" xml:space="preserve">
+    <value>CURRENT</value>
+  </data>
+  <data name="Menu.Accounts.AddNote" xml:space="preserve">
+    <value>Add a note</value>
+  </data>
+  <data name="Menu.Accounts.Switch" xml:space="preserve">
+    <value>Switch</value>
+  </data>
+  <data name="Menu.Accounts.CopyUserID" xml:space="preserve">
+    <value>Copy user ID</value>
+  </data>
+  <data name="Menu.Accounts.RemoveSavedAccount" xml:space="preserve">
+    <value>Remove saved account</value>
+  </data>
+  <data name="Menu.Appearance.ControllerNavigation" xml:space="preserve">
+    <value>Controller navigation</value>
+  </data>
+  <data name="Menu.Appearance.NavigateSettingsWindowXboxGenericGamepad" xml:space="preserve">
+    <value>Navigate this settings window with an Xbox/generic gamepad - move a virtual cursor with the left stick, click with A/B, move focus with the D-pad, and switch tabs with the bumpers.</value>
+  </data>
+  <data name="Menu.Appearance.ImageFile" xml:space="preserve">
+    <value>Image file</value>
+  </data>
+  <data name="Menu.Behaviour.Cleanup" xml:space="preserve">
+    <value>Cleanup</value>
+  </data>
+  <data name="Menu.Behaviour.AutomaticallyDeletesOldFilesAfterRoblox" xml:space="preserve">
+    <value>Automatically deletes old files after Roblox closes.</value>
+  </data>
+  <data name="Menu.Behaviour.WhatClean" xml:space="preserve">
+    <value>What to clean</value>
+  </data>
+  <data name="Menu.Behaviour.ChooseScheduleThenPickWhichCaches" xml:space="preserve">
+    <value>Choose a schedule, then pick which caches and logs it applies to.</value>
+  </data>
+  <data name="Menu.Behaviour.Schedule" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="Menu.Behaviour.PhasmaStrapLogs" xml:space="preserve">
+    <value>PhasmaStrap logs</value>
+  </data>
+  <data name="Menu.Behaviour.PhasmaStrapDownloadCache" xml:space="preserve">
+    <value>PhasmaStrap download cache</value>
+  </data>
+  <data name="Menu.Behaviour.RobloxLogs" xml:space="preserve">
+    <value>Roblox logs</value>
+  </data>
+  <data name="Menu.Behaviour.RobloxCache" xml:space="preserve">
+    <value>Roblox cache</value>
+  </data>
+  <data name="Menu.Behaviour.EngineProcess" xml:space="preserve">
+    <value>Engine &amp; process</value>
+  </data>
+  <data name="Menu.Behaviour.WhichOptimizationPresetRunsHowRoblox" xml:space="preserve">
+    <value>Which optimization preset runs and how Roblox itself behaves while playing.</value>
+  </data>
+  <data name="Menu.Behaviour.PriorityMemory" xml:space="preserve">
+    <value>Priority &amp; memory</value>
+  </data>
+  <data name="Menu.Behaviour.HowCPUPriorityMemoryUsageAre" xml:space="preserve">
+    <value>How CPU priority and memory usage are managed for Roblox and the launcher.</value>
+  </data>
+  <data name="Menu.Behaviour.AutoRejoin" xml:space="preserve">
+    <value>Auto-rejoin</value>
+  </data>
+  <data name="Menu.Behaviour.IfRobloxSProcessDisappearsWithout" xml:space="preserve">
+    <value>If Roblox's process disappears without a clean disconnect ever being logged (the closest honest signal available for "it crashed"), relaunch into the same server if possible.</value>
+  </data>
+  <data name="Menu.Behaviour.RejoinAfterCrash" xml:space="preserve">
+    <value>Rejoin after a crash</value>
+  </data>
+  <data name="Menu.Behaviour.MaxAttempts" xml:space="preserve">
+    <value>Max attempts</value>
+  </data>
+  <data name="Menu.Behaviour.HowManyTimesRetryBeforeGiving" xml:space="preserve">
+    <value>How many times to retry before giving up.</value>
+  </data>
+  <data name="Menu.Behaviour.DelayBetweenAttempts" xml:space="preserve">
+    <value>Delay between attempts</value>
+  </data>
+  <data name="Menu.Behaviour.SecondsWaitBeforeEachRejoinAttempt" xml:space="preserve">
+    <value>Seconds to wait before each rejoin attempt.</value>
+  </data>
+  <data name="Menu.Capture.Capture" xml:space="preserve">
+    <value>Capture</value>
+  </data>
+  <data name="Menu.Capture.ScreenshotsRobloxWindowSavedLocallyBind" xml:space="preserve">
+    <value>Screenshots of the Roblox window, saved locally. Bind the Take Screenshot hotkey on the Hotkeys page to capture during a game session - the button below only works while Roblox happens to be running right now, useful mainly for testing.</value>
+  </data>
+  <data name="Menu.Capture.TakeScreenshotNow" xml:space="preserve">
+    <value>Take screenshot now</value>
+  </data>
+  <data name="Menu.Capture.OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="Menu.Capture.OpenHotkeys" xml:space="preserve">
+    <value>Open Hotkeys</value>
+  </data>
+  <data name="Menu.Capture.NoScreenshotsYet" xml:space="preserve">
+    <value>No screenshots yet</value>
+  </data>
+  <data name="Menu.Capture.InstantReplay" xml:space="preserve">
+    <value>Instant Replay</value>
+  </data>
+  <data name="Menu.Capture.ContinuouslyBuffersLastSeveralSecondsGameplay" xml:space="preserve">
+    <value>Continuously buffers the last several seconds of gameplay while enabled. Press the Save Instant Replay hotkey (set one on the Hotkeys page) after something happens to save that buffer as a real MP4 clip - there's no separate start/stop for recording, it's always running once enabled.</value>
+  </data>
+  <data name="Menu.Capture.EnableInstantReplay" xml:space="preserve">
+    <value>Enable Instant Replay</value>
+  </data>
+  <data name="Menu.Capture.ClipLength" xml:space="preserve">
+    <value>Clip length</value>
+  </data>
+  <data name="Menu.Capture.SecondsBufferedGameplayKeepSaveWhen" xml:space="preserve">
+    <value>Seconds of buffered gameplay to keep, and to save when triggered.</value>
+  </data>
+  <data name="Menu.Capture.Quality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="Menu.Capture.HigherQualityCapturesAtLargerResolution" xml:space="preserve">
+    <value>Higher quality captures at a larger resolution/frame rate and higher bitrate - uses more RAM while buffering and more disk space per clip.</value>
+  </data>
+  <data name="Menu.Capture.SavedReplays" xml:space="preserve">
+    <value>Saved replays</value>
+  </data>
+  <data name="Menu.Capture.NoReplaysSavedYet" xml:space="preserve">
+    <value>No replays saved yet</value>
+  </data>
+  <data name="Menu.Channel.ChooseWhichRobloxDeploymentChannelPhasmaStrap" xml:space="preserve">
+    <value>Choose which Roblox deployment channel PhasmaStrap installs and launches, tune how it downloads Roblox, and see which days an experience typically ships updates on.</value>
+  </data>
+  <data name="Menu.Channel.AppLevelSettingsSuchAsPhasmaStrap" xml:space="preserve">
+    <value>App-level settings such as PhasmaStrap's own CPU limit, resolution/monitor changing, force-reinstall, background Roblox updates, hardware acceleration and notifications already live on their own dedicated Performance / Bootstrapper / Notifications pages, so they aren't duplicated here.</value>
+  </data>
+  <data name="Menu.Channel.CurrentlyActiveChannel" xml:space="preserve">
+    <value>Currently active channel</value>
+  </data>
+  <data name="Menu.Channel.RobloxChannel" xml:space="preserve">
+    <value>Roblox channel</value>
+  </data>
+  <data name="Menu.Channel.LeaveBlankUseRobloxSDefault" xml:space="preserve">
+    <value>Leave blank to use Roblox's default (production) channel. Pick a known channel below, or type a custom one.</value>
+  </data>
+  <data name="Menu.Channel.Production" xml:space="preserve">
+    <value>production</value>
+  </data>
+  <data name="Menu.Channel.IfRobloxSChannelChanges" xml:space="preserve">
+    <value>If Roblox's channel changes</value>
+  </data>
+  <data name="Menu.Channel.AutomaticKeepsSavedChannelEveryLaunch" xml:space="preserve">
+    <value>Automatic keeps your saved channel every launch. Prompt asks before switching. Ignore never overrides whatever channel Roblox itself reports.</value>
+  </data>
+  <data name="Menu.Channel.ChannelBuildInfo" xml:space="preserve">
+    <value>Channel build info</value>
+  </data>
+  <data name="Menu.Channel.LooksUpWhichBuildVersionVersion" xml:space="preserve">
+    <value>Looks up which build (version + version GUID) is currently deployed on the channel typed in above, without switching to it.</value>
+  </data>
+  <data name="Menu.Channel.LookUpBuild" xml:space="preserve">
+    <value>Look up build</value>
+  </data>
+  <data name="Menu.Channel.LookUp" xml:space="preserve">
+    <value>Look up</value>
+  </data>
+  <data name="Menu.Channel.Installer" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="Menu.Channel.DownloadMirror" xml:space="preserve">
+    <value>Download mirror</value>
+  </data>
+  <data name="Menu.Channel.WhichRobloxCDNMirrorDownloadFrom" xml:space="preserve">
+    <value>Which Roblox CDN mirror to download from. Auto picks whichever responds fastest.</value>
+  </data>
+  <data name="Menu.Channel.PreferredMirror" xml:space="preserve">
+    <value>Preferred mirror</value>
+  </data>
+  <data name="Menu.Channel.DownloadTuning" xml:space="preserve">
+    <value>Download tuning</value>
+  </data>
+  <data name="Menu.Channel.ControlsHowBootstrapperDownloadsRobloxS" xml:space="preserve">
+    <value>Controls how Bootstrapper downloads Roblox's packages. The defaults below exactly match PhasmaStrap's original behaviour (one package at a time, no segmentation) - raising these can speed up installs on fast connections, but puts more simultaneous load on Roblox's CDN.</value>
+  </data>
+  <data name="Menu.Channel.DownloadBufferSizeKB" xml:space="preserve">
+    <value>Download buffer size (KB)</value>
+  </data>
+  <data name="Menu.Channel.LargerBuffersCanSpeedUpDownloads" xml:space="preserve">
+    <value>Larger buffers can speed up downloads on fast connections.</value>
+  </data>
+  <data name="Menu.Channel.ConcurrentDownloads" xml:space="preserve">
+    <value>Concurrent downloads</value>
+  </data>
+  <data name="Menu.Channel.HowManyPackagesDownloadAtSame" xml:space="preserve">
+    <value>How many packages download at the same time. Higher is faster but uses more bandwidth.</value>
+  </data>
+  <data name="Menu.Channel.SegmentsPerFile" xml:space="preserve">
+    <value>Segments per file</value>
+  </data>
+  <data name="Menu.Channel.SplitsEachSufficientlyLargePackageInto" xml:space="preserve">
+    <value>Splits each sufficiently large package into this many parallel ranged downloads. Falls back automatically to a normal single-connection download for packages or mirrors that don't support this.</value>
+  </data>
+  <data name="Menu.Channel.Heatmap" xml:space="preserve">
+    <value>Heatmap</value>
+  </data>
+  <data name="Menu.Channel.UpdateHeatmap" xml:space="preserve">
+    <value>Update heatmap</value>
+  </data>
+  <data name="Menu.Channel.LooksAtExperienceSPublicUpdate" xml:space="preserve">
+    <value>Looks at an experience's public update timestamp and badge-award history to show which days of the week it typically ships updates on. Uses Roblox's own public APIs - no login required.</value>
+  </data>
+  <data name="Menu.Channel.Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="Menu.DeveloperTools.DeveloperTools" xml:space="preserve">
+    <value>Developer Tools</value>
+  </data>
+  <data name="Menu.DeveloperTools.FastFlagSnapshotsDiffingLiveProxyTraffic" xml:space="preserve">
+    <value>FastFlag snapshots/diffing, live proxy traffic, combined log viewer, and a plugin installer - all in one place for power users and troubleshooting.</value>
+  </data>
+  <data name="Menu.DeveloperTools.FastFlagSnapshots" xml:space="preserve">
+    <value>FastFlag snapshots</value>
+  </data>
+  <data name="Menu.DeveloperTools.SaveCurrentFlagSetFlipBetween" xml:space="preserve">
+    <value>Save your current flag set, flip between two saved sets to A/B compare, or diff any two snapshots.</value>
+  </data>
+  <data name="Menu.DeveloperTools.SnapshotName" xml:space="preserve">
+    <value>Snapshot name</value>
+  </data>
+  <data name="Menu.DeveloperTools.SaveCurrentAsSnapshot" xml:space="preserve">
+    <value>Save current as snapshot</value>
+  </data>
+  <data name="Menu.DeveloperTools.FlagSSaved" xml:space="preserve">
+    <value> flag(s) • saved </value>
+  </data>
+  <data name="Menu.DeveloperTools.CompareTwoSnapshots" xml:space="preserve">
+    <value>Compare two snapshots</value>
+  </data>
+  <data name="Menu.DeveloperTools.Vs" xml:space="preserve">
+    <value> vs </value>
+  </data>
+  <data name="Menu.DeveloperTools.LiveProxyTraffic" xml:space="preserve">
+    <value>Live proxy traffic</value>
+  </data>
+  <data name="Menu.DeveloperTools.RequestsHandledByLocalProxyRunning" xml:space="preserve">
+    <value>Requests handled by the local proxy running in this window - launched Roblox sessions run their own separate proxy instance and won't show up here.</value>
+  </data>
+  <data name="Menu.DeveloperTools.LogViewer" xml:space="preserve">
+    <value>Log viewer</value>
+  </data>
+  <data name="Menu.DeveloperTools.StudioPluginInstaller" xml:space="preserve">
+    <value>Studio plugin installer</value>
+  </data>
+  <data name="Menu.DeveloperTools.InstallAnyStudioPluginByIts" xml:space="preserve">
+    <value>Install any Studio plugin by its Roblox asset ID.</value>
+  </data>
+  <data name="Menu.DeveloperTools.AssetID" xml:space="preserve">
+    <value>Asset ID</value>
+  </data>
+  <data name="Menu.DeveloperTools.OpenPluginsFolder" xml:space="preserve">
+    <value>Open Plugins folder</value>
+  </data>
+  <data name="Menu.Extensions.ManageRojoLocateThirdPartyTools" xml:space="preserve">
+    <value>Manage Rojo and locate third-party tools to launch alongside Roblox.</value>
+  </data>
+  <data name="Menu.Extensions.Rojo" xml:space="preserve">
+    <value>Rojo</value>
+  </data>
+  <data name="Menu.Extensions.SyncsExternalFilesIntoRobloxStudio" xml:space="preserve">
+    <value>Syncs external files into Roblox Studio for development. Unlike the tools below, PhasmaStrap downloads and manages Rojo itself.</value>
+  </data>
+  <data name="Menu.Extensions.BrowseProject" xml:space="preserve">
+    <value>Browse project</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PhasmaStrapIsnTManagingFastFlagsRight" xml:space="preserve">
+    <value>PhasmaStrap isn't managing FastFlags right now</value>
+  </data>
+  <data name="Menu.FastFlagEditor.AllowPhasmaStrapManageFFlagsOffEngine" xml:space="preserve">
+    <value>"Allow PhasmaStrap to manage FFlags" is off (Engine Settings tab) - none of the flags below, and no place preset assignment, will actually reach Roblox until it's back on.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PresetsPerPlaceAssignment" xml:space="preserve">
+    <value>Presets &amp; per-place assignment</value>
+  </data>
+  <data name="Menu.FastFlagEditor.SaveFlagSetBelowAsNamed" xml:space="preserve">
+    <value>Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PresetName" xml:space="preserve">
+    <value>Preset name</value>
+  </data>
+  <data name="Menu.FastFlagEditor.SaveCurrentFlagsAsPreset" xml:space="preserve">
+    <value>Save current flags as preset</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PerPlaceAssignment" xml:space="preserve">
+    <value>Per-place assignment</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PlacesAssignmentLaunchPresetSFlags" xml:space="preserve">
+    <value>Places with an assignment launch with that preset's flags instead of your normal saved ones.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.AssetBlocking" xml:space="preserve">
+    <value>Asset blocking</value>
+  </data>
+  <data name="Menu.FastFlagSettings.StripSpecificAssetCategoriesFromDownloading" xml:space="preserve">
+    <value>Strip specific asset categories from downloading entirely.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.PreloadBehavior" xml:space="preserve">
+    <value>Preload behavior</value>
+  </data>
+  <data name="Menu.FastFlagSettings.WarmsAssetCacheAheadTimeSo" xml:space="preserve">
+    <value>Warms the asset cache ahead of time so games feel more responsive.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.SpoofOtherPlayers" xml:space="preserve">
+    <value>Spoof other players</value>
+  </data>
+  <data name="Menu.FastFlagSettings.OverridesWhatYouSeeOtherPlayers" xml:space="preserve">
+    <value>Overrides what you see for other players' names and status.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.SpoofYourself" xml:space="preserve">
+    <value>Spoof yourself</value>
+  </data>
+  <data name="Menu.FastFlagSettings.OverridesOwnDisplayedNameVerificationRobux" xml:space="preserve">
+    <value>Overrides your own displayed name, verification, and Robux balance.</value>
+  </data>
+  <data name="Menu.FastFlags.Balanced" xml:space="preserve">
+    <value>Balanced</value>
+  </data>
+  <data name="Menu.FastFlags.Performance" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="Menu.FastFlags.TelemetryPrivacy" xml:space="preserve">
+    <value>Telemetry &amp; privacy</value>
+  </data>
+  <data name="Menu.FastFlags.BlockDataRobloxThirdPartiesCollect" xml:space="preserve">
+    <value>Block data Roblox and third parties collect about you and your sessions.</value>
+  </data>
+  <data name="Menu.FastFlags.FrameRateRefresh" xml:space="preserve">
+    <value>Frame rate &amp; refresh</value>
+  </data>
+  <data name="Menu.FastFlags.FramerateLimitsRefreshRateTargetingFrame" xml:space="preserve">
+    <value>Framerate limits, refresh rate targeting, and the frame rate manager.</value>
+  </data>
+  <data name="Menu.FastFlags.QualityOverrides" xml:space="preserve">
+    <value>Quality overrides</value>
+  </data>
+  <data name="Menu.FastFlags.ForceSpecificQualityMeshDetailLevel" xml:space="preserve">
+    <value>Force a specific quality or mesh detail level instead of Roblox's automatic setting.</value>
+  </data>
+  <data name="Menu.FastFlags.ResolutionDistanceRendering" xml:space="preserve">
+    <value>Resolution &amp; distance rendering</value>
+  </data>
+  <data name="Menu.FastFlags.HowFarHowSharplyWorldAround" xml:space="preserve">
+    <value>How far and how sharply the world around you is drawn.</value>
+  </data>
+  <data name="Menu.FastFlags.LightingSky" xml:space="preserve">
+    <value>Lighting &amp; sky</value>
+  </data>
+  <data name="Menu.FastFlags.LightCullingLightingTechnologySkyAppearance" xml:space="preserve">
+    <value>Light culling, lighting technology, and sky appearance.</value>
+  </data>
+  <data name="Menu.FastFlags.PostProcessingShadows" xml:space="preserve">
+    <value>Post-processing &amp; shadows</value>
+  </data>
+  <data name="Menu.FastFlags.PostProcessingEffectsPlayerShadowsOcclusion" xml:space="preserve">
+    <value>Post-processing effects, player shadows, and occlusion checks.</value>
+  </data>
+  <data name="Menu.FastFlags.ShadersVulkan" xml:space="preserve">
+    <value>Shaders &amp; Vulkan</value>
+  </data>
+  <data name="Menu.FastFlags.ShaderGlintLevelVulkanRendererCompatibility" xml:space="preserve">
+    <value>Shader glint level and Vulkan renderer compatibility overrides.</value>
+  </data>
+  <data name="Menu.FastFlags.WorldDetailFoliage" xml:space="preserve">
+    <value>World detail &amp; foliage</value>
+  </data>
+  <data name="Menu.FastFlags.GrassDrawDistanceParticleDetailTerrain" xml:space="preserve">
+    <value>Grass draw distance, particle detail, and terrain mesh quality.</value>
+  </data>
+  <data name="Menu.FastFlags.MiscellaneousVisuals" xml:space="preserve">
+    <value>Miscellaneous visuals</value>
+  </data>
+  <data name="Menu.FastFlags.OddsEndsDonTFitNeatly" xml:space="preserve">
+    <value>Odds and ends that don't fit neatly elsewhere - theming, camera, and clothing rendering.</value>
+  </data>
+  <data name="Menu.FastFlags.LoadingReplication" xml:space="preserve">
+    <value>Loading &amp; replication</value>
+  </data>
+  <data name="Menu.FastFlags.HowQuicklyPlacesLoadHowClient" xml:space="preserve">
+    <value>How quickly places load and how the client keeps up with server state.</value>
+  </data>
+  <data name="Menu.FastFlags.ConnectionPackets" xml:space="preserve">
+    <value>Connection &amp; packets</value>
+  </data>
+  <data name="Menu.FastFlags.LowLevelNetworkingLagSpikesPacket" xml:space="preserve">
+    <value>Low-level networking: lag spikes, packet sending, and buffer sizing.</value>
+  </data>
+  <data name="Menu.FastFlags.AccessibilityText" xml:space="preserve">
+    <value>Accessibility &amp; text</value>
+  </data>
+  <data name="Menu.FastFlags.TextSizingLanguageOtherReadabilityOptions" xml:space="preserve">
+    <value>Text sizing, language, and other readability options.</value>
+  </data>
+  <data name="Menu.FastFlags.InterfaceAppearance" xml:space="preserve">
+    <value>Interface appearance</value>
+  </data>
+  <data name="Menu.FastFlags.BlurDarkModeChromeUIOther" xml:space="preserve">
+    <value>Blur, dark mode, chrome UI, and other cosmetic interface tweaks.</value>
+  </data>
+  <data name="Menu.FastFlags.MenusNavigation" xml:space="preserve">
+    <value>Menus &amp; navigation</value>
+  </data>
+  <data name="Menu.FastFlags.GameMenuDetailsPageVRToggle" xml:space="preserve">
+    <value>The in-game menu, details page, and VR toggle visibility.</value>
+  </data>
+  <data name="Menu.FastFlags.PerformanceCPU" xml:space="preserve">
+    <value>Performance &amp; CPU</value>
+  </data>
+  <data name="Menu.FastFlags.ThreadUsageMemoryBehaviorCPUSide" xml:space="preserve">
+    <value>Thread usage, memory behavior, and CPU-side optimizations.</value>
+  </data>
+  <data name="Menu.FastFlags.LoadingAssets" xml:space="preserve">
+    <value>Loading &amp; assets</value>
+  </data>
+  <data name="Menu.FastFlags.AssetPreloadingAdsTextureRemovalThreading" xml:space="preserve">
+    <value>Asset preloading, ads, texture removal, and threading debug checks.</value>
+  </data>
+  <data name="Menu.FastFlags.DisplayFPSOverlay" xml:space="preserve">
+    <value>Display &amp; FPS overlay</value>
+  </data>
+  <data name="Menu.FastFlags.ScreenFPSMenuFramerateCapHaptics" xml:space="preserve">
+    <value>On-screen FPS, in-menu framerate cap, haptics, and window chrome behavior.</value>
+  </data>
+  <data name="Menu.FastFlags.ConnectionPromptsOverrides" xml:space="preserve">
+    <value>Connection prompts &amp; overrides</value>
+  </data>
+  <data name="Menu.FastFlags.DisconnectMessagingCameraControlsChatUI" xml:space="preserve">
+    <value>Disconnect messaging, camera controls, chat UI, and verification overrides.</value>
+  </data>
+  <data name="Menu.Friends.Friends" xml:space="preserve">
+    <value>Friends</value>
+  </data>
+  <data name="Menu.Friends.WhoSOnlineWhatTheyRe" xml:space="preserve">
+    <value>Who's online and what they're playing, with one-click join. Ranked by online status and current game - Roblox's API never exposes another user's playtime, only your own, so a real hours-played leaderboard isn't something this can honestly show.</value>
+  </data>
+  <data name="Menu.Friends.FriendActivityAlerts" xml:space="preserve">
+    <value>Friend Activity Alerts</value>
+  </data>
+  <data name="Menu.Friends.ToastWhenFriendComesOnlineStarts" xml:space="preserve">
+    <value>Toast when a friend comes online or starts a game. Runs in the background even when Roblox isn't running.</value>
+  </data>
+  <data name="Menu.Friends.CheckEvery" xml:space="preserve">
+    <value>Check every</value>
+  </data>
+  <data name="Menu.Friends.Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
+  <data name="Menu.Friends.NoFriendsShowYet" xml:space="preserve">
+    <value>No friends to show yet</value>
+  </data>
+  <data name="Menu.GBSEditor.Small" xml:space="preserve">
+    <value>Small</value>
+  </data>
+  <data name="Menu.GBSEditor.Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Menu.GBSEditor.Large" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="Menu.GBSEditor.HUDVisibility" xml:space="preserve">
+    <value>HUD &amp; visibility</value>
+  </data>
+  <data name="Menu.GBSEditor.WhatSShownScreenWhileYou" xml:space="preserve">
+    <value>What's shown on screen while you play.</value>
+  </data>
+  <data name="Menu.GBSEditor.SensitivityVibration" xml:space="preserve">
+    <value>Sensitivity &amp; vibration</value>
+  </data>
+  <data name="Menu.GBSEditor.MouseGamepadCameraInputTuning" xml:space="preserve">
+    <value>Mouse, gamepad, and camera input tuning.</value>
+  </data>
+  <data name="Menu.GBSEditor.Comfort" xml:space="preserve">
+    <value>Comfort</value>
+  </data>
+  <data name="Menu.GBSEditor.Intense" xml:space="preserve">
+    <value>Intense</value>
+  </data>
+  <data name="Menu.GBSEditor.Token" xml:space="preserve">
+    <value>token</value>
+  </data>
+  <data name="Menu.History.EveryGameYouVePlayedThrough" xml:space="preserve">
+    <value>Every game you've played through PhasmaStrap, with how long you've spent in each and when you last played, kept across restarts. This is separate from the server-join history in the tray icon's right-click menu, which only remembers servers from your current session.</value>
+  </data>
+  <data name="Menu.History.PlayedLastPlayed" xml:space="preserve">
+    <value> played • last played </value>
+  </data>
+  <data name="Menu.History.CopyLink" xml:space="preserve">
+    <value>Copy link</value>
+  </data>
+  <data name="Menu.Home.Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Menu.Home.ContinuePlaying" xml:space="preserve">
+    <value>Continue Playing</value>
+  </data>
+  <data name="Menu.Home.NoHistoryYet" xml:space="preserve">
+    <value>No history yet</value>
+  </data>
+  <data name="Menu.Home.Played" xml:space="preserve">
+    <value> played • </value>
+  </data>
+  <data name="Menu.Home.CopyGameLink" xml:space="preserve">
+    <value>Copy game link</value>
+  </data>
+  <data name="Menu.Home.LaunchByLink" xml:space="preserve">
+    <value>Launch by link</value>
+  </data>
+  <data name="Menu.Home.WorksNormalGameLinksPrivateServer" xml:space="preserve">
+    <value>Works with normal game links, private server links (…?privateServerLinkCode=…), roblox.com/share and ro.blox.com invite links, roblox:// deep links, or a bare place ID. Show places lists every place inside the experience so you can jump straight into a specific lobby or map.</value>
+  </data>
+  <data name="Menu.Home.ShowPlaces" xml:space="preserve">
+    <value>Show places</value>
+  </data>
+  <data name="Menu.Hotkeys.Hotkeys" xml:space="preserve">
+    <value>Hotkeys</value>
+  </data>
+  <data name="Menu.Hotkeys.GlobalShortcutsWorkWhileRobloxGame" xml:space="preserve">
+    <value>Global shortcuts that work while a Roblox game session is running, no matter which window has focus. Click a box below and press the key (or key combination) you want - a single key like F9 or a numpad key works too. Escape clears a box. These only listen during an active game session, not from this Settings window; a plain letter key will also fire while you're typing in game, so prefer F-keys or combinations for those.</value>
+  </data>
+  <data name="Menu.Hotkeys.ClickSet" xml:space="preserve">
+    <value>Click to set...</value>
+  </data>
+  <data name="Menu.Integrations.TrackingSettings" xml:space="preserve">
+    <value>Tracking settings</value>
+  </data>
+  <data name="Menu.Integrations.ControlsWhatPhasmaStrapCanDetectShare" xml:space="preserve">
+    <value>Controls what PhasmaStrap can detect and share about your current session.</value>
+  </data>
+  <data name="Menu.Integrations.View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Menu.Integrations.PlayingRoblox" xml:space="preserve">
+    <value>Playing Roblox</value>
+  </data>
+  <data name="Menu.Integrations.NoGamesPlayedYetPlaySomething" xml:space="preserve">
+    <value>No games played yet - play something through PhasmaStrap to preview a real card here.</value>
+  </data>
+  <data name="Menu.Integrations.RPCAdvanced" xml:space="preserve">
+    <value>RPC Advanced</value>
+  </data>
+  <data name="Menu.Integrations.CardAboveAlwaysShowsSampleSettings" xml:space="preserve">
+    <value>The card above always shows a sample - Settings runs as its own process, separate from an active Roblox session, so it can't display your real live presence here. To see exactly what's currently being sent to Discord while you're playing, right-click the PhasmaStrap tray icon and open "RPC Debug".</value>
+  </data>
+  <data name="Menu.Integrations.CWindowsSystem32CmdExe" xml:space="preserve">
+    <value>C:\Windows\System32\cmd.exe</value>
+  </data>
+  <data name="Menu.Integrations.OnlySpecificGame" xml:space="preserve">
+    <value>Only for a specific game</value>
+  </data>
+  <data name="Menu.Integrations.CloseWhenLeavingGame" xml:space="preserve">
+    <value>Close when leaving this game</value>
+  </data>
+  <data name="Menu.Integrations.RunAsAdministrator" xml:space="preserve">
+    <value>Run as administrator</value>
+  </data>
+  <data name="Menu.Integrations.RunMinimized" xml:space="preserve">
+    <value>Run minimized</value>
+  </data>
+  <data name="Menu.Integrations.LaunchDelayMs" xml:space="preserve">
+    <value>Launch delay (ms)</value>
+  </data>
+  <data name="Menu.Mods.CursorAppearance" xml:space="preserve">
+    <value>Cursor appearance</value>
+  </data>
+  <data name="Menu.Mods.ChooseBundledCursorPresetApplyOwn" xml:space="preserve">
+    <value>Choose a bundled cursor preset, or apply your own custom cursor images.</value>
+  </data>
+  <data name="Menu.Mods.CustomCursorSetQuickFolder" xml:space="preserve">
+    <value>Custom Cursor Set (quick folder)</value>
+  </data>
+  <data name="Menu.Mods.ApplyOwnCursorImagesFromLocal" xml:space="preserve">
+    <value>Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.</value>
+  </data>
+  <data name="Menu.Mods.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Menu.Mods.ClientPresets" xml:space="preserve">
+    <value>Client presets</value>
+  </data>
+  <data name="Menu.Mods.AdditionalVisualAudioTweaksRobloxClient" xml:space="preserve">
+    <value>Additional visual and audio tweaks for the Roblox client.</value>
+  </data>
+  <data name="Menu.Mods.ChooseSound" xml:space="preserve">
+    <value>Choose Sound...</value>
+  </data>
+  <data name="Menu.Mods.UseOneImageEverySide" xml:space="preserve">
+    <value>Use one image for every side</value>
+  </data>
+  <data name="Menu.Mods.Down" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="Menu.Mods.Front" xml:space="preserve">
+    <value>Front</value>
+  </data>
+  <data name="Menu.Mods.Left" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="Menu.Mods.Right" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="Menu.Mods.Up" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="Menu.Mods.RemoveCustom" xml:space="preserve">
+    <value>Remove custom</value>
+  </data>
+  <data name="Menu.Mods.SaveUse" xml:space="preserve">
+    <value>Save and use</value>
+  </data>
+  <data name="Menu.Mods.Shiftlock" xml:space="preserve">
+    <value>Shiftlock</value>
+  </data>
+  <data name="Menu.Mods.Arrow" xml:space="preserve">
+    <value>Arrow</value>
+  </data>
+  <data name="Menu.Mods.ArrowFar" xml:space="preserve">
+    <value>ArrowFar</value>
+  </data>
+  <data name="Menu.Mods.IBeam" xml:space="preserve">
+    <value>IBeam</value>
+  </data>
+  <data name="Menu.Mods.CopySetSImagesIntoMods" xml:space="preserve">
+    <value>Copy this set's images into your Mods folder.</value>
+  </data>
+  <data name="Menu.Mods.Fetch" xml:space="preserve">
+    <value>Fetch</value>
+  </data>
+  <data name="Menu.Mods.CopyCurrentlyAppliedCursorsIntoSet" xml:space="preserve">
+    <value>Copy the currently applied cursors into this set.</value>
+  </data>
+  <data name="Menu.Mods.ImportCursorSetFromZipFile" xml:space="preserve">
+    <value>Import a cursor set from a .zip file.</value>
+  </data>
+  <data name="Menu.Mods.ExportSetZipFile" xml:space="preserve">
+    <value>Export this set to a .zip file.</value>
+  </data>
+  <data name="Menu.Mods.NoCursorSetSelected" xml:space="preserve">
+    <value>No cursor set selected.</value>
+  </data>
+  <data name="Menu.Mods.AddMod" xml:space="preserve">
+    <value>Add Mod</value>
+  </data>
+  <data name="Menu.Mods.OpenLibrary" xml:space="preserve">
+    <value>Open Library</value>
+  </data>
+  <data name="Menu.Mods.SearchModsIdentifiers" xml:space="preserve">
+    <value>Search mods or identifiers</value>
+  </data>
+  <data name="Menu.Mods.ID" xml:space="preserve">
+    <value>   ID: </value>
+  </data>
+  <data name="Menu.Mods.BackgroundColor" xml:space="preserve">
+    <value>Background color</value>
+  </data>
+  <data name="Menu.Mods.StartColor" xml:space="preserve">
+    <value>Start color</value>
+  </data>
+  <data name="Menu.Mods.EndColor" xml:space="preserve">
+    <value>End color</value>
+  </data>
+  <data name="Menu.Mods.Direction" xml:space="preserve">
+    <value>Direction</value>
+  </data>
+  <data name="Menu.Networking.LocalProxyCertificateTrustPresenceSpoofing" xml:space="preserve">
+    <value>Local proxy, certificate trust, presence spoofing, and other network-level tweaks for the Roblox client.</value>
+  </data>
+  <data name="Menu.Networking.EnableLocalProxy" xml:space="preserve">
+    <value>Enable local proxy</value>
+  </data>
+  <data name="Menu.Networking.Certificate" xml:space="preserve">
+    <value>Certificate</value>
+  </data>
+  <data name="Menu.Networking.ProxyNeedsCertificateTrustedByAccount" xml:space="preserve">
+    <value>The proxy needs a certificate trusted by your account to avoid TLS errors when it terminates Roblox's HTTPS connections. This installs only to your Windows user account's certificate store, not the whole machine, and only affects apps that use the Windows certificate store (Chrome/Edge do, Firefox doesn't).</value>
+  </data>
+  <data name="Menu.Networking.LocalProxyCertificate" xml:space="preserve">
+    <value>Local proxy certificate</value>
+  </data>
+  <data name="Menu.Networking.Presence" xml:space="preserve">
+    <value>Presence</value>
+  </data>
+  <data name="Menu.Networking.ChangesWhatSessionTypeRobloxS" xml:space="preserve">
+    <value>Changes what session type Roblox's own servers think you're connecting from.</value>
+  </data>
+  <data name="Menu.Networking.PresenceMode" xml:space="preserve">
+    <value>Presence mode</value>
+  </data>
+  <data name="Menu.Networking.RobuxBalance" xml:space="preserve">
+    <value>Robux balance</value>
+  </data>
+  <data name="Menu.Networking.ShowsDifferentBalanceOwnScreenOnly" xml:space="preserve">
+    <value>Shows a different balance on your own screen only - your real balance on Roblox's servers is never touched. Leave blank to disable.</value>
+  </data>
+  <data name="Menu.Networking.DisplayedBalance" xml:space="preserve">
+    <value>Displayed balance</value>
+  </data>
+  <data name="Menu.Networking.RealBalance" xml:space="preserve">
+    <value>Real balance</value>
+  </data>
+  <data name="Menu.Networking.DisplayName" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="Menu.Networking.OverridesNameShownGameAnyProfile" xml:space="preserve">
+    <value>Overrides the name shown in-game for any profile PhasmaStrap looks up while this is set. Leave blank to disable.</value>
+  </data>
+  <data name="Menu.Networking.DisplayNameOverride" xml:space="preserve">
+    <value>Display name override</value>
+  </data>
+  <data name="Menu.Networking.RealName" xml:space="preserve">
+    <value>Real name</value>
+  </data>
+  <data name="Menu.Networking.BlackholesRobloxSOwnTelemetryCrash" xml:space="preserve">
+    <value>Blackholes Roblox's own telemetry and crash-upload domains at the hosts-file level. Separate from the local proxy above.</value>
+  </data>
+  <data name="Menu.Networking.BlockRobloxTelemetry" xml:space="preserve">
+    <value>Block Roblox telemetry</value>
+  </data>
+  <data name="Menu.Networking.AssetBlockingPreloadingClientSpoofersLive" xml:space="preserve">
+    <value>Asset blocking, preloading and the client spoofers live on the FastFlag Settings page, under its Asset Warp tab - they all run through the local proxy above.</value>
+  </data>
+  <data name="Menu.Networking.AssetWarpSettings" xml:space="preserve">
+    <value>Asset Warp settings</value>
+  </data>
+  <data name="Menu.Networking.BlockTexturesDecalsMeshesPreloadAssets" xml:space="preserve">
+    <value>Block textures/decals/meshes, preload assets, and spoof what your own client shows.</value>
+  </data>
+  <data name="Menu.Networking.OpenAssetWarp" xml:space="preserve">
+    <value>Open Asset Warp</value>
+  </data>
+  <data name="Menu.Networking.PreloadCache" xml:space="preserve">
+    <value>Preload cache</value>
+  </data>
+  <data name="Menu.Networking.ClearAll" xml:space="preserve">
+    <value>Clear all</value>
+  </data>
+  <data name="Menu.Networking.EachEntryCachedAssetResolutionResponse" xml:space="preserve">
+    <value>Each entry is a cached asset-resolution response, keyed by a hash of the request - not an asset name, so there's nothing more specific to show per entry than size and when it was last used.</value>
+  </data>
+  <data name="Menu.Networking.PanicWipe" xml:space="preserve">
+    <value>Panic Wipe</value>
+  </data>
+  <data name="Menu.Networking.ImmediatelySignsYouOutRobloxClears" xml:space="preserve">
+    <value>Immediately signs you out of Roblox and clears every cache/log directory and the AssetWarp preload cache in one action. Different from the Cleanup schedule on the Deployment page, which only runs after Roblox closes and only for whichever directories you've opted into - this runs right now, always covers everything, and always signs you out too.</value>
+  </data>
+  <data name="Menu.Networking.WipeEverythingNow" xml:space="preserve">
+    <value>Wipe everything now</value>
+  </data>
+  <data name="Menu.Networking.Wipe" xml:space="preserve">
+    <value>Wipe</value>
+  </data>
+  <data name="Menu.Notifications.DoNotDisturb" xml:space="preserve">
+    <value>Do Not Disturb</value>
+  </data>
+  <data name="Menu.Notifications.SuppressesScreenToastPopupRestSession" xml:space="preserve">
+    <value>Suppresses the on-screen toast popup for the rest of this session. Nothing is lost - suppressed notifications still show up in History below.</value>
+  </data>
+  <data name="Menu.Notifications.HistoryOnlyShowsNotificationsFiredBy" xml:space="preserve">
+    <value>History only shows notifications fired by whichever process is open right now - most real ones (rejoin, screenshot/replay hotkeys, friend activity) fire from the game session itself, not Settings. Use this to try Do Not Disturb and History without a game running.</value>
+  </data>
+  <data name="Menu.Notifications.SendTestNotification" xml:space="preserve">
+    <value>Send test notification</value>
+  </data>
+  <data name="Menu.PhasmaStrap.PhasmaStrap" xml:space="preserve">
+    <value>PhasmaStrap</value>
+  </data>
+  <data name="Menu.PhasmaStrap.WebEnvironment" xml:space="preserve">
+    <value>Web environment</value>
+  </data>
+  <data name="Menu.PhasmaStrap.SiteUseMetrics" xml:space="preserve">
+    <value>Site to use for metrics</value>
+  </data>
+  <data name="Menu.PhasmaStrap.SystemInfo" xml:space="preserve">
+    <value>System info</value>
+  </data>
+  <data name="Menu.PhasmaStrap.ImportConfig" xml:space="preserve">
+    <value>Import config</value>
+  </data>
+  <data name="Menu.PhasmaStrap.RestoreSettingsSavedStateFastFlagsFrom" xml:space="preserve">
+    <value>Restore settings, saved state, and FastFlags from a config export made above. Overwrites what you currently have.</value>
+  </data>
+  <data name="Menu.Rendering.EverythingTunesWhatGameActuallyLooks" xml:space="preserve">
+    <value>Everything that tunes what the game actually looks like and how smoothly it runs - system/GPU tweaks, the stats HUD and crosshair overlay, and RiShade's post-processing.</value>
+  </data>
+  <data name="Menu.Rendering.System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Menu.Rendering.BootstrapperLevelTweaksDonTTouch" xml:space="preserve">
+    <value>Bootstrapper-level tweaks that don't touch Roblox itself.</value>
+  </data>
+  <data name="Menu.Rendering.CPUCoreLimit" xml:space="preserve">
+    <value>CPU core limit</value>
+  </data>
+  <data name="Menu.Rendering.RestrictsHowManyLogicalProcessorsPhasmaStrap" xml:space="preserve">
+    <value>Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.</value>
+  </data>
+  <data name="Menu.Rendering.FakeExclusiveFullscreen" xml:space="preserve">
+    <value>Fake exclusive fullscreen</value>
+  </data>
+  <data name="Menu.Rendering.StripsRobloxWindowSBorderResizes" xml:space="preserve">
+    <value>Strips the Roblox window's border and resizes it to exactly cover its monitor for lower input latency than Roblox's own windowed fullscreen.</value>
+  </data>
+  <data name="Menu.Rendering.DuckRobloxAudioWhenUnfocused" xml:space="preserve">
+    <value>Duck Roblox audio when unfocused</value>
+  </data>
+  <data name="Menu.Rendering.AutomaticallyLowersRobloxSVolumeWhile" xml:space="preserve">
+    <value>Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.</value>
+  </data>
+  <data name="Menu.Rendering.HeadsetLoudness" xml:space="preserve">
+    <value>Headset loudness</value>
+  </data>
+  <data name="Menu.Rendering.BoostsQuietSoundsFootstepsDistantCues" xml:space="preserve">
+    <value>Boosts quiet sounds (footsteps, distant cues) without letting loud moments blow out your ears.</value>
+  </data>
+  <data name="Menu.Rendering.AntiAliasing" xml:space="preserve">
+    <value>Anti-Aliasing</value>
+  </data>
+  <data name="Menu.Rendering.AppliesGPUShaderOverRobloxWindow" xml:space="preserve">
+    <value>Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering.</value>
+  </data>
+  <data name="Menu.Rendering.EnableAntiAliasingOverlay" xml:space="preserve">
+    <value>Enable Anti-Aliasing overlay</value>
+  </data>
+  <data name="Menu.Rendering.OffByDefaultSinceExtraRendering" xml:space="preserve">
+    <value>Off by default, since this is an extra rendering pass on top of Roblox.</value>
+  </data>
+  <data name="Menu.Rendering.AntiAliasingMethod" xml:space="preserve">
+    <value>Anti-Aliasing method</value>
+  </data>
+  <data name="Menu.Rendering.WhichShaderTechniqueApplyOnceOverlay" xml:space="preserve">
+    <value>Which shader technique to apply once the overlay is enabled.</value>
+  </data>
+  <data name="Menu.Rendering.FrameGeneration" xml:space="preserve">
+    <value>Frame generation</value>
+  </data>
+  <data name="Menu.Rendering.ShaderBasedMotionInterpolationDrawnClick" xml:space="preserve">
+    <value>Shader-based motion interpolation drawn in a click-through overlay above the game window. This does not improve actual FPS or reduce input lag - it only makes motion look smoother, mainly useful on low end PCs. Leave it off on mid range or high end systems.</value>
+  </data>
+  <data name="Menu.Rendering.EnableFrameGeneration" xml:space="preserve">
+    <value>Enable frame generation</value>
+  </data>
+  <data name="Menu.Rendering.InterpolatesExtraFrameBetweenRealCaptured" xml:space="preserve">
+    <value>Interpolates an extra frame between real captured frames while you're in game.</value>
+  </data>
+  <data name="Menu.Rendering.FrameGenerationQuality" xml:space="preserve">
+    <value>Frame generation quality</value>
+  </data>
+  <data name="Menu.Rendering.HigherQualityCostsMoreGPUTime" xml:space="preserve">
+    <value>Higher quality costs more GPU time per interpolated frame. 0 = Fast, 1 = Balanced, 2 = Quality.</value>
+  </data>
+  <data name="Menu.Rendering.BoostOptions" xml:space="preserve">
+    <value>Boost options</value>
+  </data>
+  <data name="Menu.Rendering.GPUTimerPowerPlanTweaksApplied" xml:space="preserve">
+    <value>GPU, timer, and power plan tweaks applied at the OS level while you play.</value>
+  </data>
+  <data name="Menu.Rendering.ForceSpecificGameResolutionChosenMonitor" xml:space="preserve">
+    <value>Force a specific in-game resolution on a chosen monitor.</value>
+  </data>
+  <data name="Menu.Rendering.ExtraHUDRows" xml:space="preserve">
+    <value>Extra HUD rows</value>
+  </data>
+  <data name="Menu.Rendering.AddMoreStatRowsBelowFPS" xml:space="preserve">
+    <value>Add more stat rows below FPS - each is shown as its own line on the same HUD panel.</value>
+  </data>
+  <data name="Menu.Rendering.FrameTime" xml:space="preserve">
+    <value>Frame time</value>
+  </data>
+  <data name="Menu.Rendering.MillisecondsPerFrameAlongsideFPS" xml:space="preserve">
+    <value>Milliseconds per frame, alongside FPS.</value>
+  </data>
+  <data name="Menu.Rendering.CPUUsage" xml:space="preserve">
+    <value>CPU usage</value>
+  </data>
+  <data name="Menu.Rendering.TotalSystemCPUUsageAllCores" xml:space="preserve">
+    <value>Total system CPU usage, all cores.</value>
+  </data>
+  <data name="Menu.Rendering.RAMUsage" xml:space="preserve">
+    <value>RAM usage</value>
+  </data>
+  <data name="Menu.Rendering.PhysicalMemoryCurrentlyUse" xml:space="preserve">
+    <value>Physical memory currently in use.</value>
+  </data>
+  <data name="Menu.Rendering.ServerPing" xml:space="preserve">
+    <value>Server ping</value>
+  </data>
+  <data name="Menu.Rendering.RoundTripTimeCurrentGameServer" xml:space="preserve">
+    <value>Round-trip time to the current game server. Shows -- if the server's address isn't known yet.</value>
+  </data>
+  <data name="Menu.Rendering.FocusMode" xml:space="preserve">
+    <value>Focus mode</value>
+  </data>
+  <data name="Menu.Rendering.InstantlyHidesHUDCrosshairWithoutTurning" xml:space="preserve">
+    <value>Instantly hides the HUD and crosshair without turning them off - handy right before a screenshot or clip. Bind the Toggle Overlay Focus Mode hotkey on the Hotkeys page to flip this during a game session.</value>
+  </data>
+  <data name="Menu.Rendering.OverlayFocusMode" xml:space="preserve">
+    <value>Overlay Focus Mode</value>
+  </data>
+  <data name="Menu.Rendering.WhileHUDCrosshairAreHiddenRegardless" xml:space="preserve">
+    <value>While on, the HUD and crosshair are hidden regardless of their own toggles above.</value>
+  </data>
+  <data name="Menu.Rendering.PerGameOverlayProfiles" xml:space="preserve">
+    <value>Per-game overlay profiles</value>
+  </data>
+  <data name="Menu.Rendering.OverrideWhetherHUDCrosshairShowUp" xml:space="preserve">
+    <value>Override whether the HUD and crosshair show up in specific games, regardless of the global toggles above.</value>
+  </data>
+  <data name="Menu.Rendering.GameOverrides" xml:space="preserve">
+    <value>Game overrides</value>
+  </data>
+  <data name="Menu.Rendering.AddPlaceIDItsOwnHUD" xml:space="preserve">
+    <value>Add a place ID with its own HUD/crosshair state.</value>
+  </data>
+  <data name="Menu.Rendering.HUD" xml:space="preserve">
+    <value>HUD</value>
+  </data>
+  <data name="Menu.Rendering.TurnRiShadeChooseWhichPresetRenders" xml:space="preserve">
+    <value>Turn RiShade on and choose which preset it renders with.</value>
+  </data>
+  <data name="Menu.Rendering.ColorTone" xml:space="preserve">
+    <value>Color &amp; tone</value>
+  </data>
+  <data name="Menu.Rendering.TurnColorGradingOff" xml:space="preserve">
+    <value>Turn color grading on or off.</value>
+  </data>
+  <data name="Menu.Rendering.TonemappingEdgeVignette" xml:space="preserve">
+    <value>Tonemapping and edge vignette.</value>
+  </data>
+  <data name="Menu.Rendering.TurnTonemappingOff" xml:space="preserve">
+    <value>Turn tonemapping on or off.</value>
+  </data>
+  <data name="Menu.Rendering.TurnVignetteOff" xml:space="preserve">
+    <value>Turn the vignette on or off.</value>
+  </data>
+  <data name="Menu.Rendering.Effects" xml:space="preserve">
+    <value>Effects</value>
+  </data>
+  <data name="Menu.Rendering.EdgeSharpeningGlowBloom" xml:space="preserve">
+    <value>Edge sharpening and glow bloom.</value>
+  </data>
+  <data name="Menu.Rendering.TurnSharpeningOff" xml:space="preserve">
+    <value>Turn sharpening on or off.</value>
+  </data>
+  <data name="Menu.Rendering.TurnBloomOff" xml:space="preserve">
+    <value>Turn bloom on or off.</value>
+  </data>
+  <data name="Menu.Rendering.ColorFringingFilmGrain" xml:space="preserve">
+    <value>Color fringing and film grain.</value>
+  </data>
+  <data name="Menu.Rendering.TurnChromaticAberrationOff" xml:space="preserve">
+    <value>Turn chromatic aberration on or off.</value>
+  </data>
+  <data name="Menu.Rendering.TurnFilmGrainOff" xml:space="preserve">
+    <value>Turn film grain on or off.</value>
+  </data>
+  <data name="Menu.ServerBrowser.JoinFastest" xml:space="preserve">
+    <value>Join fastest</value>
+  </data>
+  <data name="Menu.ServerBrowser.JoinsWhicheverServerAboveReportedLowest" xml:space="preserve">
+    <value>Joins whichever server above reported the lowest ping</value>
+  </data>
+  <data name="Menu.Shortcuts.EnableStudioCompanion" xml:space="preserve">
+    <value>Enable Studio companion</value>
+  </data>
+  <data name="Menu.Shortcuts.Reinstall" xml:space="preserve">
+    <value>Reinstall</value>
+  </data>
+  <data name="Menu.Shortcuts.StudioRichPresence" xml:space="preserve">
+    <value>Studio Rich Presence</value>
+  </data>
+  <data name="Menu.Shortcuts.ShowsSeparateDiscordStatusWhileRoblox" xml:space="preserve">
+    <value>Shows a separate Discord status while Roblox Studio is open.</value>
+  </data>
+  <data name="Menu.Shortcuts.PlaceIDGameLink" xml:space="preserve">
+    <value>Place ID or game link</value>
+  </data>
+  <data name="Menu.Shortcuts.CreateShortcut" xml:space="preserve">
+    <value>Create shortcut</value>
+  </data>
+  <data name="Menu.MainWindow.Pinned" xml:space="preserve">
+    <value>Pinned</value>
+  </data>
+  <data name="Menu.MainWindow.Core" xml:space="preserve">
+    <value>Core</value>
+  </data>
+  <data name="Menu.MainWindow.Session" xml:space="preserve">
+    <value>Session</value>
+  </data>
+  <data name="Menu.MainWindow.Configuration" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="Menu.MainWindow.App" xml:space="preserve">
+    <value>App</value>
   </data>
 </root>

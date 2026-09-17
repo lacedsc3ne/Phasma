@@ -76,8 +76,8 @@
                             <ui:CardExpander Margin="0,12,0,0">
                                 <ui:CardExpander.Header>
                                     <StackPanel>
-                                        <TextBlock FontSize="14" Text="Asset blocking" />
-                                        <TextBlock FontSize="12" Text="Strip specific asset categories from downloading entirely." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_AssetBlocking}" />
+                                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_StripSpecificAssetCategoriesFromDownloading}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
                                 </ui:CardExpander.Header>
                                 <StackPanel>
@@ -124,8 +124,8 @@
                             <ui:CardExpander Margin="0,4,0,0">
                                 <ui:CardExpander.Header>
                                     <StackPanel>
-                                        <TextBlock FontSize="14" Text="Preload behavior" />
-                                        <TextBlock FontSize="12" Text="Warms the asset cache ahead of time so games feel more responsive." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_PreloadBehavior}" />
+                                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_WarmsAssetCacheAheadTimeSo}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
                                 </ui:CardExpander.Header>
                                 <StackPanel>
@@ -165,8 +165,8 @@
                             <ui:CardExpander Margin="0,4,0,0">
                                 <ui:CardExpander.Header>
                                     <StackPanel>
-                                        <TextBlock FontSize="14" Text="Spoof other players" />
-                                        <TextBlock FontSize="12" Text="Overrides what you see for other players' names and status." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_SpoofOtherPlayers}" />
+                                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_OverridesWhatYouSeeOtherPlayers}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
                                 </ui:CardExpander.Header>
                                 <StackPanel>
@@ -193,8 +193,8 @@
                             <ui:CardExpander Margin="0,8,0,0">
                                 <ui:CardExpander.Header>
                                     <StackPanel>
-                                        <TextBlock FontSize="14" Text="Spoof yourself" />
-                                        <TextBlock FontSize="12" Text="Overrides your own displayed name, verification, and Robux balance." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_SpoofYourself}" />
+                                        <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_OverridesOwnDisplayedNameVerificationRobux}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
                                 </ui:CardExpander.Header>
                                 <StackPanel>

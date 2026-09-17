@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
@@ -11,8 +12,8 @@
       Title="CapturePage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Capture" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Screenshots of the Roblox window, saved locally. Bind the Take Screenshot hotkey on the Hotkeys page to capture during a game session - the button below only works while Roblox happens to be running right now, useful mainly for testing." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Capture_Capture}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Capture_ScreenshotsRobloxWindowSavedLocallyBind}" />
 
         <Grid Margin="0,12,0,0">
             <Grid.ColumnDefinitions>
@@ -20,13 +21,27 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <ui:Button Content="Take screenshot now" Icon="Camera24" Command="{Binding TakeScreenshotCommand, Mode=OneTime}" />
-                <ui:Button Margin="8,0,0,0" Content="Refresh" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
-                <ui:Button Margin="8,0,0,0" Content="Open folder" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenFolderCommand, Mode=OneTime}" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Capture_TakeScreenshotNow}" Icon="Camera24" Command="{Binding TakeScreenshotCommand, Mode=OneTime}" />
+                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
+                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenFolderCommand, Mode=OneTime}" />
             </StackPanel>
         </Grid>
 
         <TextBlock Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Status, Mode=OneWay}" />
+
+        <Border Margin="0,12,0,0" Padding="12,10" CornerRadius="8" BorderThickness="1" Visibility="{Binding HotkeyHintVisibility, Mode=OneWay}"
+                BorderBrush="{DynamicResource SystemFillColorCautionBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:SymbolIcon Grid.Column="0" Symbol="Keyboard24" FontSize="20" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource SystemFillColorCautionBrush}" />
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextWrapping="Wrap" Text="{Binding HotkeyHintText, Mode=OneWay}" />
+                <ui:Button Grid.Column="2" Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenHotkeys}" Icon="Keyboard24" Command="{Binding OpenHotkeysCommand, Mode=OneTime}" />
+            </Grid>
+        </Border>
 
         <StackPanel HorizontalAlignment="Center" Margin="0,24,0,24">
             <StackPanel.Style>
@@ -40,7 +55,7 @@
                 </Style>
             </StackPanel.Style>
             <ui:SymbolIcon Symbol="Camera24" FontSize="48" Opacity="0.25" HorizontalAlignment="Center" />
-            <TextBlock Text="No screenshots yet" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="16" Opacity="0.5" Margin="0,12,0,0" HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Static resources:Strings.Menu_Capture_NoScreenshotsYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="16" Opacity="0.5" Margin="0,12,0,0" HorizontalAlignment="Center" />
         </StackPanel>
 
         <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding Screenshots, Mode=OneWay}">
@@ -78,14 +93,14 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <TextBlock Text="Instant Replay" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Continuously buffers the last several seconds of gameplay while enabled. Press the Save Instant Replay hotkey (set one on the Hotkeys page) after something happens to save that buffer as a real MP4 clip - there's no separate start/stop for recording, it's always running once enabled." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Capture_InstantReplay}" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Capture_ContinuouslyBuffersLastSeveralSecondsGameplay}" />
 
-        <controls:OptionControl Header="Enable Instant Replay" x:Name="InstantReplayOption">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_EnableInstantReplay}" x:Name="InstantReplayOption">
                     <ui:ToggleSwitch IsChecked="{Binding InstantReplayEnabled, Mode=TwoWay}" />
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="Clip length" Description="Seconds of buffered gameplay to keep, and to save when triggered." IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_ClipLength}" Description="{x:Static resources:Strings.Menu_Capture_SecondsBufferedGameplayKeepSaveWhen}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal">
                         <Slider Width="180" Minimum="5" Maximum="60" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding InstantReplayClipSeconds, Mode=TwoWay}" />
                         <TextBlock VerticalAlignment="Center" Margin="8,0,0,0">
@@ -94,7 +109,7 @@
                     </StackPanel>
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="Quality" Description="Higher quality captures at a larger resolution/frame rate and higher bitrate - uses more RAM while buffering and more disk space per clip." IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_Quality}" Description="{x:Static resources:Strings.Menu_Capture_HigherQualityCapturesAtLargerResolution}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
                     <ComboBox Width="140" ItemsSource="{Binding QualityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
 
@@ -103,10 +118,10 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" FontSize="14" FontWeight="Medium" Text="Saved replays" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0" FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Capture_SavedReplays}" VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <ui:Button Content="Refresh" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshReplaysCommand, Mode=OneTime}" />
-                <ui:Button Margin="8,0,0,0" Content="Open folder" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenReplaysFolderCommand, Mode=OneTime}" />
+                <ui:Button Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshReplaysCommand, Mode=OneTime}" />
+                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenReplaysFolderCommand, Mode=OneTime}" />
             </StackPanel>
         </Grid>
 
@@ -122,7 +137,7 @@
                 </Style>
             </StackPanel.Style>
             <ui:SymbolIcon Symbol="VideoClip24" FontSize="40" Opacity="0.25" HorizontalAlignment="Center" />
-            <TextBlock Text="No replays saved yet" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Static resources:Strings.Menu_Capture_NoReplaysSavedYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
         </StackPanel>
 
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Replays, Mode=OneWay}">

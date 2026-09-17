@@ -4,56 +4,57 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       mc:Ignorable="d"
       Title="NetworkingPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Networking" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Local proxy, certificate trust, presence spoofing, and other network-level tweaks for the Roblox client." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificateTrustPresenceSpoofing}" />
 
-        <controls:OptionControl Header="Enable local proxy" Description="{Binding StatusText, Mode=OneWay}">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_EnableLocalProxy}" Description="{Binding StatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Certificate" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="The proxy needs a certificate trusted by your account to avoid TLS errors when it terminates Roblox's HTTPS connections. This installs only to your Windows user account's certificate store, not the whole machine, and only affects apps that use the Windows certificate store (Chrome/Edge do, Firefox doesn't)." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_Certificate}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ProxyNeedsCertificateTrustedByAccount}" />
 
-        <controls:OptionControl Header="Local proxy certificate" Description="{Binding CertificateStatusText, Mode=OneWay}">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificate}" Description="{Binding CertificateStatusText, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">
-                <ui:Button Content="Install" Icon="ShieldCheckmark24" Margin="0,0,8,0" Command="{Binding InstallCertificateCommand, Mode=OneTime}" />
-                <ui:Button Content="Remove" Icon="Delete24" Appearance="Secondary" Command="{Binding RemoveCertificateCommand, Mode=OneTime}" />
+                <ui:Button Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ShieldCheckmark24" Margin="0,0,8,0" Command="{Binding InstallCertificateCommand, Mode=OneTime}" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Mods_Remove}" Icon="Delete24" Appearance="Secondary" Command="{Binding RemoveCertificateCommand, Mode=OneTime}" />
             </StackPanel>
         </controls:OptionControl>
 
-        <TextBlock Text="Presence" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Changes what session type Roblox's own servers think you're connecting from." />
-        <controls:OptionControl Header="Presence mode">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_Presence}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ChangesWhatSessionTypeRobloxS}" />
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_PresenceMode}">
             <ComboBox Width="160" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Robux balance" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Shows a different balance on your own screen only - your real balance on Roblox's servers is never touched. Leave blank to disable." />
-        <controls:OptionControl Header="Displayed balance">
-            <ui:TextBox Width="160" PlaceholderText="Real balance" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_RobuxBalance}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ShowsDifferentBalanceOwnScreenOnly}" />
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayedBalance}">
+            <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealBalance}" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Display name" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Overrides the name shown in-game for any profile PhasmaStrap looks up while this is set. Leave blank to disable." />
-        <controls:OptionControl Header="Display name override">
-            <ui:TextBox Width="200" PlaceholderText="Real name" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_DisplayName}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_OverridesNameShownGameAnyProfile}" />
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayNameOverride}">
+            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealName}" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Telemetry" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Blackholes Roblox's own telemetry and crash-upload domains at the hosts-file level. Separate from the local proxy above." />
-        <controls:OptionControl Header="Block Roblox telemetry" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Telemetry}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_BlackholesRobloxSOwnTelemetryCrash}" />
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_BlockRobloxTelemetry}" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
             <ui:ToggleSwitch IsChecked="{Binding BlockRobloxTelemetry, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="Asset Warp" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Asset blocking, preloading and the client spoofers live on the FastFlag Settings page, under its Asset Warp tab - they all run through the local proxy above." />
-        <controls:OptionControl Header="Asset Warp settings" Description="Block textures/decals/meshes, preload assets, and spoof what your own client shows.">
-            <ui:Button Content="Open Asset Warp" Icon="PaintBrush24" Command="{Binding OpenAssetWarpCommand, Mode=OneTime}" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Tab_AssetWarp}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_AssetBlockingPreloadingClientSpoofersLive}" />
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_AssetWarpSettings}" Description="{x:Static resources:Strings.Menu_Networking_BlockTexturesDecalsMeshesPreloadAssets}">
+            <ui:Button Content="{x:Static resources:Strings.Menu_Networking_OpenAssetWarp}" Icon="PaintBrush24" Command="{Binding OpenAssetWarpCommand, Mode=OneTime}" />
         </controls:OptionControl>
 
         <ui:CardExpander Margin="0,8,0,0" Icon="Folder24">
@@ -64,17 +65,17 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock FontSize="14" Text="Preload cache" />
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_PreloadCache}" />
                         <TextBlock FontSize="12" Text="{Binding PreloadCacheSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Margin="0,0,8,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshPreloadCacheCommand, Mode=OneTime}" />
-                        <ui:Button Content="Clear all" Icon="Delete24" Appearance="Danger" Command="{Binding ClearPreloadCacheCommand, Mode=OneTime}" />
+                        <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshPreloadCacheCommand, Mode=OneTime}" />
+                        <ui:Button Content="{x:Static resources:Strings.Menu_Networking_ClearAll}" Icon="Delete24" Appearance="Danger" Command="{Binding ClearPreloadCacheCommand, Mode=OneTime}" />
                     </StackPanel>
                 </Grid>
             </ui:CardExpander.Header>
             <StackPanel>
-                <TextBlock Text="Each entry is a cached asset-resolution response, keyed by a hash of the request - not an asset name, so there's nothing more specific to show per entry than size and when it was last used." TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_Networking_EachEntryCachedAssetResolutionResponse}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
                 <ItemsControl ItemsSource="{Binding PreloadCacheEntries, Mode=OneWay}" MaxHeight="240">
                     <ItemsControl.Template>
                         <ControlTemplate TargetType="ItemsControl">
@@ -107,8 +108,8 @@
             </StackPanel>
         </ui:CardExpander>
 
-        <TextBlock Text="Panic Wipe" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Immediately signs you out of Roblox and clears every cache/log directory and the AssetWarp preload cache in one action. Different from the Cleanup schedule on the Deployment page, which only runs after Roblox closes and only for whichever directories you've opted into - this runs right now, always covers everything, and always signs you out too." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_PanicWipe}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ImmediatelySignsYouOutRobloxClears}" />
 
         <ui:Card Margin="0,8,0,0">
             <Grid>
@@ -117,10 +118,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock FontSize="14" Text="Wipe everything now" />
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_WipeEverythingNow}" />
                     <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding WipeStatus, Mode=OneWay}" />
                 </StackPanel>
-                <ui:Button Grid.Column="1" Content="Wipe" Icon="Delete24" Appearance="Danger" Command="{Binding WipeAllCommand, Mode=OneTime}" />
+                <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Networking_Wipe}" Icon="Delete24" Appearance="Danger" Command="{Binding WipeAllCommand, Mode=OneTime}" />
             </Grid>
         </ui:Card>
     </StackPanel>

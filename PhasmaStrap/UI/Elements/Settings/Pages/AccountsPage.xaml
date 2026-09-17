@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:models="clr-namespace:PhasmaStrap.UI.ViewModels.ContextMenu"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance models:AccountSwitcherViewModel, IsDesignTimeCreatable=False}"
@@ -11,8 +12,8 @@
       Scrollable="True"
       Unloaded="Page_Unloaded">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Accounts" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Save multiple Roblox logins and switch between them with one click. Switching swaps Roblox's own login file, so it only works while every Roblox window is closed - the next time you press Play, Roblox signs in as whichever account is currently live. See Integrations for the popup version of this same list." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Accounts_Accounts}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Accounts_SaveMultipleRobloxLoginsSwitchBetween}" />
 
         <Border Margin="0,12,0,0" Padding="14" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <Grid>
@@ -32,16 +33,16 @@
                 </Grid>
 
                 <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                    <TextBlock FontSize="11" Opacity="0.65" Text="Signed in as" />
+                    <TextBlock FontSize="11" Opacity="0.65" Text="{x:Static resources:Strings.Menu_Accounts_SignedAs}" />
                     <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding CurrentTitle}" />
                     <TextBlock FontSize="12" Opacity="0.75" Text="{Binding CurrentSubtitle}" />
                     <TextBlock FontSize="11" Opacity="0.6" Margin="0,2,0,0" Text="{Binding Status}" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <ui:Button Content="Add this account" Icon="PersonAdd24" Appearance="Primary" IsEnabled="{Binding AddCurrentEnabled}" Command="{Binding AddCurrentCommand}" />
-                    <ui:Button Content="Sign out" Icon="SignOut24" Appearance="Danger" Margin="8,0,0,0" Visibility="{Binding LoggedInVisibility}" Command="{Binding LogoutCommand}" />
-                    <ui:Button Icon="ArrowClockwise24" ToolTip="Refresh" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding RefreshCommand}" />
+                    <ui:Button Content="{x:Static resources:Strings.Menu_Accounts_AddAccount}" Icon="PersonAdd24" Appearance="Primary" IsEnabled="{Binding AddCurrentEnabled}" Command="{Binding AddCurrentCommand}" />
+                    <ui:Button Content="{x:Static resources:Strings.Menu_Accounts_SignOut}" Icon="SignOut24" Appearance="Danger" Margin="8,0,0,0" Visibility="{Binding LoggedInVisibility}" Command="{Binding LogoutCommand}" />
+                    <ui:Button Icon="ArrowClockwise24" ToolTip="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding RefreshCommand}" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -53,34 +54,34 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ui:TextBox Grid.Column="0" PlaceholderText="Search saved accounts by name, note, or user ID" Icon="Search24" ClearButtonEnabled="True" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ui:Button Grid.Column="1" Content="Log in with browser" Icon="Globe24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding LoginWithBrowserCommand, Mode=OneTime}" />
-            <ui:Button Grid.Column="2" Content="Import by cookie" Icon="Key24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding ToggleImportCommand}" />
-            <ui:Button Grid.Column="3" Content="Folder" Icon="Folder24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding OpenFolderCommand}" />
+            <ui:TextBox Grid.Column="0" PlaceholderText="{x:Static resources:Strings.Menu_Accounts_SearchSavedAccountsByNameNote}" Icon="Search24" ClearButtonEnabled="True" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Accounts_LogBrowser}" Icon="Globe24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding LoginWithBrowserCommand, Mode=OneTime}" />
+            <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Menu_Accounts_ImportByCookie}" Icon="Key24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding ToggleImportCommand}" />
+            <ui:Button Grid.Column="3" Content="{x:Static resources:Strings.Menu_Accounts_Folder}" Icon="Folder24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding OpenFolderCommand}" />
         </Grid>
 
         <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}" Visibility="{Binding ImportVisibility}">
             <StackPanel>
-                <TextBlock FontWeight="SemiBold" Text="Import an account from its .ROBLOSECURITY cookie" />
-                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="Paste a full .ROBLOSECURITY value. Only paste cookies you own." />
+                <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Accounts_ImportAccountFromItsROBLOSECURITYCookie}" />
+                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteFullROBLOSECURITYValueOnlyPaste}" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <ui:TextBox Grid.Column="0" PlaceholderText="_|WARNING:-DO-NOT-SHARE-THIS..." Text="{Binding NewCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Grid.Column="1" Content="Import" Icon="ArrowImport24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding ImportCookieCommand}" />
+                    <ui:TextBox Grid.Column="0" PlaceholderText="{x:Static resources:Strings.Menu_Accounts_WARNINGDONOTSHARE}" Text="{Binding NewCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Common_Import}" Icon="ArrowImport24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding ImportCookieCommand}" />
                 </Grid>
-                <ui:Button Margin="0,8,0,0" Content="Import several at once instead" Appearance="Transparent" HorizontalAlignment="Left" Padding="0" Command="{Binding ToggleBulkImportCommand}" />
+                <ui:Button Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Accounts_ImportSeveralAtOnceInstead}" Appearance="Transparent" HorizontalAlignment="Left" Padding="0" Command="{Binding ToggleBulkImportCommand}" />
             </StackPanel>
         </Border>
 
         <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}" Visibility="{Binding BulkImportVisibility}">
             <StackPanel>
-                <TextBlock FontWeight="SemiBold" Text="Bulk import from cookies" />
-                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="Paste one .ROBLOSECURITY value per line. Each is verified and saved the same way as a single import - only paste cookies you own." />
+                <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Accounts_BulkImportFromCookies}" />
+                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteOneROBLOSECURITYValuePerLine}" />
                 <ui:TextBox Text="{Binding BulkCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="10" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11" />
-                <ui:Button Margin="0,8,0,0" Content="Import all" Icon="ArrowImport24" Appearance="Primary" HorizontalAlignment="Left" Command="{Binding BulkImportCookiesCommand, Mode=OneTime}" />
+                <ui:Button Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Accounts_ImportAll}" Icon="ArrowImport24" Appearance="Primary" HorizontalAlignment="Left" Command="{Binding BulkImportCookiesCommand, Mode=OneTime}" />
             </StackPanel>
         </Border>
 
@@ -109,19 +110,19 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding Title}" VerticalAlignment="Center" />
                                     <Border Margin="8,0,0,0" Padding="6,1" CornerRadius="4" VerticalAlignment="Center" Background="{DynamicResource AccentFillColorDefaultBrush}" Visibility="{Binding CurrentBadgeVisibility}">
-                                        <TextBlock FontSize="9" FontWeight="SemiBold" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" Text="CURRENT" />
+                                        <TextBlock FontSize="9" FontWeight="SemiBold" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" Text="{x:Static resources:Strings.Menu_Accounts_CURRENT}" />
                                     </Border>
                                 </StackPanel>
                                 <TextBlock FontSize="12" Opacity="0.7" Text="{Binding Subtitle}" />
                                 <TextBlock FontSize="11" Opacity="0.55" Margin="0,1,0,0" Text="{Binding LastUsedDisplay}" />
                             </StackPanel>
 
-                            <ui:TextBox Grid.Column="2" VerticalAlignment="Center" Margin="10,0" MinWidth="120" MaxWidth="200" PlaceholderText="Add a note" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <ui:TextBox Grid.Column="2" VerticalAlignment="Center" Margin="10,0" MinWidth="120" MaxWidth="200" PlaceholderText="{x:Static resources:Strings.Menu_Accounts_AddNote}" Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                <ui:Button Content="Switch" Icon="ArrowSwap24" Appearance="Primary" Command="{Binding DataContext.SwitchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                                <ui:Button Icon="Copy24" ToolTip="Copy user ID" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding DataContext.CopyUserIdCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                                <ui:Button Icon="Delete24" ToolTip="Remove saved account" Appearance="Danger" Margin="6,0,0,0" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Content="{x:Static resources:Strings.Menu_Accounts_Switch}" Icon="ArrowSwap24" Appearance="Primary" Command="{Binding DataContext.SwitchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Icon="Copy24" ToolTip="{x:Static resources:Strings.Menu_Accounts_CopyUserID}" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding DataContext.CopyUserIdCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                <ui:Button Icon="Delete24" ToolTip="{x:Static resources:Strings.Menu_Accounts_RemoveSavedAccount}" Appearance="Danger" Margin="6,0,0,0" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                             </StackPanel>
                         </Grid>
                     </Border>

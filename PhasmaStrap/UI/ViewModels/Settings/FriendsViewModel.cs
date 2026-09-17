@@ -8,11 +8,20 @@ using PhasmaStrap.Integrations;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    public sealed class FriendRow
+    public sealed class FriendRow : NotifyPropertyChangedViewModel
     {
         public long UserId { get; init; }
         public string Name { get; init; } = "";
-        public string? AvatarUrl { get; init; }
+
+        private string? _avatarUrl;
+
+        // starts as the remote thumbnail URL (or the cached file if we already have one) and is
+        // swapped to the on-disk copy once AvatarCache has it, so revisits don't re-download
+        public string? AvatarUrl
+        {
+            get => _avatarUrl;
+            set { _avatarUrl = value; OnPropertyChanged(nameof(AvatarUrl)); }
+        }
         public FriendPresenceType Type { get; init; }
         public string StatusText { get; init; } = "";
         public bool Joinable { get; init; }
@@ -39,6 +48,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
     public sealed class FriendsViewModel : NotifyPropertyChangedViewModel
     {
         private const string LOG_IDENT = "FriendsViewModel";
+
+        // downloads any headshot we don't have a fresh disk copy of, then points the row at the file
+        private static async Task CacheAvatarsAsync(List<FriendRow> rows, Dictionary<long, string> remote)
+        {
+            foreach (FriendRow row in rows)
+            {
+                if (AvatarCache.TryGetFresh(row.UserId) is not null)
+                    continue;
+
+                if (!remote.TryGetValue(row.UserId, out string? url) || string.IsNullOrEmpty(url))
+                    continue;
+
+                string? local = await AvatarCache.DownloadAsync(row.UserId, url).ConfigureAwait(false);
+                if (local is null)
+                    continue;
+
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() => row.AvatarUrl = local));
+            }
+        }
 
         public ObservableCollection<FriendRow> Friends { get; } = new();
 
@@ -129,7 +157,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     {
                         UserId = f.UserId,
                         Name = string.IsNullOrWhiteSpace(f.DisplayName) ? f.Username : f.DisplayName,
-                        AvatarUrl = avatar,
+                        AvatarUrl = AvatarCache.TryGetFresh(f.UserId) ?? avatar,
                         Type = type,
                         StatusText = statusText,
                         Joinable = p?.Joinable ?? false,
@@ -143,6 +171,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Friends.Clear();
                 foreach (FriendRow row in rows)
                     Friends.Add(row);
+
+                _ = CacheAvatarsAsync(rows, avatars);
 
                 int online = rows.Count(r => r.Type != FriendPresenceType.Offline);
                 Status = $"{online} of {rows.Count} friend(s) online.";

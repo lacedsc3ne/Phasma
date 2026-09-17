@@ -53,9 +53,11 @@ namespace PhasmaStrap.Integrations
                 RequestRemove();
         }
 
-        public static bool RequestApply() => RunElevated("-writetelemetryblock");
+        // both hosts-file blocks are written by one elevated run so this never stacks a second
+        // UAC prompt on top of the proxy's
+        public static bool RequestApply() => Networking.HostsElevation.Apply(App.Settings.Prop.NetworkingProxyEnabled && Networking.HostsFileManager.IsBlockPresent(), true);
 
-        public static bool RequestRemove() => RunElevated("-removetelemetryblock");
+        public static bool RequestRemove() => Networking.HostsElevation.Apply(App.Settings.Prop.NetworkingProxyEnabled && Networking.HostsFileManager.IsBlockPresent(), false);
 
         private static bool RunElevated(string flag)
         {

@@ -55,6 +55,13 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
         /// </summary>
         public Type? NestedPageType { get; }
 
+        /// <summary>
+        /// When the entry lives on an embedded page, the tab of the HOST page that holds the
+        /// frame (e.g. "Roblox channel" on the PhasmaStrap page); <see cref="Tab"/> is then the
+        /// tab inside the embedded page itself.
+        /// </summary>
+        public string HostTab { get; }
+
         public string Breadcrumb { get; }
 
         internal string NormalizedHeader { get; }
@@ -67,7 +74,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 
         internal string[] BreadcrumbWords { get; }
 
-        public SettingsSearchEntry(SettingsSearchEntryKind kind, string header, string description, Type pageType, string pageName, string tab, string section, string group, Type? nestedPageType)
+        public SettingsSearchEntry(SettingsSearchEntryKind kind, string header, string description, Type pageType, string pageName, string tab, string section, string group, Type? nestedPageType, string hostTab = "")
         {
             Kind = kind;
             Header = (header ?? "").Trim();
@@ -78,8 +85,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             Section = (section ?? "").Trim();
             Group = (group ?? "").Trim();
             NestedPageType = nestedPageType;
+            HostTab = (hostTab ?? "").Trim();
 
-            var crumbs = new List<string>(4) { PageName };
+            var crumbs = new List<string>(5) { PageName };
+            if (HostTab.Length > 0) crumbs.Add(HostTab);
             if (Tab.Length > 0) crumbs.Add(Tab);
             if (Section.Length > 0 && Section != Header) crumbs.Add(Section);
             if (Group.Length > 0 && Group != Header) crumbs.Add(Group);

@@ -1,0 +1,8 @@
+# settings that are legitimately only used by the page that owns them
+RojoLastProjectPath
+PinnedNavItems
+RecentSettingsSearches
+# the view model itself performs the install/launch with this value
+SelectedClassicClient
+# toggling it writes/removes the Run registry key from the view model
+LaunchAtStartup

@@ -101,6 +101,7 @@ class PageInfo:
     cls: str
     file: str
     entries: list[Entry] = field(default_factory=list)
+    title_seen: bool = False
     # nested page class -> tab expr of the host tab that embeds it
     nested: dict[str, str | None] = field(default_factory=dict)
 
@@ -199,10 +200,11 @@ def walk(el: ET.Element, page: PageInfo, tab: str | None, section: str | None, g
         if name == "TextBlock" and not in_option:
             text_expr = to_expr(attr(child, "Text"))
             size = font_size(child)
-            if text_expr and size is not None and size >= 20:
-                # page title - not an entry, and doesn't become a section
+            if text_expr and size is not None and size >= 20 and not page.title_seen and tab is None:
+                # the page's own title (first big TextBlock) - not an entry, not a section
+                page.title_seen = True
                 continue
-            if text_expr and is_section_title(child):
+            if text_expr and (is_section_title(child) or (size is not None and size >= 20)):
                 section = text_expr
                 page.entries.append(Entry("Section", text_expr, None, tab, None, None))
                 continue
@@ -303,17 +305,19 @@ def main() -> int:
         seen = set()
         lines.append(f"            // ---- {info.file} ({cls}) ----")
         for e in info.entries:
-            tab = e.tab or host_tab
-            key = (e.kind, e.header, tab, e.section, e.group)
+            # an embedded page keeps its own tab; the host page's tab (the one holding the
+            # frame) travels separately so the navigator can open both in order
+            key = (e.kind, e.header, host_tab, e.tab, e.section, e.group)
             if key in seen:
                 continue
             seen.add(key)
             desc = e.description or '""'
-            tab_expr = tab or '""'
+            tab_expr = e.tab or '""'
+            host_expr = host_tab or '""'
             section_expr = e.section or '""'
             group_expr = e.group or '""'
             lines.append(
-                f"            new(SettingsSearchEntryKind.{e.kind}, {e.header}, {desc}, typeof({page_type}), {nav_label}, {tab_expr}, {section_expr}, {group_expr}, {nested_type}),")
+                f"            new(SettingsSearchEntryKind.{e.kind}, {e.header}, {desc}, typeof({page_type}), {nav_label}, {tab_expr}, {section_expr}, {group_expr}, {nested_type}, {host_expr}),")
             total += 1
             per_page[cls] = per_page.get(cls, 0) + 1
 

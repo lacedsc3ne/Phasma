@@ -80,34 +80,34 @@
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
-                    <TextBlock Text="Cleanup" FontSize="20" FontWeight="Medium" />
-                    <TextBlock Text="Automatically deletes old files after Roblox closes." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_Cleanup}" FontSize="20" FontWeight="Medium" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_AutomaticallyDeletesOldFilesAfterRoblox}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
                     <ui:CardExpander Margin="0,8,0,0" Icon="Broom24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="What to clean" />
-                                <TextBlock FontSize="12" Text="Choose a schedule, then pick which caches and logs it applies to." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Behaviour_WhatClean}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Behaviour_ChooseScheduleThenPickWhichCaches}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="Schedule">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_Schedule}">
                                 <ComboBox Width="160" ItemsSource="{Binding CleanerScheduleOptions, Mode=OneTime}" SelectedItem="{Binding CleanerSchedule, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="PhasmaStrap logs">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_PhasmaStrapLogs}">
                                 <ui:ToggleSwitch IsChecked="{Binding CleanerLogsEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="PhasmaStrap download cache">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_PhasmaStrapDownloadCache}">
                                 <ui:ToggleSwitch IsChecked="{Binding CleanerCacheEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="Roblox logs">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_RobloxLogs}">
                                 <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxLogsEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="Roblox cache">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_RobloxCache}">
                                 <ui:ToggleSwitch IsChecked="{Binding CleanerRobloxCacheEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                         </StackPanel>
@@ -119,8 +119,8 @@
                     <ui:CardExpander Margin="0,8,0,0" Icon="Gauge24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Engine &amp; process" />
-                                <TextBlock FontSize="12" Text="Which optimization preset runs and how Roblox itself behaves while playing." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Behaviour_EngineProcess}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Behaviour_WhichOptimizationPresetRunsHowRoblox}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -145,8 +145,8 @@
                     <ui:CardExpander Margin="0,8,0,0" Icon="Options24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Priority &amp; memory" />
-                                <TextBlock FontSize="12" Text="How CPU priority and memory usage are managed for Roblox and the launcher." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Behaviour_PriorityMemory}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Behaviour_HowCPUPriorityMemoryUsageAre}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -272,18 +272,18 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Text="Auto-rejoin" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="If Roblox's process disappears without a clean disconnect ever being logged (the closest honest signal available for &quot;it crashed&quot;), relaunch into the same server if possible." />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Behaviour_AutoRejoin}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Behaviour_IfRobloxSProcessDisappearsWithout}" />
 
-                    <controls:OptionControl Header="Rejoin after a crash" x:Name="AutoRejoinOption">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_RejoinAfterCrash}" x:Name="AutoRejoinOption">
                         <ui:ToggleSwitch IsChecked="{Binding AutoRejoinOnCrash, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="Max attempts" Description="How many times to retry before giving up." IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_MaxAttempts}" Description="{x:Static resources:Strings.Menu_Behaviour_HowManyTimesRetryBeforeGiving}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
                         <ui:NumberBox Width="120" Min="1" Max="10" Value="{Binding AutoRejoinMaxAttempts, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="Delay between attempts" Description="Seconds to wait before each rejoin attempt." IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Behaviour_DelayBetweenAttempts}" Description="{x:Static resources:Strings.Menu_Behaviour_SecondsWaitBeforeEachRejoinAttempt}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AutoRejoinOption, Mode=OneWay}">
                         <ui:NumberBox Width="120" Min="1" Max="60" Value="{Binding AutoRejoinDelaySeconds, Mode=TwoWay}" />
                     </controls:OptionControl>
                 </StackPanel>
@@ -314,7 +314,7 @@
                             <controls:OptionControl
                                 Header="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Title}"
                                 Description="{x:Static resources:Strings.Menu_Behaviour_RobloxTitle_Description}">
-                                <ui:TextBox Width="220" PlaceholderText="Roblox" Text="{Binding RobloxTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_Integrations_Tabs_Roblox}" Text="{Binding RobloxTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </controls:OptionControl>
 
                             <controls:OptionControl

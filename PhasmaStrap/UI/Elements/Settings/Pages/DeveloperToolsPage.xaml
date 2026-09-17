@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
@@ -13,20 +14,20 @@
       Loaded="Page_Loaded"
       Unloaded="Page_Unloaded">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Developer Tools" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="FastFlag snapshots/diffing, live proxy traffic, combined log viewer, and a plugin installer - all in one place for power users and troubleshooting." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_DeveloperTools}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_FastFlagSnapshotsDiffingLiveProxyTraffic}" />
 
         <ui:CardExpander Margin="0,12,0,0" Icon="Flag24">
             <ui:CardExpander.Header>
                 <StackPanel>
-                    <TextBlock FontSize="14" Text="FastFlag snapshots" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Save your current flag set, flip between two saved sets to A/B compare, or diff any two snapshots." />
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_FastFlagSnapshots}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentFlagSetFlipBetween}" />
                 </StackPanel>
             </ui:CardExpander.Header>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <ui:TextBox Width="220" PlaceholderText="Snapshot name" Text="{Binding NewSnapshotName, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Margin="8,0,0,0" Content="Save current as snapshot" Icon="Save24" Command="{Binding SaveSnapshotCommand, Mode=OneTime}" />
+                    <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_SnapshotName}" Text="{Binding NewSnapshotName, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentAsSnapshot}" Icon="Save24" Command="{Binding SaveSnapshotCommand, Mode=OneTime}" />
                 </StackPanel>
 
                 <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Snapshots, Mode=OneWay}">
@@ -42,10 +43,10 @@
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                         <TextBlock FontSize="13" Text="{Binding Name}" />
                                         <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                            <Run Text="{Binding FlagCount, Mode=OneWay}" /><Run Text=" flag(s) • saved " /><Run Text="{Binding CreatedDisplay, Mode=OneWay}" />
+                                            <Run Text="{Binding FlagCount, Mode=OneWay}" /><Run Text="{x:Static resources:Strings.Menu_DeveloperTools_FlagSSaved}" /><Run Text="{Binding CreatedDisplay, Mode=OneWay}" />
                                         </TextBlock>
                                     </StackPanel>
-                                    <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="Apply" Appearance="Secondary"
+                                    <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_GoogleFonts_Apply}" Appearance="Secondary"
                                                Command="{Binding DataContext.ApplySnapshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                CommandParameter="{Binding}" />
                                     <ui:Button Grid.Column="2" Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16"
@@ -57,10 +58,10 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <TextBlock Text="Compare two snapshots" FontSize="14" FontWeight="Medium" Margin="0,16,0,4" />
+                <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_CompareTwoSnapshots}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4" />
                 <StackPanel Orientation="Horizontal">
                     <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotA, Mode=TwoWay}" />
-                    <TextBlock Text=" vs " VerticalAlignment="Center" Margin="8,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_Vs}" VerticalAlignment="Center" Margin="8,0" />
                     <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotB, Mode=TwoWay}" />
                 </StackPanel>
                 <TextBlock Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding DiffSummary, Mode=OneWay}" />
@@ -101,12 +102,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock FontSize="14" Text="Live proxy traffic" />
-                        <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Requests handled by the local proxy running in this window - launched Roblox sessions run their own separate proxy instance and won't show up here." />
+                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_LiveProxyTraffic}" />
+                        <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_RequestsHandledByLocalProxyRunning}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Margin="0,0,8,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshProxyTrafficCommand, Mode=OneTime}" />
-                        <ui:Button Content="Clear" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearProxyTrafficCommand, Mode=OneTime}" />
+                        <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshProxyTrafficCommand, Mode=OneTime}" />
+                        <ui:Button Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearProxyTrafficCommand, Mode=OneTime}" />
                     </StackPanel>
                 </Grid>
             </ui:CardExpander.Header>
@@ -142,10 +143,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" FontSize="14" Text="Log viewer" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_LogViewer}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Content="Copy" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
-                        <ui:Button Margin="8,0,0,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
+                        <ui:Button Content="{x:Static resources:Strings.Common_Copy}" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
+                        <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
                     </StackPanel>
                 </Grid>
             </ui:CardExpander.Header>
@@ -159,15 +160,15 @@
         <ui:CardExpander Margin="0,8,0,0" Icon="PuzzleCube24">
             <ui:CardExpander.Header>
                 <StackPanel>
-                    <TextBlock FontSize="14" Text="Studio plugin installer" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Install any Studio plugin by its Roblox asset ID." />
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_StudioPluginInstaller}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_InstallAnyStudioPluginByIts}" />
                 </StackPanel>
             </ui:CardExpander.Header>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <ui:TextBox Width="160" PlaceholderText="Asset ID" Text="{Binding PluginAssetId, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Margin="8,0,0,0" Content="Install" Icon="ArrowDownload24" Command="{Binding InstallPluginCommand, Mode=OneTime}" />
-                    <ui:Button Margin="8,0,0,0" Content="Open Plugins folder" Appearance="Secondary" Icon="Folder24" Command="{Binding OpenPluginsFolderCommand, Mode=OneTime}" />
+                    <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_AssetID}" Text="{Binding PluginAssetId, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ArrowDownload24" Command="{Binding InstallPluginCommand, Mode=OneTime}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_OpenPluginsFolder}" Appearance="Secondary" Icon="Folder24" Command="{Binding OpenPluginsFolderCommand, Mode=OneTime}" />
                 </StackPanel>
                 <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PluginInstallStatus, Mode=OneWay}" />
             </StackPanel>

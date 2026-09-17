@@ -33,8 +33,8 @@
         <StackPanel Grid.Row="2">
             <ui:InfoBar Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_FastFlagEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_FastFlagEditor_BannerText}" Severity="Warning" IsClosable="False" />
 
-            <ui:InfoBar x:Name="ManagerDisabledBar" Margin="0,0,0,16" Padding="8" Title="PhasmaStrap isn't managing FastFlags right now"
-                        Message="&quot;Allow PhasmaStrap to manage FFlags&quot; is off (Engine Settings tab) - none of the flags below, and no place preset assignment, will actually reach Roblox until it's back on."
+            <ui:InfoBar x:Name="ManagerDisabledBar" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_FastFlagEditor_PhasmaStrapIsnTManagingFastFlagsRight}"
+                        Message="{x:Static resources:Strings.Menu_FastFlagEditor_AllowPhasmaStrapManageFFlagsOffEngine}"
                         Severity="Warning" IsOpen="True" IsClosable="False" Visibility="Collapsed" />
         </StackPanel>
 
@@ -62,15 +62,15 @@
         <ui:CardExpander x:Name="PresetsRoot" Grid.Row="5" Margin="0,0,0,16" IsExpanded="False">
             <ui:CardExpander.Header>
                 <StackPanel>
-                    <TextBlock FontSize="14" Text="Presets &amp; per-place assignment" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched." />
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagEditor_PresetsPerPlaceAssignment}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagEditor_SaveFlagSetBelowAsNamed}" />
                 </StackPanel>
             </ui:CardExpander.Header>
             <StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <ui:TextBox Width="220" PlaceholderText="Preset name" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Margin="8,0,0,0" Content="Save current flags as preset" Icon="Save24" Command="{Binding SavePresetCommand, Mode=OneTime}" />
+                <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_PresetName}" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SaveCurrentFlagsAsPreset}" Icon="Save24" Command="{Binding SavePresetCommand, Mode=OneTime}" />
             </StackPanel>
 
             <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Presets, Mode=OneWay}">
@@ -93,10 +93,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Text="Per-place assignment" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Places with an assignment launch with that preset's flags instead of your normal saved ones." />
+            <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagEditor_PerPlaceAssignment}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_FastFlagEditor_PlacesAssignmentLaunchPresetSFlags}" />
             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                <ui:TextBox Width="140" PlaceholderText="Place ID" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:TextBox Width="140" PlaceholderText="{x:Static resources:Strings.Menu_ServerBrowser_PlaceId_Title}" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <ComboBox Width="180" Margin="8,0,0,0" ItemsSource="{Binding Presets, Mode=OneWay}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedValue="{Binding AssignPresetName, Mode=TwoWay}" />
                 <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddPlaceAssignmentCommand, Mode=OneTime}" />
             </StackPanel>

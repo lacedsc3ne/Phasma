@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Enums;
+using PhasmaStrap.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +43,9 @@ namespace PhasmaStrap
         // internal use only - launched by ClassicHostRedirect.RunElevated() under UAC elevation to apply/remove
         // the classic client hosts file redirect; data is "on" or "off"
         public LaunchFlag ClassicRedirectFlag       { get; } = new("classicredirect");
+
+        // syncs BOTH hosts-file blocks in one elevated run; data is "proxy=on|off;telemetry=on|off"
+        public LaunchFlag ApplyHostsFlag            { get; } = new("applyhosts");
 
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 

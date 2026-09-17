@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -149,4 +149,9 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- opt-in audit: fails the build if a setting is written by the UI but read by nothing
+       (dotnet build -p:RunSettingsAudit=true). See tools/check_dead_settings.py. -->
+  <Target Name="CheckDeadSettings" AfterTargets="Build" Condition="'$(RunSettingsAudit)' == 'true'">
+    <Exec Command="python &quot;$(MSBuildThisFileDirectory)..	ools\check_dead_settings.py&quot;" />
+  </Target>
 </Project>
