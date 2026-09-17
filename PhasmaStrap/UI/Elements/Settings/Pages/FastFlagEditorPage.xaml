@@ -70,13 +70,13 @@
 
             <WrapPanel Margin="0,8,0,0">
                 <ui:TextBox Width="220" Margin="0,0,8,6" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_PresetName}" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Margin="0,0,8,6" Content="Create preset from selected flags" Icon="Checkmark24" Appearance="Primary" Click="PresetFromSelected_Click"
-                           ToolTip="Only the rows you have highlighted in the flag list go into the preset. Click a row to select it, Ctrl+click to add more, Shift+click for a range. Best for turning a few flags into a per-game bundle." />
-                <ui:Button Margin="0,0,8,6" Content="Create preset from all flags" Icon="Save24" Appearance="Secondary" Command="{Binding SavePresetCommand, Mode=OneTime}"
-                           ToolTip="Every flag currently in the list goes into the preset, no selection needed. Best for snapshotting your whole setup, or making all of it apply only where assigned." />
+                <ui:Button Margin="0,0,8,6" Content="{x:Static resources:Strings.Menu_FastFlagEditor_CreatePresetFromSelectedFlags}" Icon="Checkmark24" Appearance="Primary" Click="PresetFromSelected_Click"
+                           ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_OnlyRowsYouHaveHighlightedFlag}" />
+                <ui:Button Margin="0,0,8,6" Content="{x:Static resources:Strings.Menu_FastFlagEditor_CreatePresetFromAllFlags}" Icon="Save24" Appearance="Secondary" Command="{Binding SavePresetCommand, Mode=OneTime}"
+                           ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_EveryFlagCurrentlyListGoesInto}" />
             </WrapPanel>
 
-            <controls:OptionControl Header="Only use the preset's flags where it is assigned" Description="When a preset is created (from the selected flags, or from all of them), its flags are removed from your global list so they no longer apply to every game. Leave off to keep them global as well.">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlagEditor_OnlyUsePresetSFlagsWhere}" Description="{x:Static resources:Strings.Menu_FastFlagEditor_WhenPresetCreatedFromSelectedFlags}">
                 <ui:ToggleSwitch IsChecked="{Binding RemoveFromGlobal, Mode=TwoWay}" />
             </controls:OptionControl>
 
@@ -96,8 +96,8 @@
                                     <TextBlock FontSize="11" Opacity="0.7" Text="{Binding FlagCount, StringFormat='{}{0} flag(s)'}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="Edit flags" ToolTip="Change, add or remove the flags inside this preset" Command="{Binding DataContext.EditPresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                                    <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="Delete this preset" Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="{x:Static resources:Strings.Menu_FastFlagEditor_EditFlags}" ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_ChangeAddRemoveFlagsInsidePreset}" Command="{Binding DataContext.EditPresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_DeletePreset}" Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                                 </StackPanel>
                             </Grid>
                         </Border>

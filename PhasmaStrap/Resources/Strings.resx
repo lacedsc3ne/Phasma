@@ -5104,4 +5104,61 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.MainWindow.App" xml:space="preserve">
     <value>App</value>
   </data>
+  <data name="Menu.Capture.CropDrawAddTextPixelateParts" xml:space="preserve">
+    <value>Crop, draw, add text or pixelate parts of this screenshot</value>
+  </data>
+  <data name="Menu.Capture.DeleteScreenshot" xml:space="preserve">
+    <value>Delete this screenshot</value>
+  </data>
+  <data name="Menu.Capture.FrameRate" xml:space="preserve">
+    <value>Frame rate</value>
+  </data>
+  <data name="Menu.Capture.HowManyFramesPerSecondClip" xml:space="preserve">
+    <value>How many frames per second the clip records. 60 fps is only reached while Roblox is the window you are playing in. If the PC cannot keep up, the clip simply has fewer frames - it never plays too fast.</value>
+  </data>
+  <data name="Menu.Capture.NativeRecordsGameAtExactlySize" xml:space="preserve">
+    <value>Native records the game at exactly the size it is running at (1920 x 1080 on a 1080p screen). Pick a lower option to scale clips down and save memory and disk space.</value>
+  </data>
+  <data name="Menu.Capture.PictureQualitySavedClipHigherMeans" xml:space="preserve">
+    <value>Picture quality of the saved clip. Higher means a higher bitrate: sharper video, bigger files.</value>
+  </data>
+  <data name="Menu.Capture.TrimCropSlowDownSpeedUp" xml:space="preserve">
+    <value>Trim, crop, slow down or speed up this clip, or save a frame from it as a screenshot</value>
+  </data>
+  <data name="Menu.Capture.DeleteClip" xml:space="preserve">
+    <value>Delete this clip</value>
+  </data>
+  <data name="Menu.FastFlagEditor.CreatePresetFromSelectedFlags" xml:space="preserve">
+    <value>Create preset from selected flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.OnlyRowsYouHaveHighlightedFlag" xml:space="preserve">
+    <value>Only the rows you have highlighted in the flag list go into the preset. Click a row to select it, Ctrl+click to add more, Shift+click for a range. Best for turning a few flags into a per-game bundle.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.CreatePresetFromAllFlags" xml:space="preserve">
+    <value>Create preset from all flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.EveryFlagCurrentlyListGoesInto" xml:space="preserve">
+    <value>Every flag currently in the list goes into the preset, no selection needed. Best for snapshotting your whole setup, or making all of it apply only where assigned.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.OnlyUsePresetSFlagsWhere" xml:space="preserve">
+    <value>Only use the preset's flags where it is assigned</value>
+  </data>
+  <data name="Menu.FastFlagEditor.WhenPresetCreatedFromSelectedFlags" xml:space="preserve">
+    <value>When a preset is created (from the selected flags, or from all of them), its flags are removed from your global list so they no longer apply to every game. Leave off to keep them global as well.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.EditFlags" xml:space="preserve">
+    <value>Edit flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ChangeAddRemoveFlagsInsidePreset" xml:space="preserve">
+    <value>Change, add or remove the flags inside this preset</value>
+  </data>
+  <data name="Menu.FastFlagEditor.DeletePreset" xml:space="preserve">
+    <value>Delete this preset</value>
+  </data>
+  <data name="Menu.Integrations.ShowAsPlayingPhasmaStrap" xml:space="preserve">
+    <value>Show as "Playing PhasmaStrap"</value>
+  </data>
+  <data name="Menu.Integrations.NamesActivityPhasmaStrapShowsFromMoment" xml:space="preserve">
+    <value>Names the activity PhasmaStrap, shows it from the moment Roblox opens (an idle card with the logo while you're in the Roblox app), and puts the logo as the badge on the game icon while in a game (the account avatar takes that badge instead when "Show account on profile" is on). Off behaves like Bloxstrap: "Playing Roblox", in-game only. Applies to the next session.</value>
+  </data>
 </root>

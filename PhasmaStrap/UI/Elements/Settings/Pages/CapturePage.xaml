@@ -84,10 +84,10 @@
                                     <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TakenDisplay}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="Edit" ToolTip="Crop, draw, add text or pixelate parts of this screenshot"
+                                    <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_CropDrawAddTextPixelateParts}"
                                                Command="{Binding DataContext.EditScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                CommandParameter="{Binding}" />
-                                    <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="Delete this screenshot"
+                                    <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="{x:Static resources:Strings.Menu_Capture_DeleteScreenshot}"
                                                Command="{Binding DataContext.DeleteScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                CommandParameter="{Binding}" />
                                 </StackPanel>
@@ -114,9 +114,19 @@
                     </StackPanel>
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_Quality}" Description="{x:Static resources:Strings.Menu_Capture_HigherQualityCapturesAtLargerResolution}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_FrameRate}" Description="{x:Static resources:Strings.Menu_Capture_HowManyFramesPerSecondClip}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                    <ComboBox Width="140" ItemsSource="{Binding FpsOptions, Mode=OneTime}" SelectedItem="{Binding SelectedFps, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" Description="{x:Static resources:Strings.Menu_Capture_NativeRecordsGameAtExactlySize}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                    <ComboBox Width="140" ItemsSource="{Binding ResolutionOptions, Mode=OneTime}" SelectedItem="{Binding SelectedResolution, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_Quality}" Description="{x:Static resources:Strings.Menu_Capture_PictureQualitySavedClipHigherMeans}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
                     <ComboBox Width="140" ItemsSource="{Binding QualityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
+
+                <TextBlock Margin="2,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ReplayEstimateText, Mode=OneWay}" />
 
         <Grid Margin="0,12,0,0">
             <Grid.ColumnDefinitions>
@@ -169,10 +179,10 @@
                                 </StackPanel>
                             </Grid>
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <ui:Button Padding="6,4" Appearance="Secondary" Icon="Cut24" Content="Edit" ToolTip="Trim, crop, slow down or speed up this clip, or save a frame from it as a screenshot"
+                                <ui:Button Padding="6,4" Appearance="Secondary" Icon="Cut24" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_TrimCropSlowDownSpeedUp}"
                                            Command="{Binding DataContext.EditReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                            CommandParameter="{Binding}" />
-                                <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="Delete this clip"
+                                <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="{x:Static resources:Strings.Menu_Capture_DeleteClip}"
                                            Command="{Binding DataContext.DeleteReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                            CommandParameter="{Binding}" />
                             </StackPanel>

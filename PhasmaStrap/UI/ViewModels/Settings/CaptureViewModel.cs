@@ -111,10 +111,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        // every replay setting saves straight away: the recorder lives in the game-session process,
+        // which follows Settings.json (SettingsHotReload) and re-reads these values live
         public int InstantReplayClipSeconds
         {
             get => App.Settings.Prop.InstantReplayClipSeconds;
-            set { App.Settings.Prop.InstantReplayClipSeconds = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(InstantReplayClipSeconds)); }
+            set { App.Settings.Prop.InstantReplayClipSeconds = value; ReplaySettingChanged(nameof(InstantReplayClipSeconds)); }
         }
 
         public string[] QualityOptions { get; } = { "Low", "Medium", "High" };
@@ -126,8 +128,85 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 int index = Array.IndexOf(QualityOptions, value);
                 if (index >= 0)
+                {
                     App.Settings.Prop.InstantReplayQuality = index;
+                    ReplaySettingChanged(nameof(SelectedQuality));
+                }
             }
+        }
+
+        public string[] FpsOptions { get; } = InstantReplayRecorder.FpsOptions.Select(fps => $"{fps} fps").ToArray();
+
+        public string SelectedFps
+        {
+            get
+            {
+                int index = Array.IndexOf(InstantReplayRecorder.FpsOptions, App.Settings.Prop.InstantReplayFps);
+                return FpsOptions[index >= 0 ? index : Array.IndexOf(InstantReplayRecorder.FpsOptions, 30)];
+            }
+            set
+            {
+                int index = Array.IndexOf(FpsOptions, value);
+                if (index >= 0)
+                {
+                    App.Settings.Prop.InstantReplayFps = InstantReplayRecorder.FpsOptions[index];
+                    ReplaySettingChanged(nameof(SelectedFps));
+                }
+            }
+        }
+
+        public string[] ResolutionOptions { get; } = InstantReplayRecorder.MaxHeightOptions.Select(h => h == 0 ? "Native" : $"{h}p").ToArray();
+
+        public string SelectedResolution
+        {
+            get
+            {
+                int index = Array.IndexOf(InstantReplayRecorder.MaxHeightOptions, App.Settings.Prop.InstantReplayMaxHeight);
+                return ResolutionOptions[Math.Max(0, index)];
+            }
+            set
+            {
+                int index = Array.IndexOf(ResolutionOptions, value);
+                if (index >= 0)
+                {
+                    App.Settings.Prop.InstantReplayMaxHeight = InstantReplayRecorder.MaxHeightOptions[index];
+                    ReplaySettingChanged(nameof(SelectedResolution));
+                }
+            }
+        }
+
+        // what the current choices cost, worked out for this PC's main screen
+        public string ReplayEstimateText
+        {
+            get
+            {
+                var screen = System.Windows.Forms.Screen.PrimaryScreen?.Bounds ?? new System.Drawing.Rectangle(0, 0, 1920, 1080);
+                int width = screen.Width & ~1;
+                int height = screen.Height & ~1;
+
+                int maxHeight = App.Settings.Prop.InstantReplayMaxHeight;
+                if (maxHeight > 0 && height > maxHeight)
+                {
+                    width = (int)Math.Round(width * (double)maxHeight / height) & ~1;
+                    height = maxHeight;
+                }
+
+                int fps = App.Settings.Prop.InstantReplayFps;
+                int seconds = App.Settings.Prop.InstantReplayClipSeconds;
+                int quality = App.Settings.Prop.InstantReplayQuality;
+
+                double bufferMb = InstantReplayRecorder.EstimateBufferBytes(width, height, fps, seconds, quality) / 1048576.0;
+                double clipMb = InstantReplayRecorder.BitrateFor(width, height, fps, quality) / 8.0 * seconds / 1048576.0;
+
+                return $"With these settings a fullscreen game records at {width} × {height}, {fps} fps. The rolling buffer uses about {bufferMb:0} MB of RAM, and a full {seconds}s clip is about {clipMb:0} MB on disk.";
+            }
+        }
+
+        private void ReplaySettingChanged(string property)
+        {
+            App.Settings.SaveDeferred();
+            OnPropertyChanged(property);
+            OnPropertyChanged(nameof(ReplayEstimateText));
         }
 
         public ObservableCollection<ReplayClipItem> Replays { get; } = new();
