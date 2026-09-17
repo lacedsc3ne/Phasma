@@ -14480,5 +14480,176 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.MainWindow.App", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crop, draw, add text or pixelate parts of this screenshot.
+        /// </summary>
+        public static string Menu_Capture_CropDrawAddTextPixelateParts {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CropDrawAddTextPixelateParts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this screenshot.
+        /// </summary>
+        public static string Menu_Capture_DeleteScreenshot {
+            get {
+                return ResourceManager.GetString("Menu.Capture.DeleteScreenshot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frame rate.
+        /// </summary>
+        public static string Menu_Capture_FrameRate {
+            get {
+                return ResourceManager.GetString("Menu.Capture.FrameRate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How many frames per second the clip records. 60 fps is only reached while Roblox is the window you are playing in. If th.
+        /// </summary>
+        public static string Menu_Capture_HowManyFramesPerSecondClip {
+            get {
+                return ResourceManager.GetString("Menu.Capture.HowManyFramesPerSecondClip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Native records the game at exactly the size it is running at (1920 x 1080 on a 1080p screen). Pick a lower option to sca.
+        /// </summary>
+        public static string Menu_Capture_NativeRecordsGameAtExactlySize {
+            get {
+                return ResourceManager.GetString("Menu.Capture.NativeRecordsGameAtExactlySize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Picture quality of the saved clip. Higher means a higher bitrate: sharper video, bigger files..
+        /// </summary>
+        public static string Menu_Capture_PictureQualitySavedClipHigherMeans {
+            get {
+                return ResourceManager.GetString("Menu.Capture.PictureQualitySavedClipHigherMeans", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trim, crop, slow down or speed up this clip, or save a frame from it as a screenshot.
+        /// </summary>
+        public static string Menu_Capture_TrimCropSlowDownSpeedUp {
+            get {
+                return ResourceManager.GetString("Menu.Capture.TrimCropSlowDownSpeedUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this clip.
+        /// </summary>
+        public static string Menu_Capture_DeleteClip {
+            get {
+                return ResourceManager.GetString("Menu.Capture.DeleteClip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create preset from selected flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_CreatePresetFromSelectedFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.CreatePresetFromSelectedFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only the rows you have highlighted in the flag list go into the preset. Click a row to select it, Ctrl+click to add more.
+        /// </summary>
+        public static string Menu_FastFlagEditor_OnlyRowsYouHaveHighlightedFlag {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.OnlyRowsYouHaveHighlightedFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create preset from all flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_CreatePresetFromAllFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.CreatePresetFromAllFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Every flag currently in the list goes into the preset, no selection needed. Best for snapshotting your whole setup, or m.
+        /// </summary>
+        public static string Menu_FastFlagEditor_EveryFlagCurrentlyListGoesInto {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.EveryFlagCurrentlyListGoesInto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only use the preset's flags where it is assigned.
+        /// </summary>
+        public static string Menu_FastFlagEditor_OnlyUsePresetSFlagsWhere {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.OnlyUsePresetSFlagsWhere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When a preset is created (from the selected flags, or from all of them), its flags are removed from your global list so .
+        /// </summary>
+        public static string Menu_FastFlagEditor_WhenPresetCreatedFromSelectedFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.WhenPresetCreatedFromSelectedFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_EditFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.EditFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change, add or remove the flags inside this preset.
+        /// </summary>
+        public static string Menu_FastFlagEditor_ChangeAddRemoveFlagsInsidePreset {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ChangeAddRemoveFlagsInsidePreset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this preset.
+        /// </summary>
+        public static string Menu_FastFlagEditor_DeletePreset {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.DeletePreset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show as "Playing PhasmaStrap".
+        /// </summary>
+        public static string Menu_Integrations_ShowAsPlayingPhasmaStrap {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.ShowAsPlayingPhasmaStrap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Names the activity PhasmaStrap, shows it from the moment Roblox opens (an idle card with the logo while you're in the Ro.
+        /// </summary>
+        public static string Menu_Integrations_NamesActivityPhasmaStrapShowsFromMoment {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.NamesActivityPhasmaStrapShowsFromMoment", resourceCulture);
+            }
+        }
     }
 }

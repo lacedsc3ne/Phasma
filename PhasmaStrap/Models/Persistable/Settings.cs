@@ -235,6 +235,10 @@ namespace PhasmaStrap.Models.Persistable
         public bool InstantReplayEnabled { get; set; } = false;
         public int InstantReplayClipSeconds { get; set; } = 20;
         public int InstantReplayQuality { get; set; } = 1;
+        // target capture rate (15/24/30/60) and the tallest frame to keep (0 = the game's own
+        // resolution) - see InstantReplayRecorder's header; Quality above now only picks bitrate
+        public int InstantReplayFps { get; set; } = 30;
+        public int InstantReplayMaxHeight { get; set; } = 0;
 
         // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
         // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.

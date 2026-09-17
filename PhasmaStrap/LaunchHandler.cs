@@ -186,6 +186,18 @@ namespace PhasmaStrap
                 bool showAlreadyRunningWarning = Process.GetProcessesByName(App.ProjectName).Length > 1;
 
                 var window = new UI.Elements.Settings.MainWindow(showAlreadyRunningWarning);
+                if (ApplyUiTestBackground(window) && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") is string pageName)
+                {
+                    // UI-test hook: open straight on a page (class name, e.g. "CapturePage"), since a
+                    // background window can't be clicked through the navigation bar
+                    window.Loaded += (_, _) =>
+                    {
+                        Type? page = typeof(UI.Elements.Settings.MainWindow).Assembly.GetTypes()
+                            .FirstOrDefault(t => t.Name == pageName && t.Namespace == "PhasmaStrap.UI.Elements.Settings.Pages");
+                        if (page is not null)
+                            window.Dispatcher.BeginInvoke(new Action(() => window.Navigate(page)), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                    };
+                }
 
                 // typically we'd use Show(), but we need to block to ensure IPL stays in scope
                 window.ShowDialog();
@@ -206,6 +218,25 @@ namespace PhasmaStrap
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
 
+        private static bool ApplyUiTestBackground(System.Windows.Window window)
+        {
+            if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") != "1")
+                return false;
+
+            window.WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+            window.Left = 40;
+            window.Top = 40;
+            window.ShowActivated = false;
+            window.ShowInTaskbar = false;
+            window.SourceInitialized += (_, _) =>
+            {
+                IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+                SetWindowPos(hwnd, new IntPtr(1) /* HWND_BOTTOM */, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 /* NOSIZE | NOMOVE | NOACTIVATE */);
+            };
+
+            return true;
+        }
+
         public static void LaunchClipEditor(string? path)
         {
             const string LOG_IDENT = "LaunchHandler::LaunchClipEditor";
@@ -223,23 +254,8 @@ namespace PhasmaStrap
             // window can be driven (UI Automation) and captured (PrintWindow) without disturbing
             // whatever is on screen - e.g. a fullscreen game. It has to stay on-screen: a window
             // parked at negative coordinates is never composed, so PrintWindow returns nothing.
-            if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1")
-            {
-                window.WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
-                window.Left = 40;
-                window.Top = 40;
-                window.ShowActivated = false;
-                window.ShowInTaskbar = false;
-                window.SourceInitialized += (_, _) =>
-                {
-                    IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
-                    SetWindowPos(hwnd, new IntPtr(1) /* HWND_BOTTOM */, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 /* NOSIZE | NOMOVE | NOACTIVATE */);
-                };
-            }
-            else
-            {
+            if (!ApplyUiTestBackground(window))
                 window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-            }
 
             window.ShowDialog();
             App.Terminate();

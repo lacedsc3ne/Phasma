@@ -1,10 +1,8 @@
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using Vortice.MediaFoundation;
-using Windows.Win32;
-using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.Storage.Xps;
 
 namespace PhasmaStrap.Utility
 {
@@ -13,34 +11,69 @@ namespace PhasmaStrap.Utility
     // once Start() is called (mirrors how Medal/ShadowPlay-style instant replay works: press the
     // hotkey AFTER something happens, not before).
     //
-    // Capture reuses the same PrintWindow(PW_RENDERFULLCONTENT) approach as ScreenshotCapture
-    // (see its header comment), not OverlayCompositor's DXGI desktop-duplication - same reasoning
-    // as screenshots: this needs to work independent of whether overlays are enabled, and needs
-    // the game's actual content even if something else happens to be on top of it on screen.
-    // Frames are downscaled before buffering (capped resolution) since the buffer is held raw,
-    // uncompressed, in memory for the whole clip length - buffering at full 1080p+ for 30s+ would
-    // be multiple GB of RAM.
+    // Frame rate, resolution and quality are three separate settings, all re-read live:
+    //   InstantReplayFps        target capture rate (15/24/30/60)
+    //   InstantReplayMaxHeight  0 = the game's own resolution, otherwise frames taller than this
+    //                           are scaled down (1080/720/480)
+    //   InstantReplayQuality    0-2, picks the H.264 bitrate and the buffer's JPEG quality
     //
-    // Encoding is Windows Media Foundation's standard IMFSinkWriter pattern: feed it 32-bit RGB
-    // frames and an H.264/MP4 output media type, and MF's own transform-resolution pipeline
-    // inserts whatever color-space conversion and encoder MFTs are needed automatically -
-    // including a hardware encoder MFT if the system has one registered (which is the normal case
-    // on any GPU with H.264 encode support), without this code needing to enumerate or select a
-    // specific hardware transform itself.
+    // Capture has two paths:
+    //   - DXGI desktop duplication (DesktopDuplicationGrabber) while Roblox is the foreground
+    //     window: what is on screen is the game, and a grab costs a few ms, so 60fps is reachable.
+    //   - PrintWindow(PW_CLIENTONLY | PW_RENDERFULLCONTENT) otherwise: gets the game's own
+    //     content even when something covers it, but takes ~25ms at 1080p, so it tops out around
+    //     30fps. Also the fallback whenever duplication is unavailable (HDR desktop, other GPU).
+    //
+    // The buffer holds JPEG-compressed frames, not raw ones. Raw 1080p is 8MB a frame - 20s at
+    // 30fps would be 5GB; as JPEG the same buffer is ~60MB, which is what makes native-resolution
+    // capture possible at all. Compression runs on low-priority worker threads, and a frame is
+    // dropped rather than queued when they fall behind, so the game is never starved.
+    //
+    // Every frame keeps its real capture time and the clip is written with those timestamps, so
+    // a PC that can't sustain the target rate gets a clip with fewer frames - never one that
+    // plays back too fast.
+    //
+    // Self-contained (plain P/Invoke, no CsWin32 types) so the whole capture -> buffer -> encode
+    // path can be run from a console harness against a live game window.
     public sealed class InstantReplayRecorder : IDisposable
     {
         private const string LOG_IDENT = "InstantReplayRecorder";
 
+        // hard ceiling on the compressed buffer; past it the oldest frames go first
+        private const long MaxBufferBytes = 1_200L * 1024 * 1024;
+        private const int EncodeWorkers = 3;
+
         private readonly object _sync = new();
         private readonly List<BufferedFrame> _frames = new();
+        private long _bufferBytes;
 
-        private System.Threading.Timer? _captureTimer;
+        private Thread? _captureThread;
+        private Thread[] _workers = Array.Empty<Thread>();
+        private BlockingCollection<RawFrame>? _queue;
         private volatile bool _running;
         private volatile bool _mfStarted;
 
+        private DesktopDuplicationGrabber? _duplication;
+        private DateTime _duplicationRetryUtc = DateTime.MinValue;
+
+        private IntPtr _hwnd;
+        private DateTime _hwndCheckedUtc = DateTime.MinValue;
+
+        // stats, reported to the log once in a while
+        private int _statCaptured, _statDropped, _statDuplication;
+        private DateTime _statSinceUtc;
+
+        private static readonly ImageCodecInfo JpegCodec = ImageCodecInfo.GetImageEncoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+
+        private sealed class RawFrame
+        {
+            public Bitmap Bitmap = null!;
+            public DateTime CapturedUtc;
+        }
+
         private sealed class BufferedFrame
         {
-            public byte[] Bgra32 = Array.Empty<byte>();
+            public byte[] Jpeg = Array.Empty<byte>();
             public int Width;
             public int Height;
             public DateTime CapturedUtc;
@@ -50,17 +83,60 @@ namespace PhasmaStrap.Utility
 
         public bool IsRunning => _running;
 
+        // ------------------------------------------------------------------ settings
+
+        public static readonly int[] FpsOptions = { 15, 24, 30, 60 };
+
+        // 0 = native
+        public static readonly int[] MaxHeightOptions = { 0, 1080, 720, 480 };
+
+        private static int TargetFps => Math.Clamp(App.Settings.Prop.InstantReplayFps, 5, 60);
+
+        private static int MaxHeight => Math.Max(0, App.Settings.Prop.InstantReplayMaxHeight);
+
+        private static int Quality => Math.Clamp(App.Settings.Prop.InstantReplayQuality, 0, 2);
+
+        private static long JpegQuality => Quality switch { 0 => 72, 2 => 90, _ => 82 };
+
+        // bits per pixel per frame for the final H.264 encode
+        private static double BitsPerPixel(int quality) => quality switch { 0 => 0.05, 2 => 0.13, _ => 0.085 };
+
+        public static int BitrateFor(int width, int height, int fps, int quality)
+            => (int)Math.Clamp((double)width * height * fps * BitsPerPixel(quality), 1_000_000, 40_000_000);
+
+        // rough size of the rolling buffer for the settings page ("about X MB of RAM")
+        public static long EstimateBufferBytes(int width, int height, int fps, int seconds, int quality)
+        {
+            double bytesPerPixel = quality switch { 0 => 0.035, 2 => 0.065, _ => 0.048 };
+            return (long)(width * (double)height * bytesPerPixel * fps * seconds);
+        }
+
+        // ------------------------------------------------------------------ lifecycle
+
         public void Start()
         {
             if (_running)
                 return;
 
             _running = true;
+            _statSinceUtc = DateTime.UtcNow;
+            _statCaptured = _statDropped = _statDuplication = 0;
 
-            int fps = CaptureFps;
-            _captureTimer = new System.Threading.Timer(_ => CaptureFrame(), null, 0, 1000 / Math.Max(1, fps));
+            DesktopDuplicationGrabber.Log ??= message => App.Logger.WriteLine("DesktopDuplicationGrabber", message);
 
-            App.Logger.WriteLine(LOG_IDENT, $"Started ({fps} fps, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
+            _queue = new BlockingCollection<RawFrame>(boundedCapacity: 6);
+
+            _workers = new Thread[EncodeWorkers];
+            for (int i = 0; i < EncodeWorkers; i++)
+            {
+                _workers[i] = new Thread(EncodeLoop) { IsBackground = true, Priority = ThreadPriority.BelowNormal, Name = $"InstantReplayEncode{i}" };
+                _workers[i].Start(_queue);
+            }
+
+            _captureThread = new Thread(CaptureLoop) { IsBackground = true, Name = "InstantReplayCapture" };
+            _captureThread.Start(_queue);
+
+            App.Logger.WriteLine(LOG_IDENT, $"Started ({TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
         }
 
         public void Stop()
@@ -69,135 +145,322 @@ namespace PhasmaStrap.Utility
                 return;
 
             _running = false;
-            _captureTimer?.Dispose();
-            _captureTimer = null;
+
+            BlockingCollection<RawFrame>? queue = _queue;
+            _queue = null;
+
+            try { _captureThread?.Join(1500); } catch { }
+            _captureThread = null;
+
+            queue?.CompleteAdding();
+            foreach (Thread worker in _workers)
+            {
+                try { worker.Join(1500); } catch { }
+            }
+            _workers = Array.Empty<Thread>();
+
+            if (queue is not null)
+            {
+                while (queue.TryTake(out RawFrame? leftover))
+                    leftover.Bitmap.Dispose();
+                queue.Dispose();
+            }
+
+            _duplication?.Dispose();
+            _duplication = null;
 
             lock (_sync)
+            {
                 _frames.Clear();
+                _bufferBytes = 0;
+            }
 
             App.Logger.WriteLine(LOG_IDENT, "Stopped");
         }
 
-        private static int CaptureFps => App.Settings.Prop.InstantReplayQuality switch
-        {
-            0 => 8,   // Low
-            2 => 20,  // High
-            _ => 12,  // Medium
-        };
+        // ------------------------------------------------------------------ capture
 
-        private static int MaxCaptureWidth => App.Settings.Prop.InstantReplayQuality switch
+        private void CaptureLoop(object? state)
         {
-            0 => 854,
-            2 => 1600,
-            _ => 1280,
-        };
+            var queue = (BlockingCollection<RawFrame>)state!;
 
-        private void CaptureFrame()
-        {
-            if (!_running)
-                return;
+            // the default 15.6ms timer granularity can't pace anything above ~30fps
+            timeBeginPeriod(1);
 
             try
             {
-                HWND hwnd = FindRobloxWindow();
-                if (hwnd.IsNull || !PInvoke.GetWindowRect(hwnd, out RECT rect))
-                    return;
+                var clock = Stopwatch.StartNew();
+                double nextMs = 0;
 
-                int srcWidth = rect.right - rect.left;
-                int srcHeight = rect.bottom - rect.top;
-                if (srcWidth <= 0 || srcHeight <= 0)
-                    return;
-
-                int maxWidth = MaxCaptureWidth;
-                double scale = srcWidth > maxWidth ? (double)maxWidth / srcWidth : 1.0;
-                int width = Math.Max(2, (int)(srcWidth * scale)) & ~1;
-                int height = Math.Max(2, (int)(srcHeight * scale)) & ~1;
-
-                using var full = new Bitmap(srcWidth, srcHeight, PixelFormat.Format32bppRgb);
-
-                using (Graphics g = Graphics.FromImage(full))
+                while (_running)
                 {
-                    // PrintWindow(PW_RENDERFULLCONTENT), not CopyFromScreen - see ScreenshotCapture's
-                    // header comment for why: CopyFromScreen grabs whatever's visually on top of that
-                    // screen region, which during a real session is often something other than the
-                    // game (Settings, another monitor's window, a notification toast) rather than
-                    // Roblox's own content.
-                    IntPtr hdc = g.GetHdc();
+                    double intervalMs = 1000.0 / TargetFps;
+
                     try
                     {
-                        // PW_RENDERFULLCONTENT (0x2) - see ScreenshotCapture.Capture's comment on
-                        // the same cast for why this isn't a named enum member here.
-                        PInvoke.PrintWindow(hwnd, new HDC(hdc), (PRINT_WINDOW_FLAGS)2);
+                        Bitmap? bitmap = CaptureOnce();
+
+                        if (bitmap is not null)
+                        {
+                            var frame = new RawFrame { Bitmap = bitmap, CapturedUtc = DateTime.UtcNow };
+
+                            if (queue.IsAddingCompleted || !queue.TryAdd(frame))
+                            {
+                                // encoders are behind - losing a frame beats stalling capture or piling up 8MB bitmaps
+                                bitmap.Dispose();
+                                _statDropped++;
+                            }
+                            else
+                            {
+                                _statCaptured++;
+                            }
+                        }
                     }
-                    finally
+                    catch (Exception ex)
                     {
-                        g.ReleaseHdc(hdc);
+                        App.Logger.WriteLine(LOG_IDENT, $"Capture tick failed: {ex.Message}");
                     }
+
+                    ReportStats();
+
+                    nextMs += intervalMs;
+                    double waitMs = nextMs - clock.Elapsed.TotalMilliseconds;
+
+                    if (waitMs > 1)
+                        Thread.Sleep((int)waitMs);
+                    else if (waitMs < -intervalMs * 2)
+                        nextMs = clock.Elapsed.TotalMilliseconds; // fell behind - don't try to catch up in a burst
                 }
-
-                using Bitmap scaled = scale < 1.0
-                    ? ResizeBitmap(full, width, height)
-                    : (Bitmap)full.Clone();
-
-                byte[] bytes = BitmapToBgra32(scaled, out int actualWidth, out int actualHeight);
-
-                var frame = new BufferedFrame
-                {
-                    Bgra32 = bytes,
-                    Width = actualWidth,
-                    Height = actualHeight,
-                    CapturedUtc = DateTime.UtcNow,
-                };
-
-                lock (_sync)
-                {
-                    _frames.Add(frame);
-
-                    DateTime cutoff = DateTime.UtcNow.AddSeconds(-Math.Max(1, App.Settings.Prop.InstantReplayClipSeconds));
-                    _frames.RemoveAll(f => f.CapturedUtc < cutoff);
-                }
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine(LOG_IDENT, $"Capture tick failed: {ex.Message}");
-            }
-        }
-
-        private static Bitmap ResizeBitmap(Bitmap source, int width, int height)
-        {
-            var resized = new Bitmap(width, height, PixelFormat.Format32bppRgb);
-            using Graphics g = Graphics.FromImage(resized);
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-            g.DrawImage(source, 0, 0, width, height);
-            return resized;
-        }
-
-        private static byte[] BitmapToBgra32(Bitmap bitmap, out int width, out int height)
-        {
-            width = bitmap.Width;
-            height = bitmap.Height;
-
-            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppRgb);
-
-            try
-            {
-                int stride = data.Stride;
-                byte[] buffer = new byte[stride * height];
-                System.Runtime.InteropServices.Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
-                return buffer;
             }
             finally
             {
-                bitmap.UnlockBits(data);
+                timeEndPeriod(1);
             }
         }
 
-        // Encodes whatever's currently buffered into a real MP4 file via Media Foundation's
-        // SinkWriter and returns the saved path, or null if there was nothing to save / encoding
-        // failed. This is genuinely the least-verifiable code in this whole feature batch - it
-        // follows the standard documented IMFSinkWriter pattern precisely, but there is no way to
-        // visually confirm the resulting file plays correctly from this environment (no GPU
-        // capture or video playback available here). If clips come out wrong, check here first.
+        private Bitmap? CaptureOnce()
+        {
+            IntPtr hwnd = ResolveWindow();
+            if (hwnd == IntPtr.Zero || IsIconic(hwnd))
+                return null;
+
+            if (!GetClientRect(hwnd, out RECT client))
+                return null;
+
+            // H.264 wants even dimensions
+            int width = (client.Right - client.Left) & ~1;
+            int height = (client.Bottom - client.Top) & ~1;
+            if (width < 64 || height < 64)
+                return null;
+
+            if (GetForegroundWindow() == hwnd && DateTime.UtcNow >= _duplicationRetryUtc)
+            {
+                var origin = new POINT();
+                ClientToScreen(hwnd, ref origin);
+
+                _duplication ??= new DesktopDuplicationGrabber();
+
+                switch (_duplication.TryGrab(origin.X, origin.Y, width, height, 0, out Bitmap? grabbed))
+                {
+                    case DesktopDuplicationGrabber.GrabResult.Frame:
+                        _statDuplication++;
+                        return grabbed;
+
+                    case DesktopDuplicationGrabber.GrabResult.NoNewFrame:
+                        // the screen hasn't changed; the previous frame simply stays up longer
+                        return null;
+
+                    default:
+                        _duplicationRetryUtc = DateTime.UtcNow.AddSeconds(10);
+                        break;
+                }
+            }
+
+            var bitmap = new Bitmap(width, height, PixelFormat.Format32bppRgb);
+
+            try
+            {
+                using Graphics g = Graphics.FromImage(bitmap);
+                IntPtr hdc = g.GetHdc();
+                try
+                {
+                    // PW_CLIENTONLY (1) | PW_RENDERFULLCONTENT (2): the game's client area exactly,
+                    // without the title bar and window frame a windowed game would otherwise add
+                    PrintWindow(hwnd, hdc, 3);
+                }
+                finally
+                {
+                    g.ReleaseHdc(hdc);
+                }
+
+                return bitmap;
+            }
+            catch
+            {
+                bitmap.Dispose();
+                throw;
+            }
+        }
+
+        private IntPtr ResolveWindow()
+        {
+            DateTime now = DateTime.UtcNow;
+
+            if (_hwnd != IntPtr.Zero && IsWindow(_hwnd) && (now - _hwndCheckedUtc).TotalSeconds < 5)
+                return _hwnd;
+
+            if (_hwnd == IntPtr.Zero && (now - _hwndCheckedUtc).TotalSeconds < 1)
+                return IntPtr.Zero;
+
+            _hwndCheckedUtc = now;
+            _hwnd = IntPtr.Zero;
+
+            Process[] processes = Process.GetProcessesByName(App.RobloxPlayerAppName);
+            try
+            {
+                foreach (Process process in processes)
+                {
+                    if (process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        _hwnd = process.MainWindowHandle;
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                foreach (Process process in processes)
+                    process.Dispose();
+            }
+
+            return _hwnd;
+        }
+
+        private void ReportStats()
+        {
+            double seconds = (DateTime.UtcNow - _statSinceUtc).TotalSeconds;
+            if (seconds < 60)
+                return;
+
+            int count;
+            long bytes;
+            lock (_sync)
+            {
+                count = _frames.Count;
+                bytes = _bufferBytes;
+            }
+
+            App.Logger.WriteLine(LOG_IDENT, $"Capturing {_statCaptured / seconds:0.0} fps (target {TargetFps}, {_statDuplication * 100 / Math.Max(1, _statCaptured + _statDropped)}% via duplication, {_statDropped} dropped) - buffer {count} frames, {bytes / 1048576.0:0.0} MB");
+
+            _statSinceUtc = DateTime.UtcNow;
+            _statCaptured = _statDropped = _statDuplication = 0;
+        }
+
+        // ------------------------------------------------------------------ buffer
+
+        private void EncodeLoop(object? state)
+        {
+            var queue = (BlockingCollection<RawFrame>)state!;
+
+            try
+            {
+                foreach (RawFrame raw in queue.GetConsumingEnumerable())
+                {
+                    try
+                    {
+                        using Bitmap source = raw.Bitmap;
+
+                        int maxHeight = MaxHeight;
+                        Bitmap? scaled = null;
+
+                        if (maxHeight > 0 && source.Height > maxHeight)
+                        {
+                            int h = maxHeight & ~1;
+                            int w = Math.Max(2, (int)Math.Round(source.Width * (double)h / source.Height)) & ~1;
+                            scaled = Resize(source, w, h);
+                        }
+
+                        try
+                        {
+                            Bitmap final = scaled ?? source;
+
+                            using var stream = new MemoryStream(256 * 1024);
+                            using (var parameters = new EncoderParameters(1))
+                            {
+                                parameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, JpegQuality);
+                                final.Save(stream, JpegCodec, parameters);
+                            }
+
+                            Add(new BufferedFrame
+                            {
+                                Jpeg = stream.ToArray(),
+                                Width = final.Width,
+                                Height = final.Height,
+                                CapturedUtc = raw.CapturedUtc,
+                            });
+                        }
+                        finally
+                        {
+                            scaled?.Dispose();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Frame compression failed: {ex.Message}");
+                    }
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        private void Add(BufferedFrame frame)
+        {
+            lock (_sync)
+            {
+                // workers finish out of order; keep the list sorted by capture time
+                int index = _frames.Count;
+                while (index > 0 && _frames[index - 1].CapturedUtc > frame.CapturedUtc)
+                    index--;
+
+                _frames.Insert(index, frame);
+                _bufferBytes += frame.Jpeg.Length;
+
+                DateTime cutoff = DateTime.UtcNow.AddSeconds(-Math.Max(1, App.Settings.Prop.InstantReplayClipSeconds));
+
+                int remove = 0;
+                long freed = 0;
+                while (remove < _frames.Count - 1 && (_frames[remove].CapturedUtc < cutoff || _bufferBytes - freed > MaxBufferBytes))
+                {
+                    freed += _frames[remove].Jpeg.Length;
+                    remove++;
+                }
+
+                if (remove > 0)
+                {
+                    _frames.RemoveRange(0, remove);
+                    _bufferBytes -= freed;
+                }
+            }
+        }
+
+        private static Bitmap Resize(Bitmap source, int width, int height)
+        {
+            var resized = new Bitmap(width, height, PixelFormat.Format32bppRgb);
+            using Graphics g = Graphics.FromImage(resized);
+            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            g.DrawImage(source, new Rectangle(0, 0, width, height), 0, 0, source.Width, source.Height, GraphicsUnit.Pixel);
+            return resized;
+        }
+
+        // ------------------------------------------------------------------ saving
+
+        // Encodes whatever is buffered into an MP4 via Media Foundation's sink writer and returns
+        // the saved path, or null if there was nothing to save / encoding failed. Blocking - call
+        // it off the UI thread.
         public string? SaveClip()
         {
             List<BufferedFrame> frames;
@@ -211,16 +474,28 @@ namespace PhasmaStrap.Utility
                 return null;
             }
 
-            int width = frames[0].Width;
-            int height = frames[0].Height;
-            int fps = CaptureFps;
+            // the window may have been resized mid-buffer; a clip has one frame size, so keep the
+            // newest run of frames that share it
+            int width = frames[^1].Width;
+            int height = frames[^1].Height;
+            int first = frames.Count - 1;
+            while (first > 0 && frames[first - 1].Width == width && frames[first - 1].Height == height)
+                first--;
+            if (first > 0)
+                frames.RemoveRange(0, first);
+
+            int fps = TargetFps;
+            double seconds = Math.Max(0.001, (frames[^1].CapturedUtc - frames[0].CapturedUtc).TotalSeconds);
+            int bitrate = BitrateFor(width, height, fps, Quality);
 
             Directory.CreateDirectory(ClipsDir);
             string path = Path.Combine(ClipsDir, $"Replay_{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
 
-            App.Logger.WriteLine(LOG_IDENT, $"Encoding {frames.Count} buffered frame(s) ({width}x{height} @ {fps}fps) to {path}");
+            App.Logger.WriteLine(LOG_IDENT, $"Encoding {frames.Count} frame(s) over {seconds:0.0}s ({width}x{height}, {frames.Count / seconds:0.0} fps captured / {fps} target, {bitrate / 1000} kbps) to {path}");
 
             bool startedHere = false;
+            IMFSinkWriter? writer = null;
+            var timer = Stopwatch.StartNew();
 
             try
             {
@@ -231,46 +506,51 @@ namespace PhasmaStrap.Utility
                     startedHere = true;
                 }
 
-                IMFSinkWriter writer = CreateSinkWriter(path, width, height, fps, out int streamIndex);
-                App.Logger.WriteLine(LOG_IDENT, "Sink writer created, writing samples");
-
+                writer = CreateSinkWriter(path, width, height, fps, bitrate, out int streamIndex);
                 writer.BeginWriting();
 
-                long frameDurationTicks = 10_000_000L / Math.Max(1, fps);
-                long timestamp = 0;
+                long nominalDuration = 10_000_000L / Math.Max(1, fps);
+                byte[] pixels = new byte[width * height * 4];
+                DateTime origin = frames[0].CapturedUtc;
 
-                foreach (BufferedFrame frame in frames)
+                for (int i = 0; i < frames.Count; i++)
                 {
-                    IMFMediaBuffer buffer = MediaFactory.MFCreateMemoryBuffer(frame.Bgra32.Length);
-                    buffer.CurrentLength = frame.Bgra32.Length;
+                    Decode(frames[i], pixels);
 
+                    long time = (frames[i].CapturedUtc - origin).Ticks;
+                    long duration = i + 1 < frames.Count
+                        ? Math.Max(1, (frames[i + 1].CapturedUtc - frames[i].CapturedUtc).Ticks)
+                        : nominalDuration;
+
+                    using IMFMediaBuffer buffer = MediaFactory.MFCreateMemoryBuffer(pixels.Length);
                     buffer.Lock(out IntPtr ptr, out int _, out int _);
-                    System.Runtime.InteropServices.Marshal.Copy(frame.Bgra32, 0, ptr, frame.Bgra32.Length);
+                    Marshal.Copy(pixels, 0, ptr, pixels.Length);
                     buffer.Unlock();
+                    buffer.CurrentLength = pixels.Length;
 
-                    IMFSample sample = MediaFactory.MFCreateSample();
+                    using IMFSample sample = MediaFactory.MFCreateSample();
                     sample.AddBuffer(buffer);
-                    sample.SampleTime = timestamp;
-                    sample.SampleDuration = frameDurationTicks;
+                    sample.SampleTime = time;
+                    sample.SampleDuration = duration;
 
                     writer.WriteSample(streamIndex, sample);
-
-                    timestamp += frameDurationTicks;
                 }
 
-                App.Logger.WriteLine(LOG_IDENT, "All samples written, finalizing");
                 writer.Finalize();
 
-                App.Logger.WriteLine(LOG_IDENT, $"Saved {frames.Count} frame(s) ({width}x{height} @ {fps}fps) to {path}");
+                App.Logger.WriteLine(LOG_IDENT, $"Saved {frames.Count} frame(s) ({width}x{height}, {seconds:0.0}s) in {timer.ElapsedMilliseconds}ms to {path}");
                 return path;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"SaveClip failed: {ex.Message}");
+                try { if (File.Exists(path)) File.Delete(path); } catch { }
                 return null;
             }
             finally
             {
+                writer?.Dispose();
+
                 if (startedHere)
                 {
                     try { MediaFactory.MFShutdown(); } catch { }
@@ -279,11 +559,38 @@ namespace PhasmaStrap.Utility
             }
         }
 
+        // JPEG -> top-down BGRA, straight into the reusable frame buffer
+        private static void Decode(BufferedFrame frame, byte[] destination)
+        {
+            using var stream = new MemoryStream(frame.Jpeg, writable: false);
+            using var bitmap = new Bitmap(stream);
+
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppRgb);
+            try
+            {
+                int rowBytes = frame.Width * 4;
+
+                if (data.Stride == rowBytes)
+                {
+                    Marshal.Copy(data.Scan0, destination, 0, rowBytes * frame.Height);
+                }
+                else
+                {
+                    for (int y = 0; y < frame.Height; y++)
+                        Marshal.Copy(data.Scan0 + y * data.Stride, destination, y * rowBytes, rowBytes);
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(data);
+            }
+        }
+
+        // ------------------------------------------------------------------ Media Foundation
+
         // FrameSize/FrameRate/PixelAspectRatio are packed as a single UINT64 (high 32 = first
         // value, low 32 = second) - the same convention the native MFSetAttributeSize/
-        // MFSetAttributeRatio helper macros use; Vortice.MediaFoundation 2.1.0 doesn't expose
-        // those helpers directly, only the generic IMFAttributes.Set(Guid, T), so this packs by
-        // hand instead.
+        // MFSetAttributeRatio helper macros use.
         private static ulong PackAttribute(uint high, uint low) => ((ulong)high << 32) | low;
 
         // --- two Vortice.MediaFoundation 2.1.0 defects worked around here (verified with a
@@ -296,42 +603,65 @@ namespace PhasmaStrap.Utility
         //  2. MediaFactory.MFCreateSinkWriterFromURL is bound to Mfplat.dll, but the export lives
         //     in mfreadwrite.dll - EntryPointNotFoundException every time.
 
-        [System.Runtime.InteropServices.UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.StdCall)]
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int SetUInt64Fn(IntPtr self, ref Guid key, ulong value);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int SetUInt32Fn(IntPtr self, ref Guid key, uint value);
 
         private static void SetUInt64(IMFAttributes attributes, Guid key, ulong value)
         {
             IntPtr self = attributes.NativePointer;
-            IntPtr vtable = System.Runtime.InteropServices.Marshal.ReadIntPtr(self);
-            IntPtr fn = System.Runtime.InteropServices.Marshal.ReadIntPtr(vtable, 22 * IntPtr.Size);
-            int hr = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<SetUInt64Fn>(fn)(self, ref key, value);
+            IntPtr vtable = Marshal.ReadIntPtr(self);
+            IntPtr fn = Marshal.ReadIntPtr(vtable, 22 * IntPtr.Size);
+            int hr = Marshal.GetDelegateForFunctionPointer<SetUInt64Fn>(fn)(self, ref key, value);
             if (hr < 0)
-                System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(hr);
+                Marshal.ThrowExceptionForHR(hr);
         }
 
-        [System.Runtime.InteropServices.DllImport("mfreadwrite.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling = true)]
+        private static void SetUInt32(IMFAttributes attributes, Guid key, uint value)
+        {
+            IntPtr self = attributes.NativePointer;
+            IntPtr vtable = Marshal.ReadIntPtr(self);
+            IntPtr fn = Marshal.ReadIntPtr(vtable, 21 * IntPtr.Size);
+            int hr = Marshal.GetDelegateForFunctionPointer<SetUInt32Fn>(fn)(self, ref key, value);
+            if (hr < 0)
+                Marshal.ThrowExceptionForHR(hr);
+        }
+
+        private static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = new("a634a91c-822b-41b9-a494-4de4643612b0");
+
+        [DllImport("mfreadwrite.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         private static extern int MFCreateSinkWriterFromURL(string pwszOutputURL, IntPtr pByteStream, IntPtr pAttributes, out IntPtr ppSinkWriter);
 
-        private static IMFSinkWriter CreateSinkWriterFromUrl(string path)
+        private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, int bitrate, out int streamIndex)
         {
-            int hr = MFCreateSinkWriterFromURL(path, IntPtr.Zero, IntPtr.Zero, out IntPtr ptr);
-            if (hr < 0)
-                System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(hr);
-            return new IMFSinkWriter(ptr);
+            // a GPU encoder makes a 1080p60 clip save in a couple of seconds instead of ten; if the
+            // driver's encoder rejects the format, fall back to Microsoft's software one
+            try
+            {
+                return CreateSinkWriter(path, width, height, fps, bitrate, hardware: true, out streamIndex);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Hardware encoder unavailable ({ex.Message}) - using the software encoder");
+                try { if (File.Exists(path)) File.Delete(path); } catch { }
+                return CreateSinkWriter(path, width, height, fps, bitrate, hardware: false, out streamIndex);
+            }
         }
 
-        private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, out int streamIndex)
+        private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, int fps, int bitrate, bool hardware, out int streamIndex)
         {
-            IMFMediaType outputType = MediaFactory.MFCreateMediaType();
+            using IMFMediaType outputType = MediaFactory.MFCreateMediaType();
             outputType.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video);
             outputType.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.H264);
-            outputType.Set(MediaTypeAttributeKeys.AvgBitrate, (uint)BitrateForQuality());
+            outputType.Set(MediaTypeAttributeKeys.AvgBitrate, (uint)bitrate);
             outputType.Set(MediaTypeAttributeKeys.InterlaceMode, (uint)VideoInterlaceMode.Progressive);
             SetUInt64(outputType, MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
             SetUInt64(outputType, MediaTypeAttributeKeys.FrameRate, PackAttribute((uint)fps, 1));
             SetUInt64(outputType, MediaTypeAttributeKeys.PixelAspectRatio, PackAttribute(1, 1));
 
-            IMFMediaType inputType = MediaFactory.MFCreateMediaType();
+            using IMFMediaType inputType = MediaFactory.MFCreateMediaType();
             inputType.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video);
             inputType.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Rgb32);
             SetUInt64(inputType, MediaTypeAttributeKeys.FrameSize, PackAttribute((uint)width, (uint)height));
@@ -341,40 +671,53 @@ namespace PhasmaStrap.Utility
             // bottom-up and the clip comes out vertically flipped
             inputType.Set(MediaTypeAttributeKeys.DefaultStride, (uint)(width * 4));
 
-            IMFSinkWriter writer = CreateSinkWriterFromUrl(path);
-            streamIndex = writer.AddStream(outputType);
-            writer.SetInputMediaType(streamIndex, inputType, null);
-
-            return writer;
-        }
-
-        private static int BitrateForQuality() => App.Settings.Prop.InstantReplayQuality switch
-        {
-            0 => 2_000_000,
-            2 => 8_000_000,
-            _ => 4_000_000,
-        };
-
-        private static HWND FindRobloxWindow()
-        {
-            Process[] processes = Process.GetProcessesByName(App.RobloxPlayerAppName);
+            IMFAttributes? attributes = null;
+            IMFSinkWriter? writer = null;
 
             try
             {
-                foreach (Process process in processes)
+                if (hardware)
                 {
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                        return (HWND)process.MainWindowHandle;
+                    attributes = MediaFactory.MFCreateAttributes(1);
+                    SetUInt32(attributes, MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1);
                 }
+
+                int hr = MFCreateSinkWriterFromURL(path, IntPtr.Zero, attributes?.NativePointer ?? IntPtr.Zero, out IntPtr ptr);
+                if (hr < 0)
+                    Marshal.ThrowExceptionForHR(hr);
+
+                writer = new IMFSinkWriter(ptr);
+                streamIndex = writer.AddStream(outputType);
+                writer.SetInputMediaType(streamIndex, inputType, null);
+                return writer;
+            }
+            catch
+            {
+                writer?.Dispose();
+                throw;
             }
             finally
             {
-                foreach (Process process in processes)
-                    process.Dispose();
+                attributes?.Dispose();
             }
-
-            return HWND.Null;
         }
+
+        // ------------------------------------------------------------------ Win32
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT { public int Left, Top, Right, Bottom; }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct POINT { public int X, Y; }
+
+        [DllImport("user32.dll")] private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdc, uint flags);
+        [DllImport("user32.dll")] private static extern bool GetClientRect(IntPtr hwnd, out RECT rect);
+        [DllImport("user32.dll")] private static extern bool ClientToScreen(IntPtr hwnd, ref POINT point);
+        [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")] private static extern bool IsWindow(IntPtr hwnd);
+        [DllImport("user32.dll")] private static extern bool IsIconic(IntPtr hwnd);
+        [DllImport("winmm.dll")] private static extern uint timeBeginPeriod(uint milliseconds);
+        [DllImport("winmm.dll")] private static extern uint timeEndPeriod(uint milliseconds);
 
         public void Dispose()
         {
