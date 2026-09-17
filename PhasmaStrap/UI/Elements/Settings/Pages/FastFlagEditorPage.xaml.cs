@@ -309,7 +309,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         }
 
         // refresh list on page load to synchronize with preset page
-        private void Page_Loaded(object sender, RoutedEventArgs e) => ReloadList();
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            ReloadList();
+            ManagerDisabledBar.Visibility = App.Settings.Prop.UseFastFlagManager ? Visibility.Collapsed : Visibility.Visible;
+        }
 
         private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
