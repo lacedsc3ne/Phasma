@@ -82,9 +82,8 @@ namespace PhasmaStrap.Models.Persistable
         public bool ShowAccountOnRichPresence { get; set; } = false;
 
         // Discord shows the presence under the NAME (and icon) of the Discord application it was
-        // registered with. Empty = Bloxstrap's shared "Roblox" application; set your own app's
-        // client ID (created at discord.com/developers, e.g. named "PhasmaStrap" with the logo as
-        // its icon) to have it read "Playing PhasmaStrap" instead.
+        // registered with. Empty = PhasmaStrap's own application ("Playing PhasmaStrap"); an
+        // optional override for people who want their own app/name instead.
         public string DiscordApplicationId { get; set; } = "";
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();

@@ -187,10 +187,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 string id = App.Settings.Prop.DiscordApplicationId?.Trim() ?? "";
                 if (id.Length == 0)
-                    return "Using the shared \"Roblox\" application - your profile says \"Playing Roblox\".";
+                    return "Using PhasmaStrap's own application - your profile says \"Playing PhasmaStrap\" with the logo.";
                 if (id.Length < 15 || !id.All(char.IsDigit))
-                    return "That doesn't look like a Discord application ID (it's a long number) - the shared \"Roblox\" application will be used.";
-                return "Your own application will be used - the name and icon you gave it on the Discord developer portal show on your profile. Applies to the next game session.";
+                    return "That doesn't look like a Discord application ID (it's a long number) - PhasmaStrap's own application will be used.";
+                return "Your own application will be used instead - the name and icon you gave it on the Discord developer portal show on your profile. Applies to the next game session.";
             }
         }
 
