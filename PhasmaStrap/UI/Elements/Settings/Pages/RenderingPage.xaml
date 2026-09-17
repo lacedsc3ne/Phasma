@@ -13,67 +13,67 @@
       Scrollable="True">
 
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Rendering" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Rendering}" FontSize="20" FontWeight="Medium" />
         <TextBlock Margin="0,4,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                   Text="Everything that tunes what the game actually looks like and how smoothly it runs - system/GPU tweaks, the stats HUD and crosshair overlay, and RiShade's post-processing." />
+                   Text="{x:Static resources:Strings.Menu_Rendering_EverythingTunesWhatGameActuallyLooks}" />
 
         <TabControl>
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:SymbolIcon Symbol="Gauge24" Margin="0,0,6,0" />
-                        <TextBlock Text="Performance" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Performance}" />
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0" DataContext="{Binding Performance}">
                     <ui:CardExpander Margin="0,0,0,0" Icon="Wrench24" IsExpanded="True">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="System" />
-                                <TextBlock FontSize="12" Text="Bootstrapper-level tweaks that don't touch Roblox itself." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Rendering_System}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_BootstrapperLevelTweaksDonTTouch}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="CPU core limit" Description="Restricts how many logical processors PhasmaStrap itself can use. This affects the bootstrapper process only, not the Roblox game process.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_CPUCoreLimit}" Description="{x:Static resources:Strings.Menu_Rendering_RestrictsHowManyLogicalProcessorsPhasmaStrap}">
                                 <StackPanel Orientation="Horizontal">
                                     <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
                                     <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
                                 </StackPanel>
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="Fake exclusive fullscreen" Description="Strips the Roblox window's border and resizes it to exactly cover its monitor for lower input latency than Roblox's own windowed fullscreen.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_FakeExclusiveFullscreen}" Description="{x:Static resources:Strings.Menu_Rendering_StripsRobloxWindowSBorderResizes}">
                                 <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="Duck Roblox audio when unfocused" Description="Automatically lowers Roblox's volume while you're tabbed away from it during a game session, and restores it when you switch back.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_DuckRobloxAudioWhenUnfocused}" Description="{x:Static resources:Strings.Menu_Rendering_AutomaticallyLowersRobloxSVolumeWhile}">
                                 <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
                             </controls:OptionControl>
 
-                            <controls:OptionControl Header="Headset loudness" Description="Boosts quiet sounds (footsteps, distant cues) without letting loud moments blow out your ears.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_HeadsetLoudness}" Description="{x:Static resources:Strings.Menu_Rendering_BoostsQuietSoundsFootstepsDistantCues}">
                                 <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <TextBlock Text="Anti-Aliasing" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock Text="Applies a GPU shader over the Roblox window to smooth jagged edges. Runs as its own overlay window, so it costs extra GPU time on top of Roblox's own rendering." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_AntiAliasing}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_AppliesGPUShaderOverRobloxWindow}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-                    <controls:OptionControl Header="Enable Anti-Aliasing overlay" Description="Off by default, since this is an extra rendering pass on top of Roblox.">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_EnableAntiAliasingOverlay}" Description="{x:Static resources:Strings.Menu_Rendering_OffByDefaultSinceExtraRendering}">
                         <ui:ToggleSwitch IsChecked="{Binding AntiAliasingEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="Anti-Aliasing method" Description="Which shader technique to apply once the overlay is enabled.">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_AntiAliasingMethod}" Description="{x:Static resources:Strings.Menu_Rendering_WhichShaderTechniqueApplyOnceOverlay}">
                         <ComboBox Padding="10,5,10,5" MinWidth="160" IsEnabled="{Binding AntiAliasingEnabled}" ItemsSource="{Binding AntiAliasingMethodNames, Mode=OneTime}" SelectedIndex="{Binding AntiAliasingMethodIndex, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <TextBlock Text="Frame generation" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock Text="Shader-based motion interpolation drawn in a click-through overlay above the game window. This does not improve actual FPS or reduce input lag - it only makes motion look smoother, mainly useful on low end PCs. Leave it off on mid range or high end systems." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_FrameGeneration}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_ShaderBasedMotionInterpolationDrawnClick}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-                    <controls:OptionControl Header="Enable frame generation" Description="Interpolates an extra frame between real captured frames while you're in game.">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_EnableFrameGeneration}" Description="{x:Static resources:Strings.Menu_Rendering_InterpolatesExtraFrameBetweenRealCaptured}">
                         <ui:ToggleSwitch IsChecked="{Binding FrameGenEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <controls:OptionControl Header="Frame generation quality" Description="Higher quality costs more GPU time per interpolated frame. 0 = Fast, 1 = Balanced, 2 = Quality.">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_FrameGenerationQuality}" Description="{x:Static resources:Strings.Menu_Rendering_HigherQualityCostsMoreGPUTime}">
                         <StackPanel Orientation="Horizontal">
                             <Slider Width="200" Minimum="0" Maximum="2" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding FrameGenQuality, Mode=TwoWay}" />
                             <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding FrameGenQualityDisplay, Mode=OneWay}" />
@@ -145,8 +145,8 @@
                     <ui:CardExpander Margin="0,8,0,0" Icon="Rocket24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Boost options" />
-                                <TextBlock FontSize="12" Text="GPU, timer, and power plan tweaks applied at the OS level while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Rendering_BoostOptions}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_GPUTimerPowerPlanTweaksApplied}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -183,8 +183,8 @@
                     <ui:CardExpander Margin="0,8,0,0" Icon="Desktop24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Resolution" />
-                                <TextBlock FontSize="12" Text="Force a specific in-game resolution on a chosen monitor." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Performance_InGameResolutionMode_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_ForceSpecificGameResolutionChosenMonitor}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -229,48 +229,48 @@
                     <ui:CardExpander Margin="0,8,0,0" Icon="DataBarVertical24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Extra HUD rows" />
-                                <TextBlock FontSize="12" Text="Add more stat rows below FPS - each is shown as its own line on the same HUD panel." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Rendering_ExtraHUDRows}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_AddMoreStatRowsBelowFPS}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="Frame time" Description="Milliseconds per frame, alongside FPS.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_FrameTime}" Description="{x:Static resources:Strings.Menu_Rendering_MillisecondsPerFrameAlongsideFPS}">
                                 <ui:ToggleSwitch IsChecked="{Binding ShowFrameTime, Mode=TwoWay}" />
                             </controls:OptionControl>
-                            <controls:OptionControl Header="CPU usage" Description="Total system CPU usage, all cores.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_CPUUsage}" Description="{x:Static resources:Strings.Menu_Rendering_TotalSystemCPUUsageAllCores}">
                                 <ui:ToggleSwitch IsChecked="{Binding ShowCpu, Mode=TwoWay}" />
                             </controls:OptionControl>
-                            <controls:OptionControl Header="RAM usage" Description="Physical memory currently in use.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_RAMUsage}" Description="{x:Static resources:Strings.Menu_Rendering_PhysicalMemoryCurrentlyUse}">
                                 <ui:ToggleSwitch IsChecked="{Binding ShowRam, Mode=TwoWay}" />
                             </controls:OptionControl>
-                            <controls:OptionControl Header="Server ping" Description="Round-trip time to the current game server. Shows -- if the server's address isn't known yet.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_ServerPing}" Description="{x:Static resources:Strings.Menu_Rendering_RoundTripTimeCurrentGameServer}">
                                 <ui:ToggleSwitch IsChecked="{Binding ShowPing, Mode=TwoWay}" />
                             </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <TextBlock Text="Focus mode" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Instantly hides the HUD and crosshair without turning them off - handy right before a screenshot or clip. Bind the Toggle Overlay Focus Mode hotkey on the Hotkeys page to flip this during a game session." />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_FocusMode}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_InstantlyHidesHUDCrosshairWithoutTurning}" />
 
-                    <controls:OptionControl Header="Overlay Focus Mode" Description="While on, the HUD and crosshair are hidden regardless of their own toggles above.">
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_OverlayFocusMode}" Description="{x:Static resources:Strings.Menu_Rendering_WhileHUDCrosshairAreHiddenRegardless}">
                         <ui:ToggleSwitch IsChecked="{Binding FocusModeEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
 
-                    <TextBlock Text="Per-game overlay profiles" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Override whether the HUD and crosshair show up in specific games, regardless of the global toggles above." />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_PerGameOverlayProfiles}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_OverrideWhetherHUDCrosshairShowUp}" />
 
                     <ui:CardExpander Margin="0,8,0,0" Icon="Games24">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Game overrides" />
-                                <TextBlock FontSize="12" Text="Add a place ID with its own HUD/crosshair state." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Rendering_GameOverrides}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_AddPlaceIDItsOwnHUD}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                <ui:TextBox Width="140" PlaceholderText="Place ID" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Margin="12,0,0,0" Content="HUD" VerticalAlignment="Center" IsChecked="{Binding AssignHudEnabled, Mode=TwoWay}" />
-                                <CheckBox Margin="12,0,0,0" Content="Crosshair" VerticalAlignment="Center" IsChecked="{Binding AssignCrosshairEnabled, Mode=TwoWay}" />
+                                <ui:TextBox Width="140" PlaceholderText="{x:Static resources:Strings.Menu_ServerBrowser_PlaceId_Title}" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Rendering_HUD}" VerticalAlignment="Center" IsChecked="{Binding AssignHudEnabled, Mode=TwoWay}" />
+                                <CheckBox Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Overlays_Crosshair_Title}" VerticalAlignment="Center" IsChecked="{Binding AssignCrosshairEnabled, Mode=TwoWay}" />
                                 <ui:Button Margin="12,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddPlaceProfileCommand, Mode=OneTime}" />
                             </StackPanel>
                             <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding PlaceProfiles, Mode=OneWay}">
@@ -357,8 +357,8 @@
                     <ui:CardExpander Margin="0,0,0,0" Icon="Options24" IsExpanded="True">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="General" />
-                                <TextBlock FontSize="12" Text="Turn RiShade on and choose which preset it renders with." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Shortcuts_General_Title}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_TurnRiShadeChooseWhichPresetRenders}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -383,7 +383,7 @@
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <TextBlock Text="Color &amp; tone" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_ColorTone}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
                     <ui:CardExpander Margin="0,8,0,0" Icon="Color24">
                         <ui:CardExpander.Header>
@@ -392,7 +392,7 @@
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn color grading on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnColorGradingOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding GradeEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Brightness}">
@@ -420,11 +420,11 @@
                         <ui:CardExpander.Header>
                             <StackPanel>
                                 <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Tonemap}" />
-                                <TextBlock FontSize="12" Text="Tonemapping and edge vignette." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_TonemappingEdgeVignette}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn tonemapping on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnTonemappingOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding TonemapEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_TonemapOperator}">
@@ -438,7 +438,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Vignette}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn the vignette on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnVignetteOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding VignetteEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -450,17 +450,17 @@
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <TextBlock Text="Effects" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_Effects}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
                     <ui:CardExpander Margin="0,8,0,0" Icon="Sparkle24">
                         <ui:CardExpander.Header>
                             <StackPanel>
                                 <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_Sharpen}" />
-                                <TextBlock FontSize="12" Text="Edge sharpening and glow bloom." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_EdgeSharpeningGlowBloom}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn sharpening on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnSharpeningOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding SharpenEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -471,7 +471,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_Bloom}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn bloom on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnBloomOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding BloomEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -493,11 +493,11 @@
                         <ui:CardExpander.Header>
                             <StackPanel>
                                 <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_RiShade_ChromaticAberration}" />
-                                <TextBlock FontSize="12" Text="Color fringing and film grain." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Rendering_ColorFringingFilmGrain}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn chromatic aberration on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnChromaticAberrationOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding ChromaEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">
@@ -508,7 +508,7 @@
                             </controls:OptionControl>
 
                             <TextBlock Text="{x:Static resources:Strings.Menu_RiShade_FilmGrain}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="Turn film grain on or off.">
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Enabled}" Description="{x:Static resources:Strings.Menu_Rendering_TurnFilmGrainOff}">
                                 <ui:ToggleSwitch IsChecked="{Binding GrainEnabled, Mode=TwoWay}" />
                             </controls:OptionControl>
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RiShade_Common_Strength}">

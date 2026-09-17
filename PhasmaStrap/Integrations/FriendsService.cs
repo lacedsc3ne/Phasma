@@ -79,6 +79,19 @@ namespace PhasmaStrap.Integrations
                     if (id != 0)
                         result.Add(new FriendInfo { UserId = id, Username = name, DisplayName = displayName });
                 }
+
+                // friends.roblox.com stopped including names in this response - it's ids only now,
+                // so look the names up separately (users.roblox.com takes up to 100 ids per call)
+                List<long> nameless = result.Where(f => string.IsNullOrEmpty(f.Username)).Select(f => f.UserId).ToList();
+                if (nameless.Count > 0)
+                {
+                    Dictionary<long, (string Name, string DisplayName)> names = await GetUserNamesAsync(nameless, ct).ConfigureAwait(false);
+                    for (int i = 0; i < result.Count; i++)
+                    {
+                        if (names.TryGetValue(result[i].UserId, out var n))
+                            result[i] = new FriendInfo { UserId = result[i].UserId, Username = n.Name, DisplayName = string.IsNullOrEmpty(n.DisplayName) ? n.Name : n.DisplayName };
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -86,6 +99,45 @@ namespace PhasmaStrap.Integrations
             }
 
             return result;
+        }
+
+        public static async Task<Dictionary<long, (string Name, string DisplayName)>> GetUserNamesAsync(IEnumerable<long> userIds, CancellationToken ct = default)
+        {
+            var map = new Dictionary<long, (string, string)>();
+            var ids = userIds.Distinct().ToList();
+
+            try
+            {
+                for (int i = 0; i < ids.Count; i += 100)
+                {
+                    List<long> chunk = ids.GetRange(i, Math.Min(100, ids.Count - i));
+                    using HttpRequestMessage req = BuildRequest(HttpMethod.Post, "https://users.roblox.com/v1/users", null);
+                    req.Content = new StringContent(JsonSerializer.Serialize(new { userIds = chunk, excludeBannedUsers = false }), Encoding.UTF8, "application/json");
+
+                    using HttpResponseMessage res = await _client.SendAsync(req, ct).ConfigureAwait(false);
+                    if (!res.IsSuccessStatusCode)
+                        continue;
+
+                    using JsonDocument doc = JsonDocument.Parse(await res.Content.ReadAsStringAsync(ct).ConfigureAwait(false));
+                    if (!doc.RootElement.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Array)
+                        continue;
+
+                    foreach (JsonElement el in data.EnumerateArray())
+                    {
+                        long id = el.TryGetProperty("id", out var idEl) && idEl.TryGetInt64(out long l) ? l : 0;
+                        string name = el.TryGetProperty("name", out var nameEl) ? (nameEl.GetString() ?? "") : "";
+                        string displayName = el.TryGetProperty("displayName", out var dnEl) ? (dnEl.GetString() ?? "") : "";
+                        if (id != 0)
+                            map[id] = (name, displayName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"GetUserNamesAsync failed: {ex.Message}");
+            }
+
+            return map;
         }
 
         public static async Task<Dictionary<long, FriendPresence>> GetPresenceAsync(IEnumerable<long> userIds, CancellationToken ct = default)

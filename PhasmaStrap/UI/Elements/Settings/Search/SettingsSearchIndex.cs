@@ -25,6 +25,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 return Array.Empty<SettingsSearchEntry>();
             }
 
+            // rows generated at runtime from data (not XAML) - the hotkey bindings list
+            foreach (var action in PhasmaStrap.Utility.HotkeyActions.All)
+                generated.Add(new SettingsSearchEntry(SettingsSearchEntryKind.Option, action.DisplayName, action.Description, typeof(Pages.HotkeysPage), "Hotkeys", "", "", "", null));
+
             var seen = new HashSet<string>(StringComparer.Ordinal);
             var result = new List<SettingsSearchEntry>(generated.Count);
 

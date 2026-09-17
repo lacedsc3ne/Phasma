@@ -64,6 +64,40 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // similar notes. This page only edits Settings.Prop; InstantReplayRecorder itself lives
         // in Watcher.cs.) ---
 
+        // --- "no hotkey bound" hint: the most common reason screenshots/replays "don't work" ---
+
+        public System.Windows.Visibility HotkeyHintVisibility => string.IsNullOrEmpty(HotkeyHintText) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+
+        public string HotkeyHintText
+        {
+            get
+            {
+                var bindings = App.Settings.Prop.HotkeyBindings;
+                bool screenshot = bindings.TryGetValue(PhasmaStrap.Utility.HotkeyActions.TakeScreenshot, out string? s) && !string.IsNullOrWhiteSpace(s);
+                bool replay = bindings.TryGetValue(PhasmaStrap.Utility.HotkeyActions.SaveInstantReplay, out string? r) && !string.IsNullOrWhiteSpace(r);
+
+                if (screenshot && replay)
+                    return "";
+                if (!screenshot && !replay)
+                    return "No hotkeys are bound for Take Screenshot or Save Instant Replay yet - nothing will capture during a game until you set them.";
+                return !screenshot
+                    ? "No hotkey is bound for Take Screenshot yet."
+                    : "No hotkey is bound for Save Instant Replay yet - Instant Replay buffers, but there's no way to save a clip.";
+            }
+        }
+
+        public ICommand OpenHotkeysCommand => new RelayCommand(() =>
+        {
+            var window = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault();
+            window?.Navigate(typeof(PhasmaStrap.UI.Elements.Settings.Pages.HotkeysPage));
+        });
+
+        public void RefreshHotkeyHint()
+        {
+            OnPropertyChanged(nameof(HotkeyHintText));
+            OnPropertyChanged(nameof(HotkeyHintVisibility));
+        }
+
         // saved immediately (not just on the Save button) so the running game session's watcher
         // picks it up through SettingsHotReload and starts/stops buffering without a relaunch
         public bool InstantReplayEnabled

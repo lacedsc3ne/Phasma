@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:HomeViewModel, IsDesignTimeCreatable=True}"
@@ -13,64 +14,142 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </ui:UiPage.Resources>
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Home" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Home_Home}" FontSize="20" FontWeight="Medium" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding WelcomeText, Mode=OneWay}" />
 
         <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-            <ui:Button Content="Launch Roblox" Icon="Play28" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
+            <ui:Button Content="{x:Static resources:Strings.LaunchMenu_LaunchRoblox}" Icon="Play28" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
                        Command="{Binding LaunchRobloxCommand, Mode=OneTime}" />
-            <ui:Button Margin="8,0,0,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshCommand, Mode=OneTime}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshCommand, Mode=OneTime}" />
         </StackPanel>
 
-        <TextBlock Text="Continue Playing" FontSize="16" FontWeight="Medium" Margin="0,20,0,4" />
-        <TextBlock Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TabControl Margin="0,16,0,0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Play24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Home_ContinuePlaying}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <StackPanel HorizontalAlignment="Center" Margin="0,24,0,24" Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <ui:SymbolIcon Symbol="History24" FontSize="48" Opacity="0.25" HorizontalAlignment="Center" />
-            <TextBlock Text="No history yet" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="16" Opacity="0.5" Margin="0,12,0,0" HorizontalAlignment="Center" />
-        </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Margin="0,24,0,24" Visibility="{Binding IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ui:SymbolIcon Symbol="History24" FontSize="48" Opacity="0.25" HorizontalAlignment="Center" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Home_NoHistoryYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="16" Opacity="0.5" Margin="0,12,0,0" HorizontalAlignment="Center" />
+                    </StackPanel>
 
-        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding ContinuePlaying, Mode=OneWay}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <UniformGrid Columns="3" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <ui:Card Margin="0,0,10,10" Padding="0">
-                        <StackPanel>
-                            <Border Height="160" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
-                                <Image Source="{Binding IconUrl, IsAsync=True}" Stretch="Uniform" Margin="16" RenderOptions.BitmapScalingMode="HighQuality" />
-                            </Border>
+                    <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding ContinuePlaying, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,0,10,10" Padding="0">
+                                    <StackPanel>
+                                        <Border Height="160" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                            <Image Source="{Binding IconUrl, IsAsync=True}" Stretch="Uniform" Margin="16" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        </Border>
 
-                            <StackPanel Margin="12,8,12,0">
-                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
-                                <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="11" Margin="0,2,0,0">
-                                    <Run Text="{Binding TotalTimeText, Mode=OneWay}" />
-                                    <Run Text=" played • " />
-                                    <Run Text="{Binding LastPlayedText, Mode=OneWay}" />
-                                </TextBlock>
-                            </StackPanel>
+                                        <StackPanel Margin="12,8,12,0">
+                                            <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                                            <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="11" Margin="0,2,0,0">
+                                                <Run Text="{Binding TotalTimeText, Mode=OneWay}" />
+                                                <Run Text="{x:Static resources:Strings.Menu_Home_Played}" />
+                                                <Run Text="{Binding LastPlayedText, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </StackPanel>
 
-                            <Grid Margin="12,8,12,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="6" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                                        <Grid Margin="12,8,12,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="6" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
 
-                                <ui:Button Grid.Column="0" Icon="Play24" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
-                                           HorizontalAlignment="Stretch" ToolTip="{Binding Name, StringFormat='Play {0}'}"
-                                           Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                            <ui:Button Grid.Column="0" Icon="Play24" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
+                                                       HorizontalAlignment="Stretch" ToolTip="{Binding Name, StringFormat='Play {0}'}"
+                                                       Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
 
-                                <ui:Button Grid.Column="2" Icon="Copy24" Appearance="Secondary" ToolTip="Copy game link"
-                                           Command="{Binding DataContext.CopyLinkCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                            </Grid>
-                        </StackPanel>
-                    </ui:Card>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                                            <ui:Button Grid.Column="2" Icon="Copy24" Appearance="Secondary" ToolTip="{x:Static resources:Strings.Menu_Home_CopyGameLink}"
+                                                       Command="{Binding DataContext.CopyLinkCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Link24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Home_LaunchByLink}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Home_LaunchByLink}" FontSize="20" FontWeight="Medium" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Home_WorksNormalGameLinksPrivateServer}" />
+
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox Grid.Column="0" Icon="Link24" PlaceholderText="https://www.roblox.com/games/… or a place ID" ClearButtonEnabled="True"
+                                    Text="{Binding LinkInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding LinkNotBusy}" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_Launch}" Icon="Play24" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
+                                   Command="{Binding LaunchLinkCommand, Mode=OneTime}" IsEnabled="{Binding LinkNotBusy}" />
+                        <ui:Button Grid.Column="2" Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Home_ShowPlaces}" Icon="AppsList24" Appearance="Secondary"
+                                   Command="{Binding ShowPlacesCommand, Mode=OneTime}" IsEnabled="{Binding LinkNotBusy}" />
+                    </Grid>
+
+                    <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding LinkStatus, Mode=OneWay}" />
+
+                    <StackPanel Visibility="{Binding PlacesVisibility, Mode=OneWay}">
+                        <TextBlock Margin="0,16,0,6" FontSize="16" FontWeight="Medium" Text="{Binding PlacesTitle, Mode=OneWay}" />
+                        <ItemsControl ItemsSource="{Binding Places, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="8" Padding="10,8" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock FontSize="11" Opacity="0.7" Text="{Binding Subtitle}" />
+                                            </StackPanel>
+                                            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Common_Launch}" Icon="Play24" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White" VerticalAlignment="Center"
+                                                       Command="{Binding DataContext.LaunchPlaceCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="History24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Title}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="HistoryPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

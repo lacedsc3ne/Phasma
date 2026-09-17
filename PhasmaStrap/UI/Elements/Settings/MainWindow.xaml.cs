@@ -78,13 +78,63 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void MainWindow_SearchShortcut(object sender, KeyEventArgs e)
         {
+            // a hotkey capture box on the Hotkeys page must see every key, including Ctrl+F
+            if (Keyboard.FocusedElement is FrameworkElement focused && focused.Tag is HotkeyRow)
+                return;
+
             bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-            if (ctrl && (e.Key == Key.F || e.Key == Key.K))
+            bool inTextInput = Keyboard.FocusedElement is System.Windows.Controls.Primitives.TextBoxBase;
+
+            bool searchShortcut = (ctrl && (e.Key == Key.F || e.Key == Key.K))
+                || (!inTextInput && Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.OemQuestion);
+
+            if (searchShortcut)
             {
                 SettingsSearchBox.Focus();
                 SettingsSearchBox.SelectAll();
                 e.Handled = true;
             }
+        }
+
+        // --- recently opened results: shown when the box is focused while empty, and boosted in ranking ---
+
+        private static string RecentKey(Search.SettingsSearchEntry entry) => $"{entry.Kind}|{entry.PageType.Name}|{entry.Tab}|{entry.Section}|{entry.Group}|{entry.Header}";
+
+        private static void RememberRecent(Search.SettingsSearchEntry entry)
+        {
+            try
+            {
+                var recents = App.State.Prop.RecentSettingsSearches;
+                string key = RecentKey(entry);
+                recents.Remove(key);
+                recents.Insert(0, key);
+                while (recents.Count > 8)
+                    recents.RemoveAt(recents.Count - 1);
+                App.State.Save();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("MainWindow", $"Could not save recent searches: {ex.Message}");
+            }
+        }
+
+        private static List<Search.SettingsSearchResult> RecentResults()
+        {
+            var results = new List<Search.SettingsSearchResult>();
+
+            // two entries can legitimately share a key (e.g. identical action buttons in
+            // different rows) - first one wins, never throw
+            var byKey = new Dictionary<string, Search.SettingsSearchEntry>(StringComparer.Ordinal);
+            foreach (Search.SettingsSearchEntry entry in Search.SettingsSearchIndex.Entries)
+                byKey.TryAdd(RecentKey(entry), entry);
+
+            foreach (string key in App.State.Prop.RecentSettingsSearches)
+            {
+                if (byKey.TryGetValue(key, out var entry))
+                    results.Add(new Search.SettingsSearchResult(entry, 0));
+            }
+
+            return results;
         }
 
         private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -99,11 +149,21 @@ namespace PhasmaStrap.UI.Elements.Settings
 
             if (query.Trim().Length == 0)
             {
-                CloseSearchPopup();
+                ShowRecentSearches();
                 return;
             }
 
             List<Search.SettingsSearchResult> results = Search.SettingsSearchEngine.Search(query);
+
+            // things you've opened before float up a little
+            if (results.Count > 1 && App.State.Prop.RecentSettingsSearches.Count > 0)
+            {
+                var recent = new HashSet<string>(App.State.Prop.RecentSettingsSearches, StringComparer.Ordinal);
+                results = results
+                    .Select(r => recent.Contains(RecentKey(r.Entry)) ? new Search.SettingsSearchResult(r.Entry, r.Score + 35) : r)
+                    .OrderByDescending(r => r.Score)
+                    .ToList();
+            }
 
             SettingsSearchResults.ItemsSource = results;
             SettingsSearchResults.SelectedIndex = results.Count > 0 ? 0 : -1;
@@ -114,6 +174,21 @@ namespace PhasmaStrap.UI.Elements.Settings
                 _ => $"{results.Count} results  ·  ↑↓ to move, Enter to open",
             };
 
+            SettingsSearchPopup.IsOpen = true;
+        }
+
+        private void ShowRecentSearches()
+        {
+            List<Search.SettingsSearchResult> recents = RecentResults();
+            if (recents.Count == 0 || !SettingsSearchBox.IsKeyboardFocusWithin)
+            {
+                CloseSearchPopup();
+                return;
+            }
+
+            SettingsSearchResults.ItemsSource = recents;
+            SettingsSearchResults.SelectedIndex = -1;
+            SettingsSearchFooter.Text = "Recently opened  ·  type to search everything";
             SettingsSearchPopup.IsOpen = true;
         }
 
@@ -129,6 +204,8 @@ namespace PhasmaStrap.UI.Elements.Settings
         {
             if ((SettingsSearchBox.Text ?? "").Trim().Length > 0 && SettingsSearchResults.Items.Count > 0)
                 SettingsSearchPopup.IsOpen = true;
+            else if ((SettingsSearchBox.Text ?? "").Trim().Length == 0)
+                ShowRecentSearches();
         }
 
         private void SettingsSearchBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -229,6 +306,7 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void ActivateSearchResult(Search.SettingsSearchResult result)
         {
+            RememberRecent(result.Entry);
             _suppressSearchClose = true;
             try
             {

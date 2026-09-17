@@ -34,8 +34,8 @@
                     <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Tracking settings" />
-                                <TextBlock FontSize="12" Text="Controls what PhasmaStrap can detect and share about your current session." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Integrations_TrackingSettings}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_Integrations_ControlsWhatPhasmaStrapCanDetectShare}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -109,7 +109,7 @@
                     <controls:OptionControl
                         Header="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
                         Description="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}">
-                        <ui:Button Content="View" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />
+                        <ui:Button Content="{x:Static resources:Strings.Menu_Integrations_View}" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />
                     </controls:OptionControl>
 
                     <ui:Card Margin="0,8,0,0" Padding="12">
@@ -119,8 +119,8 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Playing Roblox" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-                                <ui:Button Grid.Column="1" Content="Preview" Appearance="Secondary" Command="{Binding CyclePreviewCommand, Mode=OneTime}" />
+                                <TextBlock Grid.Column="0" Text="{x:Static resources:Strings.Menu_Integrations_PlayingRoblox}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Appearance_Preview}" Appearance="Secondary" Command="{Binding CyclePreviewCommand, Mode=OneTime}" />
                             </Grid>
 
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding HasPreviewData, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -128,13 +128,13 @@
                                     <Image Source="{Binding PreviewIconUrl, IsAsync=True}" Width="52" Height="52" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
                                 </Border>
                                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock Text="Roblox" FontWeight="SemiBold" />
+                                    <TextBlock Text="{x:Static resources:Strings.Menu_Integrations_Tabs_Roblox}" FontWeight="SemiBold" />
                                     <TextBlock Text="{Binding PreviewGame, Mode=OneWay}" FontSize="13" />
                                     <TextBlock Text="{Binding PreviewStateText, Mode=OneWay}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
                             </StackPanel>
 
-                            <TextBlock Margin="0,10,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="No games played yet - play something through PhasmaStrap to preview a real card here.">
+                            <TextBlock Margin="0,10,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Integrations_NoGamesPlayedYetPlaySomething}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -151,9 +151,9 @@
 
                     <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
-                            <TextBlock FontSize="14" Text="RPC Advanced" />
+                            <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Integrations_RPCAdvanced}" />
                         </ui:CardExpander.Header>
-                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Text="The card above always shows a sample - Settings runs as its own process, separate from an active Roblox session, so it can't display your real live presence here. To see exactly what's currently being sent to Discord while you're playing, right-click the PhasmaStrap tray icon and open &quot;RPC Debug&quot;." />
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Text="{x:Static resources:Strings.Menu_Integrations_CardAboveAlwaysShowsSampleSettings}" />
                     </ui:CardExpander>
                 </StackPanel>
             </TabItem>
@@ -222,21 +222,21 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ui:TextBox Grid.Column="0" Margin="0,0,0,0" PlaceholderText="C:\Windows\System32\cmd.exe" Text="{Binding SelectedCustomIntegration.Location}" />
+                                <ui:TextBox Grid.Column="0" Margin="0,0,0,0" PlaceholderText="{x:Static resources:Strings.Menu_Integrations_CWindowsSystem32CmdExe}" Text="{Binding SelectedCustomIntegration.Location}" />
                                 <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseIntegrationLocationCommand}" />
                             </Grid>
                             <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <ui:TextBox Margin="0,4,0,0" PlaceholderText="{Binding Source='/k echo {0}', Converter={StaticResource StringFormatConverter}, ConverterParameter={x:Static resources:Strings.Menu_Integrations_Custom_LaunchArgs_Placeholder}}" Text="{Binding SelectedCustomIntegration.LaunchArgs}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
                             <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_Custom_AutoClose}" IsChecked="{Binding SelectedCustomIntegration.AutoClose}" />
 
-                            <CheckBox Margin="0,8,0,0" Content="Only for a specific game" IsChecked="{Binding SelectedCustomIntegration.SpecifyGame}" />
-                            <ui:TextBox Margin="0,4,0,0" PlaceholderText="Place ID" Text="{Binding SelectedCustomIntegration.GameID}" IsEnabled="{Binding SelectedCustomIntegration.SpecifyGame}" />
+                            <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_OnlySpecificGame}" IsChecked="{Binding SelectedCustomIntegration.SpecifyGame}" />
+                            <ui:TextBox Margin="0,4,0,0" PlaceholderText="{x:Static resources:Strings.Menu_ServerBrowser_PlaceId_Title}" Text="{Binding SelectedCustomIntegration.GameID}" IsEnabled="{Binding SelectedCustomIntegration.SpecifyGame}" />
 
-                            <CheckBox Margin="0,8,0,0" Content="Close when leaving this game" IsChecked="{Binding SelectedCustomIntegration.AutoCloseOnGame}" />
-                            <CheckBox Margin="0,8,0,0" Content="Run as administrator" IsChecked="{Binding SelectedCustomIntegration.RunAsAdmin}" />
-                            <CheckBox Margin="0,8,0,0" Content="Run minimized" IsChecked="{Binding SelectedCustomIntegration.RunMinimized}" />
+                            <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_CloseWhenLeavingGame}" IsChecked="{Binding SelectedCustomIntegration.AutoCloseOnGame}" />
+                            <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_RunAsAdministrator}" IsChecked="{Binding SelectedCustomIntegration.RunAsAdmin}" />
+                            <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_RunMinimized}" IsChecked="{Binding SelectedCustomIntegration.RunMinimized}" />
 
-                            <TextBlock Margin="0,8,0,0" Text="Launch delay (ms)" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Integrations_LaunchDelayMs}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                             <ui:NumberBox Margin="0,4,0,0" Min="0" Max="30000" Value="{Binding SelectedCustomIntegration.Delay}" />
                         </StackPanel>
                         <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="{x:Static resources:Strings.Menu_Integrations_Custom_NoneSelected}" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -254,6 +254,19 @@
                 </StackPanel>
             </TabItem>
 
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Chat24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_Title}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="GameChatPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
         </TabControl>
     </StackPanel>
 </ui:UiPage>

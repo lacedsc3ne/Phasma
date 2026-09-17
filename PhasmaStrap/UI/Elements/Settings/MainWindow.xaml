@@ -210,7 +210,7 @@
                          itself - wpfui's NavigationBase.OnNavigationCollectionChanged hard-casts every
                          removed item to INavigationItem, which NavigationHeader does not implement, so
                          removing a header from Items throws InvalidCastException. -->
-                    <ui:NavigationHeader x:Name="PinnedHeader" Text="Pinned" Icon="Pin24" Visibility="Collapsed" />
+                    <ui:NavigationHeader x:Name="PinnedHeader" Text="{x:Static resources:Strings.Menu_MainWindow_Pinned}" Icon="Pin24" Visibility="Collapsed" />
 
                     <!-- Matches Voidstrap's own sidebar grouping/order/labels where PhasmaStrap has
                          a real equivalent page (Deployment=Behaviour, Global=GBS Editor, News=Releases,
@@ -221,44 +221,40 @@
                          own additional pages (things Voidstrap doesn't have) get two headers of their
                          own instead of being crammed into Core/Configuration: "Session" for
                          gameplay/session tools, "Advanced" for technical/tuning pages. -->
-                    <ui:NavigationHeader Text="Core" Icon="Home24" />
-                    <ui:NavigationItem Content="Home" PageType="{x:Type pages:HomePage}" Icon="Home24" PageTag="home" />
+                    <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_MainWindow_Core}" Icon="Home24" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Home_Home}" PageType="{x:Type pages:HomePage}" Icon="Home24" PageTag="home" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Appearance_Title}" PageType="{x:Type pages:AppearancePage}" Icon="PaintBrush24" PageTag="appearance" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Title}" PageType="{x:Type pages:IntegrationsPage}" Icon="Add28" PageTag="integrations" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Behaviour_Title}" PageType="{x:Type pages:BehaviourPage}" Icon="PlaySettings20" PageTag="bootstrapper" />
 
-                    <ui:NavigationHeader Text="Session" Icon="Play24" />
-                    <ui:NavigationItem Content="History" PageType="{x:Type pages:HistoryPage}" Icon="History24" PageTag="history" />
+                    <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_MainWindow_Session}" Icon="Play24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ServerBrowser_Title}" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" PageTag="serverbrowser" />
-                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GameChat_Title}" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ClassicClient_Title}" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
-                    <ui:NavigationItem Content="Capture" PageType="{x:Type pages:CapturePage}" Icon="Camera24" PageTag="capture" />
-                    <ui:NavigationItem Content="Accounts" PageType="{x:Type pages:AccountsPage}" Icon="PersonAccounts24" PageTag="accounts" />
-                    <ui:NavigationItem Content="Friends" PageType="{x:Type pages:FriendsPage}" Icon="People24" PageTag="friends" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Capture_Capture}" PageType="{x:Type pages:CapturePage}" Icon="Camera24" PageTag="capture" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Accounts_Accounts}" PageType="{x:Type pages:AccountsPage}" Icon="PersonAccounts24" PageTag="accounts" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Friends_Friends}" PageType="{x:Type pages:FriendsPage}" Icon="People24" PageTag="friends" />
 
-                    <ui:NavigationHeader Text="Configuration" Icon="Settings24" />
+                    <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_MainWindow_Configuration}" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Mods_Title}" PageType="{x:Type pages:ModsPage}" Icon="WrenchScrewdriver20" PageTag="mods" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GBSEditor_Title}" PageType="{x:Type pages:GBSEditorPage}" Icon="Globe24" PageTag="gbseditor" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Releases_Title}" PageType="{x:Type pages:ReleasesPage}" Icon="DocumentBulletList24" PageTag="releases" />
-                    <ui:NavigationItem Content="Manager" PageType="{x:Type installerpages:ManagerPage}" Icon="ArrowDownload24" PageTag="manager" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Installer_Manager_Title}" PageType="{x:Type installerpages:ManagerPage}" Icon="ArrowDownload24" PageTag="manager" />
 
-                    <ui:NavigationHeader Text="Advanced" Icon="Wrench24" />
-                    <ui:NavigationItem Content="Rendering" PageType="{x:Type pages:RenderingPage}" Icon="Gauge24" PageTag="rendering" />
+                    <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Advanced}" Icon="Wrench24" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Section_Rendering}" PageType="{x:Type pages:RenderingPage}" Icon="Gauge24" PageTag="rendering" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Notifications_Title}" PageType="{x:Type pages:NotificationsPage}" Icon="Alert24" PageTag="notifications" />
-                    <ui:NavigationItem Content="Networking" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
-                    <ui:NavigationItem Content="Hotkeys" PageType="{x:Type pages:HotkeysPage}" Icon="Keyboard24" PageTag="hotkeys" />
-                    <ui:NavigationItem Content="Developer Tools" PageType="{x:Type pages:DeveloperToolsPage}" Icon="Code24" PageTag="developertools" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Hotkeys_Hotkeys}" PageType="{x:Type pages:HotkeysPage}" Icon="Keyboard24" PageTag="hotkeys" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_DeveloperTools_DeveloperTools}" PageType="{x:Type pages:DeveloperToolsPage}" Icon="Code24" PageTag="developertools" />
                 </ui:NavigationFluent.Items>
                 <ui:NavigationFluent.Footer>
                     <!-- Footer isn't pinned to the bottom of the window in this narrow sidebar - it
                          just continues straight on from Items once the list overflows, so it needs its
                          own header here to read as a separate group rather than more Advanced items. -->
-                    <ui:NavigationHeader Text="App" Icon="Apps24" />
+                    <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_MainWindow_App}" Icon="Apps24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Common_Shortcuts}" PageType="{x:Type pages:ShortcutsPage}" Icon="Apps28" PageTag="shortcuts" />
-                    <ui:NavigationItem Content="Extensions" PageType="{x:Type pages:ExtensionsPage}" Icon="PuzzleCube24" PageTag="extensions" />
-                    <ui:NavigationItem Content="Settings" PageType="{x:Type pages:ChannelPage}" Icon="ArrowRepeatAll24" PageTag="channel" />
-                    <ui:NavigationItem Content="PhasmaStrap" PageType="{x:Type pages:PhasmaStrapPage}" Icon="Settings24" PageTag="phasmastrap" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_PhasmaStrap_PhasmaStrap}" PageType="{x:Type pages:PhasmaStrapPage}" Icon="Settings24" PageTag="phasmastrap" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_About_Title}" Icon="QuestionCircle48" Margin="0,0,0,12" Command="{Binding OpenAboutCommand, Mode=OneTime}" />
                 </ui:NavigationFluent.Footer>
             </ui:NavigationFluent>

@@ -15,8 +15,17 @@
       Scrollable="True">
 
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="PhasmaStrap" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_PhasmaStrap}" FontSize="20" FontWeight="Medium" />
         <TextBlock Margin="0,0,0,8" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <TabControl Margin="0,12,0,0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Settings24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,0,0,0">
 
         <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Description}" />
@@ -51,8 +60,8 @@
         <!-- This does not need i18n as this is locked behind "Developer Mode" -->
         <controls:OptionControl
             Visibility="{Binding Path=WebEnvironmentVisibility}"
-            Header="Web environment"
-            Description="Site to use for metrics">
+            Header="{x:Static resources:Strings.Menu_PhasmaStrap_WebEnvironment}"
+            Description="{x:Static resources:Strings.Menu_PhasmaStrap_SiteUseMetrics}">
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding WebEnvironments, Mode=OneWay}" SelectedValue="{Binding WebEnvironment, Mode=TwoWay}" />
         </controls:OptionControl>
 
@@ -92,7 +101,7 @@
             <WrapPanel>
                 <CheckBox Margin="0,0,20,0" Name="ShouldExportConfig" Content="{x:Static resources:Strings.Menu_PhasmaStrap_ExportData_ExportConfig}" IsChecked="{Binding ShouldExportConfig}" />
                 <CheckBox Margin="0,0,20,0" Name="ShouldExportLogs" Content="{x:Static resources:Strings.Menu_PhasmaStrap_ExportData_ExportLogs}" IsChecked="{Binding ShouldExportLogs}" />
-                <CheckBox Name="ShouldExportSystemInfo" Content="System info" IsChecked="{Binding ShouldExportSystemInfo}" />
+                <CheckBox Name="ShouldExportSystemInfo" Content="{x:Static resources:Strings.Menu_PhasmaStrap_SystemInfo}" IsChecked="{Binding ShouldExportSystemInfo}" />
             </WrapPanel>
         </ui:CardExpander>
 
@@ -103,11 +112,27 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock FontSize="14" Text="Import config" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Restore settings, saved state, and FastFlags from a config export made above. Overwrites what you currently have." />
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_PhasmaStrap_ImportConfig}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_RestoreSettingsSavedStateFastFlagsFrom}" />
                 </StackPanel>
-                <ui:Button Grid.Column="1" MinWidth="100" Icon="ArrowImport20" Content="Import" Command="{Binding ImportDataCommand, Mode=OneTime}" />
+                <ui:Button Grid.Column="1" MinWidth="100" Icon="ArrowImport20" Content="{x:Static resources:Strings.Common_Import}" Command="{Binding ImportDataCommand, Mode=OneTime}" />
             </Grid>
         </ui:Card>
+                </StackPanel>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="ArrowRepeatAll24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Channel_RobloxChannel}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="ChannelPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

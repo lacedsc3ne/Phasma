@@ -85,11 +85,30 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             IsAvailable = NvidiaProfileInspector.IsAvailable;
             UnavailableReason = NvidiaProfileInspector.UnavailableReason;
 
-            if (IsAvailable)
-                LoadFromDriver();
-
             RefreshFlagHistory();
             NvidiaFlagHistory.Changed += OnFlagHistoryChanged;
+
+            if (IsAvailable)
+            {
+                // reading the driver profile is a slow NVAPI round-trip; do it once, in the
+                // background, so clicking the NVIDIA tab doesn't freeze the window
+                StatusMessage = "Reading the NVIDIA driver profile...";
+                _ = LoadFromDriverAsync();
+            }
+        }
+
+        private async Task LoadFromDriverAsync()
+        {
+            try
+            {
+                List<NvidiaSetting> profile = await Task.Run(() => NvidiaProfileInspector.ReadProfile());
+                ApplyProfile(profile);
+                StatusMessage = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Could not read the NVIDIA profile: {ex.Message}";
+            }
         }
 
         /// <summary>
@@ -245,7 +264,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void LoadFromDriver()
         {
-            Dictionary<uint, uint> live = NvidiaProfileInspector.ReadValues(AllTrackedIds);
+            ApplyProfile(NvidiaProfileInspector.ReadProfile());
+        }
+
+        // one profile read feeds both the curated toggles and the custom-settings list (this used
+        // to read the whole profile twice)
+        private void ApplyProfile(List<NvidiaSetting> profile)
+        {
+            HashSet<uint> tracked = new HashSet<uint>(AllTrackedIds);
+            Dictionary<uint, uint> live = new Dictionary<uint, uint>();
+            foreach (NvidiaSetting setting in profile)
+            {
+                if (setting.Type == NvSettingType.Dword && tracked.Contains(setting.Id))
+                    live[setting.Id] = setting.Value;
+            }
 
             LowLatencyMode = ReadEnum(live, IdLowLatencyMode, LowLatencyModes);
             FrlLowLatencyMode = ReadEnum(live, IdFrlLowLatencyMode, FrlLowLatencyModes);
@@ -261,20 +293,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             TextureLodBias = live.TryGetValue(IdTextureLodBias, out uint bias) ? unchecked((int)bias) : 0;
             BenchmarkOverlayMode = BenchmarkOverlayFromValue(live.TryGetValue(IdBenchmarkOverlay, out uint overlay) ? overlay : 0u);
 
-            LoadCustomSettings();
-        }
-
-        // Populates CustomSettings from whatever is currently sitting in the driver's
-        // "PhasmaStrap" profile that isn't one of the curated IDs above - see the doc comment
-        // on the CustomSettings property.
-        private void LoadCustomSettings()
-        {
+            // whatever else is in the driver's "PhasmaStrap" profile that isn't curated above
             CustomSettings.Clear();
-
-            HashSet<uint> curated = new HashSet<uint>(AllTrackedIds);
-            foreach (NvidiaSetting setting in NvidiaProfileInspector.ReadProfile())
+            foreach (NvidiaSetting setting in profile)
             {
-                if (setting.Type != NvSettingType.Dword || curated.Contains(setting.Id))
+                if (setting.Type != NvSettingType.Dword || tracked.Contains(setting.Id))
                     continue;
 
                 CustomSettings.Add(setting);

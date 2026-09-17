@@ -33,10 +33,10 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-            <ui:Button Grid.Column="1" Content="Join fastest" Icon="TopSpeed24" Appearance="Secondary"
+            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_ServerBrowser_JoinFastest}" Icon="TopSpeed24" Appearance="Secondary"
                        IsEnabled="{Binding HasPingedServers, Mode=OneWay}"
                        Command="{Binding JoinFastestCommand, Mode=OneTime}"
-                       ToolTip="Joins whichever server above reported the lowest ping" />
+                       ToolTip="{x:Static resources:Strings.Menu_ServerBrowser_JoinsWhicheverServerAboveReportedLowest}" />
         </Grid>
 
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Servers, Mode=OneWay}">

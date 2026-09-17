@@ -80,14 +80,14 @@
         <TextBlock Text="{x:Static resources:Strings.Menu_Shortcuts_StudioCompanion_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Shortcuts_StudioCompanion_Description}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-        <controls:OptionControl Header="Enable Studio companion" Description="{Binding StudioPluginStatus, Mode=OneWay}">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Shortcuts_EnableStudioCompanion}" Description="{Binding StudioPluginStatus, Mode=OneWay}">
             <StackPanel Orientation="Horizontal">
-                <ui:Button Content="Reinstall" Icon="ArrowClockwise24" Margin="0,0,8,0" IsEnabled="{Binding StudioPluginEnabled}" Command="{Binding ReinstallStudioPluginCommand, Mode=OneTime}" />
+                <ui:Button Content="{x:Static resources:Strings.Menu_Shortcuts_Reinstall}" Icon="ArrowClockwise24" Margin="0,0,8,0" IsEnabled="{Binding StudioPluginEnabled}" Command="{Binding ReinstallStudioPluginCommand, Mode=OneTime}" />
                 <ui:ToggleSwitch IsChecked="{Binding StudioPluginEnabled, Mode=TwoWay}" />
             </StackPanel>
         </controls:OptionControl>
 
-        <controls:OptionControl Header="Studio Rich Presence" Description="Shows a separate Discord status while Roblox Studio is open.">
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Shortcuts_StudioRichPresence}" Description="{x:Static resources:Strings.Menu_Shortcuts_ShowsSeparateDiscordStatusWhileRoblox}">
             <ui:ToggleSwitch IsChecked="{Binding StudioRichPresenceEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
@@ -95,8 +95,8 @@
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Shortcuts_GameShortcuts_Description}" />
 
         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-            <ui:TextBox Width="260" PlaceholderText="Place ID or game link" Text="{Binding GameShortcutInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ui:Button Margin="8,0,0,0" Content="Create shortcut" Icon="Add28" Command="{Binding CreateGameShortcutCommand, Mode=OneTime}" />
+            <ui:TextBox Width="260" PlaceholderText="{x:Static resources:Strings.Menu_Shortcuts_PlaceIDGameLink}" Text="{Binding GameShortcutInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Shortcuts_CreateShortcut}" Icon="Add28" Command="{Binding CreateGameShortcutCommand, Mode=OneTime}" />
         </StackPanel>
 
         <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding GameShortcutStatus}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

@@ -157,7 +157,15 @@ namespace PhasmaStrap.Networking
                     EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
                 };
 
-                await sslStream.AuthenticateAsServerAsync(serverOptions, token);
+                try
+                {
+                    await sslStream.AuthenticateAsServerAsync(serverOptions, token);
+                }
+                catch (Exception)
+                {
+                    OnHandshakeFailed(sniHost);
+                    throw;
+                }
 
                 if (sniHost is null || !InterceptedHosts.ContainsKey(sniHost))
                 {
@@ -206,6 +214,59 @@ namespace PhasmaStrap.Networking
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Connection for {sniHost ?? "unknown host"} failed: {ex.Message}");
             }
+        }
+
+        // --- certificate watch ---
+        // Roblox verifies the proxy's leaf cert against its own cacert.pem. If a Roblox update
+        // ships a fresh bundle (or Roblox ever starts checking the file), every handshake fails
+        // before a request is parsed - which from the user's side just looks like "spoofing
+        // stopped". A burst of handshake failures on an intercepted host triggers one re-patch
+        // attempt and one notification so it's visible instead of silent.
+        private static readonly Queue<DateTime> HandshakeFailures = new();
+        private static bool _certificateWarned;
+
+        private static void OnHandshakeFailed(string? host)
+        {
+            if (host is not null && !InterceptedHosts.ContainsKey(host))
+                return;
+
+            bool trip;
+            lock (HandshakeFailures)
+            {
+                DateTime now = DateTime.UtcNow;
+                HandshakeFailures.Enqueue(now);
+                while (HandshakeFailures.Count > 0 && (now - HandshakeFailures.Peek()).TotalSeconds > 60)
+                    HandshakeFailures.Dequeue();
+
+                trip = HandshakeFailures.Count >= 3 && !_certificateWarned;
+                if (trip)
+                    _certificateWarned = true;
+            }
+
+            if (!trip)
+                return;
+
+            App.Logger.WriteLine(LOG_IDENT, $"Repeated TLS handshake failures for {host ?? "an intercepted host"} - Roblox is rejecting the proxy certificate, re-checking its trust bundle");
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    int patched = AssetProxyCA.PatchRobloxTrustBundles();
+                    bool ok = AssetProxyCA.IsRobloxTrustBundlePatched();
+
+                    UI.NotificationCenter.Notify(
+                        "Roblox rejected the proxy certificate",
+                        patched > 0 || ok
+                            ? "Roblox's certificate bundle had changed (an update?) - PhasmaStrap re-added its certificate. Restart Roblox for spoofing to work again."
+                            : "PhasmaStrap could not re-add its certificate to Roblox's bundle - check the Networking page.",
+                        UI.NotificationCategory.General);
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Trust bundle re-check failed: {ex.Message}");
+                }
+            });
         }
 
         // minimal buffered reader that supports both line-based header reads and exact-length

@@ -76,19 +76,33 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             timer.Start();
         }
 
+        // which tab to open on the page the sidebar navigates to: for an entry living inside an
+        // embedded page that's the host tab holding the frame; for a Tab entry it's the tab itself
+        private static string TabOnHostPage(SettingsSearchEntry entry)
+        {
+            if (entry.NestedPageType is not null)
+                return entry.HostTab;
+            return entry.Kind == SettingsSearchEntryKind.Tab ? entry.Header : entry.Tab;
+        }
+
+        private static string TabInsideNestedPage(SettingsSearchEntry entry)
+        {
+            return entry.Kind == SettingsSearchEntryKind.Tab ? entry.Header : entry.Tab;
+        }
+
         private static void RevealOnPage(FrameworkElement page, SettingsSearchEntry entry, int attempt = 0)
         {
             try
             {
-                DependencyObject scope = page;
+                string tabName = TabOnHostPage(entry);
 
                 // 1. tab - a TabItem's content is presented by the TabControl's content presenter,
                 //    not inside the TabItem's own visual tree, so after selecting it the search for
                 //    the control still runs from the page root (only the selected tab's content is
                 //    realised, so there's no risk of matching another tab's controls)
-                if (entry.Tab.Length > 0)
+                if (tabName.Length > 0)
                 {
-                    TabItem? tab = Descendants<TabItem>(page).FirstOrDefault(t => HeaderText(t.Header) == entry.Tab);
+                    TabItem? tab = Descendants<TabItem>(page).FirstOrDefault(t => HeaderText(t.Header) == tabName);
 
                     if (tab is null)
                     {
@@ -99,18 +113,14 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                         }
 
                         string seen = string.Join(" | ", Descendants<TabItem>(page).Select(t => HeaderText(t.Header)));
-                        App.Logger.WriteLine(LOG_IDENT, $"Tab '{entry.Tab}' not found on {page.GetType().Name} (tabs seen: {seen})");
+                        App.Logger.WriteLine(LOG_IDENT, $"Tab '{tabName}' not found on {page.GetType().Name} (tabs seen: {seen})");
                     }
                     else
                     {
                         bool changed = !tab.IsSelected;
+                        SelectTab(tab);
 
-                        if (ItemsControl.ItemsControlFromItemContainer(tab) is TabControl tabControl)
-                            tabControl.SelectedItem = tab;
-                        else if (tab.Parent is TabControl parent)
-                            parent.SelectedItem = tab;
-
-                        if (entry.Kind == SettingsSearchEntryKind.Tab)
+                        if (entry.Kind == SettingsSearchEntryKind.Tab && entry.NestedPageType is null)
                         {
                             Highlight(tab);
                             return;
@@ -133,16 +143,22 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             }
         }
 
+        private static void SelectTab(TabItem tab)
+        {
+            if (ItemsControl.ItemsControlFromItemContainer(tab) is TabControl tabControl)
+                tabControl.SelectedItem = tab;
+            else if (tab.Parent is TabControl parent)
+                parent.SelectedItem = tab;
+        }
+
         private static void RevealAfterTab(FrameworkElement page, SettingsSearchEntry entry)
         {
             try
             {
-                DependencyObject scope = page;
-
                 // 2. embedded page frame
                 if (entry.NestedPageType is not null)
                 {
-                    Frame? nested = Descendants<Frame>(scope).FirstOrDefault();
+                    Frame? nested = Descendants<Frame>(page).FirstOrDefault();
                     if (nested is null)
                     {
                         App.Logger.WriteLine(LOG_IDENT, $"No frame found for {entry.NestedPageType.Name}");
@@ -151,7 +167,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 
                     if (nested.Content is FrameworkElement nestedPage && nestedPage.GetType() == entry.NestedPageType)
                     {
-                        RunWhenLoaded(nestedPage, () => RevealTarget(nestedPage, entry));
+                        RunWhenLoaded(nestedPage, () => RevealInNestedPage(nestedPage, entry));
                     }
                     else
                     {
@@ -160,7 +176,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                         {
                             nested.LoadCompleted -= handler;
                             if (nested.Content is FrameworkElement loaded)
-                                RunWhenLoaded(loaded, () => RevealTarget(loaded, entry));
+                                RunWhenLoaded(loaded, () => RevealInNestedPage(loaded, entry));
                         };
                         nested.LoadCompleted += handler;
                     }
@@ -168,7 +184,55 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                     return;
                 }
 
-                RevealTarget(scope, entry);
+                RevealTarget(page, entry);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Reveal failed for '{entry.Header}': {ex.Message}");
+            }
+        }
+
+        // 3. inside an embedded page: open its own tab (if the entry sits on one), then find the control
+        private static void RevealInNestedPage(FrameworkElement nestedPage, SettingsSearchEntry entry, int attempt = 0)
+        {
+            try
+            {
+                string tabName = TabInsideNestedPage(entry);
+
+                if (tabName.Length > 0)
+                {
+                    TabItem? tab = Descendants<TabItem>(nestedPage).FirstOrDefault(t => HeaderText(t.Header) == tabName);
+
+                    if (tab is null)
+                    {
+                        if (attempt < MaxAttempts)
+                        {
+                            RetryLater(nestedPage, () => RevealInNestedPage(nestedPage, entry, attempt + 1));
+                            return;
+                        }
+
+                        App.Logger.WriteLine(LOG_IDENT, $"Tab '{tabName}' not found on embedded {nestedPage.GetType().Name}");
+                    }
+                    else
+                    {
+                        bool changed = !tab.IsSelected;
+                        SelectTab(tab);
+
+                        if (entry.Kind == SettingsSearchEntryKind.Tab)
+                        {
+                            Highlight(tab);
+                            return;
+                        }
+
+                        if (changed)
+                        {
+                            nestedPage.Dispatcher.BeginInvoke(() => RevealTarget(nestedPage, entry), DispatcherPriority.Loaded);
+                            return;
+                        }
+                    }
+                }
+
+                RevealTarget(nestedPage, entry);
             }
             catch (Exception ex)
             {
@@ -253,7 +317,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 case SettingsSearchEntryKind.Option:
                     return (FrameworkElement?)Descendants<OptionControl>(scope).FirstOrDefault(o => (o.Header ?? "") == entry.Header)
                         ?? (FrameworkElement?)Descendants<ToggleSwitch>(scope).FirstOrDefault(t => HeaderText(t.Content) == entry.Header)
-                        ?? Descendants<CheckBox>(scope).FirstOrDefault(c => HeaderText(c.Content) == entry.Header);
+                        ?? (FrameworkElement?)Descendants<CheckBox>(scope).FirstOrDefault(c => HeaderText(c.Content) == entry.Header)
+                        // rows built from data templates (hotkey bindings, lists) - land on the row's title text
+                        ?? Descendants<TextBlock>(scope).FirstOrDefault(t => !IsIcon(t) && t.Text == entry.Header);
 
                 case SettingsSearchEntryKind.Group:
                     return (FrameworkElement?)Descendants<CardExpander>(scope).FirstOrDefault(c => HeaderText(c.Header) == entry.Header)
@@ -266,7 +332,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                     return Descendants<System.Windows.Controls.Button>(scope).FirstOrDefault(b => HeaderText(b.Content) == entry.Header);
 
                 case SettingsSearchEntryKind.Tab:
-                    return Descendants<TabItem>(scope).FirstOrDefault(t => HeaderText(t.Header) == entry.Tab);
+                    return Descendants<TabItem>(scope).FirstOrDefault(t => HeaderText(t.Header) == entry.Header);
 
                 default:
                     return null;

@@ -4,14 +4,15 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:HotkeysViewModel, IsDesignTimeCreatable=True}"
       Title="HotkeysPage"
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="Hotkeys" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Global shortcuts that work while a Roblox game session is running, no matter which window has focus. Click a box below and press a key combination to bind it - these only listen during an active game session, not from this Settings window." />
+        <TextBlock Text="{x:Static resources:Strings.Menu_Hotkeys_Hotkeys}" FontSize="20" FontWeight="Medium" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Hotkeys_GlobalShortcutsWorkWhileRobloxGame}" />
 
         <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding Hotkeys, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
@@ -30,11 +31,11 @@
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <ui:TextBox Width="180" IsReadOnly="True" Focusable="True"
-                                            PlaceholderText="Click to set..."
+                                            PlaceholderText="{x:Static resources:Strings.Menu_Hotkeys_ClickSet}"
                                             Text="{Binding GestureText, Mode=OneWay}"
                                             Tag="{Binding}"
                                             PreviewKeyDown="HotkeyBox_PreviewKeyDown" />
-                                <ui:Button Margin="8,0,0,0" Content="Clear" Appearance="Secondary"
+                                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Appearance="Secondary"
                                            IsEnabled="{Binding HasGesture}"
                                            Tag="{Binding}"
                                            Click="ClearButton_Click" />

@@ -23,6 +23,7 @@ namespace PhasmaStrap.Utility
         private const uint MOD_CONTROL = 0x0002;
         private const uint MOD_SHIFT = 0x0004;
         private const uint MOD_WIN = 0x0008;
+        private const uint MOD_NOREPEAT = 0x4000;
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
@@ -107,33 +108,26 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Parses the same "Ctrl+Alt+R"-style gesture text HotkeysPage displays/captures, reusing
-        // WPF's own KeyGestureConverter/KeyInterop instead of hand-rolling a key-name table.
+        // Parses the same "Ctrl+Alt+R" / "F9" gesture text HotkeysPage displays/captures (see
+        // HotkeyGesture). A key with no modifier is a valid binding.
         public static bool TryParseGesture(string text, out uint modifiers, out uint vk)
         {
             modifiers = 0;
             vk = 0;
 
-            try
-            {
-                if (new KeyGestureConverter().ConvertFromString(text) is not KeyGesture gesture)
-                    return false;
-
-                if (gesture.Modifiers == ModifierKeys.None)
-                    return false;
-
-                if ((gesture.Modifiers & ModifierKeys.Alt) != 0) modifiers |= MOD_ALT;
-                if ((gesture.Modifiers & ModifierKeys.Control) != 0) modifiers |= MOD_CONTROL;
-                if ((gesture.Modifiers & ModifierKeys.Shift) != 0) modifiers |= MOD_SHIFT;
-                if ((gesture.Modifiers & ModifierKeys.Windows) != 0) modifiers |= MOD_WIN;
-
-                vk = (uint)KeyInterop.VirtualKeyFromKey(gesture.Key);
-                return vk != 0;
-            }
-            catch (NotSupportedException)
-            {
+            if (!HotkeyGesture.TryParse(text, out ModifierKeys mods, out Key key))
                 return false;
-            }
+
+            if ((mods & ModifierKeys.Alt) != 0) modifiers |= MOD_ALT;
+            if ((mods & ModifierKeys.Control) != 0) modifiers |= MOD_CONTROL;
+            if ((mods & ModifierKeys.Shift) != 0) modifiers |= MOD_SHIFT;
+            if ((mods & ModifierKeys.Windows) != 0) modifiers |= MOD_WIN;
+
+            // don't auto-repeat while the key is held - one press, one action
+            modifiers |= MOD_NOREPEAT;
+
+            vk = (uint)KeyInterop.VirtualKeyFromKey(key);
+            return vk != 0;
         }
 
         public void Dispose()

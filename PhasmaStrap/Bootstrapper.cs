@@ -310,6 +310,12 @@ namespace PhasmaStrap
                     try
                     {
                         Networking.AssetProxyCA.PatchRobloxTrustBundles();
+
+                        if (!Networking.AssetProxyCA.IsRobloxTrustBundlePatched())
+                        {
+                            App.Logger.WriteLine(LOG_IDENT, "Roblox's trust bundle does not contain the proxy certificate after patching - spoofers will not work this session");
+                            UI.NotificationCenter.Notify("Proxy certificate not accepted", "Roblox's certificate bundle could not be patched, so Asset Warp and the spoofers won't work this session. Check the Networking page.", UI.NotificationCategory.General);
+                        }
                     }
                     catch (Exception ex)
                     {

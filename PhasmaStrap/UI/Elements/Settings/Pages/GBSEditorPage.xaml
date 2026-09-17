@@ -46,17 +46,17 @@
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_PreferredTextSize_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_PreferredTextSize_Description}">
                         <ComboBox Padding="10,5,10,5" Width="160" SelectedValuePath="Tag" SelectedValue="{Binding PreferredTextSize, Mode=TwoWay}">
-                            <ComboBoxItem Content="Small">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Small}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>0</sys:Int32>
                                 </FrameworkElement.Tag>
                             </ComboBoxItem>
-                            <ComboBoxItem Content="Normal">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Normal}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>1</sys:Int32>
                                 </FrameworkElement.Tag>
                             </ComboBoxItem>
-                            <ComboBoxItem Content="Large">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Large}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>2</sys:Int32>
                                 </FrameworkElement.Tag>
@@ -71,8 +71,8 @@
                     <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="HUD &amp; visibility" />
-                                <TextBlock FontSize="12" Text="What's shown on screen while you play." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_GBSEditor_HUDVisibility}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_GBSEditor_WhatSShownScreenWhileYou}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -113,7 +113,7 @@
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Description}">
                         <ComboBox Padding="10,5,10,5" Width="160" SelectedValuePath="Tag" SelectedValue="{Binding GraphicsQuality, Mode=TwoWay}">
-                            <ComboBoxItem Content="Automatic">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Common_Automatic}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>0</sys:Int32>
                                 </FrameworkElement.Tag>
@@ -218,8 +218,8 @@
                     <ui:CardExpander Margin="0,8,0,0">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Sensitivity &amp; vibration" />
-                                <TextBlock FontSize="12" Text="Mouse, gamepad, and camera input tuning." TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_GBSEditor_SensitivityVibration}" />
+                                <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_GBSEditor_MouseGamepadCameraInputTuning}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
@@ -266,17 +266,17 @@
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VRComfortSetting_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VRComfortSetting_Description}">
                         <ComboBox Padding="10,5,10,5" Width="150" SelectedValuePath="Tag" SelectedValue="{Binding VRComfortSetting, Mode=TwoWay}">
-                            <ComboBoxItem Content="Comfort">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Comfort}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>0</sys:Int32>
                                 </FrameworkElement.Tag>
                             </ComboBoxItem>
-                            <ComboBoxItem Content="Normal">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Normal}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>1</sys:Int32>
                                 </FrameworkElement.Tag>
                             </ComboBoxItem>
-                            <ComboBoxItem Content="Intense">
+                            <ComboBoxItem Content="{x:Static resources:Strings.Menu_GBSEditor_Intense}">
                                 <FrameworkElement.Tag>
                                     <sys:Int32>2</sys:Int32>
                                 </FrameworkElement.Tag>
@@ -360,7 +360,7 @@
 
                     <WrapPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom">
                         <ui:TextBox x:Name="NewNameTextBox" Width="180" Margin="0,0,8,12" PlaceholderText="{x:Static resources:Strings.Common_Name}" />
-                        <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="token" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
+                        <ui:TextBox x:Name="NewTypeTextBox" Width="90" Margin="0,0,8,12" Text="{x:Static resources:Strings.Menu_GBSEditor_Token}" PlaceholderText="{x:Static resources:Strings.Menu_GBSEditor_Type}" />
                         <ui:TextBox x:Name="NewValueTextBox" Width="180" Margin="0,0,12,12" PlaceholderText="{x:Static resources:Strings.Common_Value}" />
                         <ui:Button Icon="Add28" Content="{x:Static resources:Strings.Menu_GBSEditor_AddNew}" Click="AddButton_Click" Margin="0,0,12,12" />
                         <ui:Button Icon="Delete48" Content="{x:Static resources:Strings.Menu_GBSEditor_DeleteSelected}" Click="DeleteButton_Click" Appearance="Danger" Margin="0,0,12,12">
