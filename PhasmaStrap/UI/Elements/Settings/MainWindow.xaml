@@ -158,6 +158,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ServerBrowser_Title}" PageType="{x:Type pages:ServerBrowserPage}" Icon="Server24" PageTag="serverbrowser" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_GameChat_Title}" PageType="{x:Type pages:GameChatPage}" Icon="Chat24" PageTag="gamechat" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_ClassicClient_Title}" PageType="{x:Type pages:ClassicClientPage}" Icon="Clock24" PageTag="classicclient" />
+                    <ui:NavigationItem Content="Capture" PageType="{x:Type pages:CapturePage}" Icon="Camera24" PageTag="capture" />
 
                     <ui:NavigationHeader Text="Configuration" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />
