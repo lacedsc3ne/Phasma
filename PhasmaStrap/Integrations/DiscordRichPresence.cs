@@ -29,15 +29,14 @@ namespace PhasmaStrap.Integrations
     public class DiscordRichPresence : IDisposable
     {
         // PhasmaStrap's own Discord application (named "PhasmaStrap", with the logo as its icon) -
-        // this is what makes the profile read "Playing PhasmaStrap". Overridable per user via
-        // Settings.DiscordApplicationId; Bloxstrap's shared "Roblox" app was 1005469189907173486.
-        public const string DefaultApplicationId = "1550192013452906538";
+        // this is what makes the profile read "Playing PhasmaStrap". The alternative is the shared
+        // "Roblox" application Bloxstrap registered, selected by Settings.DiscordShowAsPhasmaStrap.
+        public const string PhasmaStrapApplicationId = "1550192013452906538";
 
-        public static string ResolveApplicationId()
-        {
-            string custom = (App.Settings.Prop.DiscordApplicationId ?? "").Trim();
-            return custom.Length >= 15 && custom.All(char.IsDigit) ? custom : DefaultApplicationId;
-        }
+        public const string RobloxApplicationId = "1005469189907173486";
+
+        public static string ResolveApplicationId() =>
+            App.Settings.Prop.DiscordShowAsPhasmaStrap ? PhasmaStrapApplicationId : RobloxApplicationId;
 
         private readonly DiscordRpcClient _rpcClient = new(ResolveApplicationId());
         private readonly ActivityWatcher _activityWatcher;
