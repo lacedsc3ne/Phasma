@@ -102,15 +102,15 @@
                     <ui:CardExpander Margin="0,8,0,0" IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
                         <ui:CardExpander.Header>
                             <StackPanel>
-                                <TextBlock FontSize="14" Text="Show as &quot;Playing PhasmaStrap&quot;" />
-                                <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Discord labels the activity with the name and icon of the application it belongs to. Register your own to get the PhasmaStrap name and logo at the top; the game, server and account details stay underneath." />
+                                <TextBlock FontSize="14" Text="Discord application (advanced)" />
+                                <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Your profile shows &quot;Playing PhasmaStrap&quot; with the logo, and the game, server and account details underneath. Only change this if you want the activity to appear under a different name/icon of your own." />
                             </StackPanel>
                         </ui:CardExpander.Header>
                         <StackPanel>
                             <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       Text="1. Open discord.com/developers/applications and click New Application. Name it PhasmaStrap.&#10;2. On General Information, upload the PhasmaStrap logo as the App Icon (Images/PhasmaStrap.png in the repo works) and save.&#10;3. Copy the Application ID and paste it below. No bot, OAuth or asset setup is needed - PhasmaStrap sends the game icon and avatar as image links." />
-                            <controls:OptionControl Header="Discord application ID" Description="{Binding DiscordApplicationStatus, Mode=OneWay}">
-                                <ui:TextBox Width="240" PlaceholderText="e.g. 1005469189907173486" Text="{Binding DiscordApplicationId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                       Text="To use your own: create an application at discord.com/developers/applications, give it the name and icon you want, and paste its Application ID here. Leave empty for PhasmaStrap's own. No bot, OAuth or asset setup is needed." />
+                            <controls:OptionControl Header="Application ID override" Description="{Binding DiscordApplicationStatus, Mode=OneWay}">
+                                <ui:TextBox Width="240" PlaceholderText="Leave empty for PhasmaStrap" Text="{Binding DiscordApplicationId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
