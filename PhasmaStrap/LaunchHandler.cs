@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -48,6 +48,11 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, "Opening uninstaller");
                 LaunchUninstaller();
+            }
+            else if (App.LaunchSettings.EditClipFlag.Active)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Opening clip editor");
+                LaunchClipEditor(App.LaunchSettings.EditClipFlag.Data);
             }
             else if (App.LaunchSettings.MenuFlag.Active)
             {
@@ -196,6 +201,48 @@ namespace PhasmaStrap
 
                 App.Terminate();
             }
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
+
+        public static void LaunchClipEditor(string? path)
+        {
+            const string LOG_IDENT = "LaunchHandler::LaunchClipEditor";
+
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"No such clip: '{path}'");
+                App.Terminate();
+                return;
+            }
+
+            var window = new UI.Elements.Dialogs.ClipEditorWindow(path);
+
+            // UI-test hook: open at the very bottom of the z-order without taking focus, so the
+            // window can be driven (UI Automation) and captured (PrintWindow) without disturbing
+            // whatever is on screen - e.g. a fullscreen game. It has to stay on-screen: a window
+            // parked at negative coordinates is never composed, so PrintWindow returns nothing.
+            if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1")
+            {
+                window.WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+                window.Left = 40;
+                window.Top = 40;
+                window.ShowActivated = false;
+                window.ShowInTaskbar = false;
+                window.SourceInitialized += (_, _) =>
+                {
+                    IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+                    SetWindowPos(hwnd, new IntPtr(1) /* HWND_BOTTOM */, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 /* NOSIZE | NOMOVE | NOACTIVATE */);
+                };
+            }
+            else
+            {
+                window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            }
+
+            window.ShowDialog();
+            App.Terminate();
         }
 
         public static void LaunchMenu()

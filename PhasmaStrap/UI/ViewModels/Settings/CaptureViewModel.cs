@@ -140,6 +140,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (item is not null && File.Exists(item.Path))
                 Process.Start(new ProcessStartInfo(item.Path) { UseShellExecute = true });
         });
+        public ICommand EditReplayCommand => new RelayCommand<ReplayClipItem>(item =>
+        {
+            if (item is null || !File.Exists(item.Path))
+                return;
+
+            var editor = new PhasmaStrap.UI.Elements.Dialogs.ClipEditorWindow(item.Path)
+            {
+                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault()
+            };
+
+            editor.ShowDialog();
+
+            if (editor.Saved)
+            {
+                RefreshReplays();
+                RefreshGallery(); // "Save frame" drops a PNG into the screenshots gallery
+            }
+        });
+
         public ICommand DeleteReplayCommand => new RelayCommand<ReplayClipItem>(item =>
         {
             if (item is null)

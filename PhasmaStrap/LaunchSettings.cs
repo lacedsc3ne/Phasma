@@ -47,6 +47,9 @@ namespace PhasmaStrap
         // syncs BOTH hosts-file blocks in one elevated run; data is "proxy=on|off;telemetry=on|off"
         public LaunchFlag ApplyHostsFlag            { get; } = new("applyhosts");
 
+        // -editclip "<path to mp4>": opens the Capture page's clip editor on that file directly
+        public LaunchFlag EditClipFlag              { get; } = new("editclip");
+
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");
