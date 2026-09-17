@@ -70,8 +70,10 @@
 
             <WrapPanel Margin="0,8,0,0">
                 <ui:TextBox Width="220" Margin="0,0,8,6" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_PresetName}" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Margin="0,0,8,6" Content="Create preset from selected flags" Icon="Checkmark24" Appearance="Primary" Click="PresetFromSelected_Click" />
-                <ui:Button Margin="0,0,8,6" Content="Create preset from all flags" Icon="Save24" Appearance="Secondary" Command="{Binding SavePresetCommand, Mode=OneTime}" />
+                <ui:Button Margin="0,0,8,6" Content="Create preset from selected flags" Icon="Checkmark24" Appearance="Primary" Click="PresetFromSelected_Click"
+                           ToolTip="Only the rows you have highlighted in the flag list go into the preset. Click a row to select it, Ctrl+click to add more, Shift+click for a range. Best for turning a few flags into a per-game bundle." />
+                <ui:Button Margin="0,0,8,6" Content="Create preset from all flags" Icon="Save24" Appearance="Secondary" Command="{Binding SavePresetCommand, Mode=OneTime}"
+                           ToolTip="Every flag currently in the list goes into the preset, no selection needed. Best for snapshotting your whole setup, or making all of it apply only where assigned." />
             </WrapPanel>
 
             <controls:OptionControl Header="Only use the preset's flags where it is assigned" Description="When a preset is created (from the selected flags, or from all of them), its flags are removed from your global list so they no longer apply to every game. Leave off to keep them global as well.">
