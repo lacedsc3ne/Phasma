@@ -361,10 +361,10 @@ namespace PhasmaStrap.Models.Persistable
         // See Bootstrapper.TryApplyFastFlagPlacePresetAsync.
         public Dictionary<string, string> FastFlagPlacePresets { get; set; } = new();
 
-        // restart Roblox (straight back into the same server) when a game was joined in a way that
-        // couldn't apply its preset - from inside the Roblox app, by following a friend, or while
-        // Roblox was already open. See Utility/FastFlagPresetSession.
-        public bool FastFlagPresetRestartRoblox { get; set; } = true;
+        // when a launch (browser Play, a link) needs a different preset than the one the already
+        // running Roblox started with, close that Roblox first so the new flags are actually read.
+        // Off by default - nothing restarts on its own. See Utility/FastFlagPresetSession.
+        public bool FastFlagPresetCloseRunningRoblox { get; set; } = false;
 
         // bootstrapper theme editor (BootstrapperEditorWindow): remembers which detected external
         // editor (its full .exe path, from Utility.ExternalEditor.Detect) "Open in External Editor"
