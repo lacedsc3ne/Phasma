@@ -101,7 +101,7 @@
 
                     <controls:OptionControl
                         Header="Show as &quot;Playing PhasmaStrap&quot;"
-                        Description="Puts the PhasmaStrap name and logo at the top of your Discord activity, with the game, server and account details underneath. Off shows it as &quot;Playing Roblox&quot; instead. Applies to the next game session."
+                        Description="Names the activity PhasmaStrap and puts the logo as the badge on the game icon (the account avatar takes that badge instead when &quot;Show account on profile&quot; is on). Off shows it as &quot;Playing Roblox&quot;. Applies to the next game session."
                         IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
                         <ui:ToggleSwitch IsChecked="{Binding DiscordShowAsPhasmaStrap, Mode=TwoWay}" />
                     </controls:OptionControl>

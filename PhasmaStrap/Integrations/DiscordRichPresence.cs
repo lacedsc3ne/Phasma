@@ -35,6 +35,9 @@ namespace PhasmaStrap.Integrations
 
         public const string RobloxApplicationId = "1005469189907173486";
 
+        // the repo's logo (Images/PhasmaStrap.png on the main branch) - shown as the small badge
+        public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/Phasma/main/Images/PhasmaStrap.png";
+
         public static string ResolveApplicationId() =>
             App.Settings.Prop.DiscordShowAsPhasmaStrap ? PhasmaStrapApplicationId : RobloxApplicationId;
 
@@ -388,6 +391,16 @@ namespace PhasmaStrap.Integrations
             string icon = "roblox";
             string smallImageText = "Roblox";
             string smallImage = "roblox";
+
+            // Discord's activity card never shows the application's own icon - the only pictures
+            // on it are the large image (the game) and the small badge in its corner. So the
+            // PhasmaStrap logo lives in that badge (the account avatar takes the spot instead when
+            // "Show account on profile" is on). Discord fetches image URLs through its own proxy.
+            if (App.Settings.Prop.DiscordShowAsPhasmaStrap)
+            {
+                smallImage = PhasmaStrapLogoUrl;
+                smallImageText = $"PhasmaStrap v{App.Version}";
+            }
             
 
             var activity = _activityWatcher.Data;
