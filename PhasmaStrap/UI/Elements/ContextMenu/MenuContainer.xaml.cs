@@ -1,12 +1,16 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 using PhasmaStrap.Integrations;
+using PhasmaStrap.Integrations.FrameGeneration;
+using PhasmaStrap.Integrations.Overlays;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
@@ -30,6 +34,13 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         private ChatLogs? _chatLogsWindow;
 
         private RPCWindow? _rpcWindow;
+
+        // live "Session info" readouts (play time, Roblox memory) refresh on this while in a game
+        private readonly DispatcherTimer _sessionTimer = new(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(2) };
+
+        private int _joinClosestActive;
+        private MatchmakerCandidate? _lastClosest;
+        private long _lastClosestPlaceId;
 
         public MenuContainer(Watcher watcher)
         {
@@ -57,6 +68,136 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 RPCDebugMenuItem.Visibility = Visibility.Visible;
 
             VersionTextBlock.Text = $"{App.ProjectName} v{App.Version}";
+
+            FlagsTextBlock.Text = $"FastFlags applied: {(App.Settings.Prop.UseFastFlagManager ? App.FastFlags.Prop.Count : 0)}";
+            FrameGenMenuItem.IsChecked = FrameGenSettings.ModeIndex > 0;
+            OverlayFocusModeMenuItem.IsChecked = App.Settings.Prop.OverlayFocusModeEnabled;
+
+            // the overlay-related items only make sense when the HUD/crosshair are actually on
+            bool overlaysOn = App.Settings.Prop.OverlayHudEnabled || App.Settings.Prop.Crosshair;
+            OverlayFocusModeMenuItem.Visibility = overlaysOn ? Visibility.Visible : Visibility.Collapsed;
+            CantSeeOverlaysMenuItem.Visibility = overlaysOn ? Visibility.Visible : Visibility.Collapsed;
+
+            TakeScreenshotMenuItem.Visibility = Visibility.Visible;
+            SaveReplayMenuItem.Visibility = App.Settings.Prop.InstantReplayEnabled ? Visibility.Visible : Visibility.Collapsed;
+
+            _sessionTimer.Tick += SessionTimer_Tick;
+        }
+
+        private void SessionTimer_Tick(object? sender, EventArgs e)
+        {
+            ActivityData? data = _activityWatcher?.Data;
+            if (_activityWatcher?.InGame != true || data is null)
+                return;
+
+            PlayTimeTextBlock.Text = $"Play time: {DateTime.Now - data.TimeJoined:hh\\:mm\\:ss}";
+
+            try
+            {
+                int pid = _watcher.RobloxProcessId;
+                if (pid != 0)
+                {
+                    using var process = Process.GetProcessById(pid);
+                    MemoryTextBlock.Text = $"Roblox memory: {process.WorkingSet64 / 1048576.0:0} MB";
+                }
+            }
+            catch
+            {
+                // process gone - the leave handler will reset the readouts
+            }
+        }
+
+        private async Task UpdateCurrentGameAsync(ActivityData data)
+        {
+            long universeId = data.UniverseId;
+            if (universeId == 0)
+                return;
+
+            string name = "";
+            string? iconUrl = null;
+
+            try
+            {
+                UniverseDetails? details = UniverseDetails.LoadFromCache(universeId);
+                if (details is null)
+                {
+                    await UniverseDetails.FetchSingle(universeId);
+                    details = UniverseDetails.LoadFromCache(universeId);
+                }
+
+                if (details is not null)
+                {
+                    name = details.Data.Name;
+                    iconUrl = details.Thumbnail?.ImageUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("MenuContainer::UpdateCurrentGame", $"Universe lookup failed: {ex.Message}");
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // PlayTimeStore already has the name/icon of anything played before
+                var entry = PlayTimeStore.GetAll().FirstOrDefault(x => x.UniverseId == universeId);
+                if (entry is not null)
+                {
+                    name = entry.Name;
+                    iconUrl ??= entry.IconUrl;
+                }
+            }
+
+            if (string.IsNullOrEmpty(name))
+                name = $"Place {data.PlaceId}";
+
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (_activityWatcher?.InGame != true || !ReferenceEquals(_activityWatcher.Data, data))
+                    return;
+
+                CurrentGameNameTextBlock.Text = name;
+                try
+                {
+                    CurrentGameIcon.Source = string.IsNullOrEmpty(iconUrl) ? null : new BitmapImage(new Uri(iconUrl));
+                }
+                catch
+                {
+                    CurrentGameIcon.Source = null;
+                }
+                CurrentGameMenuItem.Visibility = Visibility.Visible;
+            });
+        }
+
+        private async Task UpdateClosestServerLabelAsync(ActivityData data)
+        {
+            if (data.ServerType != ServerType.Public || data.PlaceId == 0)
+                return;
+
+            try
+            {
+                MatchmakerCandidate? best = await Matchmaker.PickBestJobIdAsync(data.PlaceId, exclude: new[] { data.JobId }, maxCandidates: 12);
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (_activityWatcher?.InGame != true || !ReferenceEquals(_activityWatcher.Data, data))
+                        return;
+
+                    if (best is not null)
+                    {
+                        _lastClosest = best;
+                        _lastClosestPlaceId = data.PlaceId;
+                        JoinClosestServerTextBlock.Text = $"Join closest server ({best.DatacenterName}, ~{best.EstimatedPingMs}ms)";
+                    }
+                    else
+                    {
+                        JoinClosestServerTextBlock.Text = "Join closest server (none found)";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("MenuContainer::UpdateClosestServer", ex.Message);
+            }
         }
 
         public void ShowServerInformationWindow()
@@ -85,22 +226,126 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             if (_activityWatcher is null)
                 return;
 
+            ActivityData data = _activityWatcher.Data;
+
             Dispatcher.Invoke(() => {
-                if (_activityWatcher.Data.ServerType == ServerType.Public)
+                if (data.ServerType == ServerType.Public)
+                {
                     InviteDeeplinkMenuItem.Visibility = Visibility.Visible;
+                    JoinClosestServerMenuItem.Visibility = Visibility.Visible;
+                    JoinClosestServerTextBlock.Text = "Join closest server (checking...)";
+                }
 
                 ServerDetailsMenuItem.Visibility = Visibility.Visible;
+                SessionInfoMenuItem.Visibility = Visibility.Visible;
+                ServerTextBlock.Text = $"Server: {data.ServerType} · {(data.MachineAddressValid ? data.MachineAddress : "address pending")}";
+                PlayTimeTextBlock.Text = "Play time: 00:00:00";
+                _sessionTimer.Start();
             });
+
+            _ = UpdateCurrentGameAsync(data);
+            _ = UpdateClosestServerLabelAsync(data);
         }
 
         public void ActivityWatcher_OnGameLeave(object? sender, EventArgs e)
         {
             Dispatcher.Invoke(() => {
+                _sessionTimer.Stop();
                 InviteDeeplinkMenuItem.Visibility = Visibility.Collapsed;
                 ServerDetailsMenuItem.Visibility = Visibility.Collapsed;
+                JoinClosestServerMenuItem.Visibility = Visibility.Collapsed;
+                SessionInfoMenuItem.Visibility = Visibility.Collapsed;
+                CurrentGameMenuItem.Visibility = Visibility.Collapsed;
+                CurrentGameIcon.Source = null;
+                CurrentGameNameTextBlock.Text = "";
+                MemoryTextBlock.Text = "Roblox memory: 0 MB";
+                _lastClosest = null;
 
                 _serverInformationWindow?.Close();
             });
+        }
+
+        private async void JoinClosestServerMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ActivityData? data = _activityWatcher?.Data;
+            if (data is null || data.PlaceId == 0)
+                return;
+
+            if (Interlocked.Exchange(ref _joinClosestActive, 1) != 0)
+                return;
+
+            JoinClosestServerMenuItem.IsEnabled = false;
+
+            try
+            {
+                MatchmakerCandidate? best = _lastClosest is not null && _lastClosestPlaceId == data.PlaceId
+                    ? _lastClosest
+                    : await Matchmaker.PickBestJobIdAsync(data.PlaceId, exclude: new[] { data.JobId }, maxCandidates: 12);
+
+                if (best is null)
+                {
+                    Frontend.ShowMessageBox("No other public servers were found for this game.", MessageBoxImage.Information);
+                    return;
+                }
+
+                // same deep-link + fresh -player process route the auto-rejoin and Friends "Join"
+                // already use - Roblox's own singleton hands the join over to the running client
+                Process.Start(Paths.Process, $"-player \"roblox://experiences/start?placeId={data.PlaceId}&gameInstanceId={best.JobId}\"");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("MenuContainer::JoinClosestServer", ex);
+                Frontend.ShowMessageBox($"Could not join: {ex.Message}", MessageBoxImage.Error);
+            }
+            finally
+            {
+                JoinClosestServerMenuItem.IsEnabled = true;
+                Interlocked.Exchange(ref _joinClosestActive, 0);
+            }
+        }
+
+        private void TakeScreenshotMenuItem_Click(object sender, RoutedEventArgs e) => _watcher.TakeScreenshot();
+
+        private void SaveReplayMenuItem_Click(object sender, RoutedEventArgs e) => _watcher.SaveInstantReplay();
+
+        private void CleanRamMenuItem_Click(object sender, RoutedEventArgs e) => _watcher.CleanRamNow();
+
+        private void FrameGenMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            App.Settings.Prop.FrameGenModeIndex = FrameGenMenuItem.IsChecked ? 1 : 0;
+            App.Settings.Save();
+            OverlayHub.Refresh();
+        }
+
+        private void OverlayFocusModeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            _watcher.ToggleOverlayFocusMode();
+            OverlayFocusModeMenuItem.IsChecked = App.Settings.Prop.OverlayFocusModeEnabled;
+        }
+
+        private void CantSeeOverlaysMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OverlayDiagnostics.RaiseOverlayWindows();
+                Frontend.ShowMessageBox(OverlayDiagnostics.BuildReport(), MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Frontend.ShowMessageBox($"Could not build the overlay diagnostics: {ex.Message}", MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenSettingsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(Paths.Process, "-settings");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("MenuContainer::OpenSettings", ex);
+            }
         }
 
         private void Window_Loaded(object? sender, RoutedEventArgs e)

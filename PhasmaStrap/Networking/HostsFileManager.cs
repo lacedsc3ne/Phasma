@@ -51,6 +51,42 @@ namespace PhasmaStrap.Networking
             }
         }
 
+        // true only when the block exists AND lists exactly the hostnames this build intercepts -
+        // a block written by an older build (different host list) would leave new policies
+        // bypassed, or worse, keep redirecting a host nothing listens for any more
+        public static bool IsBlockCurrent()
+        {
+            try
+            {
+                if (!File.Exists(HostsFilePath))
+                    return false;
+
+                var listed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                bool inBlock = false, found = false;
+
+                foreach (string raw in File.ReadAllLines(HostsFilePath))
+                {
+                    string line = raw.Trim();
+
+                    if (line.Equals(BlockStart, StringComparison.Ordinal)) { inBlock = true; found = true; continue; }
+                    if (line.Equals(BlockEnd, StringComparison.Ordinal)) { inBlock = false; continue; }
+
+                    if (!inBlock)
+                        continue;
+
+                    string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 2)
+                        listed.Add(parts[1]);
+                }
+
+                return found && listed.SetEquals(InterceptedHostnames);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         // runs the elevated write, prompting for UAC once. Returns true only if the
         // elevated process reports success.
         public static bool RequestInstall()

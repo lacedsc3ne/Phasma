@@ -150,5 +150,179 @@ namespace PhasmaStrap.Networking
                 return false;
             }
         }
+
+        // --- Roblox's own trust bundle ---
+        //
+        // The Roblox client does NOT use the Windows certificate store: its networking is
+        // libcurl built against its own bundled root list at <version>\ssl\cacert.pem. So
+        // installing the CA into the user store (above) is only enough for PhasmaStrap's own
+        // HttpClient - every TLS handshake Roblox makes to an intercepted host still fails
+        // unless the CA is ALSO appended to that bundle. Without this, the proxy sees nothing
+        // but aborted handshakes and every spoof toggle silently does nothing.
+
+        private const string BundleMarker = "# PhasmaStrap Local Proxy CA - added automatically, removed when the proxy is disabled";
+
+        private static string RootPem()
+        {
+            X509Certificate2 root = GetOrCreateRootCertificate();
+            string base64 = Convert.ToBase64String(root.Export(X509ContentType.Cert));
+
+            var sb = new StringBuilder();
+            sb.AppendLine("-----BEGIN CERTIFICATE-----");
+            for (int i = 0; i < base64.Length; i += 64)
+                sb.AppendLine(base64.Substring(i, Math.Min(64, base64.Length - i)));
+            sb.Append("-----END CERTIFICATE-----");
+            return sb.ToString();
+        }
+
+        private static IEnumerable<string> FindTrustBundles()
+        {
+            var roots = new[] { Paths.Versions, Path.Combine(Paths.LocalAppData, "Roblox", "Versions") };
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string root in roots)
+            {
+                if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
+                    continue;
+
+                string[] dirs;
+                try { dirs = Directory.GetDirectories(root); }
+                catch (Exception) { continue; }
+
+                foreach (string dir in dirs)
+                {
+                    string bundle = Path.Combine(dir, "ssl", "cacert.pem");
+                    if (File.Exists(bundle) && seen.Add(Path.GetFullPath(bundle)))
+                        yield return bundle;
+                }
+            }
+        }
+
+        // strips any earlier PhasmaStrap block (marker line + the certificate that follows it),
+        // so re-patching after a CA regeneration never leaves a stale cert behind
+        private static string StripOwnBlock(string content)
+        {
+            int index;
+            while ((index = content.IndexOf(BundleMarker, StringComparison.Ordinal)) >= 0)
+            {
+                const string End = "-----END CERTIFICATE-----";
+                int end = content.IndexOf(End, index, StringComparison.Ordinal);
+                if (end < 0)
+                {
+                    content = content[..index];
+                    break;
+                }
+
+                content = content[..index] + content[(end + End.Length)..];
+            }
+
+            return content.TrimEnd();
+        }
+
+        public static int PatchRobloxTrustBundles()
+        {
+            int patched = 0;
+            string pem;
+
+            try { pem = RootPem(); }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException(LOG_IDENT, ex);
+                return 0;
+            }
+
+            foreach (string bundle in FindTrustBundles())
+            {
+                try
+                {
+                    string original = File.ReadAllText(bundle);
+                    string updated = StripOwnBlock(original) + "\n\n" + BundleMarker + "\n" + pem + "\n";
+
+                    if (string.Equals(original.Replace("\r\n", "\n"), updated, StringComparison.Ordinal))
+                        continue;
+
+                    WriteBundle(bundle, updated);
+                    patched++;
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Could not patch trust bundle '{bundle}': {ex.Message}");
+                }
+            }
+
+            if (patched > 0)
+                App.Logger.WriteLine(LOG_IDENT, $"Added the proxy CA to {patched} Roblox trust bundle(s)");
+
+            return patched;
+        }
+
+        public static int UnpatchRobloxTrustBundles()
+        {
+            int restored = 0;
+
+            foreach (string bundle in FindTrustBundles())
+            {
+                try
+                {
+                    string original = File.ReadAllText(bundle);
+                    if (!original.Contains(BundleMarker, StringComparison.Ordinal))
+                        continue;
+
+                    WriteBundle(bundle, StripOwnBlock(original) + "\n");
+                    restored++;
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Could not restore trust bundle '{bundle}': {ex.Message}");
+                }
+            }
+
+            if (restored > 0)
+                App.Logger.WriteLine(LOG_IDENT, $"Removed the proxy CA from {restored} Roblox trust bundle(s)");
+
+            return restored;
+        }
+
+        public static bool IsRobloxTrustBundlePatched()
+        {
+            try
+            {
+                string pem = RootPem();
+                bool any = false;
+
+                foreach (string bundle in FindTrustBundles())
+                {
+                    any = true;
+                    if (!File.ReadAllText(bundle).Replace("\r\n", "\n").Contains(pem, StringComparison.Ordinal))
+                        return false;
+                }
+
+                return any;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static void WriteBundle(string path, string content)
+        {
+            FileAttributes attributes = File.GetAttributes(path);
+            bool readOnly = attributes.HasFlag(FileAttributes.ReadOnly);
+            if (readOnly)
+                File.SetAttributes(path, attributes & ~FileAttributes.ReadOnly);
+
+            try
+            {
+                string temporary = path + ".phasmastrap.tmp";
+                File.WriteAllText(temporary, content, new UTF8Encoding(false));
+                File.Move(temporary, path, true);
+            }
+            finally
+            {
+                if (readOnly && File.Exists(path))
+                    File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.ReadOnly);
+            }
+        }
     }
 }

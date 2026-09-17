@@ -403,22 +403,42 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.SmoothProgressBarsEnabled = value;
         }
 
+        // the expander below this toggle is bound OneWay to GlobalBackgroundEnabled with a
+        // no-user-expansion style, so without a change notification here it never opened and
+        // the file picker inside it was unreachable - that's why "you can't set a background
+        // image". Each of these also re-applies the background to the live window immediately
+        // rather than only on the next launch.
         public bool GlobalBackgroundEnabled
         {
             get => App.Settings.Prop.GlobalBackgroundEnabled;
-            set => App.Settings.Prop.GlobalBackgroundEnabled = value;
+            set
+            {
+                App.Settings.Prop.GlobalBackgroundEnabled = value;
+                OnPropertyChanged(nameof(GlobalBackgroundEnabled));
+                Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
+            }
         }
 
         public string GlobalBackgroundFilePath
         {
             get => App.Settings.Prop.GlobalBackgroundFilePath;
-            set => App.Settings.Prop.GlobalBackgroundFilePath = value;
+            set
+            {
+                App.Settings.Prop.GlobalBackgroundFilePath = value;
+                OnPropertyChanged(nameof(GlobalBackgroundFilePath));
+                Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
+            }
         }
 
         public double GlobalBackgroundOverlayOpacity
         {
             get => App.Settings.Prop.GlobalBackgroundOverlayOpacity;
-            set => App.Settings.Prop.GlobalBackgroundOverlayOpacity = value;
+            set
+            {
+                App.Settings.Prop.GlobalBackgroundOverlayOpacity = value;
+                OnPropertyChanged(nameof(GlobalBackgroundOverlayOpacity));
+                Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
+            }
         }
 
         public bool SnowEffectEnabled
@@ -438,7 +458,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 return;
 
             GlobalBackgroundFilePath = dialog.FileName;
-            OnPropertyChanged(nameof(GlobalBackgroundFilePath));
         }
 
         #endregion

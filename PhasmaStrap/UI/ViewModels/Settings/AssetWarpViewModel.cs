@@ -68,6 +68,39 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.AssetWarpDisableAllMeshes = value; App.Settings.Save(); OnPropertyChanged(nameof(DisableAllMeshes)); OnPropertyChanged(nameof(StatusText)); }
         }
 
+        // every spoofer below only does anything while the local proxy is routing Roblox's
+        // traffic - so switching one ON brings the proxy up (one UAC prompt for the hosts file
+        // the first time), exactly like the Asset Warp master switch does. Previously these
+        // just saved the setting, which is why "none of the spoof settings work" when the
+        // proxy had never been enabled from the Networking page.
+        private bool EnsureProxyForSpoofer(bool turningOn)
+        {
+            if (!turningOn || NetworkingController.IsActive)
+                return true;
+
+            bool ok = NetworkingController.Enable();
+            if (!ok)
+                App.Logger.WriteLine("AssetWarpViewModel", "Could not start the local proxy, leaving the spoofer off");
+
+            OnPropertyChanged(nameof(StatusText));
+            OnPropertyChanged(nameof(SpooferStatusText));
+            return ok;
+        }
+
+        public string SpooferStatusText
+        {
+            get
+            {
+                if (!NetworkingController.IsActive)
+                    return "Local proxy is off - turn any spoofer on to start it (you'll get one admin prompt for the hosts file).";
+
+                if (!AssetProxyCA.IsRobloxTrustBundlePatched())
+                    return "Proxy is running, but Roblox's own certificate bundle isn't patched yet - it will be on the next launch.";
+
+                return "Local proxy is running - spoofed values apply to this client only, the next time Roblox asks for them.";
+            }
+        }
+
         // --- presence spoofer (same underlying Settings.PresenceSpoofMode the Networking page exposes) ---
 
         public IEnumerable<PresenceSpoofMode> PresenceSpoofModes { get; } = Enum.GetValues(typeof(PresenceSpoofMode)).Cast<PresenceSpoofMode>();
@@ -75,7 +108,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public PresenceSpoofMode SelectedPresenceSpoofMode
         {
             get => App.Settings.Prop.PresenceSpoofMode;
-            set { App.Settings.Prop.PresenceSpoofMode = value; App.Settings.Save(); }
+            set
+            {
+                if (!EnsureProxyForSpoofer(value != PresenceSpoofMode.Off))
+                {
+                    OnPropertyChanged(nameof(SelectedPresenceSpoofMode));
+                    return;
+                }
+
+                App.Settings.Prop.PresenceSpoofMode = value;
+                App.Settings.Save();
+                OnPropertyChanged(nameof(SelectedPresenceSpoofMode));
+            }
         }
 
         // --- preloading ---
@@ -111,43 +155,56 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string SpoofOthersName
         {
             get => App.Settings.Prop.SpoofOthersName;
-            set { App.Settings.Prop.SpoofOthersName = value; App.Settings.Save(); }
+            set { App.Settings.Prop.SpoofOthersName = value; App.Settings.Save(); OnPropertyChanged(nameof(SpoofOthersName)); }
         }
 
         public bool SpoofOthersApplyIngame
         {
             get => App.Settings.Prop.SpoofOthersApplyIngame;
-            set { App.Settings.Prop.SpoofOthersApplyIngame = value; App.Settings.Save(); }
+            set => SetSpoofToggle(value, v => App.Settings.Prop.SpoofOthersApplyIngame = v, nameof(SpoofOthersApplyIngame));
         }
 
         public bool SpoofOthersVerified
         {
             get => App.Settings.Prop.SpoofOthersVerified;
-            set { App.Settings.Prop.SpoofOthersVerified = value; App.Settings.Save(); }
+            set => SetSpoofToggle(value, v => App.Settings.Prop.SpoofOthersVerified = v, nameof(SpoofOthersVerified));
         }
 
         public string SpoofSelfName
         {
             get => App.Settings.Prop.SpoofSelfName;
-            set { App.Settings.Prop.SpoofSelfName = value; App.Settings.Save(); }
+            set { App.Settings.Prop.SpoofSelfName = value; App.Settings.Save(); OnPropertyChanged(nameof(SpoofSelfName)); }
         }
 
         public bool SpoofSelfApplyIngame
         {
             get => App.Settings.Prop.SpoofSelfApplyIngame;
-            set { App.Settings.Prop.SpoofSelfApplyIngame = value; App.Settings.Save(); }
+            set => SetSpoofToggle(value, v => App.Settings.Prop.SpoofSelfApplyIngame = v, nameof(SpoofSelfApplyIngame));
         }
 
         public bool SpoofSelfVerified
         {
             get => App.Settings.Prop.SpoofSelfVerified;
-            set { App.Settings.Prop.SpoofSelfVerified = value; App.Settings.Save(); }
+            set => SetSpoofToggle(value, v => App.Settings.Prop.SpoofSelfVerified = v, nameof(SpoofSelfVerified));
         }
 
         public bool SpoofSelfGameCreator
         {
             get => App.Settings.Prop.SpoofSelfGameCreator;
-            set { App.Settings.Prop.SpoofSelfGameCreator = value; App.Settings.Save(); }
+            set => SetSpoofToggle(value, v => App.Settings.Prop.SpoofSelfGameCreator = v, nameof(SpoofSelfGameCreator));
+        }
+
+        private void SetSpoofToggle(bool value, Action<bool> write, string propertyName)
+        {
+            if (!EnsureProxyForSpoofer(value))
+            {
+                OnPropertyChanged(propertyName);
+                return;
+            }
+
+            write(value);
+            App.Settings.Save();
+            OnPropertyChanged(propertyName);
         }
 
         // --- Robux adjuster (same underlying Settings.RobuxSpoofAmount the Networking page exposes) ---
@@ -155,7 +212,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string RobuxSpoofAmount
         {
             get => App.Settings.Prop.RobuxSpoofAmount;
-            set { App.Settings.Prop.RobuxSpoofAmount = value; App.Settings.Save(); OnPropertyChanged(nameof(RobuxSpoofSummary)); }
+            set
+            {
+                if (!EnsureProxyForSpoofer(!string.IsNullOrWhiteSpace(value)))
+                {
+                    OnPropertyChanged(nameof(RobuxSpoofAmount));
+                    return;
+                }
+
+                App.Settings.Prop.RobuxSpoofAmount = value;
+                App.Settings.Save();
+                OnPropertyChanged(nameof(RobuxSpoofAmount));
+                OnPropertyChanged(nameof(RobuxSpoofSummary));
+            }
         }
 
         public string RobuxSpoofSummary =>
@@ -172,6 +241,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                 if (!NetworkingController.IsActive)
                     return Strings.Menu_AssetWarp_Status_ProxyNotRunning;
+
+                if (!AssetProxyCA.IsInstalledInTrustStore())
+                    return "Proxy is running, but its certificate isn't trusted yet - Roblox will refuse the connection. Install it from the Networking page.";
+
+                if (!AssetProxyCA.IsRobloxTrustBundlePatched())
+                    return "Proxy is running, but Roblox's own certificate bundle isn't patched yet - it will be on the next launch.";
 
                 return AssetWarpPolicy.IsEnabled
                     ? Strings.Menu_AssetWarp_Status_Blocking

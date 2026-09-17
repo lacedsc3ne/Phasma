@@ -171,64 +171,14 @@ namespace PhasmaStrap
             if (RobloxWindowCustomizer.IsEnabled)
                 RobloxWindowCustomizer.Start(ActivityWatcher);
 
+            // the same actions are also exposed on the tray icon's context menu (MenuContainer),
+            // so they live as methods below rather than inline lambdas
             _hotkeys = new GlobalHotkeyManager();
-            _hotkeys.RegisterAction(HotkeyActions.CleanRamNow, () =>
-            {
-                // deliberately the unelevated trim only - the standby list purge needs an elevated
-                // relaunch (a UAC prompt), which would interrupt whatever's in focus (a game) every
-                // single time this hotkey is pressed. That part stays a manual, explicit action from
-                // the Performance page's Clean RAM button, same reasoning as AutoRamCleaner.
-                SystemMemoryCleaner.TrimResult result = SystemMemoryCleaner.TrimAllProcessWorkingSets();
-                NotificationCenter.Notify(
-                    "RAM cleaned",
-                    $"Trimmed {result.ProcessesTrimmed} processes (~{result.BytesFreed / 1048576.0:0.#} MB).",
-                    NotificationCategory.General);
-            });
-            _hotkeys.RegisterAction(HotkeyActions.ToggleHeadsetAudio, () =>
-            {
-                bool enabled = !App.Settings.Prop.HeadsetAudioEnabled;
-                App.Settings.Prop.HeadsetAudioEnabled = enabled;
-                App.Settings.Save();
-
-                if (enabled)
-                    HeadsetAudio.Start();
-                else
-                    HeadsetAudio.Stop();
-            });
-            _hotkeys.RegisterAction(HotkeyActions.TakeScreenshot, () =>
-            {
-                string? path = ScreenshotCapture.Capture();
-                NotificationCenter.Notify(
-                    path is not null ? "Screenshot saved" : "Screenshot failed",
-                    path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
-                    NotificationCategory.General);
-            });
-            _hotkeys.RegisterAction(HotkeyActions.SaveInstantReplay, () =>
-            {
-                if (!App.Settings.Prop.InstantReplayEnabled || !_instantReplay.IsRunning)
-                {
-                    NotificationCenter.Notify("Instant Replay is off", "Enable it on the Capture page first.", NotificationCategory.General);
-                    return;
-                }
-
-                string? path = _instantReplay.SaveClip();
-                NotificationCenter.Notify(
-                    path is not null ? "Replay saved" : "Replay failed",
-                    path is not null ? Path.GetFileName(path) : "Nothing was buffered yet.",
-                    NotificationCategory.General);
-            });
-            _hotkeys.RegisterAction(HotkeyActions.ToggleOverlayFocusMode, () =>
-            {
-                bool enabled = !App.Settings.Prop.OverlayFocusModeEnabled;
-                App.Settings.Prop.OverlayFocusModeEnabled = enabled;
-                App.Settings.Save();
-                OverlayHub.Refresh();
-
-                NotificationCenter.Notify(
-                    enabled ? "Overlay Focus Mode on" : "Overlay Focus Mode off",
-                    enabled ? "HUD and crosshair are hidden until you toggle this again." : "HUD and crosshair are back.",
-                    NotificationCategory.General);
-            });
+            _hotkeys.RegisterAction(HotkeyActions.CleanRamNow, CleanRamNow);
+            _hotkeys.RegisterAction(HotkeyActions.ToggleHeadsetAudio, ToggleHeadsetAudio);
+            _hotkeys.RegisterAction(HotkeyActions.TakeScreenshot, TakeScreenshot);
+            _hotkeys.RegisterAction(HotkeyActions.SaveInstantReplay, SaveInstantReplay);
+            _hotkeys.RegisterAction(HotkeyActions.ToggleOverlayFocusMode, ToggleOverlayFocusMode);
             _hotkeys.ApplyBindings();
 
             _notifyIcon = new(this);
@@ -252,6 +202,72 @@ namespace PhasmaStrap
         {
             _processOptimizer?.Dispose();
             _processOptimizer = null;
+        }
+
+        public int RobloxProcessId => _watcherData?.ProcessId ?? 0;
+
+        public bool InstantReplayRunning => _instantReplay.IsRunning;
+
+        public void CleanRamNow()
+        {
+            // deliberately the unelevated trim only - the standby list purge needs an elevated
+            // relaunch (a UAC prompt), which would interrupt whatever's in focus (a game) every
+            // single time this fires. That part stays a manual, explicit action from the
+            // Rendering page's Clean RAM button, same reasoning as AutoRamCleaner.
+            SystemMemoryCleaner.TrimResult result = SystemMemoryCleaner.TrimAllProcessWorkingSets();
+            NotificationCenter.Notify(
+                "RAM cleaned",
+                $"Trimmed {result.ProcessesTrimmed} processes (~{result.BytesFreed / 1048576.0:0.#} MB).",
+                NotificationCategory.General);
+        }
+
+        public void ToggleHeadsetAudio()
+        {
+            bool enabled = !App.Settings.Prop.HeadsetAudioEnabled;
+            App.Settings.Prop.HeadsetAudioEnabled = enabled;
+            App.Settings.Save();
+
+            if (enabled)
+                HeadsetAudio.Start();
+            else
+                HeadsetAudio.Stop();
+        }
+
+        public void TakeScreenshot()
+        {
+            string? path = ScreenshotCapture.Capture();
+            NotificationCenter.Notify(
+                path is not null ? "Screenshot saved" : "Screenshot failed",
+                path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
+                NotificationCategory.General);
+        }
+
+        public void SaveInstantReplay()
+        {
+            if (!App.Settings.Prop.InstantReplayEnabled || !_instantReplay.IsRunning)
+            {
+                NotificationCenter.Notify("Instant Replay is off", "Enable it on the Capture page first.", NotificationCategory.General);
+                return;
+            }
+
+            string? path = _instantReplay.SaveClip();
+            NotificationCenter.Notify(
+                path is not null ? "Replay saved" : "Replay failed",
+                path is not null ? Path.GetFileName(path) : "Nothing was buffered yet.",
+                NotificationCategory.General);
+        }
+
+        public void ToggleOverlayFocusMode()
+        {
+            bool enabled = !App.Settings.Prop.OverlayFocusModeEnabled;
+            App.Settings.Prop.OverlayFocusModeEnabled = enabled;
+            App.Settings.Save();
+            OverlayHub.Refresh();
+
+            NotificationCenter.Notify(
+                enabled ? "Overlay Focus Mode on" : "Overlay Focus Mode off",
+                enabled ? "HUD and crosshair are hidden until you toggle this again." : "HUD and crosshair are back.",
+                NotificationCategory.General);
         }
 
         public void KillRobloxProcess() => CloseProcess(_watcherData!.ProcessId, true);

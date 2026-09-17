@@ -22,21 +22,79 @@
         Loaded="Window_Loaded"
         Closed="Window_Closed">
     <ui:UiWindow.ContextMenu>
-        <ContextMenu>
+        <ContextMenu MinWidth="248">
             <MenuItem IsEnabled="False">
                 <MenuItem.Header>
-                    <Grid>
+                    <Grid Margin="0,2,0,2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="24" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Image Grid.Column="0" Source="pack://application:,,,/PhasmaStrap.ico" RenderOptions.BitmapScalingMode="HighQuality" />
-                        <TextBlock x:Name="VersionTextBlock" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0" Text="PhasmaStrap v2.4.1" />
+                        <Image Grid.Column="0" Width="22" Height="22" Source="pack://application:,,,/PhasmaStrap.ico" RenderOptions.BitmapScalingMode="HighQuality" />
+                        <TextBlock x:Name="VersionTextBlock" FontWeight="SemiBold" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0" Text="PhasmaStrap v2.4.1" />
                     </Grid>
                 </MenuItem.Header>
             </MenuItem>
+            <MenuItem x:Name="CurrentGameMenuItem" IsEnabled="False" Visibility="Collapsed">
+                <MenuItem.Header>
+                    <Grid Margin="0,2,0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="22" Height="22" CornerRadius="5" ClipToBounds="True" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                            <Image x:Name="CurrentGameIcon" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Border>
+                        <TextBlock x:Name="CurrentGameNameTextBlock" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="220" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem x:Name="SessionInfoMenuItem" Visibility="Collapsed">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Info20"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Session info" />
+                    </Grid>
+                </MenuItem.Header>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock x:Name="PlayTimeTextBlock" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Play time: 00:00:00" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock x:Name="MemoryTextBlock" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Roblox memory: 0 MB" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock x:Name="FlagsTextBlock" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="FastFlags applied: 0" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock x:Name="ServerTextBlock" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Server: -" />
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
             <Separator />
             <MenuItem x:Name="RichPresenceMenuItem" Header="{x:Static resources:Strings.Common_DiscordRichPresence}" IsCheckable="True" IsChecked="True" Visibility="Collapsed" Click="RichPresenceMenuItem_Click" />
+            <MenuItem x:Name="JoinClosestServerMenuItem" Visibility="Collapsed" Click="JoinClosestServerMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Rocket24"/>
+                        <TextBlock x:Name="JoinClosestServerTextBlock" Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Join closest server" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
             <MenuItem x:Name="InviteDeeplinkMenuItem" Visibility="Collapsed" Click="InviteDeeplinkMenuItem_Click">
                 <MenuItem.Header>
                     <Grid>
@@ -70,6 +128,71 @@
                         </Grid.ColumnDefinitions>
                         <ui:SymbolIcon Grid.Column="0" Symbol="History24"/>
                         <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="{x:Static resources:Strings.ContextMenu_GameHistory_Title}" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <Separator />
+            <MenuItem x:Name="TakeScreenshotMenuItem" Visibility="Collapsed" Click="TakeScreenshotMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Camera24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Take screenshot" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem x:Name="SaveReplayMenuItem" Visibility="Collapsed" Click="SaveReplayMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="VideoClip24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Save instant replay" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem x:Name="CleanRamMenuItem" Click="CleanRamMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Broom24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Clean RAM now" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <Separator />
+            <MenuItem x:Name="FrameGenMenuItem" Header="Frame generation" IsCheckable="True" Click="FrameGenMenuItem_Click" />
+            <MenuItem x:Name="OverlayFocusModeMenuItem" Header="Overlay Focus Mode (hide HUD/crosshair)" IsCheckable="True" Visibility="Collapsed" Click="OverlayFocusModeMenuItem_Click" />
+            <MenuItem x:Name="CantSeeOverlaysMenuItem" Visibility="Collapsed" Click="CantSeeOverlaysMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="EyeOff24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Can't see overlays?" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
+            <Separator />
+            <MenuItem Click="OpenSettingsMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Settings24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Open PhasmaStrap settings" />
                     </Grid>
                 </MenuItem.Header>
             </MenuItem>

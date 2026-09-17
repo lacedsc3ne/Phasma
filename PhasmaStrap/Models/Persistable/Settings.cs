@@ -241,7 +241,7 @@ namespace PhasmaStrap.Models.Persistable
         public string RobloxTitle { get; set; } = "";
         public bool CycleTitleWithGameName { get; set; } = false;
         public bool ShowServerInfoInTitle { get; set; } = false;
-        public bool UseGameIconForRobloxWindow { get; set; } = false;
+        public bool UseGameIconForRobloxWindow { get; set; } = true;
 
         // in-app notification center (NotificationCenter/NotificationToast) - master switch plus
         // per-event-type toggles for the custom toast popup, independent of NotifyIconWrapper's

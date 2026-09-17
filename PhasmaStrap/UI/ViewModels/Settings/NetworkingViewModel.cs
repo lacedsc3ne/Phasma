@@ -104,41 +104,74 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        public string StatusText => App.Settings.Prop.NetworkingProxyEnabled
-            ? (NetworkingController.IsActive ? "Running" : "Enabled, but not confirmed running - check the log")
-            : "Off";
+        public string StatusText
+        {
+            get
+            {
+                if (!App.Settings.Prop.NetworkingProxyEnabled)
+                    return "Off";
+
+                if (!AssetProxyServer.IsRunning)
+                    return "Enabled, but the local listener isn't running - check the log";
+
+                if (!HostsFileManager.IsBlockPresent())
+                    return "Running, but the hosts file entries are missing - Roblox isn't being routed through it";
+
+                if (!AssetProxyCA.IsInstalledInTrustStore())
+                    return "Running, but the certificate isn't trusted - Roblox will refuse the connection until it's installed below";
+
+                if (!HostsFileManager.IsBlockCurrent())
+                    return "Running, but the hosts file entries are from an older version - toggle the proxy off and on to rewrite them";
+
+                if (!AssetProxyCA.IsRobloxTrustBundlePatched())
+                    return "Running - Roblox's own certificate bundle will be patched on the next launch";
+
+                return "Running - hosts entries present, certificate trusted by Windows and by Roblox";
+            }
+        }
 
         public bool IsCertificateInstalled => AssetProxyCA.IsInstalledInTrustStore();
 
-        public string CertificateStatusText => IsCertificateInstalled
-            ? "Installed to your Windows certificate store (current user only)"
-            : "Not installed - the proxy can run without this, but Roblox will show TLS certificate warnings/errors until it's installed";
+        public string CertificateStatusText
+        {
+            get
+            {
+                if (!IsCertificateInstalled)
+                    return "Not installed - the proxy can't work until it is; enabling the proxy installs it automatically";
+
+                return AssetProxyCA.IsRobloxTrustBundlePatched()
+                    ? "Installed to your Windows certificate store (current user only) and to Roblox's own certificate bundle"
+                    : "Installed to your Windows certificate store (current user only); Roblox's own bundle is patched the next time Roblox launches";
+            }
+        }
 
         public IEnumerable<PresenceSpoofMode> PresenceSpoofModes { get; } = Enum.GetValues(typeof(PresenceSpoofMode)).Cast<PresenceSpoofMode>();
 
         public PresenceSpoofMode SelectedPresenceSpoofMode
         {
             get => App.Settings.Prop.PresenceSpoofMode;
-            set => App.Settings.Prop.PresenceSpoofMode = value;
+            set { App.Settings.Prop.PresenceSpoofMode = value; App.Settings.Save(); OnPropertyChanged(nameof(SelectedPresenceSpoofMode)); }
         }
 
         public string RobuxSpoofAmount
         {
             get => App.Settings.Prop.RobuxSpoofAmount;
-            set => App.Settings.Prop.RobuxSpoofAmount = value;
+            set { App.Settings.Prop.RobuxSpoofAmount = value; App.Settings.Save(); OnPropertyChanged(nameof(RobuxSpoofAmount)); }
         }
 
         public string UsernameSpoofName
         {
             get => App.Settings.Prop.UsernameSpoofName;
-            set => App.Settings.Prop.UsernameSpoofName = value;
+            set { App.Settings.Prop.UsernameSpoofName = value; App.Settings.Save(); OnPropertyChanged(nameof(UsernameSpoofName)); }
         }
 
         public ICommand InstallCertificateCommand => new RelayCommand(() =>
         {
             AssetProxyCA.InstallToTrustStore();
+            AssetProxyCA.PatchRobloxTrustBundles();
             OnPropertyChanged(nameof(IsCertificateInstalled));
             OnPropertyChanged(nameof(CertificateStatusText));
+            OnPropertyChanged(nameof(StatusText));
         });
 
         public bool BlockRobloxTelemetry
@@ -163,8 +196,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand RemoveCertificateCommand => new RelayCommand(() =>
         {
             AssetProxyCA.RemoveFromTrustStore();
+            AssetProxyCA.UnpatchRobloxTrustBundles();
             OnPropertyChanged(nameof(IsCertificateInstalled));
             OnPropertyChanged(nameof(CertificateStatusText));
+            OnPropertyChanged(nameof(StatusText));
         });
 
         public bool AssetWarpEnabled
