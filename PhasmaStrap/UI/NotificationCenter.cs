@@ -107,7 +107,7 @@ namespace PhasmaStrap.UI
             // Do Not Disturb suppresses only the on-screen popup - history above is recorded
             // either way, so nothing's lost, it just doesn't interrupt the session
             if (!App.Settings.Prop.DoNotDisturbEnabled)
-                ShowToast(title, message, durationSeconds);
+                ShowToast(title, message, category, durationSeconds);
         }
 
         public static void ClearHistory()
@@ -118,7 +118,7 @@ namespace PhasmaStrap.UI
             HistoryChanged?.Invoke(null, EventArgs.Empty);
         }
 
-        private static void ShowToast(string title, string message, double durationSeconds)
+        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds)
         {
             var app = System.Windows.Application.Current;
 
@@ -132,7 +132,7 @@ namespace PhasmaStrap.UI
                     if (s_toast is null || !s_toast.IsUsable)
                         s_toast = new NotificationToast();
 
-                    s_toast.ShowNotification(title, message, durationSeconds);
+                    s_toast.ShowNotification(title, message, category, durationSeconds);
                 }
                 catch (Exception ex)
                 {

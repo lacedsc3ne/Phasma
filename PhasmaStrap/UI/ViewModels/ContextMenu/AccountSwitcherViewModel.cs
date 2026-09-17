@@ -2,10 +2,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using CommunityToolkit.Mvvm.Input;
 
+using Windows.Win32;
+using Windows.Win32.Foundation;
+
 using PhasmaStrap.Integrations;
+using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
@@ -159,7 +164,17 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             ImportCookieCommand = new AsyncRelayCommand(ImportByCookieAsync);
             CopyUserIdCommand = new RelayCommand<SwitcherAccount?>(CopyUserId);
 
+            LaunchNewInstanceCommand = new AsyncRelayCommand(LaunchNewInstanceAsync);
+            LaunchInstanceForAccountCommand = new AsyncRelayCommand<SwitcherAccount?>(LaunchInstanceForAccountAsync);
+            FocusInstanceCommand = new RelayCommand<RobloxInstanceRow?>(FocusInstance);
+            CloseInstanceCommand = new RelayCommand<RobloxInstanceRow?>(CloseInstance);
+
             _ = RefreshAsync();
+
+            RefreshInstances();
+            _instanceRefreshTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(2) };
+            _instanceRefreshTimer.Tick += (_, _) => RefreshInstances();
+            _instanceRefreshTimer.Start();
         }
 
         public string Status { get => _status; set { _status = value; OnPropertyChanged(nameof(Status)); } }
@@ -381,16 +396,65 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
         }
 
+        private string ResolveTemplate() => File.Exists(_liveCookiePath)
+            ? _liveCookiePath
+            : Accounts.Select(a => Path.Combine(_folder, a.DatFile)).FirstOrDefault(File.Exists) ?? "";
+
+        /// <summary>
+        /// Verifies one pasted cookie and, if valid, saves it as a library account. Shared by both
+        /// the single "Import by cookie" flow and bulk import - trims surrounding whitespace/quotes
+        /// too, since a cookie value copied out of a JSON export or some browser extensions often
+        /// comes wrapped in quote characters that would otherwise make an otherwise-valid cookie
+        /// look "invalid".
+        /// </summary>
+        private async Task<(bool Success, string? Username, string? Error)> ImportOneCookieAsync(string rawCookie, string template)
+        {
+            string cookie = rawCookie.Trim().Trim('"', '\'', ' ');
+
+            if (string.IsNullOrEmpty(cookie))
+                return (false, null, "Empty");
+
+            var account = await RobloxCookie.GetAccountAsync(cookie).ConfigureAwait(true);
+
+            if (account == null)
+                return (false, null, "Invalid or expired cookie");
+
+            SwitcherAccount? existing = Accounts.FirstOrDefault(a => a.UserId == account.UserId);
+            string datName = existing?.DatFile ?? $"acc_{account.UserId}_{Guid.NewGuid():N}"[..8] + ".dat";
+            string datPath = Path.Combine(_folder, datName);
+
+            if (!RobloxCookie.SynthesizeDatWithCookie(template, cookie, datPath))
+                return (false, account.Username, "Could not build a login file from this cookie");
+
+            if (existing != null)
+            {
+                existing.Username = account.Username;
+                existing.DisplayName = account.DisplayName;
+            }
+            else
+            {
+                Accounts.Insert(0, CreateAccount(account.UserId, account.Username, account.DisplayName, "", datName, DateTime.UtcNow, default));
+            }
+
+            return (true, account.Username, null);
+        }
+
         private async Task ImportByCookieAsync()
         {
             if (_busy)
                 return;
 
-            string cookie = _newCookieText.Trim();
-
-            if (string.IsNullOrEmpty(cookie))
+            if (string.IsNullOrWhiteSpace(_newCookieText))
             {
                 Frontend.ShowMessageBox("Paste a .ROBLOSECURITY cookie value first.", MessageBoxImage.Warning);
+                return;
+            }
+
+            string template = ResolveTemplate();
+
+            if (string.IsNullOrEmpty(template))
+            {
+                Frontend.ShowMessageBox("Sign into any Roblox account once (or add the current account) before importing by cookie. PhasmaStrap needs an existing login as a template.", MessageBoxImage.Warning);
                 return;
             }
 
@@ -401,57 +465,119 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             try
             {
                 Status = "Verifying cookie...";
-                var account = await RobloxCookie.GetAccountAsync(cookie).ConfigureAwait(true);
+                (bool success, string? username, string? error) = await ImportOneCookieAsync(_newCookieText, template).ConfigureAwait(true);
 
-                if (account == null)
+                if (!success)
                 {
-                    Status = "That cookie is invalid or expired.";
-                    Frontend.ShowMessageBox("That cookie is invalid or expired.", MessageBoxImage.Warning);
+                    Status = error ?? "Import failed.";
+                    Frontend.ShowMessageBox(error ?? "Import failed.", MessageBoxImage.Warning);
                     return;
-                }
-
-                string template = File.Exists(_liveCookiePath)
-                    ? _liveCookiePath
-                    : Accounts.Select(a => Path.Combine(_folder, a.DatFile)).FirstOrDefault(File.Exists) ?? "";
-
-                if (string.IsNullOrEmpty(template))
-                {
-                    Frontend.ShowMessageBox("Sign into any Roblox account once (or add the current account) before importing by cookie. PhasmaStrap needs an existing login as a template.", MessageBoxImage.Warning);
-                    return;
-                }
-
-                SwitcherAccount? existing = Accounts.FirstOrDefault(a => a.UserId == account.UserId);
-                string datName = existing?.DatFile ?? $"acc_{account.UserId}_{Guid.NewGuid():N}"[..8] + ".dat";
-                string datPath = Path.Combine(_folder, datName);
-
-                if (!RobloxCookie.SynthesizeDatWithCookie(template, cookie, datPath))
-                {
-                    Status = "Could not import this cookie.";
-                    Frontend.ShowMessageBox("Could not build a login file from that cookie.", MessageBoxImage.Error);
-                    return;
-                }
-
-                if (existing != null)
-                {
-                    existing.Username = account.Username;
-                    existing.DisplayName = account.DisplayName;
-                }
-                else
-                {
-                    Accounts.Insert(0, CreateAccount(account.UserId, account.Username, account.DisplayName, "", datName, DateTime.UtcNow, default));
                 }
 
                 NewCookieText = "";
                 ImportVisible = false;
                 SaveMeta();
                 ApplyFilter();
-                Status = $"Imported account: {account.Username}";
+                Status = $"Imported account: {username}";
 
                 await FetchAvatarsSafeAsync().ConfigureAwait(true);
             }
             catch (Exception ex)
             {
                 Status = $"Import failed: {ex.Message}";
+            }
+            finally
+            {
+                _opLock.Release();
+                _busy = false;
+                OnPropertyChanged(nameof(AddCurrentEnabled));
+            }
+        }
+
+        // --- bulk import: one cookie per line, each verified/saved the same way as the single
+        // import above. Meant for moving a whole library of accounts over at once rather than
+        // one-at-a-time. ---
+
+        private string _bulkCookieText = "";
+
+        public string BulkCookieText
+        {
+            get => _bulkCookieText;
+            set { _bulkCookieText = value ?? ""; OnPropertyChanged(nameof(BulkCookieText)); }
+        }
+
+        private bool _bulkImportVisible;
+
+        public bool BulkImportVisible
+        {
+            get => _bulkImportVisible;
+            set { if (_bulkImportVisible != value) { _bulkImportVisible = value; OnPropertyChanged(nameof(BulkImportVisible)); OnPropertyChanged(nameof(BulkImportVisibility)); } }
+        }
+
+        public Visibility BulkImportVisibility => _bulkImportVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        public ICommand ToggleBulkImportCommand => new RelayCommand(() => BulkImportVisible = !BulkImportVisible);
+        public ICommand BulkImportCookiesCommand => new AsyncRelayCommand(BulkImportCookiesAsync);
+
+        private async Task BulkImportCookiesAsync()
+        {
+            if (_busy)
+                return;
+
+            string[] lines = _bulkCookieText.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (lines.Length == 0)
+            {
+                Frontend.ShowMessageBox("Paste at least one .ROBLOSECURITY cookie value, one per line.", MessageBoxImage.Warning);
+                return;
+            }
+
+            string template = ResolveTemplate();
+
+            if (string.IsNullOrEmpty(template))
+            {
+                Frontend.ShowMessageBox("Sign into any Roblox account once (or add the current account) before importing by cookie. PhasmaStrap needs an existing login as a template.", MessageBoxImage.Warning);
+                return;
+            }
+
+            _busy = true;
+            OnPropertyChanged(nameof(AddCurrentEnabled));
+            await _opLock.WaitAsync().ConfigureAwait(true);
+
+            int succeeded = 0;
+            var failures = new List<string>();
+
+            try
+            {
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    Status = $"Importing {i + 1} of {lines.Length}...";
+
+                    (bool success, string? username, string? error) = await ImportOneCookieAsync(lines[i], template).ConfigureAwait(true);
+
+                    if (success)
+                        succeeded++;
+                    else
+                        failures.Add($"Line {i + 1}{(username is not null ? $" ({username})" : "")}: {error}");
+                }
+
+                SaveMeta();
+                ApplyFilter();
+                BulkCookieText = "";
+                Status = failures.Count == 0
+                    ? $"Imported {succeeded} account(s)."
+                    : $"Imported {succeeded} of {lines.Length} - {failures.Count} failed.";
+
+                if (failures.Count > 0)
+                    Frontend.ShowMessageBox("Some cookies could not be imported:\n\n" + string.Join("\n", failures), MessageBoxImage.Warning);
+                else
+                    BulkImportVisible = false;
+
+                await FetchAvatarsSafeAsync().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                Status = $"Bulk import failed: {ex.Message}";
             }
             finally
             {
@@ -829,6 +955,171 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             throw new IOException("Could not write the Roblox cookie file. Make sure Roblox is fully closed.");
         }
 
+        // --- running instances (merged in from what was a separate Instances page) + launching a
+        // new one bound to a specific saved account. Roblox only ever reads its login from the one
+        // shared RobloxCookies.dat file at its own startup - it doesn't watch that file
+        // continuously - so swapping it right before launching a NEW instance sets up only that new
+        // window with a different account, without touching whatever any already-running windows
+        // already read at their own startup. SingletonMutexBypass is what lets that new window
+        // start at all alongside ones already running (see its own header comment for how). ---
+
+        public ObservableCollection<RobloxInstanceRow> Instances { get; } = new();
+
+        private readonly DispatcherTimer _instanceRefreshTimer;
+
+        public ICommand LaunchNewInstanceCommand { get; }
+        public ICommand LaunchInstanceForAccountCommand { get; }
+        public ICommand FocusInstanceCommand { get; }
+        public ICommand CloseInstanceCommand { get; }
+
+        private void RefreshInstances()
+        {
+            Instances.Clear();
+
+            foreach (Process process in Utilities.GetProcessesSafe().Where(p => p.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)))
+            {
+                try
+                {
+                    Instances.Add(new RobloxInstanceRow
+                    {
+                        ProcessId = process.Id,
+                        MemoryDisplay = $"{process.WorkingSet64 / 1048576.0:0.#} MB",
+                        UptimeDisplay = $"Running for {DateTime.Now - process.StartTime:hh\\:mm\\:ss}",
+                        WindowHandle = process.MainWindowHandle,
+                    });
+                }
+                catch
+                {
+                    // process may have exited between enumeration and read - skip it
+                }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+
+            OnPropertyChanged(nameof(Instances));
+            OnPropertyChanged(nameof(HasInstances));
+        }
+
+        public bool HasInstances => Instances.Count > 0;
+
+        private async Task LaunchNewInstanceAsync()
+        {
+            await LaunchInstanceCoreAsync(null).ConfigureAwait(true);
+        }
+
+        private async Task LaunchInstanceForAccountAsync(SwitcherAccount? account)
+        {
+            if (account is null)
+                return;
+
+            await LaunchInstanceCoreAsync(account).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Frees the singleton lock on whatever's currently running, optionally swaps the live
+        /// cookie to a specific saved account first, then starts a fresh PhasmaStrap.exe -player
+        /// process. <paramref name="account"/> null means "whichever account is already live".
+        /// </summary>
+        private async Task LaunchInstanceCoreAsync(SwitcherAccount? account)
+        {
+            if (_busy)
+                return;
+
+            _busy = true;
+            OnPropertyChanged(nameof(AddCurrentEnabled));
+            await _opLock.WaitAsync().ConfigureAwait(true);
+
+            try
+            {
+                if (account is not null)
+                {
+                    string datPath = Path.Combine(_folder, account.DatFile);
+
+                    if (!File.Exists(datPath))
+                    {
+                        Frontend.ShowMessageBox("The saved login for this account is missing. Remove it and add the account again.", MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    Status = $"Setting up {account.Username}...";
+                    await ReplaceLiveCookieAsync(datPath).ConfigureAwait(true);
+                    account.LastUsedUtc = DateTime.UtcNow;
+                    SaveMeta();
+                }
+
+                List<Process> running = Utilities.GetProcessesSafe().Where(p => p.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                try
+                {
+                    if (running.Count > 0)
+                    {
+                        Status = "Freeing the singleton lock...";
+
+                        foreach (Process process in running)
+                            await Task.Run(() => SingletonMutexBypass.TryFreeSingleton(process.Id)).ConfigureAwait(true);
+                    }
+
+                    Status = "Launching a new instance...";
+                    Process.Start(new ProcessStartInfo { FileName = Paths.Process, Arguments = "-player", UseShellExecute = false });
+
+                    await Task.Delay(2500).ConfigureAwait(true);
+                    RefreshInstances();
+                    Status = "Launched. Only the first instance in a session gets Discord Rich Presence/hotkeys/overlays - additional windows are plain Roblox.";
+                }
+                finally
+                {
+                    foreach (Process process in running)
+                        process.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                Status = $"Launch failed: {ex.Message}";
+                App.Logger.WriteLine(LOG_IDENT, $"LaunchInstanceCoreAsync failed: {ex.Message}");
+            }
+            finally
+            {
+                _opLock.Release();
+                _busy = false;
+                OnPropertyChanged(nameof(AddCurrentEnabled));
+            }
+        }
+
+        private static void FocusInstance(RobloxInstanceRow? row)
+        {
+            if (row is null || row.WindowHandle == IntPtr.Zero)
+                return;
+
+            try
+            {
+                PInvoke.SetForegroundWindow((HWND)row.WindowHandle);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Focus instance failed: {ex.Message}");
+            }
+        }
+
+        private void CloseInstance(RobloxInstanceRow? row)
+        {
+            if (row is null)
+                return;
+
+            try
+            {
+                using Process process = Process.GetProcessById(row.ProcessId);
+                process.CloseMainWindow();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Close instance failed: {ex.Message}");
+            }
+
+            RefreshInstances();
+        }
+
         public void Dispose()
         {
             if (_disposed)
@@ -838,6 +1129,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             try
             {
+                _instanceRefreshTimer.Stop();
                 _opLock.Dispose();
 
                 foreach (SwitcherAccount a in Accounts)
@@ -850,5 +1142,13 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             GC.SuppressFinalize(this);
         }
+    }
+
+    public sealed class RobloxInstanceRow
+    {
+        public int ProcessId { get; init; }
+        public string MemoryDisplay { get; init; } = "";
+        public string UptimeDisplay { get; init; } = "";
+        public IntPtr WindowHandle { get; init; }
     }
 }

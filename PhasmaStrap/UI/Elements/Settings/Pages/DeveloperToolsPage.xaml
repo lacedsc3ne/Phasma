@@ -141,7 +141,10 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" FontSize="14" Text="Log viewer" VerticalAlignment="Center" />
-                    <ui:Button Grid.Column="1" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <ui:Button Content="Copy" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
+                        <ui:Button Margin="8,0,0,0" Content="Refresh" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
+                    </StackPanel>
                 </Grid>
             </ui:CardExpander.Header>
             <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Padding="8">
