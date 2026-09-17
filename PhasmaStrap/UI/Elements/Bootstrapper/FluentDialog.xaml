@@ -202,27 +202,27 @@
 
         <!--  drifting red mist, clipped to the window bounds, sits behind the frosted glass tint  -->
         <Canvas ClipToBounds="True">
-            <Ellipse x:Name="Mist1" Width="320" Height="320" Canvas.Left="-100" Canvas.Top="-120" Opacity="0.25" Effect="{StaticResource MistBlur}">
+            <Ellipse x:Name="Mist1" Width="320" Height="320" Canvas.Left="-100" Canvas.Top="-120" Opacity="0.25" Effect="{StaticResource MistBlur}" Fill="{DynamicResource BackgroundGlowPrimaryBrush}">
                 <Ellipse.RenderTransform>
                     <TranslateTransform x:Name="MistTranslate1" X="-60" Y="20" />
                 </Ellipse.RenderTransform>
-                <Ellipse.Fill>
+                <Ellipse.OpacityMask>
                     <RadialGradientBrush>
-                        <GradientStop Color="#8FF4554B" Offset="0" />
-                        <GradientStop Color="#00F4554B" Offset="1" />
+                        <GradientStop Color="#8F000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
                     </RadialGradientBrush>
-                </Ellipse.Fill>
+                </Ellipse.OpacityMask>
             </Ellipse>
-            <Ellipse x:Name="Mist2" Width="280" Height="280" Canvas.Left="260" Canvas.Top="-60" Opacity="0.3" Effect="{StaticResource MistBlur}">
+            <Ellipse x:Name="Mist2" Width="280" Height="280" Canvas.Left="260" Canvas.Top="-60" Opacity="0.3" Effect="{StaticResource MistBlur}" Fill="{DynamicResource BackgroundGlowSecondaryBrush}">
                 <Ellipse.RenderTransform>
                     <TranslateTransform x:Name="MistTranslate2" X="70" Y="-25" />
                 </Ellipse.RenderTransform>
-                <Ellipse.Fill>
+                <Ellipse.OpacityMask>
                     <RadialGradientBrush>
-                        <GradientStop Color="#80CF3B32" Offset="0" />
-                        <GradientStop Color="#00CF3B32" Offset="1" />
+                        <GradientStop Color="#80000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
                     </RadialGradientBrush>
-                </Ellipse.Fill>
+                </Ellipse.OpacityMask>
             </Ellipse>
             <Ellipse x:Name="Mist3" Width="240" Height="240" Canvas.Left="90" Canvas.Top="60" Opacity="0.2" Effect="{StaticResource MistBlur}">
                 <Ellipse.RenderTransform>

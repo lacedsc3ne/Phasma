@@ -2,4 +2,10 @@
     <SolidColorBrush x:Key="NewTextEditorBackground" Color="White" />
     <SolidColorBrush x:Key="NewTextEditorForeground" Color="Black" />
     <SolidColorBrush x:Key="NewTextEditorLink" Color="Blue" />
+
+    <!--  the two drifting glows behind the settings window (MainWindow.xaml); AppColorTheme can override them  -->
+    <Color x:Key="BackgroundGlowPrimaryColor">#FFF4554B</Color>
+    <SolidColorBrush x:Key="BackgroundGlowPrimaryBrush" Color="#FFF4554B" />
+    <Color x:Key="BackgroundGlowSecondaryColor">#FFCF3B32</Color>
+    <SolidColorBrush x:Key="BackgroundGlowSecondaryBrush" Color="#FFCF3B32" />
 </ResourceDictionary>
