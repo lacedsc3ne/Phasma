@@ -151,6 +151,7 @@
                                         <Grid Margin="0,4">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="120" />
                                                 <ColumnDefinition Width="38" />
                                             </Grid.ColumnDefinitions>
@@ -160,13 +161,28 @@
                                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                 Text="{Binding Label}"
                                                 TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Opacity - 0% is invisible, 100% is solid">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="StackPanel">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding AllowAlpha}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+                                                <Slider Width="90" Minimum="0" Maximum="100" VerticalAlignment="Center" Value="{Binding OpacityPercent, Mode=TwoWay}" />
+                                                <TextBlock Width="36" Margin="6,0,0,0" VerticalAlignment="Center" TextAlignment="Right" FontSize="12"
+                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding OpacityPercent, StringFormat={}{0:0}%}" />
+                                            </StackPanel>
                                             <ui:TextBox
-                                                Grid.Column="1"
+                                                Grid.Column="2"
                                                 Margin="6,0"
                                                 FontFamily="Consolas"
                                                 Text="{Binding Hex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                             <Button
-                                                Grid.Column="2"
+                                                Grid.Column="3"
                                                 Width="32"
                                                 Height="32"
                                                 Padding="0"
