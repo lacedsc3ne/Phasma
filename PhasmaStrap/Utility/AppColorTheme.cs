@@ -97,7 +97,9 @@ namespace PhasmaStrap.Utility
 
             // A panel behind the search box and navigation list. Fully transparent by default (the
             // sidebar has no background of its own); raise the opacity for a solid or frosted look.
-            new() { Label = "Sidebar background", Group = "Window", ColorKey = "SidebarBackgroundColor", BrushKey = "SidebarBackgroundBrush", Fallback = "#00000000", AllowAlpha = true },
+            // The hidden default is a lighter slate, NOT black: a black panel over the near-black
+            // window is invisible at any opacity, which made the slider look like it did nothing.
+            new() { Label = "Sidebar panel (raise opacity to show)", Group = "Window", ColorKey = "SidebarBackgroundColor", BrushKey = "SidebarBackgroundBrush", Fallback = "#002C2C38", AllowAlpha = true },
 
             // Not an ordinary resource: Wpf.Ui derives a whole family of accent colours and brushes
             // from one colour and writes them straight into Application.Resources, where a merged

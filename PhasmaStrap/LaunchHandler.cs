@@ -185,6 +185,16 @@ namespace PhasmaStrap
             {
                 bool showAlreadyRunningWarning = Process.GetProcessesByName(App.ProjectName).Length > 1;
 
+                // UI-test hook: open the colour theme editor on its own, in the background
+                if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "ColorThemeEditor")
+                {
+                    var editor = new UI.Elements.ContextMenu.AppColorThemeEditor();
+                    ApplyUiTestBackground(editor);
+                    editor.ShowDialog();
+                    App.Terminate();
+                    return;
+                }
+
                 var window = new UI.Elements.Settings.MainWindow(showAlreadyRunningWarning);
                 if (ApplyUiTestBackground(window) && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") is string pageName)
                 {
