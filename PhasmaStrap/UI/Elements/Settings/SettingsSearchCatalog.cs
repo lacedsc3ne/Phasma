@@ -74,7 +74,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             string extensions = "Extensions";
             string fastFlags = Strings.Menu_FastFlags_Title;
             string channel = "Channel";
-            string performance = "Performance";
+            string performance = "Rendering";
             string gbsEditor = Strings.Menu_GBSEditor_Title;
             string nvidia = "NVIDIA";
             string networking = "Networking";
@@ -240,26 +240,26 @@ namespace PhasmaStrap.UI.Elements.Settings
                 Entry("Update heatmap", "Shows which days of the week an experience typically ships updates on, from its public badge-award history.", typeof(ChannelPage), channel),
 
                 // Performance - System
-                Entry("CPU core limit", "Restricts how many logical processors PhasmaStrap itself can use.", typeof(PerformancePage), performance),
-                Entry("Fake exclusive fullscreen", "Strips the Roblox window's border for lower input latency than Roblox's own windowed fullscreen.", typeof(PerformancePage), performance),
-                Entry("Duck Roblox audio when unfocused", "Automatically lowers Roblox's volume while you're tabbed away from it.", typeof(PerformancePage), performance),
-                Entry("Headset loudness", "Boosts quiet sounds without letting loud moments blow out your ears.", typeof(PerformancePage), performance),
+                Entry("CPU core limit", "Restricts how many logical processors PhasmaStrap itself can use.", typeof(RenderingPage), performance),
+                Entry("Fake exclusive fullscreen", "Strips the Roblox window's border for lower input latency than Roblox's own windowed fullscreen.", typeof(RenderingPage), performance),
+                Entry("Duck Roblox audio when unfocused", "Automatically lowers Roblox's volume while you're tabbed away from it.", typeof(RenderingPage), performance),
+                Entry("Headset loudness", "Boosts quiet sounds without letting loud moments blow out your ears.", typeof(RenderingPage), performance),
 
                 // Performance - Roblox game settings
-                Entry("Lock settings file", "Marks the file read-only so Roblox can't silently overwrite these changes.", typeof(PerformancePage), performance),
-                Entry("Framerate cap", "0 leaves it uncapped.", typeof(PerformancePage), performance),
-                Entry("Graphics quality level", "0 to 10, where 10 is Roblox's highest preset.", typeof(PerformancePage), performance),
-                Entry("Mouse sensitivity", "", typeof(PerformancePage), performance),
-                Entry("Reduced motion", "Cuts down on in-game UI animation.", typeof(PerformancePage), performance),
-                Entry("VR enabled", "", typeof(PerformancePage), performance),
-                Entry("Show performance stats", "Roblox's built-in FPS/ping/memory overlay.", typeof(PerformancePage), performance),
+                Entry("Lock settings file", "Marks the file read-only so Roblox can't silently overwrite these changes.", typeof(RenderingPage), performance),
+                Entry("Framerate cap", "0 leaves it uncapped.", typeof(RenderingPage), performance),
+                Entry("Graphics quality level", "0 to 10, where 10 is Roblox's highest preset.", typeof(RenderingPage), performance),
+                Entry("Mouse sensitivity", "", typeof(RenderingPage), performance),
+                Entry("Reduced motion", "Cuts down on in-game UI animation.", typeof(RenderingPage), performance),
+                Entry("VR enabled", "", typeof(RenderingPage), performance),
+                Entry("Show performance stats", "Roblox's built-in FPS/ping/memory overlay.", typeof(RenderingPage), performance),
 
                 // Performance - Cleanup
-                Entry("Schedule", "How often old PhasmaStrap/Roblox files are automatically deleted after Roblox closes.", typeof(PerformancePage), performance),
-                Entry("PhasmaStrap logs", "", typeof(PerformancePage), performance),
-                Entry("PhasmaStrap download cache", "", typeof(PerformancePage), performance),
-                Entry("Roblox logs", "", typeof(PerformancePage), performance),
-                Entry("Roblox cache", "", typeof(PerformancePage), performance),
+                Entry("Schedule", "How often old PhasmaStrap/Roblox files are automatically deleted after Roblox closes.", typeof(RenderingPage), performance),
+                Entry("PhasmaStrap logs", "", typeof(RenderingPage), performance),
+                Entry("PhasmaStrap download cache", "", typeof(RenderingPage), performance),
+                Entry("Roblox logs", "", typeof(RenderingPage), performance),
+                Entry("Roblox cache", "", typeof(RenderingPage), performance),
 
                 // GBS Editor
                 Entry(Strings.Menu_GBSEditor_Title, Strings.Menu_GBSEditor_Description, typeof(GBSEditorPage), gbsEditor),
