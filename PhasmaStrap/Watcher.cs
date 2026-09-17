@@ -268,7 +268,8 @@ namespace PhasmaStrap
             NotificationCenter.Notify(
                 path is not null ? "Screenshot saved" : "Screenshot failed",
                 path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
-                NotificationCategory.General);
+                NotificationCategory.General,
+                onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
         }
 
         private int _replaySaving;
@@ -333,8 +334,9 @@ namespace PhasmaStrap
                 {
                     NotificationCenter.Notify(
                         path is not null ? "Replay saved" : "Replay failed",
-                        path is not null ? $"{Path.GetFileName(path)} - open it from the Capture page." : (error ?? "Nothing was buffered yet - check the log for details."),
-                        NotificationCategory.General, 6);
+                        path is not null ? Path.GetFileName(path) : (error ?? "Nothing was buffered yet - check the log for details."),
+                        NotificationCategory.General, 6,
+                        onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
                 });
             });
         }

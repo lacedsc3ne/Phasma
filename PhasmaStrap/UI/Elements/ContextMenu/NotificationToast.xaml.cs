@@ -39,14 +39,14 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Closed += Window_Closed;
         }
 
-        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5)
+        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5, Action? onClick = null)
         {
             if (_closed)
                 return;
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds)));
+                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds, onClick)));
                 return;
             }
 
@@ -58,7 +58,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 Title = title,
                 Message = message,
                 Category = category,
-                Duration = durationSeconds
+                Duration = durationSeconds,
+                OnClick = onClick
             });
 
             if (!_isProcessing)
@@ -86,6 +87,11 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     MessageText.Text = item.Message;
                     MessageText.Visibility = string.IsNullOrWhiteSpace(item.Message) ? Visibility.Collapsed : Visibility.Visible;
                     ApplyCategoryStyle(item.Category);
+
+                    _currentClick = item.OnClick;
+                    NotificationBorder.Cursor = item.OnClick is null ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand;
+                    if (item.OnClick is not null)
+                        SourceText.Text += "  \u00b7  Click to open";
 
                     ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
                     ProgressScale.ScaleX = 0;
@@ -196,6 +202,27 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             }
         }
 
+        private Action? _currentClick;
+
+        private void NotificationBorder_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Action? action = _currentClick;
+            if (action is null)
+                return;
+
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("NotificationToast::Click", $"Click action failed: {ex.Message}");
+            }
+
+            // the toast did its job - dismiss it
+            _currentItemCts?.Cancel();
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             // cancel just the current item's hold delay, not the whole toast lifetime - lets the
@@ -256,6 +283,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             public string Message { get; set; } = "";
             public NotificationCategory Category { get; set; }
             public double Duration { get; set; } = 5;
+            public Action? OnClick { get; set; }
         }
     }
 }

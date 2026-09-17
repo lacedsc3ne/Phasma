@@ -42,7 +42,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             // plain code-behind (see the comment above), so this doesn't touch page-level
             // DataContext at all, same "bind a sub-section, not the whole page" shape as
             // BehaviourViewModel.Matchmaker's tab
-            PresetsRoot.DataContext = new PhasmaStrap.UI.ViewModels.Settings.FastFlagPresetsViewModel();
+            var presets = new PhasmaStrap.UI.ViewModels.Settings.FastFlagPresetsViewModel();
+            presets.GlobalFlagsChanged += (_, _) => ReloadList();
+            PresetsRoot.DataContext = presets;
         }
 
         // builds a preset out of the rows selected in the grid (Ctrl/Shift+click for several) - see

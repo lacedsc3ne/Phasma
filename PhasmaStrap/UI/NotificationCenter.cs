@@ -28,12 +28,16 @@ namespace PhasmaStrap.UI
         public NotificationCategory Category { get; }
         public DateTime Timestamp { get; }
 
-        public NotificationRecord(string title, string message, NotificationCategory category)
+        /// <summary>What clicking the toast does (open the saved file, ...), if anything.</summary>
+        public Action? OnClick { get; }
+
+        public NotificationRecord(string title, string message, NotificationCategory category, Action? onClick = null)
         {
             Title = title;
             Message = message;
             Category = category;
             Timestamp = DateTime.Now;
+            OnClick = onClick;
         }
     }
 
@@ -81,7 +85,7 @@ namespace PhasmaStrap.UI
         /// switch and (for <see cref="NotificationCategory.GameJoin"/>/<see cref="NotificationCategory.GameLeave"/>)
         /// the relevant per-event-type setting are both enabled.
         /// </summary>
-        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5)
+        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5, Action? onClick = null)
         {
             if (!App.Settings.Prop.NotificationsEnabled)
                 return;
@@ -92,7 +96,7 @@ namespace PhasmaStrap.UI
             if (category == NotificationCategory.GameLeave && !App.Settings.Prop.NotificationsLeaveToastEnabled)
                 return;
 
-            var record = new NotificationRecord(title, message, category);
+            var record = new NotificationRecord(title, message, category, onClick);
 
             lock (s_lock)
             {
@@ -107,8 +111,24 @@ namespace PhasmaStrap.UI
             // Do Not Disturb suppresses only the on-screen popup - history above is recorded
             // either way, so nothing's lost, it just doesn't interrupt the session
             if (!App.Settings.Prop.DoNotDisturbEnabled)
-                ShowToast(title, message, category, durationSeconds);
+                ShowToast(title, message, category, durationSeconds, onClick);
         }
+
+        /// <summary>A click action that reveals a saved file in Explorer (for screenshot/replay toasts).</summary>
+        public static Action RevealFile(string path) => () =>
+        {
+            try
+            {
+                if (File.Exists(path))
+                    Process.Start("explorer.exe", "/select,\"" + path + "\"");
+                else
+                    Process.Start("explorer.exe", Path.GetDirectoryName(path) ?? path);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("NotificationCenter::RevealFile", $"Could not open '{path}': {ex.Message}");
+            }
+        };
 
         public static void ClearHistory()
         {
@@ -118,7 +138,7 @@ namespace PhasmaStrap.UI
             HistoryChanged?.Invoke(null, EventArgs.Empty);
         }
 
-        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds)
+        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds, Action? onClick)
         {
             var app = System.Windows.Application.Current;
 
@@ -132,7 +152,7 @@ namespace PhasmaStrap.UI
                     if (s_toast is null || !s_toast.IsUsable)
                         s_toast = new NotificationToast();
 
-                    s_toast.ShowNotification(title, message, category, durationSeconds);
+                    s_toast.ShowNotification(title, message, category, durationSeconds, onClick);
                 }
                 catch (Exception ex)
                 {

@@ -54,18 +54,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             private set { _presetStatus = value; OnPropertyChanged(nameof(PresetStatus)); }
         }
 
+        /// <summary>Raised after flags were removed from the global list so the editor grid reloads.</summary>
+        public event EventHandler? GlobalFlagsChanged;
+
+        // "Create preset from all flags" - honours the same toggle as the selected-flags button
         private void SavePreset()
         {
-            if (string.IsNullOrWhiteSpace(NewPresetName))
-            {
-                PresetStatus = "Give the preset a name first.";
-                return;
-            }
-
-            FastFlagSnapshotManager.Save(NewPresetName.Trim());
-            PresetStatus = $"Saved '{NewPresetName.Trim()}' with every flag currently in the list ({App.FastFlags.Prop.Count}). Those flags are still global - use 'Preset from selected flags' to make place-only flags.";
-            NewPresetName = "";
-            RefreshPresets();
+            SavePresetFromFlags(App.FastFlags.Prop.Keys.ToList(), all: true);
         }
 
         /// <summary>
@@ -73,7 +68,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         /// flag list, so they take effect only for places the preset is assigned to. Returns true
         /// when the editor's flag list changed and should be reloaded.
         /// </summary>
-        public bool SavePresetFromFlags(IReadOnlyList<string> flagNames)
+        public bool SavePresetFromFlags(IReadOnlyList<string> flagNames, bool all = false)
         {
             if (string.IsNullOrWhiteSpace(NewPresetName))
             {
@@ -83,7 +78,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             if (flagNames.Count == 0)
             {
-                PresetStatus = "Select one or more flags in the list below first (Ctrl+click for several).";
+                PresetStatus = all
+                    ? "There are no flags in the list to save."
+                    : "Select one or more flags in the list below first (Ctrl+click for several).";
                 return false;
             }
 
@@ -102,15 +99,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 foreach (var flag in flags)
                     App.FastFlags.SetValue(flag.Key, null);
+
+                // persist right away - the preset file was written already, and leaving the global
+                // removal pending until the Save button made it look like nothing happened
+                App.FastFlags.Save();
                 changedGlobal = flags.Count > 0;
             }
 
             PresetStatus = RemoveFromGlobal
-                ? $"Saved '{presetName}' with {flags.Count} flag(s) and removed them from your global flags - they now apply only to places you assign this preset to. Press Save to keep the change."
+                ? $"Saved '{presetName}' with {flags.Count} flag(s) and removed them from your global flags - they now apply only to places you assign this preset to."
                 : $"Saved '{presetName}' with {flags.Count} flag(s). They're still in your global flags too.";
 
             NewPresetName = "";
             RefreshPresets();
+
+            if (changedGlobal)
+                GlobalFlagsChanged?.Invoke(this, EventArgs.Empty);
+
             return changedGlobal;
         }
 
