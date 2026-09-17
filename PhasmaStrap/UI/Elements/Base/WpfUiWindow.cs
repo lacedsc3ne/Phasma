@@ -17,8 +17,21 @@ namespace PhasmaStrap.UI.Elements.Base
         // Phasma brand accent (coral-red), matches PhasmaMacro's --accent
         private static readonly Color PhasmaAccent = Color.FromRgb(0xF4, 0x55, 0x4B);
 
-        // dark, near-opaque tint over the acrylic blur - glassy at the edges, but reads dark overall
-        private static readonly SolidColorBrush GlassTintBrush = new(Color.FromArgb(232, 0x0E, 0x0E, 0x12));
+        // near-opaque tint over the acrylic blur - glassy at the edges, but reads as a solid
+        // surface overall. One per theme: the dark one used to be applied unconditionally, which
+        // is why the Light theme came out as dark text painted over a dark window.
+        private static readonly SolidColorBrush DarkGlassTintBrush = new(Color.FromArgb(232, 0x0E, 0x0E, 0x12));
+        private static readonly SolidColorBrush LightGlassTintBrush = new(Color.FromArgb(225, 0xF6, 0xF6, 0xF9));
+
+        // the layers OnSourceInitialized inserts behind the content, kept so they can be
+        // swapped live when the theme or background image settings change
+        private Border? _tintLayer;
+        private FrameworkElement? _backgroundImageLayer;
+        private FrameworkElement? _backgroundOverlayLayer;
+        private Grid? _rootGrid;
+
+        private static SolidColorBrush CurrentGlassTint =>
+            App.Settings.Prop.Theme.GetFinal() == Enums.Theme.Dark ? DarkGlassTintBrush : LightGlassTintBrush;
 
         // FluentDialog implements its own richer entrance (elastic bounce, mist), so it opts out of this
         protected virtual bool UseDefaultEntranceAnimation => true;
@@ -69,6 +82,9 @@ namespace PhasmaStrap.UI.Elements.Base
 
             ApplyAppColorTheme();
 
+            if (_tintLayer is not null)
+                _tintLayer.Background = CurrentGlassTint;
+
 #if QA_BUILD
             this.BorderBrush = System.Windows.Media.Brushes.Red;
             this.BorderThickness = new Thickness(4);
@@ -114,6 +130,65 @@ namespace PhasmaStrap.UI.Elements.Base
             }
         }
 
+        /// <summary>
+        /// Re-reads the settings-window background image settings and swaps the image/dim layers
+        /// on the open settings window in place, so toggling or picking a file on the Appearance
+        /// page shows up immediately instead of only after a relaunch.
+        /// </summary>
+        public static void RefreshGlobalBackgroundOnAllWindows()
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is WpfUiWindow wpfUiWindow)
+                    wpfUiWindow.RefreshGlobalBackground();
+            }
+        }
+
+        private void RefreshGlobalBackground()
+        {
+            if (_rootGrid is null || this is not PhasmaStrap.UI.Elements.Settings.MainWindow)
+                return;
+
+            if (_backgroundImageLayer is not null)
+                _rootGrid.Children.Remove(_backgroundImageLayer);
+            if (_backgroundOverlayLayer is not null)
+                _rootGrid.Children.Remove(_backgroundOverlayLayer);
+            _backgroundImageLayer = null;
+            _backgroundOverlayLayer = null;
+
+            var layers = App.Settings.Prop.GlobalBackgroundEnabled
+                ? PhasmaStrap.UI.GlobalBackground.TryCreateLayers(App.Settings.Prop.GlobalBackgroundFilePath, App.Settings.Prop.GlobalBackgroundOverlayOpacity)
+                : null;
+
+            // the near-opaque glass tint would hide the picture almost entirely - while an image is
+            // showing, the user's own dim overlay (opacity slider) is what keeps text readable instead
+            if (_tintLayer is not null)
+                _tintLayer.Visibility = layers is null ? Visibility.Visible : Visibility.Collapsed;
+
+            if (layers is null)
+                return;
+
+            int rowSpan = Math.Max(1, _rootGrid.RowDefinitions.Count);
+            int columnSpan = Math.Max(1, _rootGrid.ColumnDefinitions.Count);
+
+            // image goes under the glass tint (index 0), the dim overlay sits between them - the
+            // tint itself stays where it is so the ordering matches OnSourceInitialized's
+            int tintIndex = _tintLayer is not null ? _rootGrid.Children.IndexOf(_tintLayer) : 0;
+            if (tintIndex < 0)
+                tintIndex = 0;
+
+            Grid.SetRowSpan(layers.Value.Image, rowSpan);
+            Grid.SetColumnSpan(layers.Value.Image, columnSpan);
+            _rootGrid.Children.Insert(tintIndex, layers.Value.Image);
+
+            Grid.SetRowSpan(layers.Value.Overlay, rowSpan);
+            Grid.SetColumnSpan(layers.Value.Overlay, columnSpan);
+            _rootGrid.Children.Insert(tintIndex + 1, layers.Value.Overlay);
+
+            _backgroundImageLayer = layers.Value.Image;
+            _backgroundOverlayLayer = layers.Value.Overlay;
+        }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             // WindowBackdropType can only be applied once ExtendsContentIntoTitleBar is set, which
@@ -129,31 +204,21 @@ namespace PhasmaStrap.UI.Elements.Base
                 // behind everything else in the root Grid, spanning its full size
                 if (Content is Grid rootGrid)
                 {
+                    _rootGrid = rootGrid;
                     int rowSpan = Math.Max(1, rootGrid.RowDefinitions.Count);
                     int columnSpan = Math.Max(1, rootGrid.ColumnDefinitions.Count);
-                    int insertIndex = 0;
-
-                    // optional background image, settings window only (UI polish port from Voidstrap)
                     bool isSettingsWindow = this is PhasmaStrap.UI.Elements.Settings.MainWindow;
-                    if (isSettingsWindow && App.Settings.Prop.GlobalBackgroundEnabled)
-                    {
-                        var layers = PhasmaStrap.UI.GlobalBackground.TryCreateLayers(App.Settings.Prop.GlobalBackgroundFilePath, App.Settings.Prop.GlobalBackgroundOverlayOpacity);
-                        if (layers != null)
-                        {
-                            Grid.SetRowSpan(layers.Value.Image, rowSpan);
-                            Grid.SetColumnSpan(layers.Value.Image, columnSpan);
-                            rootGrid.Children.Insert(insertIndex++, layers.Value.Image);
 
-                            Grid.SetRowSpan(layers.Value.Overlay, rowSpan);
-                            Grid.SetColumnSpan(layers.Value.Overlay, columnSpan);
-                            rootGrid.Children.Insert(insertIndex++, layers.Value.Overlay);
-                        }
-                    }
-
-                    var tint = new Border { Background = GlassTintBrush, IsHitTestVisible = false };
+                    var tint = new Border { Background = CurrentGlassTint, IsHitTestVisible = false };
                     Grid.SetRowSpan(tint, rowSpan);
                     Grid.SetColumnSpan(tint, columnSpan);
-                    rootGrid.Children.Insert(insertIndex, tint);
+                    rootGrid.Children.Insert(0, tint);
+                    _tintLayer = tint;
+
+                    // optional background image, settings window only (UI polish port from Voidstrap) -
+                    // inserted underneath the tint by RefreshGlobalBackground, which is also what the
+                    // Appearance page calls to swap it live
+                    RefreshGlobalBackground();
 
                     // decorative snow overlay, settings window only, drawn on top of everything else
                     if (isSettingsWindow && App.Settings.Prop.SnowEffectEnabled)

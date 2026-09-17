@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -31,11 +32,24 @@ namespace PhasmaStrap.Networking
         public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform, Func<ProxiedRequest, ProxiedResponse?>? TryServeFromCache)> InterceptedHosts
             = new(StringComparer.OrdinalIgnoreCase);
 
+        // headers that describe THIS hop's connection rather than the request itself; forwarding
+        // them verbatim would either be meaningless upstream or (Accept-Encoding, Expect)
+        // actively break the body handling below
+        private static readonly string[] HopByHopRequestHeaders =
+        {
+            "Connection", "Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "Content-Length", "Expect", "Accept-Encoding", "Upgrade",
+        };
+
         private static TcpListener? _listener;
 
         private static CancellationTokenSource? _cts;
 
         private static readonly object Sync = new();
+
+        // another PhasmaStrap process (the settings window vs. the game-session watcher) may
+        // already be hosting the proxy on 443 - that's normal, not an error, so only the first
+        // "port busy" is logged and the keeper loop keeps retrying quietly until it frees up
+        private static bool _loggedPortBusy;
 
         public static bool IsRunning
         {
@@ -60,7 +74,18 @@ namespace PhasmaStrap.Networking
                     _listener = listener;
                     _cts = new CancellationTokenSource();
                     _ = Task.Run(() => AcceptLoopAsync(listener, _cts.Token));
+                    _loggedPortBusy = false;
                     App.Logger.WriteLine(LOG_IDENT, $"Listening on 127.0.0.1:{Port}");
+                }
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    if (!_loggedPortBusy)
+                    {
+                        _loggedPortBusy = true;
+                        App.Logger.WriteLine(LOG_IDENT, $"Port {Port} is already in use (another PhasmaStrap process is probably hosting the proxy) - will keep retrying quietly");
+                    }
+
+                    _listener = null;
                 }
                 catch (Exception ex)
                 {
@@ -117,6 +142,8 @@ namespace PhasmaStrap.Networking
 
             try
             {
+                client.NoDelay = true;
+
                 using var networkStream = client.GetStream();
                 using var sslStream = new SslStream(networkStream, false);
 
@@ -138,7 +165,7 @@ namespace PhasmaStrap.Networking
                     return;
                 }
 
-                ProxiedRequest? request = await ReadRequestAsync(new RawHttpReader(sslStream), sniHost, token);
+                ProxiedRequest? request = await ReadRequestAsync(new RawHttpReader(sslStream), sslStream, sniHost, token);
                 if (request is null)
                     return;
 
@@ -173,7 +200,7 @@ namespace PhasmaStrap.Networking
 
                 ProxyTrafficLog.Record(request.Host, request.Method, request.Path, response.StatusCode, servedFromCache, response.Body.Length);
 
-                await WriteResponseAsync(sslStream, response, token);
+                await WriteResponseAsync(sslStream, response, request.Method, token);
             }
             catch (Exception ex)
             {
@@ -188,7 +215,7 @@ namespace PhasmaStrap.Networking
         private sealed class RawHttpReader
         {
             private readonly Stream _stream;
-            private readonly byte[] _buffer = new byte[8192];
+            private readonly byte[] _buffer = new byte[16384];
             private int _bufferLen;
             private int _bufferPos;
 
@@ -246,11 +273,77 @@ namespace PhasmaStrap.Networking
                     offset += read;
                 }
 
-                return result;
+                return offset == length ? result : result[..offset];
+            }
+
+            public async Task<byte[]> ReadToEndAsync(CancellationToken token)
+            {
+                using var output = new MemoryStream();
+
+                int available = _bufferLen - _bufferPos;
+                if (available > 0)
+                {
+                    output.Write(_buffer, _bufferPos, available);
+                    _bufferPos = _bufferLen;
+                }
+
+                var chunk = new byte[16384];
+                while (true)
+                {
+                    int read = await _stream.ReadAsync(chunk.AsMemory(0, chunk.Length), token);
+                    if (read == 0)
+                        break;
+
+                    output.Write(chunk, 0, read);
+                }
+
+                return output.ToArray();
+            }
+
+            // "Transfer-Encoding: chunked" - a sequence of <hex length>\r\n<bytes>\r\n, terminated
+            // by a zero-length chunk and optional trailer headers. Roblox's APIs frequently reply
+            // this way, and libcurl uses it for streamed POST bodies, so a proxy that only
+            // understands Content-Length sees those as empty and never rewrites them
+            public async Task<byte[]> ReadChunkedAsync(CancellationToken token)
+            {
+                using var output = new MemoryStream();
+
+                while (true)
+                {
+                    string? sizeLine = await ReadLineAsync(token);
+                    if (sizeLine is null)
+                        break;
+
+                    sizeLine = sizeLine.Trim();
+                    if (sizeLine.Length == 0)
+                        continue;
+
+                    int semicolon = sizeLine.IndexOf(';');
+                    if (semicolon >= 0)
+                        sizeLine = sizeLine[..semicolon].Trim();
+
+                    if (!int.TryParse(sizeLine, System.Globalization.NumberStyles.HexNumber, null, out int size) || size < 0)
+                        throw new IOException($"Malformed chunk size '{sizeLine}'");
+
+                    if (size == 0)
+                    {
+                        // trailers, up to the blank line
+                        while (!string.IsNullOrEmpty(await ReadLineAsync(token))) { }
+                        break;
+                    }
+
+                    byte[] chunk = await ReadExactAsync(size, token);
+                    output.Write(chunk, 0, chunk.Length);
+
+                    // CRLF after the chunk data
+                    await ReadLineAsync(token);
+                }
+
+                return output.ToArray();
             }
         }
 
-        private static async Task<ProxiedRequest?> ReadRequestAsync(RawHttpReader reader, string sniHost, CancellationToken token)
+        private static async Task<ProxiedRequest?> ReadRequestAsync(RawHttpReader reader, Stream clientStream, string sniHost, CancellationToken token)
         {
             string? requestLine = await reader.ReadLineAsync(token);
             if (string.IsNullOrEmpty(requestLine))
@@ -274,12 +367,30 @@ namespace PhasmaStrap.Networking
                 headers[line[..colon].Trim()] = line[(colon + 1)..].Trim();
             }
 
-            byte[] body = Array.Empty<byte>();
-            if (headers.TryGetValue("Content-Length", out string? lengthHeader) && int.TryParse(lengthHeader, out int length) && length > 0)
-                body = await reader.ReadExactAsync(length, token);
+            // libcurl sends larger POST bodies with "Expect: 100-continue" and then WAITS for the
+            // interim response before transmitting the body; without answering it, the request
+            // hangs until curl's timeout and the body never arrives
+            if (headers.TryGetValue("Expect", out string? expect) && expect.Contains("100-continue", StringComparison.OrdinalIgnoreCase))
+            {
+                await clientStream.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 100 Continue\r\n\r\n"), token);
+                await clientStream.FlushAsync(token);
+            }
+
+            byte[] body = await ReadBodyAsync(reader, headers, token);
 
             string host = headers.TryGetValue("Host", out string? hostHeader) ? hostHeader : sniHost;
             return new ProxiedRequest(host, method, path, headers, body);
+        }
+
+        private static async Task<byte[]> ReadBodyAsync(RawHttpReader reader, Dictionary<string, string> headers, CancellationToken token)
+        {
+            if (headers.TryGetValue("Transfer-Encoding", out string? transfer) && transfer.Contains("chunked", StringComparison.OrdinalIgnoreCase))
+                return await reader.ReadChunkedAsync(token);
+
+            if (headers.TryGetValue("Content-Length", out string? lengthHeader) && int.TryParse(lengthHeader, out int length))
+                return length > 0 ? await reader.ReadExactAsync(length, token) : Array.Empty<byte>();
+
+            return Array.Empty<byte>();
         }
 
         private static async Task<ProxiedResponse?> ForwardToUpstreamAsync(ProxiedRequest request, CancellationToken token)
@@ -291,7 +402,7 @@ namespace PhasmaStrap.Networking
                 return null;
             }
 
-            using var upstream = new TcpClient();
+            using var upstream = new TcpClient { NoDelay = true };
             await upstream.ConnectAsync(ip, 443, token);
 
             using var upstreamSsl = new SslStream(upstream.GetStream(), false, (sender, cert, chain, errors) => errors == SslPolicyErrors.None);
@@ -305,11 +416,15 @@ namespace PhasmaStrap.Networking
             requestBuilder.Append($"{request.Method} {request.Path} HTTP/1.1\r\n");
             foreach (var header in request.Headers)
             {
-                if (header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
+                if (HopByHopRequestHeaders.Contains(header.Key, StringComparer.OrdinalIgnoreCase))
                     continue;
 
                 requestBuilder.Append($"{header.Key}: {header.Value}\r\n");
             }
+
+            // ask for an uncompressed body so the JSON transforms can actually read it; if the
+            // server compresses anyway, DecodeBody below handles the common encodings
+            requestBuilder.Append("Accept-Encoding: identity\r\n");
             requestBuilder.Append($"Content-Length: {request.Body.Length}\r\n");
             requestBuilder.Append("Connection: close\r\n\r\n");
 
@@ -317,58 +432,133 @@ namespace PhasmaStrap.Networking
             await upstreamSsl.WriteAsync(headerBytes, token);
             if (request.Body.Length > 0)
                 await upstreamSsl.WriteAsync(request.Body, token);
+            await upstreamSsl.FlushAsync(token);
 
             var reader = new RawHttpReader(upstreamSsl);
 
-            string? statusLine = await reader.ReadLineAsync(token);
-            if (string.IsNullOrEmpty(statusLine))
-                return null;
+            int statusCode;
+            string statusText;
+            Dictionary<string, string> headers;
 
-            string[] statusParts = statusLine.Split(' ', 3);
-            int statusCode = statusParts.Length > 1 && int.TryParse(statusParts[1], out int code) ? code : 502;
-            string statusText = statusParts.Length > 2 ? statusParts[2] : "";
-
-            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            string? line;
-            while (!string.IsNullOrEmpty(line = await reader.ReadLineAsync(token)))
+            // skip any 1xx interim responses (100 Continue, 103 Early Hints) to reach the real one
+            while (true)
             {
-                int colon = line.IndexOf(':');
-                if (colon <= 0)
-                    continue;
+                string? statusLine = await reader.ReadLineAsync(token);
+                if (string.IsNullOrEmpty(statusLine))
+                    return null;
 
-                headers[line[..colon].Trim()] = line[(colon + 1)..].Trim();
+                string[] statusParts = statusLine.Split(' ', 3);
+                statusCode = statusParts.Length > 1 && int.TryParse(statusParts[1], out int code) ? code : 502;
+                statusText = statusParts.Length > 2 ? statusParts[2] : "";
+
+                headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                string? line;
+                while (!string.IsNullOrEmpty(line = await reader.ReadLineAsync(token)))
+                {
+                    int colon = line.IndexOf(':');
+                    if (colon <= 0)
+                        continue;
+
+                    headers[line[..colon].Trim()] = line[(colon + 1)..].Trim();
+                }
+
+                if (statusCode >= 200)
+                    break;
             }
 
-            byte[] body = Array.Empty<byte>();
-            if (headers.TryGetValue("Content-Length", out string? lengthHeader) && int.TryParse(lengthHeader, out int length) && length > 0)
-                body = await reader.ReadExactAsync(length, token);
+            byte[] body;
+            bool bodyless = request.Method.Equals("HEAD", StringComparison.OrdinalIgnoreCase) || statusCode == 204 || statusCode == 304;
+
+            if (bodyless)
+                body = Array.Empty<byte>();
+            else if (headers.TryGetValue("Transfer-Encoding", out string? transfer) && transfer.Contains("chunked", StringComparison.OrdinalIgnoreCase))
+                body = await reader.ReadChunkedAsync(token);
+            else if (headers.TryGetValue("Content-Length", out string? lengthHeader) && int.TryParse(lengthHeader, out int length))
+                body = length > 0 ? await reader.ReadExactAsync(length, token) : Array.Empty<byte>();
+            else
+                body = await reader.ReadToEndAsync(token); // "Connection: close" delimits the body
+
+            body = DecodeBody(headers, body);
 
             return new ProxiedResponse(statusCode, statusText, headers, body);
         }
 
-        private static async Task WriteResponseAsync(Stream stream, ProxiedResponse response, CancellationToken token)
+        // inflates gzip/deflate/br bodies in place so the transforms see plain JSON, and drops
+        // the Content-Encoding header so the client isn't told the (now plain) body is compressed
+        private static byte[] DecodeBody(Dictionary<string, string> headers, byte[] body)
         {
+            if (body.Length == 0 || !headers.TryGetValue("Content-Encoding", out string? encoding))
+                return body;
+
+            encoding = encoding.Trim().ToLowerInvariant();
+
+            try
+            {
+                using var input = new MemoryStream(body);
+                using var output = new MemoryStream();
+
+                Stream? decoder = encoding switch
+                {
+                    "gzip" or "x-gzip" => new GZipStream(input, CompressionMode.Decompress),
+                    "deflate" => new DeflateStream(input, CompressionMode.Decompress),
+                    "br" => new BrotliStream(input, CompressionMode.Decompress),
+                    "identity" or "" => null,
+                    _ => null,
+                };
+
+                if (decoder is null)
+                {
+                    if (encoding is "identity" or "")
+                        headers.Remove("Content-Encoding");
+                    return body;
+                }
+
+                using (decoder)
+                    decoder.CopyTo(output);
+
+                headers.Remove("Content-Encoding");
+                return output.ToArray();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not decode '{encoding}' body ({body.Length} bytes), passing through: {ex.Message}");
+                return body;
+            }
+        }
+
+        private static async Task WriteResponseAsync(Stream stream, ProxiedResponse response, string requestMethod, CancellationToken token)
+        {
+            bool bodyless = requestMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase) || response.StatusCode == 204 || response.StatusCode == 304;
+
             var builder = new StringBuilder();
             builder.Append($"HTTP/1.1 {response.StatusCode} {response.StatusText}\r\n");
             foreach (var header in response.Headers)
             {
-                if (header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase) || header.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase))
+                if (header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)
+                    || header.Key.Equals("Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
+                    || header.Key.Equals("Connection", StringComparison.OrdinalIgnoreCase)
+                    || header.Key.Equals("Keep-Alive", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 builder.Append($"{header.Key}: {header.Value}\r\n");
             }
-            builder.Append($"Content-Length: {response.Body.Length}\r\n");
+
+            if (!bodyless || response.StatusCode == 304)
+                builder.Append($"Content-Length: {response.Body.Length}\r\n");
+
             builder.Append("Connection: close\r\n\r\n");
 
             await stream.WriteAsync(Encoding.ASCII.GetBytes(builder.ToString()), token);
-            if (response.Body.Length > 0)
+            if (!bodyless && response.Body.Length > 0)
                 await stream.WriteAsync(response.Body, token);
+            await stream.FlushAsync(token);
         }
 
         private static async Task WriteSimpleResponseAsync(Stream stream, int statusCode, string statusText, CancellationToken token)
         {
             byte[] bytes = Encoding.ASCII.GetBytes($"HTTP/1.1 {statusCode} {statusText}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
             await stream.WriteAsync(bytes, token);
+            await stream.FlushAsync(token);
         }
     }
 }

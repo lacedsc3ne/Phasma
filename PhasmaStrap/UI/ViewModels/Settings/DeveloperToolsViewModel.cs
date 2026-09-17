@@ -160,10 +160,35 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             const int MaxCharsPerLog = 100_000;
             var sb = new System.Text.StringBuilder();
 
-            sb.AppendLine("=== PhasmaStrap log ===");
-            AppendTail(sb, App.Logger.FileLocation, MaxCharsPerLog);
+            // every PhasmaStrap process (this settings window, each Bootstrapper/Watcher game
+            // session, elevated helpers) writes its own log file - showing only this process's
+            // log hid everything that actually matters for diagnosing gameplay features
+            // (overlays, hotkeys, replay, proxy), since those run in the Watcher process
+            try
+            {
+                var recentLogs = Directory.Exists(Paths.Logs)
+                    ? new DirectoryInfo(Paths.Logs).GetFiles("*.log").OrderByDescending(f => f.LastWriteTimeUtc).Take(4).ToList()
+                    : new List<FileInfo>();
 
-            sb.AppendLine();
+                if (recentLogs.Count == 0)
+                {
+                    sb.AppendLine("=== PhasmaStrap log ===");
+                    AppendTail(sb, App.Logger.FileLocation, MaxCharsPerLog);
+                }
+
+                foreach (FileInfo log in recentLogs)
+                {
+                    bool isThisProcess = string.Equals(log.FullName, App.Logger.FileLocation, StringComparison.OrdinalIgnoreCase);
+                    sb.AppendLine($"=== PhasmaStrap log: {log.Name}{(isThisProcess ? " (this window)" : "")} ===");
+                    AppendTail(sb, log.FullName, MaxCharsPerLog / 2);
+                    sb.AppendLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine($"(could not list PhasmaStrap logs: {ex.Message})");
+            }
+
             sb.AppendLine("=== Most recent Roblox log ===");
 
             try

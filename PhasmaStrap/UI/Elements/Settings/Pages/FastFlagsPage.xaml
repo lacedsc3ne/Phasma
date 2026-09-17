@@ -24,7 +24,12 @@
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Title}"
             Description="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Description}">
-            <ComboBox Padding="10,5,10,5" Width="160" ItemsSource="{Binding EnginePresetNames, Mode=OneTime}" Text="{Binding SelectedEnginePreset, Mode=TwoWay}" />
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Content="Default" Appearance="Secondary" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Default" />
+                <ui:Button Content="Balanced" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Balanced" />
+                <ui:Button Content="Performance" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Performance" />
+                <ui:Button Content="Quality" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Quality" />
+            </StackPanel>
         </controls:OptionControl>
 
 

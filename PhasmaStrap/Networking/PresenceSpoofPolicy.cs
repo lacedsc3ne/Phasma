@@ -19,6 +19,8 @@ namespace PhasmaStrap.Networking
 
         private const string PulseFragment = "/user-heartbeats-api/pulse";
 
+        private const string ActionReportFragment = "/user-heartbeats-api/action-report";
+
         public static byte[]? TransformRequest(ProxiedRequest request)
         {
             PresenceSpoofMode mode = App.Settings.Prop.PresenceSpoofMode;
@@ -84,13 +86,19 @@ namespace PhasmaStrap.Networking
         {
             PresenceSpoofMode mode = App.Settings.Prop.PresenceSpoofMode;
 
-            if (mode != PresenceSpoofMode.Offline)
+            if (mode == PresenceSpoofMode.Off)
                 return null;
 
             if (!request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            if (!request.Path.Contains(PulseFragment, StringComparison.OrdinalIgnoreCase))
+            // "action reports" are the client telling the backend what it's doing (in a game,
+            // which place, etc.) - they'd expose the real activity behind any spoofed presence,
+            // so swallow them whenever a spoof mode is active, not just for Offline
+            bool actionReport = request.Path.Contains(ActionReportFragment, StringComparison.OrdinalIgnoreCase);
+            bool pulse = request.Path.Contains(PulseFragment, StringComparison.OrdinalIgnoreCase);
+
+            if (!actionReport && !(mode == PresenceSpoofMode.Offline && pulse))
                 return null;
 
             var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

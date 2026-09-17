@@ -302,6 +302,20 @@ namespace PhasmaStrap
                 // we require deployment details for applying modifications for a worst case scenario,
                 // where we'd need to restore files from a package that isn't present on disk and needs to be redownloaded
                 allModificationsApplied = await ApplyModifications();
+
+                // a fresh Roblox version ships a fresh ssl\cacert.pem - re-add the proxy CA to it
+                // or every intercepted request from the new client fails its TLS handshake
+                if (App.Settings.Prop.NetworkingProxyEnabled)
+                {
+                    try
+                    {
+                        Networking.AssetProxyCA.PatchRobloxTrustBundles();
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Could not patch Roblox's trust bundle: {ex.Message}");
+                    }
+                }
             }
 
             // check registry entries for every launch, just in case the stock bootstrapper changes it back

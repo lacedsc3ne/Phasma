@@ -10,6 +10,15 @@ namespace PhasmaStrap.Networking
 
         private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromSeconds(5) };
 
+        // tried in order; a network that blocks one resolver (some ISPs/VPNs null-route
+        // cloudflare-dns.com) shouldn't take the whole proxy down with it
+        private static readonly string[] Resolvers =
+        {
+            "https://cloudflare-dns.com/dns-query",
+            "https://dns.google/resolve",
+            "https://1.1.1.1/dns-query",
+        };
+
         private static readonly Dictionary<string, (string Ip, DateTime Expiry)> Cache = new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly object Sync = new();
@@ -22,19 +31,24 @@ namespace PhasmaStrap.Networking
                     return cached.Ip;
             }
 
-            try
+            string? lastError = null;
+
+            foreach (string resolver in Resolvers)
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"https://cloudflare-dns.com/dns-query?name={Uri.EscapeDataString(hostname)}&type=A");
-                request.Headers.Add("Accept", "application/dns-json");
-
-                using HttpResponseMessage response = await Client.SendAsync(request, ct);
-                response.EnsureSuccessStatusCode();
-
-                string body = await response.Content.ReadAsStringAsync(ct);
-                using JsonDocument document = JsonDocument.Parse(body);
-
-                if (document.RootElement.TryGetProperty("Answer", out JsonElement answers))
+                try
                 {
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"{resolver}?name={Uri.EscapeDataString(hostname)}&type=A");
+                    request.Headers.Add("Accept", "application/dns-json");
+
+                    using HttpResponseMessage response = await Client.SendAsync(request, ct);
+                    response.EnsureSuccessStatusCode();
+
+                    string body = await response.Content.ReadAsStringAsync(ct);
+                    using JsonDocument document = JsonDocument.Parse(body);
+
+                    if (!document.RootElement.TryGetProperty("Answer", out JsonElement answers))
+                        continue;
+
                     foreach (JsonElement answer in answers.EnumerateArray())
                     {
                         // type 1 == A record
@@ -52,14 +66,24 @@ namespace PhasmaStrap.Networking
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    lastError = ex.Message;
+                }
+            }
 
-                return null;
-            }
-            catch (Exception ex)
+            // serve a stale cache entry rather than nothing - the IP is almost certainly still valid
+            lock (Sync)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Resolution failed for {hostname}: {ex.Message}");
-                return null;
+                if (Cache.TryGetValue(hostname, out var stale))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"All resolvers failed for {hostname} ({lastError}), using the cached address");
+                    return stale.Ip;
+                }
             }
+
+            App.Logger.WriteLine(LOG_IDENT, $"Resolution failed for {hostname}: {lastError ?? "no A record"}");
+            return null;
         }
     }
 }

@@ -131,6 +131,15 @@ namespace PhasmaStrap.Integrations.Overlays
             CancellationToken token = owner.Token;
             Mutex? mutex = null;
             bool held = false;
+
+            // RobloxWindowTracker only starts discovering the Roblox window once something holds a
+            // lease on it (Acquire -> Ensure). Nothing did that before this point unless the
+            // window customizer happened to be on, so the loop below sat on "Waiting for the Roblox
+            // window" forever with Current.Hwnd never leaving zero - the compositor (which takes its
+            // own lease) is only ever created AFTER that check passes. Hold a lease for the whole
+            // supervise session so discovery is actually running by the time we look.
+            IDisposable trackerLease = RobloxWindowTracker.Acquire();
+
             try
             {
                 mutex = new Mutex(false, "PhasmaStrapOverlayCompositorActive");
@@ -234,6 +243,7 @@ namespace PhasmaStrap.Integrations.Overlays
                     }
                 }
                 mutex?.Dispose();
+                trackerLease.Dispose();
                 CompleteThread(owner);
             }
         }

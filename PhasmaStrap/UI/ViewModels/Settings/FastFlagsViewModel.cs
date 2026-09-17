@@ -1153,31 +1153,34 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // something niche/situational the user didn't expect
         public string[] EnginePresetNames { get; } = { "Default", "Balanced", "Performance", "Quality" };
 
-        // one-time apply action, not a persisted selection - the individual toggles above are the
-        // source of truth, and may not match any named preset once hand-tweaked
-        public string SelectedEnginePreset
-        {
-            get => "";
-            set
-            {
-                switch (value)
-                {
-                    case "Quality":
-                        ApplyQualityPreset();
-                        break;
-                    case "Balanced":
-                        ApplyBalancedPreset();
-                        break;
-                    case "Performance":
-                        ApplyPerformancePreset();
-                        break;
-                    default:
-                        ApplyDefaultPreset();
-                        break;
-                }
+        // one-shot apply actions (buttons), not a persisted selection - the individual toggles
+        // below are the source of truth and may not match any named preset once hand-tweaked.
+        // This used to be a ComboBox whose getter always returned "" so it looked permanently
+        // blank, and whose setter tore down and rebuilt the page's DataContext from inside the
+        // ComboBox's own binding update - reloading is now deferred to the dispatcher so the
+        // preset is fully applied before the page re-reads the flags.
+        public ICommand ApplyEnginePresetCommand => new RelayCommand<string>(ApplyEnginePreset);
 
-                RequestPageReloadEvent?.Invoke(this, EventArgs.Empty);
+        private void ApplyEnginePreset(string? name)
+        {
+            switch (name)
+            {
+                case "Quality":
+                    ApplyQualityPreset();
+                    break;
+                case "Balanced":
+                    ApplyBalancedPreset();
+                    break;
+                case "Performance":
+                    ApplyPerformancePreset();
+                    break;
+                default:
+                    ApplyDefaultPreset();
+                    break;
             }
+
+            App.FastFlags.Save();
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() => RequestPageReloadEvent?.Invoke(this, EventArgs.Empty)));
         }
 
         private void ApplyDefaultPreset()
