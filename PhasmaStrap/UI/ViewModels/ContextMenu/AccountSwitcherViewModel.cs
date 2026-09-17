@@ -2,16 +2,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 using CommunityToolkit.Mvvm.Input;
 
-using Windows.Win32;
-using Windows.Win32.Foundation;
-
 using PhasmaStrap.Integrations;
 using PhasmaStrap.UI.Elements.ContextMenu;
-using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
@@ -165,17 +160,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             ImportCookieCommand = new AsyncRelayCommand(ImportByCookieAsync);
             CopyUserIdCommand = new RelayCommand<SwitcherAccount?>(CopyUserId);
 
-            LaunchNewInstanceCommand = new AsyncRelayCommand(LaunchNewInstanceAsync);
-            LaunchInstanceForAccountCommand = new AsyncRelayCommand<SwitcherAccount?>(LaunchInstanceForAccountAsync);
-            FocusInstanceCommand = new RelayCommand<RobloxInstanceRow?>(FocusInstance);
-            CloseInstanceCommand = new RelayCommand<RobloxInstanceRow?>(CloseInstance);
-
             _ = RefreshAsync();
-
-            RefreshInstances();
-            _instanceRefreshTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(2) };
-            _instanceRefreshTimer.Tick += (_, _) => RefreshInstances();
-            _instanceRefreshTimer.Start();
         }
 
         public string Status { get => _status; set { _status = value; OnPropertyChanged(nameof(Status)); } }
@@ -1015,171 +1000,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
         }
 
-        // --- running instances (merged in from what was a separate Instances page) + launching a
-        // new one bound to a specific saved account. Roblox only ever reads its login from the one
-        // shared RobloxCookies.dat file at its own startup - it doesn't watch that file
-        // continuously - so swapping it right before launching a NEW instance sets up only that new
-        // window with a different account, without touching whatever any already-running windows
-        // already read at their own startup. SingletonMutexBypass is what lets that new window
-        // start at all alongside ones already running (see its own header comment for how). ---
-
-        public ObservableCollection<RobloxInstanceRow> Instances { get; } = new();
-
-        private readonly DispatcherTimer _instanceRefreshTimer;
-
-        public ICommand LaunchNewInstanceCommand { get; }
-        public ICommand LaunchInstanceForAccountCommand { get; }
-        public ICommand FocusInstanceCommand { get; }
-        public ICommand CloseInstanceCommand { get; }
-
-        private void RefreshInstances()
-        {
-            Instances.Clear();
-
-            foreach (Process process in Utilities.GetProcessesSafe().Where(p => p.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)))
-            {
-                try
-                {
-                    Instances.Add(new RobloxInstanceRow
-                    {
-                        ProcessId = process.Id,
-                        MemoryDisplay = $"{process.WorkingSet64 / 1048576.0:0.#} MB",
-                        UptimeDisplay = $"Running for {DateTime.Now - process.StartTime:hh\\:mm\\:ss}",
-                        WindowHandle = process.MainWindowHandle,
-                    });
-                }
-                catch
-                {
-                    // process may have exited between enumeration and read - skip it
-                }
-                finally
-                {
-                    process.Dispose();
-                }
-            }
-
-            OnPropertyChanged(nameof(Instances));
-            OnPropertyChanged(nameof(HasInstances));
-        }
-
-        public bool HasInstances => Instances.Count > 0;
-
-        private async Task LaunchNewInstanceAsync()
-        {
-            await LaunchInstanceCoreAsync(null).ConfigureAwait(true);
-        }
-
-        private async Task LaunchInstanceForAccountAsync(SwitcherAccount? account)
-        {
-            if (account is null)
-                return;
-
-            await LaunchInstanceCoreAsync(account).ConfigureAwait(true);
-        }
-
-        /// <summary>
-        /// Frees the singleton lock on whatever's currently running, optionally swaps the live
-        /// cookie to a specific saved account first, then starts a fresh PhasmaStrap.exe -player
-        /// process. <paramref name="account"/> null means "whichever account is already live".
-        /// </summary>
-        private async Task LaunchInstanceCoreAsync(SwitcherAccount? account)
-        {
-            if (_busy)
-                return;
-
-            _busy = true;
-            OnPropertyChanged(nameof(AddCurrentEnabled));
-            await _opLock.WaitAsync().ConfigureAwait(true);
-
-            try
-            {
-                if (account is not null)
-                {
-                    string datPath = Path.Combine(_folder, account.DatFile);
-
-                    if (!File.Exists(datPath))
-                    {
-                        Frontend.ShowMessageBox("The saved login for this account is missing. Remove it and add the account again.", MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    Status = $"Setting up {account.Username}...";
-                    await ReplaceLiveCookieAsync(datPath).ConfigureAwait(true);
-                    account.LastUsedUtc = DateTime.UtcNow;
-                    SaveMeta();
-                }
-
-                List<Process> running = Utilities.GetProcessesSafe().Where(p => p.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)).ToList();
-
-                try
-                {
-                    if (running.Count > 0)
-                    {
-                        Status = "Freeing the singleton lock...";
-
-                        foreach (Process process in running)
-                            await Task.Run(() => SingletonMutexBypass.TryFreeSingleton(process.Id)).ConfigureAwait(true);
-                    }
-
-                    Status = "Launching a new instance...";
-                    Process.Start(new ProcessStartInfo { FileName = Paths.Process, Arguments = "-player", UseShellExecute = false });
-
-                    await Task.Delay(2500).ConfigureAwait(true);
-                    RefreshInstances();
-                    Status = "Launched. Only the first instance in a session gets Discord Rich Presence/hotkeys/overlays - additional windows are plain Roblox.";
-                }
-                finally
-                {
-                    foreach (Process process in running)
-                        process.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                Status = $"Launch failed: {ex.Message}";
-                App.Logger.WriteLine(LOG_IDENT, $"LaunchInstanceCoreAsync failed: {ex.Message}");
-            }
-            finally
-            {
-                _opLock.Release();
-                _busy = false;
-                OnPropertyChanged(nameof(AddCurrentEnabled));
-            }
-        }
-
-        private static void FocusInstance(RobloxInstanceRow? row)
-        {
-            if (row is null || row.WindowHandle == IntPtr.Zero)
-                return;
-
-            try
-            {
-                PInvoke.SetForegroundWindow((HWND)row.WindowHandle);
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine(LOG_IDENT, $"Focus instance failed: {ex.Message}");
-            }
-        }
-
-        private void CloseInstance(RobloxInstanceRow? row)
-        {
-            if (row is null)
-                return;
-
-            try
-            {
-                using Process process = Process.GetProcessById(row.ProcessId);
-                process.CloseMainWindow();
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine(LOG_IDENT, $"Close instance failed: {ex.Message}");
-            }
-
-            RefreshInstances();
-        }
-
         public void Dispose()
         {
             if (_disposed)
@@ -1189,7 +1009,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             try
             {
-                _instanceRefreshTimer.Stop();
                 _opLock.Dispose();
 
                 foreach (SwitcherAccount a in Accounts)
@@ -1202,13 +1021,5 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             GC.SuppressFinalize(this);
         }
-    }
-
-    public sealed class RobloxInstanceRow
-    {
-        public int ProcessId { get; init; }
-        public string MemoryDisplay { get; init; } = "";
-        public string UptimeDisplay { get; init; } = "";
-        public IntPtr WindowHandle { get; init; }
     }
 }
