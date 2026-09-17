@@ -331,7 +331,7 @@ namespace PhasmaStrap
                         await TryApplyMatchmakingAsync();
 
                     long? launchPlaceId = TryResolveLaunchPlaceId();
-                    await TryApplyEngineSettingsScopeAsync(launchPlaceId);
+                    await TryApplyFastFlagPlacePresetAsync(launchPlaceId);
 
                     // fire-and-forget: warms the AssetWarp preload cache ahead of the game
                     // actually asking, never something a launch should wait on or fail over
@@ -747,61 +747,46 @@ namespace PhasmaStrap
             return null;
         }
 
-        // scopes FastFlagsPage's curated "Engine Settings" toggle set to specific places, or excludes
-        // specific places from it, by stripping those flag keys (FastFlagManager.PresetFlags.Values -
-        // every real FFlag name any toggle on that page ever writes) from the already-materialized
-        // ClientAppSettings.json for this launch only. Never touches the user's global flag file, so
-        // the toggles on the settings page still show their real, unscoped state.
-        private async Task TryApplyEngineSettingsScopeAsync(long? placeId)
+        // applies a saved FastFlag preset (Fast Flag Editor page's Presets section) for this one
+        // launch, if the launched place has an assignment - replaces the already-materialized
+        // ClientAppSettings.json's flags with the snapshot's, the same "full replace, not a merge"
+        // semantics FastFlagSnapshotManager.Apply uses for the live A/B toggle, just written
+        // directly to this launch's file instead of the user's global flag file. Never touches
+        // App.FastFlags.Prop/FastFlags.json, so the Fast Flag Editor still shows your real,
+        // un-scoped saved flags afterward. Replaced the old per-game "Engine Settings" scope
+        // (strip curated toggles for/except listed places) with this more general place-to-preset
+        // mechanism instead.
+        private async Task TryApplyFastFlagPlacePresetAsync(long? placeId)
         {
-            const string LOG_IDENT = "Bootstrapper::TryApplyEngineSettingsScopeAsync";
+            const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagPlacePresetAsync";
 
             if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
                 return;
 
-            EngineSettingsScopeMode scope = App.Settings.Prop.EngineSettingsScope;
-            if (scope == EngineSettingsScopeMode.All)
+            if (!App.Settings.Prop.FastFlagPlacePresets.TryGetValue(placeId.Value.ToString(), out string? presetName) || string.IsNullOrEmpty(presetName))
                 return;
 
-            bool isListed = App.Settings.Prop.EngineSettingsScopedPlaces.Contains(placeId.Value.ToString());
-            bool shouldStrip = scope == EngineSettingsScopeMode.OnlyListedPlaces ? !isListed : isListed;
-
-            if (!shouldStrip)
+            Utility.FastFlagSnapshot? snapshot = Utility.FastFlagSnapshotManager.List().FirstOrDefault(s => s.Name == presetName);
+            if (snapshot is null)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} is assigned preset '{presetName}', but that snapshot no longer exists");
                 return;
+            }
 
             try
             {
                 string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
-                if (!File.Exists(filePath))
-                    return;
 
-                string existing = await File.ReadAllTextAsync(filePath);
-                if (string.IsNullOrWhiteSpace(existing))
-                    return;
-
-                Dictionary<string, object>? flags = JsonSerializer.Deserialize<Dictionary<string, object>>(existing);
-                if (flags is null)
-                    return;
-
-                int removed = 0;
-                foreach (string flagName in FastFlagManager.PresetFlags.Values)
-                {
-                    if (flags.Remove(flagName))
-                        removed++;
-                }
-
-                if (removed == 0)
-                    return;
-
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
                 Filesystem.AssertReadOnly(filePath);
-                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true }));
+                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(snapshot.Flags, new JsonSerializerOptions { WriteIndented = true }));
                 Filesystem.AssertReadOnly(filePath);
 
-                App.Logger.WriteLine(LOG_IDENT, $"Stripped {removed} Engine Settings flag(s) for place {placeId} (scope: {scope})");
+                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag preset '{presetName}' ({snapshot.Flags.Count} flag(s)) for place {placeId}");
             }
             catch (Exception ex)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply Engine Settings scope, launching with the global flag set: {ex.Message}");
+                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag preset '{presetName}', launching with the global flag set: {ex.Message}");
             }
         }
 

@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -52,11 +53,66 @@
             <ui:Button Icon="Search24" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SearchDatabase}" Click="SearchDatabaseButton_Click" Margin="0,0,12,16" />
         </WrapPanel>
 
-        <TextBlock Grid.Row="5" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Flags_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+        <StackPanel x:Name="PresetsRoot" Grid.Row="5" Margin="0,0,0,16">
+            <TextBlock Text="Presets" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Save the flag set below as a named preset, then optionally assign a place ID to launch with a specific preset instead of your normal saved flags - only for that one launch, your saved flags here are never touched." />
 
-        <ui:TextBox x:Name="SearchTextBox" Grid.Row="6" Margin="0,0,0,16" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <ui:TextBox Width="220" PlaceholderText="Preset name" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button Margin="8,0,0,0" Content="Save current flags as preset" Icon="Save24" Command="{Binding SavePresetCommand, Mode=OneTime}" />
+            </StackPanel>
 
-        <DataGrid Name="DataGrid" Grid.Row="7" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+            <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Presets, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border CornerRadius="8" Padding="10,8" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" />
+                                    <TextBlock FontSize="11" Opacity="0.7" Text="{Binding FlagCount, StringFormat='{}{0} flag(s)'}" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Text="Per-place assignment" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Places with an assignment launch with that preset's flags instead of your normal saved ones." />
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <ui:TextBox Width="140" PlaceholderText="Place ID" Text="{Binding AssignPlaceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Width="180" Margin="8,0,0,0" ItemsSource="{Binding Presets, Mode=OneWay}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedValue="{Binding AssignPresetName, Mode=TwoWay}" />
+                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_AddSingle}" Command="{Binding AddPlaceAssignmentCommand, Mode=OneTime}" />
+            </StackPanel>
+            <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding PlaceAssignments, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,8,6" Padding="8,4" Background="{DynamicResource ControlFillColorDefaultBrush}" CornerRadius="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Display}" FontFamily="Consolas" FontSize="12" />
+                                <ui:Button Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" Command="{Binding DataContext.RemovePlaceAssignmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <TextBlock Grid.Row="6" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Flags_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
+
+        <ui:TextBox x:Name="SearchTextBox" Grid.Row="7" Margin="0,0,0,16" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />
+
+        <DataGrid Name="DataGrid" Grid.Row="8" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
             <DataGrid.Style>
                 <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                     <Setter Property="Background" Value="Transparent" />

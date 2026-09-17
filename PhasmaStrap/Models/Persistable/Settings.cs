@@ -345,13 +345,12 @@ namespace PhasmaStrap.Models.Persistable
         // by GlobalHotkeyManager.TryParseGesture. Unbound (missing/empty) actions register nothing.
         public Dictionary<string, string> HotkeyBindings { get; set; } = new();
 
-        // scope for FastFlagsPage's curated toggle set ("Engine Settings" - the ~83-toggle panel,
-        // not to be confused with the runtime optimizer above despite the similar name). All (the
-        // default) applies those flags everywhere as before; the other two modes restrict them to
-        // only the listed places, or to every place except the listed ones. See
-        // Bootstrapper.TryApplyEngineSettingsScopeAsync.
-        public EngineSettingsScopeMode EngineSettingsScope { get; set; } = EngineSettingsScopeMode.All;
-        public List<string> EngineSettingsScopedPlaces { get; set; } = new();
+        // per-place FastFlag presets (Fast Flag Editor page): places with an entry here get that
+        // saved snapshot's flags applied for that one launch only - the user's actual saved
+        // FastFlags.json is never touched, same as the per-game engine preset scoping this
+        // replaced. Keyed by placeId (string), value is a FastFlagSnapshotManager snapshot name.
+        // See Bootstrapper.TryApplyFastFlagPlacePresetAsync.
+        public Dictionary<string, string> FastFlagPlacePresets { get; set; } = new();
 
         // bootstrapper theme editor (BootstrapperEditorWindow): remembers which detected external
         // editor (its full .exe path, from Utility.ExternalEditor.Detect) "Open in External Editor"
