@@ -27,7 +27,17 @@
             </StackPanel>
         </controls:OptionControl>
 
-        <TextBlock Margin="0,12,0,0" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding StatusText, Mode=OneWay}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <ui:Button Grid.Column="1" Content="Join fastest" Icon="TopSpeed24" Appearance="Secondary"
+                       IsEnabled="{Binding HasPingedServers, Mode=OneWay}"
+                       Command="{Binding JoinFastestCommand, Mode=OneTime}"
+                       ToolTip="Joins whichever server above reported the lowest ping" />
+        </Grid>
 
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Servers, Mode=OneWay}">
             <ItemsControl.ItemTemplate>

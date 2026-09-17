@@ -3,6 +3,7 @@ using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
 using PhasmaStrap.Models;
+using PhasmaStrap.UI;
 using PhasmaStrap.Utility;
 
 namespace PhasmaStrap
@@ -229,6 +230,16 @@ namespace PhasmaStrap
             while (Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
                 await Task.Delay(1000);
 
+            // ActivityWatcher.InGame only ever goes back to false via a clean disconnect/leave log
+            // line (see ActivityWatcher's GameDisconnectedEntry/GameLeavingEntry handling) - if the
+            // process is gone but that never happened, nothing ever told us the session ended
+            // normally, so this is the closest honest signal for "Roblox crashed" available without
+            // reading process exit codes (which Roblox's own client doesn't set meaningfully anyway).
+            bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
+
+            if (possibleCrash && App.Settings.Prop.AutoRejoinOnCrash)
+                await TryAutoRejoinAsync();
+
             if (_watcherData.AutoclosePids is not null)
             {
                 foreach (int pid in _watcherData.AutoclosePids)
@@ -237,6 +248,61 @@ namespace PhasmaStrap
 
             if (App.LaunchSettings.TestModeFlag.Active)
                 Process.Start(Paths.Process, "-settings -testmode");
+        }
+
+        private async Task TryAutoRejoinAsync()
+        {
+            const string LOG_IDENT = "Watcher::TryAutoRejoinAsync";
+
+            long placeId = ActivityWatcher?.Data.PlaceId ?? 0;
+            string jobId = ActivityWatcher?.Data.JobId ?? "";
+
+            if (placeId == 0)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Possible crash detected but no place ID was captured, cannot rejoin");
+                return;
+            }
+
+            int maxAttempts = Math.Max(1, App.Settings.Prop.AutoRejoinMaxAttempts);
+            int delaySeconds = Math.Max(1, App.Settings.Prop.AutoRejoinDelaySeconds);
+
+            string uri = string.IsNullOrEmpty(jobId)
+                ? $"roblox://experiences/start?placeId={placeId}"
+                : $"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}";
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                NotificationCenter.Notify(
+                    "Possible crash detected",
+                    $"Attempting to rejoin (try {attempt} of {maxAttempts})...",
+                    NotificationCategory.General);
+
+                await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+
+                try
+                {
+                    Process.Start(Paths.Process, $"-player \"{uri}\"");
+                    App.Logger.WriteLine(LOG_IDENT, $"Rejoin attempt {attempt}/{maxAttempts} launched for place {placeId}, job {jobId}");
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Rejoin attempt {attempt}/{maxAttempts} failed to launch: {ex.Message}");
+                    continue;
+                }
+
+                // give the freshly-launched process a moment to actually start before deciding
+                // whether this attempt "took" - if a Roblox player process is now running, stop
+                // here rather than launching several overlapping instances
+                await Task.Delay(TimeSpan.FromSeconds(3));
+
+                if (Utilities.GetProcessesSafe().Any(x => x.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    NotificationCenter.Notify("Rejoin successful", "Roblox relaunched.", NotificationCategory.General);
+                    return;
+                }
+            }
+
+            NotificationCenter.Notify("Rejoin failed", $"Could not relaunch Roblox after {maxAttempts} attempt(s).", NotificationCategory.General);
         }
 
         public void Dispose()

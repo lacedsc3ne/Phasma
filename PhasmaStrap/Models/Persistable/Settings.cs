@@ -196,6 +196,15 @@ namespace PhasmaStrap.Models.Persistable
         // joins stop resolving. Ported from Voidstrap's VoidstrapMatchmakerGamejoinApiVersion.
         public int MatchmakerGamejoinApiVersion { get; set; } = 1;
 
+        // auto-rejoin: if Roblox's process disappears while ActivityWatcher.InGame is still true
+        // (i.e. no clean disconnect log line was ever seen - see Watcher.Run/TryAutoRejoinAsync),
+        // treat it as a crash and relaunch into the same place/server (falls back to same place,
+        // any server, if the job ID wasn't captured yet). Off by default since silently relaunching
+        // Roblox after any process exit is a meaningful behavior change.
+        public bool AutoRejoinOnCrash { get; set; } = false;
+        public int AutoRejoinMaxAttempts { get; set; } = 3;
+        public int AutoRejoinDelaySeconds { get; set; } = 5;
+
         // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
         // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
         public bool DisableRobloxCrashHandler { get; set; } = false;
