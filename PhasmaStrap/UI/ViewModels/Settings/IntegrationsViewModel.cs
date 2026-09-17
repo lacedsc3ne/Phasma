@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using Microsoft.Win32;
@@ -168,6 +168,30 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             get => App.Settings.Prop.ShowAccountOnRichPresence;
             set => App.Settings.Prop.ShowAccountOnRichPresence = value;
+        }
+
+        public string DiscordApplicationId
+        {
+            get => App.Settings.Prop.DiscordApplicationId;
+            set
+            {
+                App.Settings.Prop.DiscordApplicationId = (value ?? "").Trim();
+                OnPropertyChanged(nameof(DiscordApplicationId));
+                OnPropertyChanged(nameof(DiscordApplicationStatus));
+            }
+        }
+
+        public string DiscordApplicationStatus
+        {
+            get
+            {
+                string id = App.Settings.Prop.DiscordApplicationId?.Trim() ?? "";
+                if (id.Length == 0)
+                    return "Using the shared \"Roblox\" application - your profile says \"Playing Roblox\".";
+                if (id.Length < 15 || !id.All(char.IsDigit))
+                    return "That doesn't look like a Discord application ID (it's a long number) - the shared \"Roblox\" application will be used.";
+                return "Your own application will be used - the name and icon you gave it on the Discord developer portal show on your profile. Applies to the next game session.";
+            }
         }
 
         public bool DisableAppPatchEnabled

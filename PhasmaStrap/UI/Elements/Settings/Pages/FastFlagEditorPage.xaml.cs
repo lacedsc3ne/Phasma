@@ -45,6 +45,19 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             PresetsRoot.DataContext = new PhasmaStrap.UI.ViewModels.Settings.FastFlagPresetsViewModel();
         }
 
+        // builds a preset out of the rows selected in the grid (Ctrl/Shift+click for several) - see
+        // FastFlagPresetsViewModel.SavePresetFromFlags for the "remove from global" behaviour
+        private void PresetFromSelected_Click(object sender, RoutedEventArgs e)
+        {
+            if (PresetsRoot.DataContext is not PhasmaStrap.UI.ViewModels.Settings.FastFlagPresetsViewModel vm)
+                return;
+
+            var names = DataGrid.SelectedItems.OfType<FastFlag>().Select(f => f.Name).Where(n => !string.IsNullOrEmpty(n)).ToList();
+
+            if (vm.SavePresetFromFlags(names))
+                ReloadList();
+        }
+
         private void ReloadList()
         {
             var selectedEntry = DataGrid.SelectedItem as FastFlag;

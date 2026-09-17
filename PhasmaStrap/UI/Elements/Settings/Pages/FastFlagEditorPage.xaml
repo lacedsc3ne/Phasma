@@ -68,10 +68,17 @@
             </ui:CardExpander.Header>
             <StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_PresetName}" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SaveCurrentFlagsAsPreset}" Icon="Save24" Command="{Binding SavePresetCommand, Mode=OneTime}" />
-            </StackPanel>
+            <WrapPanel Margin="0,8,0,0">
+                <ui:TextBox Width="220" Margin="0,0,8,6" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_PresetName}" Text="{Binding NewPresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button Margin="0,0,8,6" Content="Preset from selected flags" Icon="Checkmark24" Appearance="Primary" Click="PresetFromSelected_Click" />
+                <ui:Button Margin="0,0,8,6" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SaveCurrentFlagsAsPreset}" Icon="Save24" Appearance="Secondary" Command="{Binding SavePresetCommand, Mode=OneTime}" />
+            </WrapPanel>
+
+            <controls:OptionControl Header="Only use the selected flags where the preset is assigned" Description="Removes them from your global flag list when the preset is created, so they don't apply to every game. Leave off to keep them global as well.">
+                <ui:ToggleSwitch IsChecked="{Binding RemoveFromGlobal, Mode=TwoWay}" />
+            </controls:OptionControl>
+
+            <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PresetStatus, Mode=OneWay}" />
 
             <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Presets, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
