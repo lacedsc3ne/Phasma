@@ -10,11 +10,13 @@ namespace PhasmaStrap.Utility
     {
         public const string CleanRamNow = "CleanRamNow";
         public const string ToggleHeadsetAudio = "ToggleHeadsetAudio";
+        public const string TakeScreenshot = "TakeScreenshot";
 
         public static readonly (string Id, string DisplayName, string Description)[] All =
         {
             (CleanRamNow, "Clean RAM Now", "Trims process working sets and purges the standby list - the same action as the Performance page's Clean RAM button."),
             (ToggleHeadsetAudio, "Toggle Headset Audio Boost", "Turns the headset loudness boost on or off without switching to Settings."),
+            (TakeScreenshot, "Take Screenshot", "Captures the Roblox window and saves it to the Capture page's gallery."),
         };
     }
 }

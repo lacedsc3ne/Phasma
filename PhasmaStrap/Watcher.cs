@@ -165,6 +165,14 @@ namespace PhasmaStrap
                 else
                     HeadsetAudio.Stop();
             });
+            _hotkeys.RegisterAction(HotkeyActions.TakeScreenshot, () =>
+            {
+                string? path = ScreenshotCapture.Capture();
+                NotificationCenter.Notify(
+                    path is not null ? "Screenshot saved" : "Screenshot failed",
+                    path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
+                    NotificationCategory.General);
+            });
             _hotkeys.ApplyBindings();
 
             _notifyIcon = new(this);
