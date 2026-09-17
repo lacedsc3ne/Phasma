@@ -22,7 +22,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand PreviewBootstrapperCommand => new RelayCommand(PreviewBootstrapper);
         public ICommand BrowseCustomIconLocationCommand => new RelayCommand(BrowseCustomIconLocation);
-        public ICommand BrowseGlobalBackgroundFileCommand => new RelayCommand(BrowseGlobalBackgroundFile);
 
         public ICommand AddCustomThemeCommand => new RelayCommand(AddCustomTheme);
         public ICommand DeleteCustomThemeCommand => new RelayCommand(DeleteCustomTheme);
@@ -67,6 +66,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Icons.Add(new BootstrapperIconEntry { IconType = entry });
 
             PopulateCustomThemes();
+            LoadBackgrounds();
         }
 
         public IEnumerable<Theme> Themes { get; } = Enum.GetValues(typeof(Theme)).Cast<Theme>();
@@ -408,12 +408,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // the file picker inside it was unreachable - that's why "you can't set a background
         // image". Each of these also re-applies the background to the live window immediately
         // rather than only on the next launch.
+        // Every change here applies to the open window AND saves straight away. It used to only
+        // change the in-memory settings: the new picture showed immediately, which looked saved, but
+        // unless the Save button was pressed the next launch went back to whatever was on disk.
         public bool GlobalBackgroundEnabled
         {
             get => App.Settings.Prop.GlobalBackgroundEnabled;
             set
             {
                 App.Settings.Prop.GlobalBackgroundEnabled = value;
+                App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(GlobalBackgroundEnabled));
                 Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
             }
@@ -424,8 +428,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.GlobalBackgroundFilePath;
             set
             {
-                App.Settings.Prop.GlobalBackgroundFilePath = value;
+                App.Settings.Prop.GlobalBackgroundFilePath = value ?? "";
+                App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(GlobalBackgroundFilePath));
+
+                foreach (BackgroundItem item in Backgrounds)
+                    item.IsSelected = string.Equals(item.Path, App.Settings.Prop.GlobalBackgroundFilePath, StringComparison.OrdinalIgnoreCase);
+
                 Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
             }
         }
@@ -436,49 +445,152 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set
             {
                 App.Settings.Prop.GlobalBackgroundOverlayOpacity = value;
+                App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(GlobalBackgroundOverlayOpacity));
-                ScheduleBackgroundRefresh();
+
+                // cheap now - the window only moves its dim layer, the picture is left alone
+                Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
             }
         }
 
-        // the slider fires per pixel and a refresh re-decodes the background image, so apply once
-        // shortly after the drag settles instead of on every tick
-        private readonly System.Windows.Threading.DispatcherTimer _backgroundRefreshTimer = new() { Interval = TimeSpan.FromMilliseconds(150) };
-        private bool _backgroundRefreshHooked;
-
-        private void ScheduleBackgroundRefresh()
+        public sealed class BackgroundItem : NotifyPropertyChangedViewModel
         {
-            if (!_backgroundRefreshHooked)
+            private bool _isSelected;
+            private System.Windows.Media.ImageSource? _thumbnail;
+
+            public string Path { get; init; } = "";
+            public string Name { get; init; } = "";
+            public bool IsAnimated { get; init; }
+
+            // a file outside the library (set by an older version, or by hand in Settings.json)
+            public bool IsLinked { get; init; }
+
+            public bool IsSelected
             {
-                _backgroundRefreshTimer.Tick += (_, _) =>
-                {
-                    _backgroundRefreshTimer.Stop();
-                    Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
-                };
-                _backgroundRefreshHooked = true;
+                get => _isSelected;
+                set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
             }
 
-            _backgroundRefreshTimer.Stop();
-            _backgroundRefreshTimer.Start();
+            public System.Windows.Media.ImageSource? Thumbnail
+            {
+                get => _thumbnail;
+                set { _thumbnail = value; OnPropertyChanged(nameof(Thumbnail)); }
+            }
+        }
+
+        public ObservableCollection<BackgroundItem> Backgrounds { get; } = new();
+
+        public bool HasBackgrounds => Backgrounds.Count > 0;
+
+        public ICommand AddBackgroundCommand => new RelayCommand(AddBackground);
+
+        public ICommand SelectBackgroundCommand => new RelayCommand<BackgroundItem>(item =>
+        {
+            if (item is not null)
+                GlobalBackgroundFilePath = item.Path;
+        });
+
+        public ICommand RemoveBackgroundCommand => new RelayCommand<BackgroundItem>(item =>
+        {
+            if (item is null)
+                return;
+
+            bool wasSelected = item.IsSelected;
+            Backgrounds.Remove(item);
+            OnPropertyChanged(nameof(HasBackgrounds));
+
+            if (wasSelected)
+                GlobalBackgroundFilePath = "";
+
+            // a linked file belongs to the user - only library copies are deleted
+            if (!item.IsLinked)
+                BackgroundLibrary.Remove(item.Path);
+        });
+
+        private void LoadBackgrounds()
+        {
+            Backgrounds.Clear();
+
+            string current = App.Settings.Prop.GlobalBackgroundFilePath ?? "";
+            var paths = BackgroundLibrary.List();
+
+            if (current.Length > 0 && File.Exists(current) && !BackgroundLibrary.Contains(current))
+                paths.Insert(0, current);
+
+            foreach (string path in paths)
+                Backgrounds.Add(CreateBackgroundItem(path, string.Equals(path, current, StringComparison.OrdinalIgnoreCase)));
+
+            OnPropertyChanged(nameof(HasBackgrounds));
+        }
+
+        private static BackgroundItem CreateBackgroundItem(string path, bool selected)
+        {
+            var item = new BackgroundItem
+            {
+                Path = path,
+                Name = BackgroundLibrary.DisplayName(path),
+                IsAnimated = string.Equals(System.IO.Path.GetExtension(path), ".gif", StringComparison.OrdinalIgnoreCase),
+                IsLinked = !BackgroundLibrary.Contains(path),
+                IsSelected = selected,
+            };
+
+            // thumbnails decode off the UI thread and pop in when ready
+            Task.Run(() => GifImageBehavior.LoadThumbnail(path, 320)).ContinueWith(task =>
+            {
+                if (task.Status == TaskStatus.RanToCompletion && task.Result is not null)
+                    System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() => item.Thumbnail = task.Result));
+            });
+
+            return item;
+        }
+
+        private void AddBackground()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = $"{Strings.FileTypes_ImageFiles}|{string.Join(";", BackgroundLibrary.Extensions.Select(e => "*" + e))}"
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            string? last = null;
+
+            foreach (string file in dialog.FileNames)
+            {
+                try
+                {
+                    string imported = BackgroundLibrary.Import(file);
+
+                    if (!Backgrounds.Any(b => string.Equals(b.Path, imported, StringComparison.OrdinalIgnoreCase)))
+                        Backgrounds.Insert(0, CreateBackgroundItem(imported, false));
+
+                    last = imported;
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine("AppearanceViewModel::AddBackground", $"Could not add '{file}': {ex.Message}");
+                    Frontend.ShowMessageBox($"That file could not be added as a background:\n\n{ex.Message}", System.Windows.MessageBoxImage.Warning);
+                }
+            }
+
+            OnPropertyChanged(nameof(HasBackgrounds));
+
+            if (last is null)
+                return;
+
+            // picking a picture means wanting to see it
+            if (!GlobalBackgroundEnabled)
+                GlobalBackgroundEnabled = true;
+
+            GlobalBackgroundFilePath = last;
         }
 
         public bool SnowEffectEnabled
         {
             get => App.Settings.Prop.SnowEffectEnabled;
             set => App.Settings.Prop.SnowEffectEnabled = value;
-        }
-
-        private void BrowseGlobalBackgroundFile()
-        {
-            var dialog = new OpenFileDialog
-            {
-                Filter = $"{Strings.FileTypes_ImageFiles}|*.png;*.jpg;*.jpeg;*.bmp;*.gif"
-            };
-
-            if (dialog.ShowDialog() != true)
-                return;
-
-            GlobalBackgroundFilePath = dialog.FileName;
         }
 
         #endregion

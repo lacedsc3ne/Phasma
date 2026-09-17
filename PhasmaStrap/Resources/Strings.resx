@@ -5161,4 +5161,19 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Integrations.NamesActivityPhasmaStrapShowsFromMoment" xml:space="preserve">
     <value>Names the activity PhasmaStrap, shows it from the moment Roblox opens (an idle card with the logo while you're in the Roblox app), and puts the logo as the badge on the game icon while in a game (the account avatar takes that badge instead when "Show account on profile" is on). Off behaves like Bloxstrap: "Playing Roblox", in-game only. Applies to the next session.</value>
   </data>
+  <data name="Menu.Appearance.ClickPictureUseImagesAnimatedGIFs" xml:space="preserve">
+    <value>Click a picture to use it. Images and animated GIFs are copied into PhasmaStrap, so they keep working if you move or delete the original. Changes are saved straight away.</value>
+  </data>
+  <data name="Menu.Appearance.AddImageGIF" xml:space="preserve">
+    <value>Add image or GIF</value>
+  </data>
+  <data name="Menu.Appearance.NoBackgroundsAddedYet" xml:space="preserve">
+    <value>No backgrounds added yet.</value>
+  </data>
+  <data name="Menu.Appearance.GIF" xml:space="preserve">
+    <value>GIF</value>
+  </data>
+  <data name="Menu.Appearance.RemoveBackground" xml:space="preserve">
+    <value>Remove this background</value>
+  </data>
 </root>

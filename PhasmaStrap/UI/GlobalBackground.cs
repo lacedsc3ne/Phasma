@@ -32,8 +32,10 @@ namespace PhasmaStrap.UI
                     IsHitTestVisible = false,
                     ClipToBounds = true
                 };
+                // GifImageBehavior fades the picture in once it has decoded. ImageFx.SmoothLoad must
+                // NOT be used here: it restarts a fade on every Source change, and an animated GIF
+                // changes Source on every frame - the background pulsed constantly.
                 GifImageBehavior.SetSourcePath(image, filePath);
-                ImageFx.SetSmoothLoad(image, true);
 
                 var overlay = new Border
                 {

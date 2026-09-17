@@ -14651,5 +14651,50 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Integrations.NamesActivityPhasmaStrapShowsFromMoment", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click a picture to use it. Images and animated GIFs are copied into PhasmaStrap, so they keep working if you move or del.
+        /// </summary>
+        public static string Menu_Appearance_ClickPictureUseImagesAnimatedGIFs {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.ClickPictureUseImagesAnimatedGIFs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add image or GIF.
+        /// </summary>
+        public static string Menu_Appearance_AddImageGIF {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.AddImageGIF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No backgrounds added yet..
+        /// </summary>
+        public static string Menu_Appearance_NoBackgroundsAddedYet {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.NoBackgroundsAddedYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GIF.
+        /// </summary>
+        public static string Menu_Appearance_GIF {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.GIF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove this background.
+        /// </summary>
+        public static string Menu_Appearance_RemoveBackground {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.RemoveBackground", resourceCulture);
+            }
+        }
     }
 }

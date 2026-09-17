@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -28,6 +28,7 @@ namespace PhasmaStrap.UI.Elements.Base
         private Border? _tintLayer;
         private FrameworkElement? _backgroundImageLayer;
         private FrameworkElement? _backgroundOverlayLayer;
+        private string _backgroundPath = "";
         private Grid? _rootGrid;
 
         private static SolidColorBrush CurrentGlassTint =>
@@ -149,12 +150,24 @@ namespace PhasmaStrap.UI.Elements.Base
             if (_rootGrid is null || this is not PhasmaStrap.UI.Elements.Settings.MainWindow)
                 return;
 
+            string wantedPath = App.Settings.Prop.GlobalBackgroundEnabled ? App.Settings.Prop.GlobalBackgroundFilePath ?? "" : "";
+
+            // same picture as before (the dim slider moved, or an unrelated refresh): adjust the
+            // overlay in place instead of tearing the image down and starting it again
+            if (_backgroundImageLayer is not null && _backgroundOverlayLayer is not null
+                && wantedPath.Length > 0 && string.Equals(wantedPath, _backgroundPath, StringComparison.OrdinalIgnoreCase))
+            {
+                _backgroundOverlayLayer.Opacity = Math.Clamp(App.Settings.Prop.GlobalBackgroundOverlayOpacity, 0.0, 1.0);
+                return;
+            }
+
             if (_backgroundImageLayer is not null)
                 _rootGrid.Children.Remove(_backgroundImageLayer);
             if (_backgroundOverlayLayer is not null)
                 _rootGrid.Children.Remove(_backgroundOverlayLayer);
             _backgroundImageLayer = null;
             _backgroundOverlayLayer = null;
+            _backgroundPath = "";
 
             var layers = App.Settings.Prop.GlobalBackgroundEnabled
                 ? PhasmaStrap.UI.GlobalBackground.TryCreateLayers(App.Settings.Prop.GlobalBackgroundFilePath, App.Settings.Prop.GlobalBackgroundOverlayOpacity)
@@ -187,6 +200,7 @@ namespace PhasmaStrap.UI.Elements.Base
 
             _backgroundImageLayer = layers.Value.Image;
             _backgroundOverlayLayer = layers.Value.Overlay;
+            _backgroundPath = wantedPath;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
