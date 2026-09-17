@@ -1,0 +1,35 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.ContextMenu.BrowserLoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="Sign in to Roblox"
+        Width="480"
+        Height="740"
+        MinWidth="380"
+        MinHeight="480"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="Sign in to Roblox" ShowMinimize="False" ShowMaximize="False" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <TextBlock Grid.Row="1" Margin="16,8,16,0" FontSize="11" Opacity="0.6" TextWrapping="Wrap"
+                   Text="Log in below like you normally would. Once Roblox signs you in, this closes on its own and the account is added." />
+
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+            <wv2:WebView2 x:Name="Browser" />
+            <StackPanel x:Name="LoadingPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock Margin="0,10,0,0" Text="Loading..." HorizontalAlignment="Center" Opacity="0.7" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>
