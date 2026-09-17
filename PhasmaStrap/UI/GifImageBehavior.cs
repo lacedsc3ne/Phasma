@@ -183,9 +183,11 @@ namespace PhasmaStrap.UI
             try
             {
                 using FileStream stream = File.OpenRead(path);
+                // no IgnoreImageCache here: a stream has no URI for WPF's image cache to key on, and
+                // BitmapImage throws "Key cannot be null" if asked to bypass it - which silently left
+                // every thumbnail empty
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.DecodePixelWidth = width;
                 bitmap.StreamSource = stream;
@@ -193,8 +195,9 @@ namespace PhasmaStrap.UI
                 bitmap.Freeze();
                 return bitmap;
             }
-            catch
+            catch (Exception ex)
             {
+                App.Logger.WriteLine(LOG_IDENT, $"Thumbnail failed for '{Path.GetFileName(path)}': {ex.Message}");
                 return null;
             }
         }
