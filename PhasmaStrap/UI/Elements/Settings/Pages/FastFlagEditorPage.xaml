@@ -30,7 +30,13 @@
             <controls:MarkdownTextBlock TextWrapping="Wrap" FontSize="14" FontWeight="Bold" Margin="0,4,0,0" MarkdownText="{Binding Source={x:Static resources:Strings.Menu_FastFlagEditor_AllowlistInformation}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://devforum.roblox.com/t/allowlist-for-local-client-configuration-via-fast-flags/3966569'}"  Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
-        <ui:InfoBar Grid.Row="2" Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_FastFlagEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_FastFlagEditor_BannerText}" Severity="Warning" IsClosable="False" />
+        <StackPanel Grid.Row="2">
+            <ui:InfoBar Margin="0,0,0,16" Padding="8" Title="{x:Static resources:Strings.Menu_FastFlagEditor_BannerTitle}" IsOpen="True" Message="{x:Static resources:Strings.Menu_FastFlagEditor_BannerText}" Severity="Warning" IsClosable="False" />
+
+            <ui:InfoBar x:Name="ManagerDisabledBar" Margin="0,0,0,16" Padding="8" Title="PhasmaStrap isn't managing FastFlags right now"
+                        Message="&quot;Allow PhasmaStrap to manage FFlags&quot; is off (Engine Settings tab) - none of the flags below, and no place preset assignment, will actually reach Roblox until it's back on."
+                        Severity="Caution" IsClosable="False" Visibility="Collapsed" />
+        </StackPanel>
 
         <TextBlock Grid.Row="3" Text="{x:Static resources:Strings.Menu_FastFlagEditor_Section_Actions_Header}" FontSize="20" FontWeight="Medium" Margin="0,0,0,8" />
 
