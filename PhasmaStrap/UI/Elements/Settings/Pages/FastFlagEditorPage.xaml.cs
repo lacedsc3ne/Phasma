@@ -37,6 +37,12 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         public FastFlagEditorPage()
         {
             InitializeComponent();
+
+            // scoped to just the Presets section below - the rest of this page is deliberately
+            // plain code-behind (see the comment above), so this doesn't touch page-level
+            // DataContext at all, same "bind a sub-section, not the whole page" shape as
+            // BehaviourViewModel.Matchmaker's tab
+            PresetsRoot.DataContext = new PhasmaStrap.UI.ViewModels.Settings.FastFlagPresetsViewModel();
         }
 
         private void ReloadList()

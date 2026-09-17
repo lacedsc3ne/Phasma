@@ -1243,68 +1243,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         #endregion
 
-        #region Per-game scope
-
-        public string[] EngineScopeModeOptions { get; } =
-        {
-            "Apply everywhere",
-            "Only apply to listed games",
-            "Apply everywhere except listed games",
-        };
-
-        public string SelectedEngineScopeMode
-        {
-            get => App.Settings.Prop.EngineSettingsScope switch
-            {
-                Enums.EngineSettingsScopeMode.OnlyListedPlaces => EngineScopeModeOptions[1],
-                Enums.EngineSettingsScopeMode.AllExceptListedPlaces => EngineScopeModeOptions[2],
-                _ => EngineScopeModeOptions[0],
-            };
-            set
-            {
-                App.Settings.Prop.EngineSettingsScope = value == EngineScopeModeOptions[1]
-                    ? Enums.EngineSettingsScopeMode.OnlyListedPlaces
-                    : value == EngineScopeModeOptions[2]
-                        ? Enums.EngineSettingsScopeMode.AllExceptListedPlaces
-                        : Enums.EngineSettingsScopeMode.All;
-
-                OnPropertyChanged(nameof(SelectedEngineScopeMode));
-            }
-        }
-
-        public ObservableCollection<string> EngineScopedPlaces { get; } = new(App.Settings.Prop.EngineSettingsScopedPlaces);
-
-        private string _engineScopePlaceId = "";
-
-        public string EngineScopePlaceId
-        {
-            get => _engineScopePlaceId;
-            set { _engineScopePlaceId = value; OnPropertyChanged(nameof(EngineScopePlaceId)); }
-        }
-
-        public ICommand AddEngineScopedPlaceCommand => new RelayCommand(() =>
-        {
-            string id = EngineScopePlaceId.Trim();
-
-            if (!long.TryParse(id, out _) || EngineScopedPlaces.Contains(id))
-                return;
-
-            EngineScopedPlaces.Add(id);
-            App.Settings.Prop.EngineSettingsScopedPlaces.Add(id);
-            EngineScopePlaceId = "";
-        });
-
-        public ICommand RemoveEngineScopedPlaceCommand => new RelayCommand<string>(id =>
-        {
-            if (id is null)
-                return;
-
-            EngineScopedPlaces.Remove(id);
-            App.Settings.Prop.EngineSettingsScopedPlaces.Remove(id);
-        });
-
-        #endregion
-
         public bool ResetConfiguration
         {
             get => _preResetFlags is not null;
