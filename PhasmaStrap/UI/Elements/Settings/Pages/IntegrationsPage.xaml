@@ -101,7 +101,7 @@
 
                     <controls:OptionControl
                         Header="Show as &quot;Playing PhasmaStrap&quot;"
-                        Description="Names the activity PhasmaStrap and puts the logo as the badge on the game icon (the account avatar takes that badge instead when &quot;Show account on profile&quot; is on). Off shows it as &quot;Playing Roblox&quot;. Applies to the next game session."
+                        Description="Names the activity PhasmaStrap, shows it from the moment Roblox opens (an idle card with the logo while you're in the Roblox app), and puts the logo as the badge on the game icon while in a game (the account avatar takes that badge instead when &quot;Show account on profile&quot; is on). Off behaves like Bloxstrap: &quot;Playing Roblox&quot;, in-game only. Applies to the next session."
                         IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
                         <ui:ToggleSwitch IsChecked="{Binding DiscordShowAsPhasmaStrap, Mode=TwoWay}" />
                     </controls:OptionControl>

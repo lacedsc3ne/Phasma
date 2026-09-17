@@ -56,6 +56,8 @@ namespace PhasmaStrap.Integrations
 
         private bool _visible = true;
 
+        private readonly DateTime _sessionStartUtc = DateTime.UtcNow;
+
         /// <summary>
         /// The last presence snapshot actually sent to (or cleared from) Discord. Updated at the end
         /// of every <see cref="UpdatePresence"/> call, which raises <see cref="PresenceChanged"/> -
@@ -100,6 +102,9 @@ namespace PhasmaStrap.Integrations
                 App.Logger.WriteLine(LOG_IDENT, $"Lost connection to Discord RPC - {e.Reason} ({e.Code})");
 
             _rpcClient.Initialize();
+
+            // show the idle card right away - Roblox's own app is open before any game is
+            _ = Task.Run(() => SetCurrentGame());
         }
 
         public void ProcessRPCMessage(Message message, bool implicitUpdate = true)
@@ -379,10 +384,32 @@ namespace PhasmaStrap.Integrations
             
             if (!_activityWatcher.InGame)
             {
-                App.Logger.WriteLine(LOG_IDENT, "Not in game, clearing presence");
-
-                _currentPresence = _originalPresence =  null;
                 _messageQueue.Clear();
+
+                if (App.Settings.Prop.DiscordShowAsPhasmaStrap)
+                {
+                    // Roblox is open but no game is - keep "Playing PhasmaStrap" up with an idle
+                    // card (logo as the big image) instead of vanishing from the profile
+                    App.Logger.WriteLine(LOG_IDENT, "Not in game, showing the idle PhasmaStrap presence");
+
+                    _currentPresence = new DiscordRPC.RichPresence
+                    {
+                        Details = "In the Roblox app",
+                        State = "Not in a game",
+                        Timestamps = new Timestamps { Start = _sessionStartUtc },
+                        Assets = new Assets
+                        {
+                            LargeImageKey = PhasmaStrapLogoUrl,
+                            LargeImageText = $"PhasmaStrap v{App.Version}",
+                        }
+                    };
+                    _originalPresence = _currentPresence.Clone();
+                }
+                else
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Not in game, clearing presence");
+                    _currentPresence = _originalPresence = null;
+                }
 
                 UpdatePresence();
                 return true;
