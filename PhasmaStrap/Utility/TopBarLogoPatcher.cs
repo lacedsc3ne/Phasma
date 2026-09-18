@@ -2,36 +2,37 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 namespace PhasmaStrap.Utility
 {
     // Replaces the Roblox logo on the in-game top bar (the round menu button, top left) with the
     // PhasmaStrap mark.
     //
-    // That icon is not a file of its own. The current top bar draws the sprite "icons/logo/block"
-    // out of three shared spritesheets (1x / 2x / 3x), at offsets listed in a Lua table that ships
-    // with the client - and both the sheet numbers and the offsets move with every Roblox update.
-    // A static mod file would therefore paint over whatever else lands on that spot in the next
-    // version. So this runs at launch instead: it reads the table from the version being started,
-    // and draws the logo into exactly that rectangle of exactly those sheets. The older top bar
-    // used plain files (textures/ui/TopBar/coloredlogo*.png); those are replaced as well, for
-    // clients that still use them.
+    // That logo is not an image. Every icon on the current top bar is a glyph of the "Builder
+    // Icons" font that ships with the client, and the menu button is the glyph named "tilt" - so
+    // the mark is traced from the PhasmaStrap logo and swapped into that glyph (IconFontPatcher).
+    // Fonts are single-colour: it shows as a white silhouette, tinted like every other top bar
+    // icon. The font gains icons with Roblox updates, so this patches whatever font the version
+    // being launched ships rather than dropping in a pre-made one.
+    //
+    // (An earlier version of this file drew the logo into a FoundationImages spritesheet cell named
+    // by a Lua table. That table was a stale leftover pointing at an EMPTY cell - the icon had
+    // already moved to the font - and the next Roblox update stopped shipping the Lua at all.)
+    //
+    // The pre-Unibar top bar used plain files (textures/ui/TopBar/coloredlogo*.png); those are
+    // replaced too, in full colour, for clients that still use them.
     //
     // The caller adds the returned paths to the mod manifest, so switching the option off makes
-    // the normal "mod file was removed" path restore the original sheets from the packages.
+    // the normal "mod file was removed" path restore the originals from the packages.
     //
     // No App dependencies, so it can be exercised from a console harness on a copy of the files.
     public static class TopBarLogoPatcher
     {
         public static Action<string>? Log;
 
-        private const string SpriteName = "icons/logo/block";
+        private const string GlyphName = "tilt";
         private const string MarkerFile = "PhasmaTopBarLogo.json";
-
-        private static readonly Regex SpriteEntry = new(
-            @"\[""" + Regex.Escape(SpriteName) + @"""\]\s*=\s*\{\s*ImageRectOffset\s*=\s*Vector2\.new\((\d+),\s*(\d+)\),\s*ImageRectSize\s*=\s*Vector2\.new\((\d+),\s*(\d+)\),\s*ImageSet\s*=\s*""([^""]+)""",
-            RegexOptions.Compiled);
+        private const string OriginalSuffix = ".phasma-original";
 
         // Returns the files (relative to versionDirectory) that now carry the logo.
         public static List<string> Apply(string versionDirectory, Func<Stream> openLogo)
@@ -50,8 +51,7 @@ namespace PhasmaStrap.Utility
 
                 Dictionary<string, string> marker = ReadMarker(versionDirectory);
 
-                foreach ((string sheet, Rectangle rect) in FindSprites(versionDirectory))
-                    Patch(versionDirectory, sheet, rect, logo, marker, owned);
+                PatchFonts(versionDirectory, logo, marker, owned);
 
                 // pre-Unibar top bar: the logo is a whole file per scale
                 string legacy = Path.Combine(versionDirectory, "content", "textures", "ui", "TopBar");
@@ -72,41 +72,61 @@ namespace PhasmaStrap.Utility
             return owned;
         }
 
-        private static IEnumerable<(string Sheet, Rectangle Rect)> FindSprites(string versionDirectory)
+        private static void PatchFonts(string versionDirectory, Bitmap logo, Dictionary<string, string> marker, List<string> owned)
         {
-            string root = Path.Combine(versionDirectory, "ExtraContent", "LuaPackages", "Packages", "_Index", "FoundationImages");
+            string root = Path.Combine(versionDirectory, "ExtraContent", "LuaPackages", "Packages", "_Index", "BuilderIcons");
             if (!Directory.Exists(root))
             {
-                Log?.Invoke("FoundationImages is not where it used to be - only the legacy top bar logo will be replaced");
-                yield break;
+                Log?.Invoke("The Builder Icons font package is not where it used to be - only the legacy top bar logo will be replaced");
+                return;
             }
 
-            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            List<List<PointF>>? outline = null;
+            int patched = 0;
 
-            foreach (string dataFile in Directory.GetFiles(root, "*ImageSetData.lua", SearchOption.AllDirectories))
+            foreach (string font in Directory.GetFiles(root, "*.ttf", SearchOption.AllDirectories))
             {
-                string text = File.ReadAllText(dataFile);
+                string relative = Path.GetRelativePath(versionDirectory, font);
 
-                foreach (Match match in SpriteEntry.Matches(text))
+                // already carries the mark from an earlier launch of this same version
+                if (marker.TryGetValue(relative, out string? patchedHash) && patchedHash == Hash(font))
                 {
-                    string imageSet = match.Groups[5].Value;
-                    string? sheet = Directory.GetFiles(root, imageSet + ".png", SearchOption.AllDirectories).FirstOrDefault();
-
-                    if (sheet is null)
-                    {
-                        Log?.Invoke($"Spritesheet {imageSet} named by {Path.GetFileName(dataFile)} was not found");
-                        continue;
-                    }
-
-                    var rect = new Rectangle(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[4].Value));
-
-                    if (seen.Add($"{sheet}|{rect}"))
-                        yield return (sheet, rect);
+                    owned.Add(relative);
+                    patched++;
+                    continue;
                 }
+
+                // Always start from the untouched font. The new glyph is sized from the ORIGINAL
+                // glyph's box; patching an already patched font would measure our own mark instead
+                // and grow it a little every time.
+                string pristine = font + OriginalSuffix;
+                if (!File.Exists(pristine))
+                    File.Copy(font, pristine);
+
+                outline ??= IconFontPatcher.Trace(logo);
+
+                byte[]? result = IconFontPatcher.ReplaceGlyph(File.ReadAllBytes(pristine), GlyphName, outline);
+                if (result is null)
+                {
+                    Log?.Invoke($"{relative}: no '{GlyphName}' glyph to replace (or not a TrueType font) - left alone");
+                    File.Delete(pristine);
+                    continue;
+                }
+
+                var info = new FileInfo(font);
+                if (info.IsReadOnly)
+                    info.IsReadOnly = false;
+
+                File.WriteAllBytes(font, result);
+
+                owned.Add(relative);
+                marker[relative] = Hash(font);
+                patched++;
+                Log?.Invoke($"Top bar logo glyph written into {relative}");
             }
 
-            if (seen.Count == 0)
-                Log?.Invoke($"No {SpriteName} entry found - Roblox may have changed how the top bar icon is stored");
+            if (patched == 0)
+                Log?.Invoke($"No font with a '{GlyphName}' glyph was found - Roblox may have changed how the top bar icon is stored");
         }
 
         // rect == Empty means "the whole image"
