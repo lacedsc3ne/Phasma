@@ -5212,4 +5212,22 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Capture.CopyClipClipboardReadyPasteInto" xml:space="preserve">
     <value>Copy the clip to the clipboard, ready to paste into a chat</value>
   </data>
+  <data name="Menu.Capture.Storage" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="Menu.Capture.KeepScreenshotClipFoldersFromGrowing" xml:space="preserve">
+    <value>Keep the screenshot and clip folders from growing forever. The oldest captures are moved to the Recycle Bin, right after a new one is saved - never the newest one, and never a file you marked read-only.</value>
+  </data>
+  <data name="Menu.Capture.SizeLimit" xml:space="preserve">
+    <value>Size limit</value>
+  </data>
+  <data name="Menu.Capture.HowMuchRoomScreenshotsClipsGIFs" xml:space="preserve">
+    <value>How much room screenshots, clips and GIFs may take up together.</value>
+  </data>
+  <data name="Menu.Capture.RemoveCapturesOlderThan" xml:space="preserve">
+    <value>Remove captures older than</value>
+  </data>
+  <data name="Menu.Capture.CapturesPastAgeAreCleanedUp" xml:space="preserve">
+    <value>Captures past this age are cleaned up even when there is room left.</value>
+  </data>
 </root>

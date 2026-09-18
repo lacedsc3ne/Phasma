@@ -14804,5 +14804,59 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.CopyClipClipboardReadyPasteInto", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Storage.
+        /// </summary>
+        public static string Menu_Capture_Storage {
+            get {
+                return ResourceManager.GetString("Menu.Capture.Storage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep the screenshot and clip folders from growing forever. The oldest captures are moved to the Recycle Bin, right after.
+        /// </summary>
+        public static string Menu_Capture_KeepScreenshotClipFoldersFromGrowing {
+            get {
+                return ResourceManager.GetString("Menu.Capture.KeepScreenshotClipFoldersFromGrowing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size limit.
+        /// </summary>
+        public static string Menu_Capture_SizeLimit {
+            get {
+                return ResourceManager.GetString("Menu.Capture.SizeLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How much room screenshots, clips and GIFs may take up together..
+        /// </summary>
+        public static string Menu_Capture_HowMuchRoomScreenshotsClipsGIFs {
+            get {
+                return ResourceManager.GetString("Menu.Capture.HowMuchRoomScreenshotsClipsGIFs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove captures older than.
+        /// </summary>
+        public static string Menu_Capture_RemoveCapturesOlderThan {
+            get {
+                return ResourceManager.GetString("Menu.Capture.RemoveCapturesOlderThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Captures past this age are cleaned up even when there is room left..
+        /// </summary>
+        public static string Menu_Capture_CapturesPastAgeAreCleanedUp {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CapturesPastAgeAreCleanedUp", resourceCulture);
+            }
+        }
     }
 }

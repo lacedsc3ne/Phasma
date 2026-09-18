@@ -250,6 +250,11 @@ namespace PhasmaStrap.Models.Persistable
         public bool CaptureCopyScreenshotToClipboard { get; set; } = true;
         public bool CaptureCopyReplayToClipboard { get; set; } = false;
 
+        // Screenshots + Replays folder housekeeping (see CaptureStorage); 0 = off. Oldest captures
+        // go to the Recycle Bin once the folders pass the size limit or a capture passes the age.
+        public int CaptureStorageLimitMB { get; set; } = 0;
+        public int CaptureMaxAgeDays { get; set; } = 0;
+
         // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
         // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
         public bool DisableRobloxCrashHandler { get; set; } = false;

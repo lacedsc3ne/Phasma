@@ -276,11 +276,41 @@ namespace PhasmaStrap
 
             bool copied = path is not null && App.Settings.Prop.CaptureCopyScreenshotToClipboard && CopyCapture(path, image: true);
 
+            if (path is not null)
+                TidyCaptures();
+
             NotificationCenter.Notify(
                 path is null ? "Screenshot failed" : copied ? "Screenshot saved and copied" : "Screenshot saved",
                 path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
                 NotificationCategory.General,
                 onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
+        }
+
+        // runs after a capture has been saved - the only moment old captures are ever cleaned up
+        private static void TidyCaptures()
+        {
+            int limitMb = App.Settings.Prop.CaptureStorageLimitMB;
+            int maxAge = App.Settings.Prop.CaptureMaxAgeDays;
+            if (limitMb <= 0 && maxAge <= 0)
+                return;
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    CaptureStorage.Log ??= message => App.Logger.WriteLine("CaptureStorage", message);
+                    CaptureStorage.Result result = CaptureStorage.Enforce(
+                        new[] { ScreenshotCapture.ScreenshotsDir, InstantReplayRecorder.ClipsDir },
+                        limitMb * 1048576L, maxAge);
+
+                    if (result.Removed > 0)
+                        App.Logger.WriteLine("Watcher::TidyCaptures", $"Moved {result.Removed} old capture(s) ({result.FreedBytes / 1048576.0:0} MB) to the Recycle Bin");
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine("Watcher::TidyCaptures", $"Failed: {ex.Message}");
+                }
+            });
         }
 
         private static bool CopyCapture(string path, bool image)
@@ -348,6 +378,9 @@ namespace PhasmaStrap
                 }
 
                 bool copied = path is not null && App.Settings.Prop.CaptureCopyReplayToClipboard && CopyCapture(path, image: false);
+
+                if (path is not null)
+                    TidyCaptures();
 
                 App.Current.Dispatcher.BeginInvoke(() =>
                 {
