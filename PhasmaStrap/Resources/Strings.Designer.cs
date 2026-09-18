@@ -14894,5 +14894,59 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.PhasmaStrap.Restore", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only alert for favourites.
+        /// </summary>
+        public static string Menu_Friends_OnlyAlertFavourites {
+            get {
+                return ResourceManager.GetString("Menu.Friends.OnlyAlertFavourites", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toasts only for the friends you starred below..
+        /// </summary>
+        public static string Menu_Friends_ToastsOnlyFriendsYouStarredBelow {
+            get {
+                return ResourceManager.GetString("Menu.Friends.ToastsOnlyFriendsYouStarredBelow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search names and notes.
+        /// </summary>
+        public static string Menu_Friends_SearchNamesNotes {
+            get {
+                return ResourceManager.GetString("Menu.Friends.SearchNamesNotes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Favourites only.
+        /// </summary>
+        public static string Menu_Friends_FavouritesOnly {
+            get {
+                return ResourceManager.GetString("Menu.Friends.FavouritesOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Favourite - keeps this friend on top of the list.
+        /// </summary>
+        public static string Menu_Friends_FavouriteKeepsFriendTopList {
+            get {
+                return ResourceManager.GetString("Menu.Friends.FavouriteKeepsFriendTopList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your own note about this friend - only stored on this PC.
+        /// </summary>
+        public static string Menu_Friends_OwnNoteAboutFriendOnlyStored {
+            get {
+                return ResourceManager.GetString("Menu.Friends.OwnNoteAboutFriendOnlyStored", resourceCulture);
+            }
+        }
     }
 }

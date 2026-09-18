@@ -247,6 +247,9 @@ namespace PhasmaStrap.Models.Persistable
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
         // was copied a few seconds after the hotkey, which is easy to be surprised by)
+        // friend activity toasts only for friends starred on the Friends page
+        public bool FriendActivityFavouritesOnly { get; set; } = false;
+
         public bool CaptureCopyScreenshotToClipboard { get; set; } = true;
         public bool CaptureCopyReplayToClipboard { get; set; } = false;
 

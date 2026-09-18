@@ -5242,4 +5242,22 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.PhasmaStrap.Restore" xml:space="preserve">
     <value>Restore</value>
   </data>
+  <data name="Menu.Friends.OnlyAlertFavourites" xml:space="preserve">
+    <value>Only alert for favourites</value>
+  </data>
+  <data name="Menu.Friends.ToastsOnlyFriendsYouStarredBelow" xml:space="preserve">
+    <value>Toasts only for the friends you starred below.</value>
+  </data>
+  <data name="Menu.Friends.SearchNamesNotes" xml:space="preserve">
+    <value>Search names and notes</value>
+  </data>
+  <data name="Menu.Friends.FavouritesOnly" xml:space="preserve">
+    <value>Favourites only</value>
+  </data>
+  <data name="Menu.Friends.FavouriteKeepsFriendTopList" xml:space="preserve">
+    <value>Favourite - keeps this friend on top of the list</value>
+  </data>
+  <data name="Menu.Friends.OwnNoteAboutFriendOnlyStored" xml:space="preserve">
+    <value>Your own note about this friend - only stored on this PC</value>
+  </data>
 </root>

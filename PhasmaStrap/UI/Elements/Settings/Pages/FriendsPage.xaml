@@ -36,13 +36,21 @@
                 </StackPanel>
             </controls:OptionControl>
 
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_OnlyAlertFavourites}" Description="{x:Static resources:Strings.Menu_Friends_ToastsOnlyFriendsYouStarredBelow}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
+                <ui:ToggleSwitch IsChecked="{Binding AlertFavouritesOnly, Mode=TwoWay}" />
+            </controls:OptionControl>
+
             <Grid Margin="0,16,0,8">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Text="{Binding Status}" />
-                <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
+                <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_Friends_SearchNamesNotes}" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Content="{x:Static resources:Strings.Menu_Friends_FavouritesOnly}" IsChecked="{Binding FavouritesOnly, Mode=TwoWay}" />
+                <TextBlock Grid.Column="2" Margin="12,0,12,0" FontSize="12" Opacity="0.7" VerticalAlignment="Center" TextAlignment="Right" TextTrimming="CharacterEllipsis" Text="{Binding Status}" />
+                <ui:Button Grid.Column="3" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
             </Grid>
         </StackPanel>
 
@@ -72,11 +80,30 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <Grid Grid.Column="0" Width="38" Height="38" VerticalAlignment="Center">
+                            <ToggleButton Grid.Column="0" Margin="0,0,8,0" Padding="4" Width="32" Height="32" VerticalAlignment="Center" Focusable="False"
+                                          Background="Transparent" BorderThickness="0" IsChecked="{Binding IsFavourite, Mode=TwoWay}"
+                                          ToolTip="{x:Static resources:Strings.Menu_Friends_FavouriteKeepsFriendTopList}" AutomationProperties.Name="Favourite">
+                                <ui:SymbolIcon Symbol="Star24" Filled="{Binding StarFilled}" FontSize="18">
+                                    <ui:SymbolIcon.Style>
+                                        <Style TargetType="ui:SymbolIcon" BasedOn="{StaticResource {x:Type ui:SymbolIcon}}">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorTertiaryBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StarFilled}" Value="True">
+                                                    <Setter Property="Foreground" Value="#F5B301" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:SymbolIcon.Style>
+                                </ui:SymbolIcon>
+                            </ToggleButton>
+
+                            <Grid Grid.Column="1" Width="38" Height="38" VerticalAlignment="Center">
                                 <Ellipse Fill="{DynamicResource ControlFillColorSecondaryBrush}" />
                                 <Image Source="{Binding AvatarUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
                                     <Image.Clip>
@@ -103,12 +130,16 @@
                                 </Ellipse>
                             </Grid>
 
-                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <StackPanel Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" />
                                 <TextBlock FontSize="11" Opacity="0.7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
 
-                            <ui:Button Grid.Column="2" Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Icon="ArrowRight24" Appearance="Primary" VerticalAlignment="Center"
+                            <ui:TextBox Grid.Column="3" Width="240" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" MaxLength="200"
+                                        PlaceholderText="{x:Static resources:Strings.Menu_Accounts_AddNote}" ClearButtonEnabled="False" ToolTip="{x:Static resources:Strings.Menu_Friends_OwnNoteAboutFriendOnlyStored}"
+                                        Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=350}" />
+
+                            <ui:Button Grid.Column="4" Margin="10,0,0,0" Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Icon="ArrowRight24" Appearance="Primary" VerticalAlignment="Center"
                                        Visibility="{Binding Joinable, Converter={StaticResource BooleanToVisibilityConverter}}"
                                        Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
                         </Grid>
