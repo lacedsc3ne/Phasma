@@ -14732,5 +14732,77 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Mods.ShowsPhasmaStrapMarkInsteadRobloxLogo", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy new screenshots to the clipboard.
+        /// </summary>
+        public static string Menu_Capture_CopyNewScreenshotsClipboard {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CopyNewScreenshotsClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A screenshot taken with the hotkey is also copied, so it can be pasted straight into a chat with Ctrl+V. Right-click any.
+        /// </summary>
+        public static string Menu_Capture_ScreenshotTakenHotkeyAlsoCopiedSo {
+            get {
+                return ResourceManager.GetString("Menu.Capture.ScreenshotTakenHotkeyAlsoCopiedSo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy file path.
+        /// </summary>
+        public static string Menu_Capture_CopyFilePath {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CopyFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show in folder.
+        /// </summary>
+        public static string Menu_Capture_ShowFolder {
+            get {
+                return ResourceManager.GetString("Menu.Capture.ShowFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to the clipboard, ready to paste into a chat.
+        /// </summary>
+        public static string Menu_Capture_CopyClipboardReadyPasteIntoChat {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CopyClipboardReadyPasteIntoChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy new clips to the clipboard.
+        /// </summary>
+        public static string Menu_Capture_CopyNewClipsClipboard {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CopyNewClipsClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When a replay finishes saving, the clip is copied so it can be pasted straight into a chat. This replaces whatever you h.
+        /// </summary>
+        public static string Menu_Capture_WhenReplayFinishesSavingClipCopied {
+            get {
+                return ResourceManager.GetString("Menu.Capture.WhenReplayFinishesSavingClipCopied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy the clip to the clipboard, ready to paste into a chat.
+        /// </summary>
+        public static string Menu_Capture_CopyClipClipboardReadyPasteInto {
+            get {
+                return ResourceManager.GetString("Menu.Capture.CopyClipClipboardReadyPasteInto", resourceCulture);
+            }
+        }
     }
 }

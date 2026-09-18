@@ -273,11 +273,20 @@ namespace PhasmaStrap
         public void TakeScreenshot()
         {
             string? path = ScreenshotCapture.Capture();
+
+            bool copied = path is not null && App.Settings.Prop.CaptureCopyScreenshotToClipboard && CopyCapture(path, image: true);
+
             NotificationCenter.Notify(
-                path is not null ? "Screenshot saved" : "Screenshot failed",
+                path is null ? "Screenshot failed" : copied ? "Screenshot saved and copied" : "Screenshot saved",
                 path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
                 NotificationCategory.General,
                 onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
+        }
+
+        private static bool CopyCapture(string path, bool image)
+        {
+            ClipboardShare.Log ??= message => App.Logger.WriteLine("ClipboardShare", message);
+            return image ? ClipboardShare.CopyImageFile(path) : ClipboardShare.CopyFile(path);
         }
 
         private int _replaySaving;
@@ -338,10 +347,12 @@ namespace PhasmaStrap
                     Interlocked.Exchange(ref _replaySaving, 0);
                 }
 
+                bool copied = path is not null && App.Settings.Prop.CaptureCopyReplayToClipboard && CopyCapture(path, image: false);
+
                 App.Current.Dispatcher.BeginInvoke(() =>
                 {
                     NotificationCenter.Notify(
-                        path is not null ? "Replay saved" : "Replay failed",
+                        path is null ? "Replay failed" : copied ? "Replay saved and copied" : "Replay saved",
                         path is not null ? Path.GetFileName(path) : (error ?? "Nothing was buffered yet - check the log for details."),
                         NotificationCategory.General, 6,
                         onClick: path is not null ? NotificationCenter.RevealFile(path) : null);

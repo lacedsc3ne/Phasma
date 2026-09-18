@@ -210,6 +210,66 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool CopyScreenshotToClipboard
+        {
+            get => App.Settings.Prop.CaptureCopyScreenshotToClipboard;
+            set { App.Settings.Prop.CaptureCopyScreenshotToClipboard = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(CopyScreenshotToClipboard)); }
+        }
+
+        public bool CopyReplayToClipboard
+        {
+            get => App.Settings.Prop.CaptureCopyReplayToClipboard;
+            set { App.Settings.Prop.CaptureCopyReplayToClipboard = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(CopyReplayToClipboard)); }
+        }
+
+        // --- sharing: the buttons and right-click menus on the gallery cards ---
+
+        private void Copy(string path, bool image)
+        {
+            if (!File.Exists(path))
+            {
+                Report(image, $"{Path.GetFileName(path)} is no longer there.");
+                return;
+            }
+
+            ClipboardShare.Log ??= message => App.Logger.WriteLine("ClipboardShare", message);
+
+            bool ok = image ? ClipboardShare.CopyImageFile(path) : ClipboardShare.CopyFile(path);
+
+            Report(image, ok
+                ? $"Copied {Path.GetFileName(path)} - paste it into a chat with Ctrl+V."
+                : "Could not reach the clipboard - another program is holding it. Try again.");
+        }
+
+        private void CopyPath(string path, bool image)
+        {
+            Report(image, ClipboardShare.CopyText(path) ? "Copied the file path." : "Could not reach the clipboard - another program is holding it. Try again.");
+        }
+
+        // screenshots and clips each report next to their own list - the page is long
+        private void Report(bool screenshot, string message)
+        {
+            if (screenshot)
+                Status = message;
+            else
+                ReplayStatus = message;
+        }
+
+        private string _replayStatus = "";
+        public string ReplayStatus
+        {
+            get => _replayStatus;
+            private set { _replayStatus = value; OnPropertyChanged(nameof(ReplayStatus)); }
+        }
+
+        public ICommand CopyScreenshotCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) Copy(item.Path, image: true); });
+        public ICommand CopyScreenshotPathCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) CopyPath(item.Path, image: true); });
+        public ICommand RevealScreenshotCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) NotificationCenter.RevealFile(item.Path)(); });
+
+        public ICommand CopyReplayCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) Copy(item.Path, image: false); });
+        public ICommand CopyReplayPathCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) CopyPath(item.Path, image: false); });
+        public ICommand RevealReplayCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) NotificationCenter.RevealFile(item.Path)(); });
+
         private void ReplaySettingChanged(string property)
         {
             App.Settings.SaveDeferred();

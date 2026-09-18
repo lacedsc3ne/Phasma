@@ -5188,4 +5188,28 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Mods.ShowsPhasmaStrapMarkInsteadRobloxLogo" xml:space="preserve">
     <value>Shows the PhasmaStrap mark instead of the Roblox logo on the round menu button at the top left of every game. Applied when Roblox starts, and kept across Roblox updates. Turn it off to get the Roblox logo back on the next launch.</value>
   </data>
+  <data name="Menu.Capture.CopyNewScreenshotsClipboard" xml:space="preserve">
+    <value>Copy new screenshots to the clipboard</value>
+  </data>
+  <data name="Menu.Capture.ScreenshotTakenHotkeyAlsoCopiedSo" xml:space="preserve">
+    <value>A screenshot taken with the hotkey is also copied, so it can be pasted straight into a chat with Ctrl+V. Right-click any screenshot below for more.</value>
+  </data>
+  <data name="Menu.Capture.CopyFilePath" xml:space="preserve">
+    <value>Copy file path</value>
+  </data>
+  <data name="Menu.Capture.ShowFolder" xml:space="preserve">
+    <value>Show in folder</value>
+  </data>
+  <data name="Menu.Capture.CopyClipboardReadyPasteIntoChat" xml:space="preserve">
+    <value>Copy to the clipboard, ready to paste into a chat</value>
+  </data>
+  <data name="Menu.Capture.CopyNewClipsClipboard" xml:space="preserve">
+    <value>Copy new clips to the clipboard</value>
+  </data>
+  <data name="Menu.Capture.WhenReplayFinishesSavingClipCopied" xml:space="preserve">
+    <value>When a replay finishes saving, the clip is copied so it can be pasted straight into a chat. This replaces whatever you had copied.</value>
+  </data>
+  <data name="Menu.Capture.CopyClipClipboardReadyPasteInto" xml:space="preserve">
+    <value>Copy the clip to the clipboard, ready to paste into a chat</value>
+  </data>
 </root>

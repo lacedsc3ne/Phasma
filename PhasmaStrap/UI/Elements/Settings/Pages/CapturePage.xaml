@@ -29,6 +29,10 @@
 
         <TextBlock Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Status, Mode=OneWay}" />
 
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_CopyNewScreenshotsClipboard}" Description="{x:Static resources:Strings.Menu_Capture_ScreenshotTakenHotkeyAlsoCopiedSo}">
+            <ui:ToggleSwitch IsChecked="{Binding CopyScreenshotToClipboard, Mode=TwoWay}" />
+        </controls:OptionControl>
+
         <Border Margin="0,12,0,0" Padding="12,10" CornerRadius="8" BorderThickness="1" Visibility="{Binding HotkeyHintVisibility, Mode=OneWay}"
                 BorderBrush="{DynamicResource SystemFillColorCautionBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <Grid>
@@ -66,7 +70,31 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,10,10" Padding="0">
+                    <ui:Card Margin="0,0,10,10" Padding="0" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                        <ui:Card.ContextMenu>
+                            <ContextMenu DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{x:Static resources:Strings.Common_Copy}" Command="{Binding Tag.CopyScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Copy24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Menu_Capture_CopyFilePath}" Command="{Binding Tag.CopyScreenshotPathCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Link24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.Common_Open}" Command="{Binding Tag.OpenScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Open24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Common_Edit}" Command="{Binding Tag.EditScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Edit24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Menu_Capture_ShowFolder}" Command="{Binding Tag.RevealScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.Common_Delete}" Command="{Binding Tag.DeleteScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Delete24" /></MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ui:Card.ContextMenu>
                         <StackPanel>
                             <Border Height="140" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}" Cursor="Hand">
                                 <Border.InputBindings>
@@ -84,6 +112,9 @@
                                     <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TakenDisplay}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <ui:Button Margin="0,0,6,0" Padding="4" Appearance="Transparent" Icon="Copy16" ToolTip="{x:Static resources:Strings.Menu_Capture_CopyClipboardReadyPasteIntoChat}" AutomationProperties.Name="Copy screenshot"
+                                               Command="{Binding DataContext.CopyScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                               CommandParameter="{Binding}" />
                                     <ui:Button Padding="6,4" Appearance="Secondary" Icon="Edit16" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_CropDrawAddTextPixelateParts}"
                                                Command="{Binding DataContext.EditScreenshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                CommandParameter="{Binding}" />
@@ -126,6 +157,10 @@
                     <ComboBox Width="140" ItemsSource="{Binding QualityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
 
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_CopyNewClipsClipboard}" Description="{x:Static resources:Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied}">
+                    <ui:ToggleSwitch IsChecked="{Binding CopyReplayToClipboard, Mode=TwoWay}" />
+                </controls:OptionControl>
+
                 <TextBlock Margin="2,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ReplayEstimateText, Mode=OneWay}" />
 
         <Grid Margin="0,12,0,0">
@@ -139,6 +174,8 @@
                 <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenReplaysFolderCommand, Mode=OneTime}" />
             </StackPanel>
         </Grid>
+
+        <TextBlock Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ReplayStatus, Mode=OneWay}" />
 
         <StackPanel HorizontalAlignment="Center" Margin="0,16,0,16">
             <StackPanel.Style>
@@ -158,7 +195,31 @@
         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Replays, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ui:Card Margin="0,0,0,6" Padding="12,10">
+                    <ui:Card Margin="0,0,0,6" Padding="12,10" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                        <ui:Card.ContextMenu>
+                            <ContextMenu DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{x:Static resources:Strings.Common_Copy}" Command="{Binding Tag.CopyReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Copy24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Menu_Capture_CopyFilePath}" Command="{Binding Tag.CopyReplayPathCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Link24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.Common_Open}" Command="{Binding Tag.OpenReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Open24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Common_Edit}" Command="{Binding Tag.EditReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Edit24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Menu_Capture_ShowFolder}" Command="{Binding Tag.RevealReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="{x:Static resources:Strings.Common_Delete}" Command="{Binding Tag.DeleteReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Delete24" /></MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ui:Card.ContextMenu>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -179,6 +240,9 @@
                                 </StackPanel>
                             </Grid>
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <ui:Button Margin="0,0,6,0" Padding="6,4" Appearance="Secondary" Icon="Copy16" Content="{x:Static resources:Strings.Common_Copy}" ToolTip="{x:Static resources:Strings.Menu_Capture_CopyClipClipboardReadyPasteInto}"
+                                           Command="{Binding DataContext.CopyReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
                                 <ui:Button Padding="6,4" Appearance="Secondary" Icon="Cut24" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_TrimCropSlowDownSpeedUp}"
                                            Command="{Binding DataContext.EditReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                            CommandParameter="{Binding}" />
