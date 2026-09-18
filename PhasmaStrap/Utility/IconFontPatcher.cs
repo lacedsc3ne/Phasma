@@ -25,45 +25,124 @@ namespace PhasmaStrap.Utility
     {
         // ------------------------------------------------------------------ tracing
 
+        public sealed class ColorLayer
+        {
+            public List<List<PointF>> Contours = new();
+            public Color Color;
+        }
+
+        private const int WorkingSize = 512;
+
+        // The picture enlarged to the working resolution, as ARGB ints. Tracing on an enlarged
+        // copy turns the source's pixel staircase into sub-pixel edge positions, which the
+        // simplifier then keeps as clean diagonals.
+        private static int[] Rasterize(Bitmap image, out int w, out int h)
+        {
+            w = h = WorkingSize;
+
+            using var scaled = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(scaled))
+            {
+                g.CompositingMode = CompositingMode.SourceCopy;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                using var attributes = new ImageAttributes();
+                attributes.SetWrapMode(WrapMode.TileFlipXY);
+                g.DrawImage(image, new Rectangle(0, 0, w, h), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
+            }
+
+            BitmapData data = scaled.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            try
+            {
+                var pixels = new int[w * h];
+                for (int y = 0; y < h; y++)
+                    Marshal.Copy(data.Scan0 + y * data.Stride, pixels, y * w, w);
+                return pixels;
+            }
+            finally
+            {
+                scaled.UnlockBits(data);
+            }
+        }
+
+        private static bool IsOpaque(int argb) => ((argb >> 24) & 0xFF) >= 128;
+
+        private static bool IsRed(int argb)
+        {
+            int r = (argb >> 16) & 0xFF, g = (argb >> 8) & 0xFF, b = argb & 0xFF;
+            return r > 70 && r > g * 1.5 + 10 && r > b * 1.5 + 10;
+        }
+
+        private static double Luminance(int argb) =>
+            0.2126 * ((argb >> 16) & 0xFF) + 0.7152 * ((argb >> 8) & 0xFF) + 0.0722 * (argb & 0xFF);
+
         // Closed outlines of everything in `image` that is more opaque than not, in image pixel
         // coordinates (y down). Outer edges run clockwise on screen, holes the other way round.
-        public static List<List<PointF>> Trace(Bitmap image, int workingSize = 512, double tolerance = 1.1)
+        public static List<List<PointF>> Trace(Bitmap image, double tolerance = 1.1)
         {
-            // trace on an enlarged copy: the smooth resampling turns the source's pixel staircase into
-            // sub-pixel edge positions, which the simplifier below then keeps as clean diagonals
-            int w = workingSize, h = workingSize;
+            int[] pixels = Rasterize(image, out int w, out int h);
+            return TraceMask(pixels.Select(IsOpaque).ToArray(), w, h, (double)image.Width / w, (double)image.Height / h, tolerance);
+        }
+
+        // The picture as a stack of flat-colour shapes, bottom first - what a COLR/CPAL colour font
+        // can hold (solid fills only, no gradients). The mark is two families of colour: the greys
+        // of the hood and the reds of the triangle and eyes. Each family is cut into brightness
+        // bands, and every band is traced CUMULATIVELY ("this bright or brighter"), each painted over
+        // the darker one below. Nested shapes can't leave hairline gaps between bands the way
+        // side-by-side ones would, and the whole silhouette in the darkest tone sits underneath.
+        public static List<ColorLayer> TraceColorLayers(Bitmap image, int greyBands = 4, int redBands = 2, double tolerance = 1.1)
+        {
+            int[] pixels = Rasterize(image, out int w, out int h);
             double scaleX = (double)image.Width / w, scaleY = (double)image.Height / h;
 
-            bool[] filled = new bool[w * h];
+            var layers = new List<ColorLayer>();
 
-            using (var scaled = new Bitmap(w, h, PixelFormat.Format32bppArgb))
+            void AddFamily(Func<int, bool> member, int bands, bool wholeSilhouetteFirst)
             {
-                using (Graphics g = Graphics.FromImage(scaled))
-                {
-                    g.CompositingMode = CompositingMode.SourceCopy;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    using var attributes = new ImageAttributes();
-                    attributes.SetWrapMode(WrapMode.TileFlipXY);
-                    g.DrawImage(image, new Rectangle(0, 0, w, h), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
-                }
+                double[] values = pixels.Where(p => IsOpaque(p) && member(p)).Select(Luminance).OrderBy(v => v).ToArray();
+                if (values.Length == 0)
+                    return;
 
-                BitmapData data = scaled.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                try
+                for (int band = 0; band < bands; band++)
                 {
-                    byte[] pixels = new byte[data.Stride * h];
-                    Marshal.Copy(data.Scan0, pixels, 0, pixels.Length);
+                    double from = values[(int)((long)values.Length * band / bands)];
+                    double to = band + 1 < bands ? values[(int)((long)values.Length * (band + 1) / bands)] : double.MaxValue;
 
-                    for (int y = 0; y < h; y++)
-                        for (int x = 0; x < w; x++)
-                            filled[y * w + x] = pixels[y * data.Stride + x * 4 + 3] >= 128;
-                }
-                finally
-                {
-                    scaled.UnlockBits(data);
+                    // the band's own colour: the average of the pixels that fall in it
+                    long r = 0, g = 0, b = 0, n = 0;
+                    foreach (int p in pixels)
+                    {
+                        if (!IsOpaque(p) || !member(p))
+                            continue;
+
+                        double l = Luminance(p);
+                        if (l < from || l >= to)
+                            continue;
+
+                        r += (p >> 16) & 0xFF; g += (p >> 8) & 0xFF; b += p & 0xFF; n++;
+                    }
+
+                    if (n == 0)
+                        continue;
+
+                    bool[] mask = band == 0 && wholeSilhouetteFirst
+                        ? pixels.Select(IsOpaque).ToArray()
+                        : pixels.Select(p => IsOpaque(p) && member(p) && (band == 0 || Luminance(p) >= from)).ToArray();
+
+                    var contours = TraceMask(mask, w, h, scaleX, scaleY, tolerance);
+                    if (contours.Count > 0)
+                        layers.Add(new ColorLayer { Contours = contours, Color = Color.FromArgb(255, (int)(r / n), (int)(g / n), (int)(b / n)) });
                 }
             }
 
+            AddFamily(p => !IsRed(p), greyBands, wholeSilhouetteFirst: true);
+            AddFamily(IsRed, redBands, wholeSilhouetteFirst: false);
+
+            return layers;
+        }
+
+        private static List<List<PointF>> TraceMask(bool[] filled, int w, int h, double scaleX, double scaleY, double tolerance)
+        {
             bool At(int x, int y) => x >= 0 && y >= 0 && x < w && y < h && filled[y * w + x];
 
             // one directed edge per filled-pixel side that faces an empty pixel, oriented so the
@@ -218,7 +297,12 @@ namespace PhasmaStrap.Utility
         // Returns the font with glyph `glyphName` replaced by `contours` (image coordinates, y
         // down), scaled to sit where the original glyph sat. Null when the font isn't the kind this
         // handles or has no such glyph.
-        public static byte[]? ReplaceGlyph(byte[] font, string glyphName, List<List<PointF>> contours, double sizeFactor = 1.12)
+        //
+        // With `layers`, the font also becomes a colour font for that one glyph: each layer is added
+        // as an extra glyph, and COLR/CPAL tables (version 0 - the format of Roblox's own
+        // RobloxEmoji.ttf and TwemojiMozilla.ttf) tell the text engine to paint them in order. An
+        // engine that ignores colour tables still draws the plain outline.
+        public static byte[]? ReplaceGlyph(byte[] font, string glyphName, List<List<PointF>> contours, List<ColorLayer>? layers = null, double sizeFactor = 1.12)
         {
             if (font.Length < 12 || contours.Count == 0)
                 return null;
@@ -292,31 +376,78 @@ namespace PhasmaStrap.Utility
             if (advance > 0)
                 target = Math.Min(target, advance);
 
-            byte[] newGlyph = BuildGlyph(contours, centreX, centreY, target, out int pointCount, out int contourCount);
+            // one placement for the outline and every colour layer, or the layers would not line up
+            RectangleF source = Bounds(contours);
+
+            byte[] newGlyph = BuildGlyph(contours, source, centreX, centreY, target, out int pointCount, out int contourCount, out _);
+
+            // a font that already has colour tables is left monochrome rather than merged into
+            bool colour = layers is { Count: > 0 } && Find("COLR") is null && Find("CPAL") is null && glyphCount + layers.Count < 0xFFFF;
+
+            var layerGlyphs = new List<byte[]>();
+            var layerBearings = new List<int>();
+
+            if (colour)
+            {
+                foreach (ColorLayer layer in layers!)
+                {
+                    layerGlyphs.Add(BuildGlyph(layer.Contours, source, centreX, centreY, target, out int points, out int loops, out int xMin));
+                    layerBearings.Add(xMin);
+                    pointCount = Math.Max(pointCount, points);
+                    contourCount = Math.Max(contourCount, loops);
+                }
+            }
+
+            int newGlyphCount = glyphCount + layerGlyphs.Count;
 
             // reassemble glyf + loca (always written long: no offset limit, no evenness rule)
             using var glyfStream = new MemoryStream();
-            var newOffsets = new uint[glyphCount + 1];
+            var newOffsets = new uint[newGlyphCount + 1];
 
-            for (int i = 0; i < glyphCount; i++)
+            for (int i = 0; i < newGlyphCount; i++)
             {
                 newOffsets[i] = (uint)glyfStream.Position;
 
                 if (i == glyphId)
                     glyfStream.Write(newGlyph);
+                else if (i >= glyphCount)
+                    glyfStream.Write(layerGlyphs[i - glyphCount]);
                 else
                     glyfStream.Write(glyf.Data, offsets[i], offsets[i + 1] - offsets[i]);
 
                 while (glyfStream.Position % 4 != 0)
                     glyfStream.WriteByte(0);
             }
-            newOffsets[glyphCount] = (uint)glyfStream.Position;
+            newOffsets[newGlyphCount] = (uint)glyfStream.Position;
 
             glyf.Data = glyfStream.ToArray();
 
-            loca.Data = new byte[(glyphCount + 1) * 4];
-            for (int i = 0; i <= glyphCount; i++)
+            loca.Data = new byte[(newGlyphCount + 1) * 4];
+            for (int i = 0; i <= newGlyphCount; i++)
                 BinaryPrimitives.WriteUInt32BigEndian(loca.Data.AsSpan(i * 4), newOffsets[i]);
+
+            if (colour)
+            {
+                // every table with one entry per glyph has to grow with the glyph count
+                BinaryPrimitives.WriteUInt16BigEndian(maxp.Data.AsSpan(4), (ushort)newGlyphCount);
+
+                // hmtx: glyphs past numberOfHMetrics carry only a left side bearing and share the last
+                // advance - fine for layers, which are positioned by the base glyph
+                int expectedHmtx = metricsCount * 4 + (glyphCount - metricsCount) * 2;
+                if (hmtx.Data.Length < expectedHmtx)
+                    return null;
+
+                var grownHmtx = new byte[expectedHmtx + layerGlyphs.Count * 2];
+                Array.Copy(hmtx.Data, grownHmtx, expectedHmtx);
+                for (int i = 0; i < layerBearings.Count; i++)
+                    BinaryPrimitives.WriteInt16BigEndian(grownHmtx.AsSpan(expectedHmtx + i * 2), (short)layerBearings[i]);
+                hmtx.Data = grownHmtx;
+
+                post.Data = GrowPost(post.Data, glyphName, layerGlyphs.Count);
+
+                tables.Add(new Table { Tag = "COLR", Data = BuildColr(glyphId, glyphCount, layerGlyphs.Count) });
+                tables.Add(new Table { Tag = "CPAL", Data = BuildCpal(layers!.Select(l => l.Color).ToList()) });
+            }
 
             BinaryPrimitives.WriteInt16BigEndian(head.Data.AsSpan(50), 1);
 
@@ -330,6 +461,105 @@ namespace PhasmaStrap.Utility
             }
 
             return Assemble(sfntVersion, tables);
+        }
+
+        private static RectangleF Bounds(List<List<PointF>> contours)
+        {
+            float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
+            foreach (PointF p in contours.SelectMany(c => c))
+            {
+                minX = Math.Min(minX, p.X); maxX = Math.Max(maxX, p.X);
+                minY = Math.Min(minY, p.Y); maxY = Math.Max(maxY, p.Y);
+            }
+            return RectangleF.FromLTRB(minX, minY, maxX, maxY);
+        }
+
+        // 'post' format 2.0 lists a name index per glyph followed by the custom names - add one of
+        // each per new glyph ("tilt.color0", ...)
+        private static byte[] GrowPost(byte[] post, string baseName, int extra)
+        {
+            if (post.Length < 34 || BinaryPrimitives.ReadUInt32BigEndian(post) != 0x00020000)
+                return post;
+
+            int count = BinaryPrimitives.ReadUInt16BigEndian(post.AsSpan(32));
+            int namesStart = 34 + count * 2;
+
+            int existingNames = 0;
+            for (int position = namesStart; position < post.Length; position += 1 + post[position])
+                existingNames++;
+
+            using var stream = new MemoryStream();
+            stream.Write(post, 0, 32);
+
+            Span<byte> two = stackalloc byte[2];
+            BinaryPrimitives.WriteUInt16BigEndian(two, (ushort)(count + extra));
+            stream.Write(two);
+
+            stream.Write(post, 34, count * 2);
+            for (int i = 0; i < extra; i++)
+            {
+                BinaryPrimitives.WriteUInt16BigEndian(two, (ushort)(258 + existingNames + i));
+                stream.Write(two);
+            }
+
+            stream.Write(post, namesStart, post.Length - namesStart);
+            for (int i = 0; i < extra; i++)
+            {
+                byte[] name = System.Text.Encoding.ASCII.GetBytes($"{baseName}.color{i}");
+                stream.WriteByte((byte)name.Length);
+                stream.Write(name);
+            }
+
+            return stream.ToArray();
+        }
+
+        // COLR v0: one base glyph record pointing at a run of (glyph, palette entry) layer records
+        private static byte[] BuildColr(int baseGlyph, int firstLayerGlyph, int layerCount)
+        {
+            const int header = 14;
+            var data = new byte[header + 6 + layerCount * 4];
+
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);                   // version
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), 1);                   // numBaseGlyphRecords
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(4), header);              // baseGlyphRecordsOffset
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header + 6);          // layerRecordsOffset
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), (ushort)layerCount); // numLayerRecords
+
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header), (ushort)baseGlyph);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 2), 0);          // firstLayerIndex
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 4), (ushort)layerCount);
+
+            for (int i = 0; i < layerCount; i++)
+            {
+                BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 6 + i * 4), (ushort)(firstLayerGlyph + i));
+                BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 8 + i * 4), (ushort)i); // palette entry
+            }
+
+            return data;
+        }
+
+        // CPAL v0: a single palette, one BGRA entry per layer
+        private static byte[] BuildCpal(List<Color> colors)
+        {
+            const int header = 14;
+            var data = new byte[header + colors.Count * 4];
+
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);                       // version
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), (ushort)colors.Count);    // numPaletteEntries
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(4), 1);                       // numPalettes
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(6), (ushort)colors.Count);    // numColorRecords
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header);                  // colorRecordsArrayOffset
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), 0);                      // colorRecordIndices[0]
+
+            for (int i = 0; i < colors.Count; i++)
+            {
+                data[header + i * 4] = colors[i].B;
+                data[header + i * 4 + 1] = colors[i].G;
+                data[header + i * 4 + 2] = colors[i].R;
+                data[header + i * 4 + 3] = colors[i].A;
+            }
+
+            return data;
         }
 
         private static int FindGlyph(byte[] post, string name, int glyphCount)
@@ -363,17 +593,12 @@ namespace PhasmaStrap.Utility
         }
 
         // A simple (non-composite) glyph made of straight segments only - every point is on-curve.
-        private static byte[] BuildGlyph(List<List<PointF>> contours, double centreX, double centreY, double target, out int pointCount, out int contourCount)
+        // `source` is the box (in picture coordinates) that gets mapped onto the glyph's place - the
+        // whole mark's box, also when building a single colour layer of it
+        private static byte[] BuildGlyph(List<List<PointF>> contours, RectangleF source, double centreX, double centreY, double target, out int pointCount, out int contourCount, out int xMinOut)
         {
-            float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
-            foreach (PointF p in contours.SelectMany(c => c))
-            {
-                minX = Math.Min(minX, p.X); maxX = Math.Max(maxX, p.X);
-                minY = Math.Min(minY, p.Y); maxY = Math.Max(maxY, p.Y);
-            }
-
-            double scale = target / Math.Max(maxX - minX, maxY - minY);
-            double sourceCentreX = (minX + maxX) / 2.0, sourceCentreY = (minY + maxY) / 2.0;
+            double scale = target / Math.Max(source.Width, source.Height);
+            double sourceCentreX = (source.Left + source.Right) / 2.0, sourceCentreY = (source.Top + source.Bottom) / 2.0;
 
             var glyphContours = new List<List<(int X, int Y)>>();
 
@@ -406,6 +631,7 @@ namespace PhasmaStrap.Utility
 
             int xMin = glyphContours.SelectMany(c => c).Min(p => p.X), xMax = glyphContours.SelectMany(c => c).Max(p => p.X);
             int yMin = glyphContours.SelectMany(c => c).Min(p => p.Y), yMax = glyphContours.SelectMany(c => c).Max(p => p.Y);
+            xMinOut = xMin;
 
             using var stream = new MemoryStream();
             void WriteInt16(int value)
