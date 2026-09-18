@@ -5182,4 +5182,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.FastFlagEditor.RobloxOnlyReadsFastFlagsWhenStarts" xml:space="preserve">
     <value>Roblox only reads FastFlags when it starts. If it is already open when you press Play in the browser, it takes the join over and the game's preset is never read. With this on, PhasmaStrap closes the running Roblox first in that case, so the game starts with its preset. Off by default. PhasmaStrap never restarts Roblox on its own: when you join a game whose preset isn't active (from inside the Roblox app, or by following a friend), you only get a notification - click it if you want to restart into the same server with the preset.</value>
   </data>
+  <data name="Menu.Mods.PhasmaStrapLogoGameTopBar" xml:space="preserve">
+    <value>PhasmaStrap logo on the in-game top bar</value>
+  </data>
+  <data name="Menu.Mods.ShowsPhasmaStrapMarkInsteadRobloxLogo" xml:space="preserve">
+    <value>Shows the PhasmaStrap mark instead of the Roblox logo on the round menu button at the top left of every game. Applied when Roblox starts, and kept across Roblox updates. Turn it off to get the Roblox logo back on the next launch.</value>
+  </data>
 </root>

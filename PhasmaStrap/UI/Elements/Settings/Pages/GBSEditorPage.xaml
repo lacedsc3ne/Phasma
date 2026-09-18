@@ -108,7 +108,7 @@
                     <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Graphics_Header}" />
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_FramerateCap_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_FramerateCap_Description}">
-                        <ui:NumberBox Width="140" Min="0" Max="10000" Value="{Binding FramerateCap, Mode=TwoWay}" />
+                        <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="10000" Value="{Binding FramerateCap, Mode=TwoWay}" />
                     </controls:OptionControl>
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_GraphicsQuality_Description}">

@@ -1822,6 +1822,24 @@ namespace PhasmaStrap
                 }
             }
 
+            // PhasmaStrap logo on the in-game top bar. Patched straight into this version's own
+            // spritesheets (the sprite's position changes with every Roblox update, so it can't be a
+            // static mod file). Listing the files as mods means switching the option off restores the
+            // originals through the normal path below.
+            if (_launchMode == LaunchMode.Player && App.Settings.Prop.TopBarPhasmaLogo)
+            {
+                Utility.TopBarLogoPatcher.Log ??= message => App.Logger.WriteLine("TopBarLogoPatcher", message);
+
+                List<string> logoFiles = Utility.TopBarLogoPatcher.Apply(_latestVersionDirectory, () =>
+                    System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Resources/PhasmaStrapLogo.png")).Stream);
+
+                foreach (string logoFile in logoFiles)
+                {
+                    if (!modFolderFiles.Contains(logoFile, StringComparer.OrdinalIgnoreCase))
+                        modFolderFiles.Add(logoFile);
+                }
+            }
+
             // the manifest is primarily here to keep track of what files have been
             // deleted from the modifications folder, so that we know when to restore the original files from the downloaded packages
             // now check for files that have been deleted from the mod folder according to the manifest

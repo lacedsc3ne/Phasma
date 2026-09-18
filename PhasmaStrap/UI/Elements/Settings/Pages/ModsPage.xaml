@@ -145,6 +145,10 @@
 
                     <TextBlock Text="{x:Static resources:Strings.Common_Miscellaneous}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
 
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Mods_PhasmaStrapLogoGameTopBar}" Description="{x:Static resources:Strings.Menu_Mods_ShowsPhasmaStrapMarkInsteadRobloxLogo}">
+                        <ui:ToggleSwitch IsChecked="{Binding TopBarPhasmaLogo, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_Mods_Misc_CustomFont_Title}">
                         <StackPanel>
                             <ui:Button Margin="0,0,0,4" Icon="TextFont16" Content="{x:Static resources:Strings.Menu_Mods_Misc_GoogleFonts_Browse}" Command="{Binding BrowseGoogleFontsCommand}" Visibility="{Binding ChooseCustomFontVisibility, Mode=OneWay}" />

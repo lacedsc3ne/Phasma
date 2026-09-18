@@ -91,6 +91,10 @@ namespace PhasmaStrap.Models.Persistable
         // mod preset configuration
         public bool UseDisableAppPatch { get; set; } = false;
 
+        // the round menu button on Roblox's in-game top bar shows the PhasmaStrap mark instead of the
+        // Roblox logo - see Utility/TopBarLogoPatcher
+        public bool TopBarPhasmaLogo { get; set; } = true;
+
         // cleaner
         public CleanerOptions CleanerOptions { get; set; } = CleanerOptions.Never;
         public List<string> CleanerDirectories { get; set; } = new();
