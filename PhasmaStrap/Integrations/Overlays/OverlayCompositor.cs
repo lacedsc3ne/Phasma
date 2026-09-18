@@ -1070,6 +1070,7 @@ namespace PhasmaStrap.Integrations.Overlays
             if (App.Settings.Prop.OverlayHudShowCpu) rows++;
             if (App.Settings.Prop.OverlayHudShowRam) rows++;
             if (App.Settings.Prop.OverlayHudShowPing) rows++;
+            if (App.Settings.Prop.OverlayHudShowRegion) rows++;
             return rows;
         }
 
@@ -1126,6 +1127,14 @@ namespace PhasmaStrap.Integrations.Overlays
                     int ping = ServerPingMonitor.LatestMs;
                     labels.Add("PING");
                     values.Add(ping >= 0 ? $"{ping}ms" : "--");
+                }
+
+                if (App.Settings.Prop.OverlayHudShowRegion)
+                {
+                    // the value column holds 18 characters
+                    string region = ServerRegion.Current;
+                    labels.Add("REGION");
+                    values.Add(region.Length > 0 ? ServerRegion.Shorten(region, 18) : "--");
                 }
 
                 _hud.Update(_context!, labels.ToArray(), values.ToArray());

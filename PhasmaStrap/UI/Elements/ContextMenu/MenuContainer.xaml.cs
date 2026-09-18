@@ -93,6 +93,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 return;
 
             PlayTimeTextBlock.Text = $"Play time: {DateTime.Now - data.TimeJoined:hh\\:mm\\:ss}";
+            UpdateServerLine(data);
 
             try
             {
@@ -107,6 +108,17 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             {
                 // process gone - the leave handler will reset the readouts
             }
+        }
+
+        // "Server: Public · Frankfurt, DE · 23 ms" - the region arrives a moment after the join,
+        // the ping only when the ping monitor runs (HUD ping or region row switched on)
+        private void UpdateServerLine(ActivityData data)
+        {
+            string region = PhasmaStrap.Utility.ServerRegion.Current;
+            string where = region.Length > 0 ? region : data.MachineAddressValid ? data.MachineAddress : "address pending";
+            int ping = PhasmaStrap.Utility.ServerPingMonitor.LatestMs;
+
+            ServerTextBlock.Text = $"Server: {data.ServerType} · {where}" + (ping >= 0 ? $" · {ping} ms" : "");
         }
 
         private async Task UpdateCurrentGameAsync(ActivityData data)
@@ -240,7 +252,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
                 ServerDetailsMenuItem.Visibility = Visibility.Visible;
                 SessionInfoMenuItem.Visibility = Visibility.Visible;
-                ServerTextBlock.Text = $"Server: {data.ServerType} · {(data.MachineAddressValid ? data.MachineAddress : "address pending")}";
+                UpdateServerLine(data);
                 PlayTimeTextBlock.Text = "Play time: 00:00:00";
                 _sessionTimer.Start();
             });

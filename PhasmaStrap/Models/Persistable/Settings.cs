@@ -178,6 +178,9 @@ namespace PhasmaStrap.Models.Persistable
         public bool OverlayHudShowRam { get; set; } = false;
         public bool OverlayHudShowPing { get; set; } = false;
 
+        // HUD row with where the current server is ("Frankfurt, DE") - see Utility.ServerRegion
+        public bool OverlayHudShowRegion { get; set; } = false;
+
         // manual "hide overlays for a moment" switch - toggled from the Overlays page or a global
         // hotkey (HotkeyActions.ToggleOverlayFocusMode). Only suppresses the informational HUD/
         // crosshair, not the RiShade/Anti-Aliasing/Frame Generation render effects, since those
