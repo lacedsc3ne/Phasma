@@ -49,6 +49,11 @@ namespace PhasmaStrap
                 App.Logger.WriteLine(LOG_IDENT, "Opening uninstaller");
                 LaunchUninstaller();
             }
+            else if (App.LaunchSettings.SwitchAccountFlag.Active)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Switching account");
+                LaunchAccountSwitch(App.LaunchSettings.SwitchAccountFlag.Data);
+            }
             else if (App.LaunchSettings.EditClipFlag.Active)
             {
                 App.Logger.WriteLine(LOG_IDENT, "Opening clip editor");
@@ -284,6 +289,70 @@ namespace PhasmaStrap
             };
 
             return true;
+        }
+
+        // Started by the tray menu after the user picked an account and confirmed. Runs in its own
+        // process because the Watcher (which owns the tray) goes away when Roblox closes.
+        public static void LaunchAccountSwitch(string? data)
+        {
+            const string LOG_IDENT = "LaunchHandler::LaunchAccountSwitch";
+
+            if (!long.TryParse(data, out long userId))
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Not a user ID: '{data}'");
+                App.Terminate();
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    Utility.AccountQuickSwitch.Log ??= message => App.Logger.WriteLine("AccountQuickSwitch", message);
+
+                    // ask nicely first so Roblox can flush its state, then insist
+                    foreach (string name in new[] { App.RobloxPlayerAppName, App.RobloxStudioAppName })
+                    {
+                        foreach (Process process in Process.GetProcessesByName(name))
+                        {
+                            try { process.CloseMainWindow(); } catch { }
+                            process.Dispose();
+                        }
+                    }
+
+                    bool StillRunning() => new[] { App.RobloxPlayerAppName, App.RobloxStudioAppName }
+                        .Any(name => { Process[] found = Process.GetProcessesByName(name); foreach (Process p in found) p.Dispose(); return found.Length > 0; });
+
+                    for (int i = 0; i < 20 && StillRunning(); i++)
+                        await Task.Delay(250);
+
+                    foreach (Process process in Process.GetProcessesByName(App.RobloxPlayerAppName))
+                    {
+                        try { process.Kill(); } catch { }
+                        process.Dispose();
+                    }
+
+                    for (int i = 0; i < 40 && StillRunning(); i++)
+                        await Task.Delay(250);
+
+                    if (StillRunning())
+                        throw new InvalidOperationException("Roblox (or Roblox Studio) is still running. Close it and switch again.");
+
+                    await Utility.AccountQuickSwitch.SwitchAsync(Paths.AccountBackups, Integrations.RobloxCookie.LiveCookiesDatPath, userId);
+
+                    App.Logger.WriteLine(LOG_IDENT, "Login switched - starting Roblox");
+                    Process.Start(Paths.Process, "-player");
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteException(LOG_IDENT, ex);
+                    App.Current.Dispatcher.Invoke(() => Frontend.ShowMessageBox($"Could not switch accounts: {ex.Message}", System.Windows.MessageBoxImage.Warning));
+                }
+                finally
+                {
+                    App.Current.Dispatcher.Invoke(() => App.Terminate());
+                }
+            });
         }
 
         public static void LaunchClipEditor(string? path)

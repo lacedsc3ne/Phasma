@@ -50,6 +50,10 @@ namespace PhasmaStrap
         // -editclip "<path to mp4>": opens the Capture page's clip editor on that file directly
         public LaunchFlag EditClipFlag              { get; } = new("editclip");
 
+        // -switchaccount <userId>: close Roblox, sign in as that saved account, start Roblox again
+        // (the tray menu's "Switch account" - see Utility.AccountQuickSwitch)
+        public LaunchFlag SwitchAccountFlag         { get; } = new("switchaccount");
+
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");

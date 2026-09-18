@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -60,6 +60,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             if (_watcher.RichPresence is not null)
                 RichPresenceMenuItem.Visibility = Visibility.Visible;
+
+            PopulateAccounts();
 
             if (App.Settings.Prop.GameChatEnabled)
                 ChatLogsMenuItem.Visibility = Visibility.Visible;
@@ -375,6 +377,70 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             if (location is not null)
                 Utilities.ShellExecute(location);
+        }
+
+        // ---- Switch account: the saved logins from the Accounts page. Picking one restarts Roblox
+        // on that account, through a separate process (this one ends when Roblox closes).
+
+        private void PopulateAccounts()
+        {
+            var accounts = PhasmaStrap.Utility.AccountQuickSwitch.List(Paths.AccountBackups);
+
+            SwitchAccountMenuItem.Items.Clear();
+            SwitchAccountMenuItem.Visibility = accounts.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            // known only once a game has been joined in this session (it comes from the join log line)
+            long currentUserId = _activityWatcher?.Data?.UserId ?? 0;
+
+            foreach (var account in accounts)
+            {
+                bool current = account.UserId == currentUserId;
+
+                var item = new MenuItem
+                {
+                    Header = current ? $"{account.Title}  -  playing now" : account.Title,
+                    IsEnabled = !current,
+                    Tag = account,
+                };
+
+                if (!string.IsNullOrWhiteSpace(account.Note))
+                    item.ToolTip = account.Note;
+
+                item.Click += SwitchAccountItem_Click;
+                SwitchAccountMenuItem.Items.Add(item);
+            }
+        }
+
+        private void SwitchAccountMenuItem_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            if (ReferenceEquals(e.OriginalSource, SwitchAccountMenuItem))
+                PopulateAccounts();
+        }
+
+        private void SwitchAccountItem_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as MenuItem)?.Tag is not PhasmaStrap.Utility.AccountQuickSwitch.Account account)
+                return;
+
+            MessageBoxResult result = Frontend.ShowMessageBox(
+                $"Switch to {account.Title}?\n\nRoblox closes (you leave the game you are in), signs in as this account and starts again.",
+                MessageBoxImage.Question,
+                MessageBoxButton.YesNo);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                // closing Roblox mid-game on purpose is not a crash - no auto-rejoin on the old account
+                PhasmaStrap.Utility.FastFlagPresetSession.MarkIntentionalRestart();
+
+                Process.Start(Paths.Process, $"-switchaccount {account.UserId}");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("MenuContainer::SwitchAccount", ex);
+            }
         }
 
         private void CloseRobloxMenuItem_Click(object sender, RoutedEventArgs e)
