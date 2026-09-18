@@ -51,7 +51,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Path { get; init; } = "";
         public string FileName => System.IO.Path.GetFileName(Path);
         public DateTime Taken { get; init; }
-        public string TakenDisplay => Taken.ToString("g");
+        public long Bytes { get; init; }
+        public string TakenDisplay => $"{Taken:g}  ·  {Bytes / 1048576.0:0.0} MB";
+
+        // GIFs exported from the clip editor are listed with the clips; only videos can be edited
+        public bool IsGif => Path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+        public System.Windows.Visibility EditVisibility => IsGif ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+        public Wpf.Ui.Common.SymbolRegular Symbol => IsGif ? Wpf.Ui.Common.SymbolRegular.Gif24 : Wpf.Ui.Common.SymbolRegular.VideoClip24;
     }
 
     public class CaptureViewModel : NotifyPropertyChangedViewModel
@@ -289,7 +295,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         });
         public ICommand EditReplayCommand => new RelayCommand<ReplayClipItem>(item =>
         {
-            if (item is null || !File.Exists(item.Path))
+            if (item is null || item.IsGif || !File.Exists(item.Path))
                 return;
 
             var editor = new PhasmaStrap.UI.Elements.Dialogs.ClipEditorWindow(item.Path)
@@ -336,11 +342,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (Directory.Exists(InstantReplayRecorder.ClipsDir))
             {
                 var files = new DirectoryInfo(InstantReplayRecorder.ClipsDir)
-                    .GetFiles("*.mp4")
+                    .GetFiles()
+                    .Where(f => f.Extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase) || f.Extension.Equals(".gif", StringComparison.OrdinalIgnoreCase))
+                    .Where(f => !f.Name.EndsWith(".editing.mp4", StringComparison.OrdinalIgnoreCase))
                     .OrderByDescending(f => f.LastWriteTime);
 
                 foreach (FileInfo file in files)
-                    Replays.Add(new ReplayClipItem { Path = file.FullName, Taken = file.LastWriteTime });
+                    Replays.Add(new ReplayClipItem { Path = file.FullName, Taken = file.LastWriteTime, Bytes = file.Length });
             }
 
             OnPropertyChanged(nameof(HasReplays));

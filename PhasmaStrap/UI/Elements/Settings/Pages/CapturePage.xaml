@@ -233,7 +233,7 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ui:SymbolIcon Grid.Column="0" Symbol="VideoClip24" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                <ui:SymbolIcon Grid.Column="0" Symbol="{Binding Symbol}" VerticalAlignment="Center" Margin="0,0,10,0" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock FontSize="13" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" />
                                     <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TakenDisplay}" />
@@ -243,7 +243,7 @@
                                 <ui:Button Margin="0,0,6,0" Padding="6,4" Appearance="Secondary" Icon="Copy16" Content="{x:Static resources:Strings.Common_Copy}" ToolTip="{x:Static resources:Strings.Menu_Capture_CopyClipClipboardReadyPasteInto}"
                                            Command="{Binding DataContext.CopyReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                            CommandParameter="{Binding}" />
-                                <ui:Button Padding="6,4" Appearance="Secondary" Icon="Cut24" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_TrimCropSlowDownSpeedUp}"
+                                <ui:Button Padding="6,4" Appearance="Secondary" Icon="Cut24" Content="{x:Static resources:Strings.Common_Edit}" ToolTip="{x:Static resources:Strings.Menu_Capture_TrimCropSlowDownSpeedUp}" Visibility="{Binding EditVisibility}"
                                            Command="{Binding DataContext.EditReplayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                            CommandParameter="{Binding}" />
                                 <ui:Button Margin="6,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="{x:Static resources:Strings.Menu_Capture_DeleteClip}"
