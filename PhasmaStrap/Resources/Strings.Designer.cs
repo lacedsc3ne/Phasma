@@ -15020,5 +15020,149 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.MixesDefaultMicrophoneIntoClipOff", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your sessions, how much you play and who you played with. Everything here is kept on this PC only..
+        /// </summary>
+        public static string Menu_Activity_SessionsHowMuchYouPlayWho {
+            get {
+                return ResourceManager.GetString("Menu.Activity.SessionsHowMuchYouPlayWho", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timeline.
+        /// </summary>
+        public static string Menu_Activity_Timeline {
+            get {
+                return ResourceManager.GetString("Menu.Activity.Timeline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No sessions yet - they appear here after you have played..
+        /// </summary>
+        public static string Menu_Activity_NoSessionsYetTheyAppearHere {
+            get {
+                return ResourceManager.GetString("Menu.Activity.NoSessionsYetTheyAppearHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The FPS line needs something that watches the game's frames while you play: the overlay HUD or Instant Replay. Without e.
+        /// </summary>
+        public static string Menu_Activity_FPSLineNeedsSomethingWatchesGame {
+            get {
+                return ResourceManager.GetString("Menu.Activity.FPSLineNeedsSomethingWatchesGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playtime.
+        /// </summary>
+        public static string Menu_Activity_Playtime {
+            get {
+                return ResourceManager.GetString("Menu.Activity.Playtime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last 14 days.
+        /// </summary>
+        public static string Menu_Activity_Last14Days {
+            get {
+                return ResourceManager.GetString("Menu.Activity.Last14Days", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last 12 weeks.
+        /// </summary>
+        public static string Menu_Activity_Last12Weeks {
+            get {
+                return ResourceManager.GetString("Menu.Activity.Last12Weeks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to By game.
+        /// </summary>
+        public static string Menu_Activity_ByGame {
+            get {
+                return ResourceManager.GetString("Menu.Activity.ByGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing played in this period..
+        /// </summary>
+        public static string Menu_Activity_NothingPlayedPeriod {
+            get {
+                return ResourceManager.GetString("Menu.Activity.NothingPlayedPeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Played with.
+        /// </summary>
+        public static string Menu_Activity_Played {
+            get {
+                return ResourceManager.GetString("Menu.Activity.Played", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note which friends share my server.
+        /// </summary>
+        public static string Menu_Activity_NoteWhichFriendsShareMyServer {
+            get {
+                return ResourceManager.GetString("Menu.Activity.NoteWhichFriendsShareMyServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to While you are in a game, PhasmaStrap asks Roblox every 90 seconds where your friends are (with your login, read-only) an.
+        /// </summary>
+        public static string Menu_Activity_WhileYouAreGamePhasmaStrapAsks {
+            get {
+                return ResourceManager.GetString("Menu.Activity.WhileYouAreGamePhasmaStrapAsks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep a session history.
+        /// </summary>
+        public static string Menu_Activity_KeepSessionHistory {
+            get {
+                return ResourceManager.GetString("Menu.Activity.KeepSessionHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writes down each server you join, how long you stayed, its region and FPS readings. Without it this page stays empty. Ta.
+        /// </summary>
+        public static string Menu_Activity_WritesDownEachServerYouJoin {
+            get {
+                return ResourceManager.GetString("Menu.Activity.WritesDownEachServerYouJoin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete the history.
+        /// </summary>
+        public static string Menu_Activity_DeleteHistory {
+            get {
+                return ResourceManager.GetString("Menu.Activity.DeleteHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removes every recorded session. Screenshots, clips and the per-game totals on the Home page stay..
+        /// </summary>
+        public static string Menu_Activity_RemovesEveryRecordedSessionScreenshotsClips {
+            get {
+                return ResourceManager.GetString("Menu.Activity.RemovesEveryRecordedSessionScreenshotsClips", resourceCulture);
+            }
+        }
     }
 }

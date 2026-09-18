@@ -257,6 +257,12 @@ namespace PhasmaStrap.Models.Persistable
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
         // was copied a few seconds after the hotkey, which is easy to be surprised by)
+        // Activity page. The session history is local bookkeeping like the playtime totals, so it
+        // is on; noting which friends share your server means asking Roblox where your friends
+        // are (with your login, read-only, every 90 s while in a game), so that part is opt-in.
+        public bool SessionHistoryEnabled { get; set; } = true;
+        public bool SessionTrackFriends { get; set; } = false;
+
         // friend activity toasts only for friends starred on the Friends page
         public bool FriendActivityFavouritesOnly { get; set; } = false;
 

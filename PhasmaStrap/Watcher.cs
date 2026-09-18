@@ -24,6 +24,8 @@ namespace PhasmaStrap
 
         public readonly PlayTimeWatcher? PlayTimeWatcher;
 
+        public readonly SessionTracker? SessionTracker;
+
         public readonly GameChatIntegration? GameChat;
 
         private readonly GlobalHotkeyManager? _hotkeys;
@@ -113,6 +115,9 @@ namespace PhasmaStrap
                     IntegrationWatcher = new(ActivityWatcher);
 
                 PlayTimeWatcher = new(ActivityWatcher);
+
+                if (App.Settings.Prop.SessionHistoryEnabled)
+                    SessionTracker = new(ActivityWatcher);
 
                 if (App.Settings.Prop.FakeExclusiveFullscreen)
                 {
@@ -550,6 +555,7 @@ namespace PhasmaStrap
             GameChat?.Dispose();
             IntegrationWatcher?.Dispose();
             PlayTimeWatcher?.Dispose();
+            SessionTracker?.Dispose();
             PlayTimeStore.Shutdown();
             FakeExclusiveFullscreen.Shutdown();
             AudioDucker.Shutdown();

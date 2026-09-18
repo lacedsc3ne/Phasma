@@ -81,6 +81,10 @@ namespace PhasmaStrap.Utility
         // closed segments that were dropped while a clip was still being written from them
         private readonly List<Segment> _limbo = new();
 
+        // frames the game presented, as counted by desktop duplication - for FpsFeed
+        private long _presented;
+        private long _presentedSince;
+
         // stats
         private long _statFrames, _statDropped;
         private DateTime _statSinceUtc;
@@ -310,6 +314,9 @@ namespace PhasmaStrap.Utility
                     _duplication!.AcquireNextFrame(Math.Clamp(frameWaitMs, 0, 100), out OutduplFrameInfo info, out resource);
                     acquired = true;
 
+                    // the grab rate is the recorder's; how many frames went by in between is the game's
+                    CountPresented((int)info.AccumulatedFrames);
+
                     // a mouse-only update carries no new image
                     if (info.LastPresentTime == 0)
                         return true;
@@ -404,6 +411,24 @@ namespace PhasmaStrap.Utility
                     try { _duplication?.ReleaseFrame(); } catch { }
                 }
             }
+        }
+
+        private void CountPresented(int frames)
+        {
+            long now = Now();
+
+            if (_presentedSince == 0)
+                _presentedSince = now;
+
+            _presented += Math.Max(0, frames);
+
+            long elapsed = now - _presentedSince;
+            if (elapsed < 10_000_000)
+                return;
+
+            FpsFeed.Report(FpsFeed.Source.Recorder, _presented * 10_000_000.0 / elapsed);
+            _presented = 0;
+            _presentedSince = now;
         }
 
         // ------------------------------------------------------------------ segments
