@@ -11,8 +11,10 @@ namespace PhasmaStrap.Utility
     // That logo is not an image. Every icon on the current top bar is a glyph of the "Builder
     // Icons" font that ships with the client, and the menu button is the glyph named "tilt" - so
     // the mark is traced from the PhasmaStrap logo and swapped into that glyph (IconFontPatcher).
-    // Fonts are single-colour: it shows as a white silhouette, tinted like every other top bar
-    // icon. The font gains icons with Roblox updates, so this patches whatever font the version
+    // The glyph itself is the plain silhouette; on top of it the font gets COLR/CPAL colour layers
+    // (the format Roblox's own emoji fonts use) carrying the mark's greys and reds. An engine that
+    // ignores colour layers just draws the silhouette, tinted like every other top bar icon.
+    // The font gains icons with Roblox updates, so this patches whatever font the version
     // being launched ships rather than dropping in a pre-made one.
     //
     // (An earlier version of this file drew the logo into a FoundationImages spritesheet cell named
@@ -34,6 +36,10 @@ namespace PhasmaStrap.Utility
         private const string MarkerFile = "PhasmaTopBarLogo.json";
         private const string OriginalSuffix = ".phasma-original";
 
+        // bump when what gets written changes (2 = colour layers)
+        private const string FormatKey = "#format";
+        private const string FormatVersion = "2";
+
         // Returns the files (relative to versionDirectory) that now carry the logo.
         public static List<string> Apply(string versionDirectory, Func<Stream> openLogo)
         {
@@ -50,6 +56,11 @@ namespace PhasmaStrap.Utility
                 using Bitmap logo = source.Clone(visible, PixelFormat.Format32bppArgb);
 
                 Dictionary<string, string> marker = ReadMarker(versionDirectory);
+
+                // files patched by an older build of this class get patched again
+                if (!marker.TryGetValue(FormatKey, out string? format) || format != FormatVersion)
+                    marker.Clear();
+                marker[FormatKey] = FormatVersion;
 
                 PatchFonts(versionDirectory, logo, marker, owned);
 
@@ -82,6 +93,7 @@ namespace PhasmaStrap.Utility
             }
 
             List<List<PointF>>? outline = null;
+            List<IconFontPatcher.ColorLayer>? layers = null;
             int patched = 0;
 
             foreach (string font in Directory.GetFiles(root, "*.ttf", SearchOption.AllDirectories))
@@ -104,8 +116,11 @@ namespace PhasmaStrap.Utility
                     File.Copy(font, pristine);
 
                 outline ??= IconFontPatcher.Trace(logo);
+                layers ??= IconFontPatcher.TraceColorLayers(logo);
 
-                byte[]? result = IconFontPatcher.ReplaceGlyph(File.ReadAllBytes(pristine), GlyphName, outline);
+                // outline = the plain silhouette every engine can draw; layers = the same mark in
+                // its real greys and reds for engines that honour colour fonts
+                byte[]? result = IconFontPatcher.ReplaceGlyph(File.ReadAllBytes(pristine), GlyphName, outline, layers);
                 if (result is null)
                 {
                     Log?.Invoke($"{relative}: no '{GlyphName}' glyph to replace (or not a TrueType font) - left alone");
