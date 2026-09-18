@@ -90,8 +90,13 @@ namespace PhasmaStrap.Utility
             if (!App.Settings.Prop.FriendActivityAlertsEnabled)
                 return;
 
+            HashSet<long>? favourites = App.Settings.Prop.FriendActivityFavouritesOnly ? FriendNotesStore.Shared.Favourites() : null;
+
             foreach (FriendInfo friend in friends)
             {
+                if (favourites is not null && !favourites.Contains(friend.UserId))
+                    continue;
+
                 if (!after.TryGetValue(friend.UserId, out FriendPresence? now))
                     continue;
 

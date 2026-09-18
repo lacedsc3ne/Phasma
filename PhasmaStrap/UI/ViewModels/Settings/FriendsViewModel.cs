@@ -36,6 +36,63 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         };
 
         public int SortRank => Rank(Type);
+
+        // ---- your own star and note (FriendNotesStore) - local only
+
+        public Action<FriendRow>? FavouriteChanged;
+
+        private bool _isFavourite;
+        public bool IsFavourite
+        {
+            get => _isFavourite;
+            set
+            {
+                if (_isFavourite == value)
+                    return;
+
+                _isFavourite = value;
+                PhasmaStrap.Utility.FriendNotesStore.Shared.Set(UserId, _isFavourite, _note);
+                OnPropertyChanged(nameof(IsFavourite));
+                OnPropertyChanged(nameof(StarSymbol));
+                OnPropertyChanged(nameof(StarFilled));
+                FavouriteChanged?.Invoke(this);
+            }
+        }
+
+        public Wpf.Ui.Common.SymbolRegular StarSymbol => Wpf.Ui.Common.SymbolRegular.Star24;
+        public bool StarFilled => _isFavourite;
+
+        private string _note = "";
+        public string Note
+        {
+            get => _note;
+            set
+            {
+                value ??= "";
+                if (_note == value)
+                    return;
+
+                _note = value;
+                PhasmaStrap.Utility.FriendNotesStore.Shared.Set(UserId, _isFavourite, _note);
+                OnPropertyChanged(nameof(Note));
+            }
+        }
+
+        // for loading - no write-back, no events
+        public void LoadNote(bool favourite, string note)
+        {
+            _isFavourite = favourite;
+            _note = note;
+        }
+
+        public bool Matches(string search) =>
+            search.Length == 0
+            || Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || Username.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || _note.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || StatusText.Contains(search, StringComparison.OrdinalIgnoreCase);
+
+        public string Username { get; init; } = "";
     }
 
     /// <summary>
@@ -69,6 +126,49 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         public ObservableCollection<FriendRow> Friends { get; } = new();
+
+        // everything that was loaded; Friends is this, filtered and sorted
+        private List<FriendRow> _all = new();
+
+        private string _search = "";
+        public string Search
+        {
+            get => _search;
+            set { _search = value ?? ""; OnPropertyChanged(nameof(Search)); ApplyView(); }
+        }
+
+        private bool _favouritesOnly;
+        public bool FavouritesOnly
+        {
+            get => _favouritesOnly;
+            set { _favouritesOnly = value; OnPropertyChanged(nameof(FavouritesOnly)); ApplyView(); }
+        }
+
+        public bool AlertFavouritesOnly
+        {
+            get => App.Settings.Prop.FriendActivityFavouritesOnly;
+            set { App.Settings.Prop.FriendActivityFavouritesOnly = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(AlertFavouritesOnly)); }
+        }
+
+        // favourites on top, then who is in a game / online, then by name
+        private void ApplyView()
+        {
+            string search = _search.Trim();
+
+            List<FriendRow> rows = _all
+                .Where(r => (!_favouritesOnly || r.IsFavourite) && r.Matches(search))
+                .OrderByDescending(r => r.IsFavourite)
+                .ThenBy(r => r.SortRank)
+                .ThenBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            Friends.Clear();
+            foreach (FriendRow row in rows)
+                Friends.Add(row);
+
+            OnPropertyChanged(nameof(HasFriends));
+            OnPropertyChanged(nameof(EmptyStateVisibility));
+        }
 
         private bool _loading;
         public bool Loading { get => _loading; private set { _loading = value; OnPropertyChanged(nameof(Loading)); } }
@@ -123,6 +223,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (me is null)
                 {
                     Status = "Sign into Roblox to see your friends list.";
+                    _all = new();
                     Friends.Clear();
                     return;
                 }
@@ -132,6 +233,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (friends.Count == 0)
                 {
                     Status = "No friends found (or this account's friends list is private).";
+                    _all = new();
                     Friends.Clear();
                     return;
                 }
@@ -153,9 +255,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         _ => "Offline",
                     };
 
-                    return new FriendRow
+                    PhasmaStrap.Utility.FriendNotesStore.Entry mine = PhasmaStrap.Utility.FriendNotesStore.Shared.Get(f.UserId);
+
+                    var row = new FriendRow
                     {
                         UserId = f.UserId,
+                        Username = f.Username ?? "",
                         Name = string.IsNullOrWhiteSpace(f.DisplayName) ? f.Username : f.DisplayName,
                         AvatarUrl = AvatarCache.TryGetFresh(f.UserId) ?? avatar,
                         Type = type,
@@ -163,19 +268,21 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         Joinable = p?.Joinable ?? false,
                         Presence = p,
                     };
+
+                    row.LoadNote(mine.Favourite, mine.Note);
+                    row.FavouriteChanged = _ => ApplyView();
+                    return row;
                 })
-                .OrderBy(r => r.SortRank)
-                .ThenBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-                Friends.Clear();
-                foreach (FriendRow row in rows)
-                    Friends.Add(row);
+                _all = rows;
+                ApplyView();
 
                 _ = CacheAvatarsAsync(rows, avatars);
 
                 int online = rows.Count(r => r.Type != FriendPresenceType.Offline);
-                Status = $"{online} of {rows.Count} friend(s) online.";
+                int starred = rows.Count(r => r.IsFavourite);
+                Status = $"{online} of {rows.Count} friend(s) online." + (starred > 0 ? $"  {starred} favourite(s)." : "");
             }
             catch (Exception ex)
             {

@@ -322,6 +322,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             // ---- FriendsPage.xaml (FriendsPage) ----
             new(SettingsSearchEntryKind.Option, Strings.Menu_Friends_FriendActivityAlerts, Strings.Menu_Friends_ToastWhenFriendComesOnlineStarts, typeof(FriendsPage), Strings.Menu_Friends_Friends, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Friends_CheckEvery, "", typeof(FriendsPage), Strings.Menu_Friends_Friends, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Friends_OnlyAlertFavourites, Strings.Menu_Friends_ToastsOnlyFriendsYouStarredBelow, typeof(FriendsPage), Strings.Menu_Friends_Friends, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Friends_FavouritesOnly, "", typeof(FriendsPage), Strings.Menu_Friends_Friends, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(FriendsPage), Strings.Menu_Friends_Friends, "", "", "", null, ""),
             // ---- GBSEditorPage.xaml (GBSEditorPage) ----
             new(SettingsSearchEntryKind.Option, Strings.Menu_GBSEditor_LockFile, Strings.Menu_GBSEditor_LockFileDescription, typeof(GBSEditorPage), Strings.Menu_GBSEditor_Title, "", "", "", null, ""),
