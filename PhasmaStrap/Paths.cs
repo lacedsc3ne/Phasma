@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap
+namespace PhasmaStrap
 {
     static class Paths
     {
@@ -58,6 +58,9 @@
         // app UI colour theme override (AppColorTheme) - distinct from CustomThemes above, which
         // holds custom *bootstrapper dialog* definitions, not app colour schemes
         public static string CustomColorThemeXaml => Path.Combine(Base, "CustomColorTheme.xaml");
+
+        // rolling snapshots of Settings.json / ClientAppSettings.json (Utility.SettingsBackups)
+        public static string SettingsBackups => Path.Combine(Base, "Backups");
 
         public static bool Initialized => !String.IsNullOrEmpty(Base);
 

@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap
+namespace PhasmaStrap
 {
     public class JsonManager<T> where T : class, new()
     {
@@ -138,6 +138,13 @@
             try
             {
                 string contents = JsonSerializer.Serialize(Prop, new JsonSerializerOptions { WriteIndented = true });
+
+                // keep what is about to be replaced (Settings / FastFlags only, see SettingsBackups)
+                if (Utility.SettingsBackups.IsTracked(FileLocation))
+                {
+                    Utility.SettingsBackups.Log ??= message => App.Logger.WriteLine("SettingsBackups", message);
+                    Utility.SettingsBackups.BeforeSave(Paths.SettingsBackups, FileLocation, contents);
+                }
 
                 File.WriteAllText(FileLocation, contents);
 
