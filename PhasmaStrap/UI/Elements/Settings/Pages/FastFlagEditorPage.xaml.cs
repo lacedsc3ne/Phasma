@@ -34,6 +34,35 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         private bool _showPresets = false;
         private string _searchFilter = "";
 
+        // space the flag list always gets, even when everything above it is tall
+        private const double MinimumListHeight = 320;
+
+        private void PageScroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateLayoutHeight();
+
+        private void RootLayout_LayoutUpdated(object? sender, EventArgs e) => UpdateLayoutHeight();
+
+        // Fill the visible area when there is room (the list takes the rest, as before); when the
+        // sections above are taller than that, grow past it so the page scrolls instead of clipping.
+        private void UpdateLayoutHeight()
+        {
+            if (PageScroller is null || RootLayout is null || RootLayout.RowDefinitions.Count == 0)
+                return;
+
+            double above = 0;
+            for (int i = 0; i < RootLayout.RowDefinitions.Count - 1; i++)
+                above += RootLayout.RowDefinitions[i].ActualHeight;
+
+            double available = PageScroller.ViewportHeight - RootLayout.Margin.Top - RootLayout.Margin.Bottom;
+            double wanted = Math.Max(available, above + MinimumListHeight);
+
+            if (wanted <= 0 || double.IsNaN(wanted) || double.IsInfinity(wanted))
+                return;
+
+            // LayoutUpdated fires constantly; only touch Height when it really changes, or this loops
+            if (double.IsNaN(RootLayout.Height) || Math.Abs(RootLayout.Height - wanted) > 0.5)
+                RootLayout.Height = wanted;
+        }
+
         public FastFlagEditorPage()
         {
             InitializeComponent();
