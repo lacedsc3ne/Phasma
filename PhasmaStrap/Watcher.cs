@@ -81,10 +81,15 @@ namespace PhasmaStrap
                 // the Overlays page takes effect on the very next game join, no relaunch needed
                 ActivityWatcher.OnGameJoin += (sender, _) =>
                 {
-                    if (App.Settings.Prop.OverlayHudShowPing)
+                    // the region badge shows the ping next to the region in the tray menu
+                    if (App.Settings.Prop.OverlayHudShowPing || App.Settings.Prop.OverlayHudShowRegion)
                         ServerPingMonitor.Start((sender as ActivityWatcher)?.Data.MachineAddress);
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => ServerPingMonitor.Stop();
+
+                // where the server is - an offline lookup, always on (tray menu + optional HUD row)
+                ActivityWatcher.OnGameJoin += (sender, _) => ServerRegion.OnGameJoin((sender as ActivityWatcher)?.Data.MachineAddress);
+                ActivityWatcher.OnGameLeave += (_, _) => ServerRegion.OnGameLeave();
 
                 if (App.Settings.Prop.UseDisableAppPatch)
                 {

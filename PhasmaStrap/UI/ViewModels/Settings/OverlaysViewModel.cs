@@ -51,6 +51,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.OverlayHudShowPing = value;
         }
 
+        public bool ShowRegion
+        {
+            get => App.Settings.Prop.OverlayHudShowRegion;
+            set => App.Settings.Prop.OverlayHudShowRegion = value;
+        }
+
         // --- Overlay Focus Mode: a manual suppress-all switch for the HUD/crosshair, toggleable
         // here or via the Toggle Overlay Focus Mode hotkey (bind one on the Hotkeys page) -
         // there's no reliable general Windows API for detecting "something is capturing my screen

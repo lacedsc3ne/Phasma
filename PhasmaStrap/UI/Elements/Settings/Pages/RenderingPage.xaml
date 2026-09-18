@@ -246,6 +246,9 @@
                             <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_ServerPing}" Description="{x:Static resources:Strings.Menu_Rendering_RoundTripTimeCurrentGameServer}">
                                 <ui:ToggleSwitch IsChecked="{Binding ShowPing, Mode=TwoWay}" />
                             </controls:OptionControl>
+                            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_ServerRegion}" Description="{x:Static resources:Strings.Menu_Rendering_WhereCurrentGameServerSuchAs}">
+                                <ui:ToggleSwitch IsChecked="{Binding ShowRegion, Mode=TwoWay}" />
+                            </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
 

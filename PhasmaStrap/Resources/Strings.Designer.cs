@@ -14948,5 +14948,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Friends.OwnNoteAboutFriendOnlyStored", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server region.
+        /// </summary>
+        public static string Menu_Rendering_ServerRegion {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ServerRegion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where the current game server is, such as Frankfurt, DE. Also shown in the tray menu, with the ping. Takes effect from t.
+        /// </summary>
+        public static string Menu_Rendering_WhereCurrentGameServerSuchAs {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.WhereCurrentGameServerSuchAs", resourceCulture);
+            }
+        }
     }
 }

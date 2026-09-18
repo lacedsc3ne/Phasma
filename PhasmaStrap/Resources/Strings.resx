@@ -5260,4 +5260,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Friends.OwnNoteAboutFriendOnlyStored" xml:space="preserve">
     <value>Your own note about this friend - only stored on this PC</value>
   </data>
+  <data name="Menu.Rendering.ServerRegion" xml:space="preserve">
+    <value>Server region</value>
+  </data>
+  <data name="Menu.Rendering.WhereCurrentGameServerSuchAs" xml:space="preserve">
+    <value>Where the current game server is, such as Frankfurt, DE. Also shown in the tray menu, with the ping. Takes effect from the next game you join.</value>
+  </data>
 </root>
