@@ -209,6 +209,19 @@ namespace PhasmaStrap
                             .FirstOrDefault(t => t.Name == pageName && t.Namespace == "PhasmaStrap.UI.Elements.Settings.Pages");
                         if (page is not null)
                             window.Dispatcher.BeginInvoke(new Action(() => window.Navigate(page)), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
+                        // PHASMASTRAP_UITEST_SCROLL=<0-100>: scroll the page that far down once it has
+                        // loaded (a background window gets no mouse wheel either)
+                        if (double.TryParse(Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_SCROLL"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double percent))
+                        {
+                            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };
+                            timer.Tick += (_, _) =>
+                            {
+                                timer.Stop();
+                                UiTestScroll(window, percent);
+                            };
+                            timer.Start();
+                        }
                     };
                 }
 
@@ -230,6 +243,25 @@ namespace PhasmaStrap
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
+
+        // scrolls the tallest scrollable area of the window (the page, not the navigation bar)
+        private static void UiTestScroll(System.Windows.DependencyObject root, double percent)
+        {
+            System.Windows.Controls.ScrollViewer? best = null;
+
+            void Walk(System.Windows.DependencyObject node)
+            {
+                if (node is System.Windows.Controls.ScrollViewer viewer && viewer.ScrollableHeight > 0
+                    && (best is null || viewer.ActualHeight * viewer.ActualWidth > best.ActualHeight * best.ActualWidth))
+                    best = viewer;
+
+                for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(node); i++)
+                    Walk(System.Windows.Media.VisualTreeHelper.GetChild(node, i));
+            }
+
+            Walk(root);
+            best?.ScrollToVerticalOffset(best.ScrollableHeight * Math.Clamp(percent, 0, 100) / 100.0);
+        }
 
         private static bool ApplyUiTestBackground(System.Windows.Window window)
         {

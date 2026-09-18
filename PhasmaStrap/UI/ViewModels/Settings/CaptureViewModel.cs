@@ -228,6 +228,67 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.CaptureCopyReplayToClipboard = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(CopyReplayToClipboard)); }
         }
 
+        // --- storage limits (CaptureStorage) ---
+
+        private static readonly int[] LimitValuesMb = { 0, 1024, 2048, 5120, 10240, 25600, 51200 };
+        public string[] StorageLimitOptions { get; } = { "No limit", "1 GB", "2 GB", "5 GB", "10 GB", "25 GB", "50 GB" };
+
+        public string SelectedStorageLimit
+        {
+            get => StorageLimitOptions[Math.Max(0, Array.IndexOf(LimitValuesMb, App.Settings.Prop.CaptureStorageLimitMB))];
+            set
+            {
+                int index = Array.IndexOf(StorageLimitOptions, value);
+                if (index < 0)
+                    return;
+
+                App.Settings.Prop.CaptureStorageLimitMB = LimitValuesMb[index];
+                App.Settings.SaveDeferred();
+                OnPropertyChanged(nameof(SelectedStorageLimit));
+                OnPropertyChanged(nameof(StorageUsageText));
+            }
+        }
+
+        private static readonly int[] AgeValuesDays = { 0, 7, 30, 90, 365 };
+        public string[] MaxAgeOptions { get; } = { "Keep forever", "7 days", "30 days", "90 days", "1 year" };
+
+        public string SelectedMaxAge
+        {
+            get => MaxAgeOptions[Math.Max(0, Array.IndexOf(AgeValuesDays, App.Settings.Prop.CaptureMaxAgeDays))];
+            set
+            {
+                int index = Array.IndexOf(MaxAgeOptions, value);
+                if (index < 0)
+                    return;
+
+                App.Settings.Prop.CaptureMaxAgeDays = AgeValuesDays[index];
+                App.Settings.SaveDeferred();
+                OnPropertyChanged(nameof(SelectedMaxAge));
+                OnPropertyChanged(nameof(StorageUsageText));
+            }
+        }
+
+        private static string Size(long bytes) => bytes >= 1073741824L ? $"{bytes / 1073741824.0:0.0} GB" : $"{bytes / 1048576.0:0} MB";
+
+        public string StorageUsageText
+        {
+            get
+            {
+                List<CaptureStorage.Entry> shots = CaptureStorage.Scan(new[] { ScreenshotCapture.ScreenshotsDir });
+                List<CaptureStorage.Entry> clips = CaptureStorage.Scan(new[] { InstantReplayRecorder.ClipsDir });
+
+                string text = $"Screenshots: {shots.Count} ({Size(shots.Sum(e => e.Bytes))})  ·  Clips and GIFs: {clips.Count} ({Size(clips.Sum(e => e.Bytes))})";
+
+                List<CaptureStorage.Entry> due = CaptureStorage.Plan(shots.Concat(clips).ToList(),
+                    App.Settings.Prop.CaptureStorageLimitMB * 1048576L, App.Settings.Prop.CaptureMaxAgeDays, DateTime.Now);
+
+                if (due.Count > 0)
+                    text += $"\nWith these limits the {due.Count} oldest ({Size(due.Sum(e => e.Bytes))}) will move to the Recycle Bin the next time you take a screenshot or save a clip.";
+
+                return text;
+            }
+        }
+
         // --- sharing: the buttons and right-click menus on the gallery cards ---
 
         private void Copy(string path, bool image)
@@ -352,6 +413,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
 
             OnPropertyChanged(nameof(HasReplays));
+            OnPropertyChanged(nameof(StorageUsageText));
         }
 
         public bool HasScreenshots => Screenshots.Count > 0;
@@ -445,6 +507,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
 
             OnPropertyChanged(nameof(HasScreenshots));
+            OnPropertyChanged(nameof(StorageUsageText));
         }
     }
 }

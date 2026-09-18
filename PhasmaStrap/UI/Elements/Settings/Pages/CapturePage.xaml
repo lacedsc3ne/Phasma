@@ -255,5 +255,17 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Capture_Storage}" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Capture_KeepScreenshotClipFoldersFromGrowing}" />
+        <TextBlock Margin="0,8,0,4" FontSize="12" TextWrapping="Wrap" Text="{Binding StorageUsageText, Mode=OneWay}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_SizeLimit}" Description="{x:Static resources:Strings.Menu_Capture_HowMuchRoomScreenshotsClipsGIFs}">
+            <ComboBox Width="140" ItemsSource="{Binding StorageLimitOptions, Mode=OneTime}" SelectedItem="{Binding SelectedStorageLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RemoveCapturesOlderThan}" Description="{x:Static resources:Strings.Menu_Capture_CapturesPastAgeAreCleanedUp}">
+            <ComboBox Width="140" ItemsSource="{Binding MaxAgeOptions, Mode=OneTime}" SelectedItem="{Binding SelectedMaxAge, Mode=TwoWay}" />
+        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

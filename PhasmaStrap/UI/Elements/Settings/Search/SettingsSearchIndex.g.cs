@@ -110,6 +110,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_CopyNewClipsClipboard, Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_Storage, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_SizeLimit, Strings.Menu_Capture_HowMuchRoomScreenshotsClipsGIFs, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_Storage, "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_RemoveCapturesOlderThan, Strings.Menu_Capture_CapturesPastAgeAreCleanedUp, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_Storage, "", null, ""),
             // ---- ChannelPage.xaml (ChannelPage) ----
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Integrations_Tabs_Roblox, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, "", "", "", typeof(ChannelPage), Strings.Menu_Channel_RobloxChannel),
             new(SettingsSearchEntryKind.Section, Strings.ContextMenu_ChatLogs_ColumnChannel, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, Strings.Menu_Integrations_Tabs_Roblox, "", "", typeof(ChannelPage), Strings.Menu_Channel_RobloxChannel),
