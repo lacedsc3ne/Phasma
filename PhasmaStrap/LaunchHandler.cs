@@ -214,7 +214,11 @@ namespace PhasmaStrap
                         // loaded (a background window gets no mouse wheel either)
                         if (double.TryParse(Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_SCROLL"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double percent))
                         {
-                            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };
+                            // PHASMASTRAP_UITEST_SCROLL_DELAY=<seconds>: leave time to expand something first
+                            if (!double.TryParse(Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_SCROLL_DELAY"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double delay))
+                                delay = 2.5;
+
+                            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(Math.Clamp(delay, 0.5, 120)) };
                             timer.Tick += (_, _) =>
                             {
                                 timer.Stop();

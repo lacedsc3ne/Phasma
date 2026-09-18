@@ -14858,5 +14858,41 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.CapturesPastAgeAreCleanedUp", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings history.
+        /// </summary>
+        public static string Menu_PhasmaStrap_SettingsHistory {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.SettingsHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PhasmaStrap keeps a copy of your settings and FastFlags from before each round of changes. Put one back if something wen.
+        /// </summary>
+        public static string Menu_PhasmaStrap_PhasmaStrapKeepsCopySettingsFastFlagsFrom {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.PhasmaStrapKeepsCopySettingsFastFlagsFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing here yet - the first copy is made the next time a setting changes..
+        /// </summary>
+        public static string Menu_PhasmaStrap_NothingHereYetFirstCopyMade {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.NothingHereYetFirstCopyMade", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore.
+        /// </summary>
+        public static string Menu_PhasmaStrap_Restore {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.Restore", resourceCulture);
+            }
+        }
     }
 }

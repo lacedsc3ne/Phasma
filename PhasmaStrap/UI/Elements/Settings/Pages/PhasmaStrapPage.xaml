@@ -118,6 +118,54 @@
                 <ui:Button Grid.Column="1" MinWidth="100" Icon="ArrowImport20" Content="{x:Static resources:Strings.Common_Import}" Command="{Binding ImportDataCommand, Mode=OneTime}" />
             </Grid>
         </ui:Card>
+
+        <ui:CardExpander Margin="0,8,0,0" x:Name="HistoryExpander" Expanded="HistoryExpander_Expanded">
+            <ui:CardExpander.Header>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_PhasmaStrap_SettingsHistory}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_PhasmaStrapKeepsCopySettingsFastFlagsFrom}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <ui:Button Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshBackupsCommand, Mode=OneTime}" />
+                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenBackupsFolderCommand, Mode=OneTime}" />
+                </StackPanel>
+
+                <TextBlock Margin="2,6,0,6" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Visibility="{Binding NoBackupsVisibility, Mode=OneWay}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_NothingHereYetFirstCopyMade}" />
+
+                <ItemsControl ItemsSource="{Binding Backups, Mode=OneWay}" MaxHeight="360">
+                    <ItemsControl.Template>
+                        <ControlTemplate TargetType="ItemsControl">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" controls:ScrollBubbling.Enabled="True">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,8,6" Padding="12,8" CornerRadius="6" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon Grid.Column="0" Symbol="{Binding Symbol}" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock FontSize="13" Text="{Binding Title}" />
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Detail}" />
+                                    </StackPanel>
+                                    <ui:Button Grid.Column="2" Padding="8,4" Appearance="Secondary" Icon="ArrowUndo24" Content="{x:Static resources:Strings.Menu_PhasmaStrap_Restore}"
+                                               Command="{Binding DataContext.RestoreBackupCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                               CommandParameter="{Binding}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ui:CardExpander>
                 </StackPanel>
             </TabItem>
             <TabItem>

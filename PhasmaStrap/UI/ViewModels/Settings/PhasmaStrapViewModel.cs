@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using ICSharpCode.SharpZipLib.Zip;
@@ -132,6 +132,113 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // Restores whatever "Config/" entries an export made with ExportData above contains -
         // matched back to their real target file by name, not by hardcoding the 3 filenames
         // twice, so this can never drift out of sync with what export actually writes.
+        // ------------------------------------------------------------ settings history
+
+        public sealed class BackupItem
+        {
+            public PhasmaStrap.Utility.SettingsBackups.Backup Backup { get; init; } = null!;
+            public string Location { get; init; } = "";
+            public string Title { get; init; } = "";
+            public string Detail { get; init; } = "";
+            public Wpf.Ui.Common.SymbolRegular Symbol { get; init; }
+        }
+
+        public System.Collections.ObjectModel.ObservableCollection<BackupItem> Backups { get; } = new();
+
+        public Visibility NoBackupsVisibility => Backups.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        public ICommand RefreshBackupsCommand => new RelayCommand(RefreshBackups);
+
+        public ICommand OpenBackupsFolderCommand => new RelayCommand(() =>
+        {
+            Directory.CreateDirectory(Paths.SettingsBackups);
+            Process.Start("explorer.exe", Paths.SettingsBackups);
+        });
+
+        public ICommand RestoreBackupCommand => new RelayCommand<BackupItem>(RestoreBackup);
+
+        public void RefreshBackups()
+        {
+            Backups.Clear();
+
+            var sources = new (string Location, string Label, Wpf.Ui.Common.SymbolRegular Symbol)[]
+            {
+                (App.Settings.FileLocation, "Settings", Wpf.Ui.Common.SymbolRegular.Settings24),
+                (App.FastFlags.FileLocation, "FastFlags", Wpf.Ui.Common.SymbolRegular.Flag24),
+            };
+
+            var items = new List<BackupItem>();
+
+            foreach (var source in sources)
+            {
+                string current = "";
+                try { if (File.Exists(source.Location)) current = File.ReadAllText(source.Location); } catch { }
+
+                foreach (PhasmaStrap.Utility.SettingsBackups.Backup backup in PhasmaStrap.Utility.SettingsBackups.List(Paths.SettingsBackups, source.Location))
+                {
+                    int differences = -1;
+                    try { differences = PhasmaStrap.Utility.SettingsBackups.CountDifferences(File.ReadAllText(backup.Path), current); } catch { }
+
+                    string what = source.Label == "Settings" ? "setting" : "flag";
+                    string detail = differences switch
+                    {
+                        0 => "same as now",
+                        1 => $"1 {what} differs from now",
+                        > 1 => $"{differences} {what}s differ from now",
+                        _ => $"{backup.Bytes / 1024.0:0.0} KB",
+                    };
+
+                    items.Add(new BackupItem
+                    {
+                        Backup = backup,
+                        Location = source.Location,
+                        Title = $"{source.Label}  ·  {backup.Taken:g}",
+                        Detail = detail,
+                        Symbol = source.Symbol,
+                    });
+                }
+            }
+
+            foreach (BackupItem item in items.OrderByDescending(i => i.Backup.Taken))
+                Backups.Add(item);
+
+            OnPropertyChanged(nameof(NoBackupsVisibility));
+        }
+
+        private void RestoreBackup(BackupItem? item)
+        {
+            if (item is null)
+                return;
+
+            var answer = Frontend.ShowMessageBox(
+                $"Put back the {item.Title.Replace("  ·  ", " from ")}?\n\nWhat you have now is saved to this history first, so this can be undone. The settings window restarts afterwards.",
+                MessageBoxImage.Question, MessageBoxButton.YesNo);
+
+            if (answer != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                PhasmaStrap.Utility.SettingsBackups.Restore(Paths.SettingsBackups, item.Location, item.Backup);
+
+                // the window's Restart saves everything first, so the restored values have to be
+                // what is in memory by then
+                if (item.Location == App.Settings.FileLocation)
+                    App.Settings.Load(false);
+                else
+                    App.FastFlags.Load(false);
+
+                var window = Application.Current.Windows.OfType<Elements.Settings.MainWindow>().FirstOrDefault();
+                if (window?.DataContext is MainWindowViewModel main)
+                    main.RestartCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("PhasmaStrapViewModel::RestoreBackup", ex);
+                Frontend.ShowMessageBox($"Could not restore that snapshot: {ex.Message}", MessageBoxImage.Warning);
+            }
+        }
+
         public ICommand ImportDataCommand => new RelayCommand(ImportData);
 
         private void ImportData()
