@@ -73,6 +73,15 @@ namespace PhasmaStrap.Utility
         // "Roblox vanished mid-game, must have crashed" auto-rejoin doesn't fire on top
         public static bool RestartedRecently => (DateTime.UtcNow - Read().RestartUtc).TotalSeconds < 45;
 
+        // Roblox is about to be closed on purpose by something else (the tray's account switch) -
+        // same effect as above: the Watcher must not mistake it for a crash and rejoin
+        public static void MarkIntentionalRestart()
+        {
+            Marker marker = Read();
+            marker.RestartUtc = DateTime.UtcNow;
+            Write(marker);
+        }
+
         // the preset a place should run with, or "" for the plain global flags
         public static string DesiredFor(long placeId)
         {
