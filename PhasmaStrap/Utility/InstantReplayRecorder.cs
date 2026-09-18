@@ -37,6 +37,11 @@ namespace PhasmaStrap.Utility
     //
     // Self-contained (plain P/Invoke, no CsWin32 types) so the whole capture -> buffer -> encode
     // path can be run from a console harness against a live game window.
+    //
+    // Everything above describes the CPU path. With InstantReplayGpuEncoding (the default) this
+    // class only fronts GpuReplayRecorder + ReplayAudio - frames encoded on the GPU as they
+    // arrive, sound included, clips saved by remuxing - and the CPU path below is what it falls
+    // back to, by itself, on a PC where the GPU path cannot start.
     public sealed class InstantReplayRecorder : IDisposable
     {
         private const string LOG_IDENT = "InstantReplayRecorder";
@@ -131,12 +136,133 @@ namespace PhasmaStrap.Utility
 
         // ------------------------------------------------------------------ lifecycle
 
+        // ------------------------------------------------------------------ GPU path
+
+        private readonly object _modeLock = new();
+        private GpuReplayRecorder? _gpu;
+        private ReplayAudio? _audio;
+
+        private static GpuReplayRecorder.Settings GpuSettings() => new()
+        {
+            Fps = TargetFps,
+            MaxHeight = MaxHeight,
+            ClipSeconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120),
+            ProcessName = App.RobloxPlayerAppName,
+            BitrateFor = (width, height, fps) => BitrateFor(width, height, fps, Quality),
+        };
+
+        private void StartGpu()
+        {
+            GpuReplayRecorder.Log ??= message => App.Logger.WriteLine("GpuReplayRecorder", message);
+            ReplayMuxer.Log ??= message => App.Logger.WriteLine("ReplayMuxer", message);
+            ReplayAudio.Log ??= message => App.Logger.WriteLine("ReplayAudio", message);
+
+            var gpu = new GpuReplayRecorder(GpuSettings);
+
+            gpu.GaveUp += () => Task.Run(() =>
+            {
+                lock (_modeLock)
+                {
+                    if (!ReferenceEquals(_gpu, gpu))
+                        return;
+
+                    App.Logger.WriteLine(LOG_IDENT, $"GPU recording is not available here ({gpu.UnavailableReason.Trim()}) - switching to the CPU recorder");
+                    StopGpu();
+
+                    if (_running)
+                        StartCpu();
+                }
+            });
+
+            _gpu = gpu;
+
+            if (App.Settings.Prop.InstantReplayAudio)
+            {
+                _audio = new ReplayAudio(
+                    () => Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120) + GpuReplayRecorder.SegmentSeconds + 2,
+                    App.RobloxPlayerAppName,
+                    App.Settings.Prop.InstantReplayMicrophone);
+                _audio.Start();
+            }
+
+            gpu.Start();
+
+            App.Logger.WriteLine(LOG_IDENT, $"Started on the GPU path ({TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, sound {(_audio is null ? "off" : App.Settings.Prop.InstantReplayMicrophone ? "game + microphone" : "game")})");
+        }
+
+        private void StopGpu()
+        {
+            GpuReplayRecorder? gpu = _gpu;
+            ReplayAudio? audio = _audio;
+            _gpu = null;
+            _audio = null;
+
+            try { gpu?.Dispose(); } catch (Exception ex) { App.Logger.WriteLine(LOG_IDENT, $"Stopping the GPU recorder: {ex.Message}"); }
+            try { audio?.Dispose(); } catch (Exception ex) { App.Logger.WriteLine(LOG_IDENT, $"Stopping sound capture: {ex.Message}"); }
+        }
+
+        private string? SaveGpuClip(GpuReplayRecorder gpu, ReplayAudio? audio)
+        {
+            var timer = Stopwatch.StartNew();
+            int seconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120);
+
+            using GpuReplayRecorder.Cut? cut = gpu.TakeCut(seconds);
+            if (cut is null)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "SaveClip called with nothing buffered (the game has to be the window in front for it to record)");
+                return null;
+            }
+
+            Directory.CreateDirectory(ClipsDir);
+            string path = Path.Combine(ClipsDir, $"Replay_{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
+
+            try
+            {
+                ReplayMuxer.Mux(cut, path, audio is null ? null : audio.Read);
+            }
+            catch (Exception ex) when (audio is not null)
+            {
+                // better a silent clip than none
+                App.Logger.WriteLine(LOG_IDENT, $"Writing the clip with sound failed ({ex.Message.Trim()}) - writing it without");
+                ReplayMuxer.Mux(cut, path, null);
+            }
+
+            double length = cut.Segments.Sum(s => s.EndTicks - s.StartTicks) / 1e7;
+            App.Logger.WriteLine(LOG_IDENT, $"Saved {length:0.0}s ({cut.Segments[0].Width}x{cut.Segments[0].Height}, {cut.Segments.Sum(s => s.Frames)} frames, {cut.Segments.Count} segment(s), sound {(audio is null ? "off" : "on")}) in {timer.ElapsedMilliseconds}ms to {path}");
+            return path;
+        }
+
+        // ------------------------------------------------------------------ lifecycle
+
         public void Start()
         {
-            if (_running)
-                return;
+            lock (_modeLock)
+            {
+                if (_running)
+                    return;
 
-            _running = true;
+                _running = true;
+
+                if (App.Settings.Prop.InstantReplayGpuEncoding)
+                {
+                    try
+                    {
+                        StartGpu();
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Could not start the GPU path ({ex.Message.Trim()}) - using the CPU recorder");
+                        StopGpu();
+                    }
+                }
+
+                StartCpu();
+            }
+        }
+
+        private void StartCpu()
+        {
             _statSinceUtc = DateTime.UtcNow;
             _statCaptured = _statDropped = _statDuplication = 0;
 
@@ -163,6 +289,9 @@ namespace PhasmaStrap.Utility
                 return;
 
             _running = false;
+
+            lock (_modeLock)
+                StopGpu();
 
             BlockingCollection<RawFrame>? queue = _queue;
             _queue = null;
@@ -486,6 +615,27 @@ namespace PhasmaStrap.Utility
         // it off the UI thread.
         public string? SaveClip()
         {
+            GpuReplayRecorder? gpu;
+            ReplayAudio? audio;
+            lock (_modeLock)
+            {
+                gpu = _gpu;
+                audio = _audio;
+            }
+
+            if (gpu is not null)
+            {
+                try
+                {
+                    return SaveGpuClip(gpu, audio);
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"SaveClip failed: {ex.Message.Trim()}");
+                    return null;
+                }
+            }
+
             List<BufferedFrame> frames;
 
             lock (_sync)

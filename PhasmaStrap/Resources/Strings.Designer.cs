@@ -14966,5 +14966,59 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Rendering.WhereCurrentGameServerSuchAs", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encode on the graphics card.
+        /// </summary>
+        public static string Menu_Capture_EncodeGraphicsCard {
+            get {
+                return ResourceManager.GetString("Menu.Capture.EncodeGraphicsCard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frames stay on the GPU and are encoded as you play: far less CPU use, a much smaller buffer, and clips save in a fractio.
+        /// </summary>
+        public static string Menu_Capture_FramesStayGPUAreEncodedAs {
+            get {
+                return ResourceManager.GetString("Menu.Capture.FramesStayGPUAreEncodedAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Record game sound.
+        /// </summary>
+        public static string Menu_Capture_RecordGameSound {
+            get {
+                return ResourceManager.GetString("Menu.Capture.RecordGameSound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only what Roblox itself plays - not Discord, music or anything else on your speakers. Needs encoding on the graphics car.
+        /// </summary>
+        public static string Menu_Capture_OnlyWhatRobloxItselfPlaysNot {
+            get {
+                return ResourceManager.GetString("Menu.Capture.OnlyWhatRobloxItselfPlaysNot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Record my microphone too.
+        /// </summary>
+        public static string Menu_Capture_RecordMyMicrophoneToo {
+            get {
+                return ResourceManager.GetString("Menu.Capture.RecordMyMicrophoneToo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mixes your default microphone into the clip. Off unless you switch it on. Takes effect from the next game you join..
+        /// </summary>
+        public static string Menu_Capture_MixesDefaultMicrophoneIntoClipOff {
+            get {
+                return ResourceManager.GetString("Menu.Capture.MixesDefaultMicrophoneIntoClipOff", resourceCulture);
+            }
+        }
     }
 }

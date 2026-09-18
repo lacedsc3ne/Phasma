@@ -247,6 +247,13 @@ namespace PhasmaStrap.Models.Persistable
         public int InstantReplayFps { get; set; } = 30;
         public int InstantReplayMaxHeight { get; set; } = 0;
 
+        // GPU path (GpuReplayRecorder): frames stay on the GPU and are encoded as they arrive, so
+        // saving a clip is instant and the CPU is left alone. Falls back to the CPU recorder on
+        // its own when the GPU path cannot start. Sound (ReplayAudio) needs the GPU path.
+        public bool InstantReplayGpuEncoding { get; set; } = true;
+        public bool InstantReplayAudio { get; set; } = true;
+        public bool InstantReplayMicrophone { get; set; } = false;
+
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
         // was copied a few seconds after the hotkey, which is easy to be surprised by)

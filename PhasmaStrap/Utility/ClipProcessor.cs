@@ -233,22 +233,50 @@ namespace PhasmaStrap.Utility
 
                 Log?.Invoke($"Export {source} -> {destination}: {startTicks / 1e7:0.00}s-{(endTicks == long.MaxValue ? info.Duration.TotalSeconds : endTicks / 1e7):0.00}s crop={cropX},{cropY} {outW}x{outH} speed={speed} fps={outFps:0.##} bitrate={bitrate}");
 
-                int streamIndex;
-                try
+                // Sound rides along unchanged for a trim / crop. A speed change would need the
+                // pitch corrected to be listenable, so a re-timed clip is saved without sound.
+                using AudioPass? audio = Math.Abs(speed - 1.0) < 0.001 ? AudioPass.TryOpen(source) : null;
+
+                // The graphics card's encoder first (several times faster), Microsoft's software one
+                // if it refuses. High-frame-rate 1080p is outside the H.264 levels some encoders
+                // enforce; the stream is then declared as 60fps - samples keep their real
+                // timestamps, so nothing is lost.
+                var attempts = new List<(bool Hardware, double Fps)> { (true, outFps), (false, outFps) };
+                if (outFps > 60)
                 {
-                    writer = CreateSinkWriter(destination, outW, outH, outFps, bitrate, out streamIndex);
-                    writer.BeginWriting();
+                    attempts.Add((true, 60));
+                    attempts.Add((false, 60));
                 }
-                catch (Exception ex) when (outFps > 60)
+
+                int streamIndex = 0;
+                Exception? refused = null;
+
+                foreach ((bool hardware, double declaredFps) in attempts)
                 {
-                    // high-frame-rate 1080p is outside the H.264 levels some encoders enforce; declare
-                    // 60fps instead - samples keep their real timestamps, so nothing is lost
-                    Log?.Invoke($"Encoder refused {outW}x{outH}@{outFps:0.##} ({ex.Message}) - declaring 60fps");
-                    writer?.Dispose();
-                    try { if (File.Exists(destination)) File.Delete(destination); } catch { }
-                    writer = CreateSinkWriter(destination, outW, outH, 60, bitrate, out streamIndex);
-                    writer.BeginWriting();
+                    try
+                    {
+                        writer = CreateSinkWriter(destination, outW, outH, declaredFps, bitrate, hardware, out streamIndex);
+                        audio?.AddTo(writer);
+                        writer.BeginWriting();
+
+                        if (refused is not null)
+                            Log?.Invoke($"Encoding with the {(hardware ? "hardware" : "software")} encoder, stream declared as {declaredFps:0.##}fps");
+
+                        refused = null;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        refused = ex;
+                        Log?.Invoke($"{(hardware ? "Hardware" : "Software")} encoder refused {outW}x{outH}@{declaredFps:0.##}: {ex.Message.Trim()}");
+                        writer?.Dispose();
+                        writer = null;
+                        try { if (File.Exists(destination)) File.Delete(destination); } catch { }
+                    }
                 }
+
+                if (writer is null)
+                    throw refused ?? new InvalidOperationException("No H.264 encoder is available.");
 
                 byte[] frame = new byte[outW * outH * 4];
                 long defaultDuration = (long)(10_000_000 / Math.Max(1, info.Fps));
@@ -287,6 +315,9 @@ namespace PhasmaStrap.Utility
                         writer.WriteSample(streamIndex, outSample);
                         written++;
 
+                        // keep the sound level with the picture, so the file stays interleaved
+                        audio?.Pump(writer, ts, startTicks, endTicks);
+
                         if (sourceSpan > 0)
                             progress?.Invoke(Math.Clamp((double)(ts - startTicks) / sourceSpan, 0, 1));
                     }
@@ -295,10 +326,12 @@ namespace PhasmaStrap.Utility
                 if (written == 0)
                     throw new InvalidOperationException("There are no frames between the trim start and end.");
 
+                audio?.Pump(writer, long.MaxValue, startTicks, endTicks);
+
                 writer.Finalize();
                 finished = true;
                 progress?.Invoke(1);
-                Log?.Invoke($"Export wrote {written} frame(s)");
+                Log?.Invoke($"Export wrote {written} frame(s){(audio is null ? "" : $" and {audio.Written} block(s) of sound")}");
             }
             finally
             {
@@ -470,6 +503,147 @@ namespace PhasmaStrap.Utility
             }
         }
 
+        // ------------------------------------------------------------------ sound
+
+        // The clip's sound track, decoded to PCM by a reader of its own and re-encoded to AAC by
+        // the export's writer. null when the clip is silent (or its sound is in a format the AAC
+        // encoder cannot take) - the export then simply has no sound either.
+        private sealed class AudioPass : IDisposable
+        {
+            private const int FirstAudioStream = unchecked((int)0xFFFFFFFD);
+            private const int AllStreams = unchecked((int)0xFFFFFFFE);
+
+            private readonly IMFSourceReader _reader;
+            private readonly IMFMediaType _pcm;
+            private readonly uint _rate, _channels;
+            private int _stream = -1;
+            private IMFSample? _pending;
+            private long _pendingTime;
+            private bool _done;
+
+            public int Written { get; private set; }
+
+            private AudioPass(IMFSourceReader reader, IMFMediaType pcm, uint rate, uint channels)
+            {
+                _reader = reader;
+                _pcm = pcm;
+                _rate = rate;
+                _channels = channels;
+            }
+
+            public static AudioPass? TryOpen(string path)
+            {
+                IMFSourceReader? reader = null;
+                IMFMediaType? current = null;
+
+                try
+                {
+                    int hr = MFCreateSourceReaderFromURL(path, IntPtr.Zero, out IntPtr ptr);
+                    if (hr < 0)
+                        Marshal.ThrowExceptionForHR(hr);
+
+                    reader = new IMFSourceReader(ptr);
+                    reader.SetStreamSelection(AllStreams, false);
+                    reader.SetStreamSelection(FirstAudioStream, true); // throws when the clip has no sound
+
+                    using (IMFMediaType wanted = MediaFactory.MFCreateMediaType())
+                    {
+                        wanted.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Audio);
+                        wanted.Set(MediaTypeAttributeKeys.Subtype, AudioFormatGuids.Pcm);
+                        SetCurrentMediaType(reader, FirstAudioStream, wanted);
+                    }
+
+                    current = reader.GetCurrentMediaType(FirstAudioStream);
+
+                    if (!TryGetUInt32(current, MediaTypeAttributeKeys.AudioSamplesPerSecond, out uint rate)
+                        || !TryGetUInt32(current, MediaTypeAttributeKeys.AudioNumChannels, out uint channels)
+                        || (rate != 44100 && rate != 48000) || channels is < 1 or > 2)
+                    {
+                        Log?.Invoke("The clip's sound is not something the AAC encoder takes - exporting without it");
+                        current.Dispose();
+                        reader.Dispose();
+                        return null;
+                    }
+
+                    return new AudioPass(reader, current, rate, channels);
+                }
+                catch (Exception)
+                {
+                    // the ordinary case: a clip without a sound track
+                    current?.Dispose();
+                    reader?.Dispose();
+                    return null;
+                }
+            }
+
+            // before BeginWriting
+            public void AddTo(IMFSinkWriter writer)
+            {
+                using IMFMediaType output = MediaFactory.MFCreateMediaType();
+                output.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Audio);
+                output.Set(MediaTypeAttributeKeys.Subtype, AudioFormatGuids.Aac);
+                SetUInt32(output, MediaTypeAttributeKeys.AudioSamplesPerSecond, _rate);
+                SetUInt32(output, MediaTypeAttributeKeys.AudioNumChannels, _channels);
+                SetUInt32(output, MediaTypeAttributeKeys.AudioBitsPerSample, 16);
+                SetUInt32(output, MediaTypeAttributeKeys.AudioAvgBytesPerSecond, 24000);
+
+                _stream = writer.AddStream(output);
+                writer.SetInputMediaType(_stream, _pcm, null);
+            }
+
+            // writes the sound up to `untilTicks` (source time), keeping only [startTicks, endTicks)
+            public void Pump(IMFSinkWriter writer, long untilTicks, long startTicks, long endTicks)
+            {
+                while (!_done && _stream >= 0)
+                {
+                    if (_pending is null)
+                    {
+                        _reader.ReadSample(FirstAudioStream, 0, out int _, out int flags, out _pendingTime, out _pending);
+
+                        if ((flags & FlagEndOfStream) != 0)
+                        {
+                            _pending?.Dispose();
+                            _pending = null;
+                            _done = true;
+                            return;
+                        }
+
+                        if (_pending is null)
+                            continue;
+                    }
+
+                    if (_pendingTime >= endTicks)
+                    {
+                        _done = true;
+                        return;
+                    }
+
+                    if (_pendingTime > untilTicks)
+                        return; // the picture has not got this far yet
+
+                    long duration = 0;
+                    try { duration = _pending.SampleDuration; } catch { }
+
+                    if (_pendingTime + duration > startTicks)
+                    {
+                        _pending.SampleTime = Math.Max(0, _pendingTime - startTicks);
+                        writer.WriteSample(_stream, _pending);
+                        Written++;
+                    }
+
+                    _pending.Dispose();
+                    _pending = null;
+                }
+            }
+
+            public void Dispose()
+            {
+                _pending?.Dispose();
+                _pcm.Dispose();
+                _reader.Dispose();
+            }
+        }
+
         // ------------------------------------------------------------------ reader
 
         private sealed class Reader : IDisposable
@@ -623,7 +797,9 @@ namespace PhasmaStrap.Utility
 
         // ------------------------------------------------------------------ writer
 
-        private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, double fps, uint bitrate, out int streamIndex)
+        private static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = new("a634a91c-822b-41b9-a494-4de4643612b0");
+
+        private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, double fps, uint bitrate, bool hardware, out int streamIndex)
         {
             uint fpsNum = (uint)Math.Round(fps * 1000);
             const uint fpsDen = 1000;
@@ -646,14 +822,27 @@ namespace PhasmaStrap.Utility
             // frames handed to the writer are top-down
             inputType.Set(MediaTypeAttributeKeys.DefaultStride, (uint)(width * 4));
 
-            int hr = MFCreateSinkWriterFromURL(path, IntPtr.Zero, IntPtr.Zero, out IntPtr ptr);
+            using IMFAttributes? attributes = hardware ? MediaFactory.MFCreateAttributes(1) : null;
+            if (attributes is not null)
+                SetUInt32(attributes, MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1);
+
+            int hr = MFCreateSinkWriterFromURL(path, IntPtr.Zero, attributes?.NativePointer ?? IntPtr.Zero, out IntPtr ptr);
             if (hr < 0)
                 Marshal.ThrowExceptionForHR(hr);
 
             var writer = new IMFSinkWriter(ptr);
-            streamIndex = writer.AddStream(outputType);
-            writer.SetInputMediaType(streamIndex, inputType, null);
-            return writer;
+
+            try
+            {
+                streamIndex = writer.AddStream(outputType);
+                writer.SetInputMediaType(streamIndex, inputType, null);
+                return writer;
+            }
+            catch
+            {
+                writer.Dispose();
+                throw;
+            }
         }
 
         // ------------------------------------------------------------------ raw COM helpers

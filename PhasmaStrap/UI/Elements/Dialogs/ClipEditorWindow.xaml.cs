@@ -554,7 +554,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             TimeSpan selection = _end - _start;
             string size = _crop is Rect rect ? $"{_info.Width} × {_info.Height} → {(int)Math.Round(rect.Width) & ~1} × {(int)Math.Round(rect.Height) & ~1}" : $"{_info.Width} × {_info.Height}";
-            string speed = Math.Abs(_speed - 1.0) > 0.001 ? $"  ·  {_speed:0.##}× → {selection.TotalSeconds / _speed:0.0}s saved" : "";
+            // (a re-timed clip is saved without its sound - see ClipProcessor.Export)
+            string speed = Math.Abs(_speed - 1.0) > 0.001 ? $"  ·  {_speed:0.##}× → {selection.TotalSeconds / _speed:0.0}s saved, without sound" : "";
 
             StatusText.Text = $"Selected {selection.TotalSeconds:0.0}s of {_duration.TotalSeconds:0.0}s  ·  {size}{speed}" + (extra is null ? "" : $"  ·  {extra}");
         }

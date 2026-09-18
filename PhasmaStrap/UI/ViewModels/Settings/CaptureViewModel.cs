@@ -181,6 +181,26 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool GpuEncoding
+        {
+            get => App.Settings.Prop.InstantReplayGpuEncoding;
+            set { App.Settings.Prop.InstantReplayGpuEncoding = value; ReplaySettingChanged(nameof(GpuEncoding)); OnPropertyChanged(nameof(SoundAvailable)); }
+        }
+
+        public bool SoundAvailable => App.Settings.Prop.InstantReplayGpuEncoding;
+
+        public bool RecordSound
+        {
+            get => App.Settings.Prop.InstantReplayAudio;
+            set { App.Settings.Prop.InstantReplayAudio = value; ReplaySettingChanged(nameof(RecordSound)); }
+        }
+
+        public bool RecordMicrophone
+        {
+            get => App.Settings.Prop.InstantReplayMicrophone;
+            set { App.Settings.Prop.InstantReplayMicrophone = value; ReplaySettingChanged(nameof(RecordMicrophone)); }
+        }
+
         // what the current choices cost, worked out for this PC's main screen
         public string ReplayEstimateText
         {
@@ -203,6 +223,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                 double bufferMb = InstantReplayRecorder.EstimateBufferBytes(width, height, fps, seconds, quality) / 1048576.0;
                 double clipMb = InstantReplayRecorder.BitrateFor(width, height, fps, quality) / 8.0 * seconds / 1048576.0;
+
+                if (App.Settings.Prop.InstantReplayGpuEncoding)
+                {
+                    // the buffer IS the finished video (plus one spare segment), and sound as plain PCM
+                    double videoMb = clipMb * (seconds + GpuReplayRecorder.SegmentSeconds) / seconds;
+                    double soundMb = App.Settings.Prop.InstantReplayAudio ? (seconds + GpuReplayRecorder.SegmentSeconds + 2) * 48000 * 4 / 1048576.0 * (App.Settings.Prop.InstantReplayMicrophone ? 2 : 1) : 0;
+
+                    return $"With these settings a fullscreen game records at {width} × {height}, {fps} fps, encoded on the graphics card as you play. The rolling buffer uses about {videoMb + soundMb:0} MB of RAM, a {seconds}s clip is about {clipMb:0} MB on disk and saves almost instantly. Clips start on a {GpuReplayRecorder.SegmentSeconds}-second boundary, so they can run up to {GpuReplayRecorder.SegmentSeconds}s longer than the length you picked - never shorter. Only what is on screen while Roblox is the window in front is recorded.";
+                }
 
                 string text = $"With these settings a fullscreen game records at {width} × {height}, {fps} fps. The rolling buffer uses about {Math.Min(bufferMb, InstantReplayRecorder.MaxBufferMegabytes):0} MB of RAM, and a full {seconds}s clip is about {clipMb:0} MB on disk.";
 
