@@ -11,7 +11,13 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="FastFlagEditorPage"
       Loaded="Page_Loaded">
-    <Grid Margin="0,0,14,14">
+    <!-- The whole editor scrolls. It used to be a fixed-height layout with the flag list in the
+         leftover space: expanding Presets pushed the list (and the rest of the page) off the bottom
+         with no way to reach it. The list keeps a usable minimum height and scrolls on its own; the
+         layout height is worked out in code-behind (UpdateLayoutHeight) because a star-sized row
+         inside a ScrollViewer would otherwise grow to fit every flag and switch virtualization off. -->
+    <ScrollViewer x:Name="PageScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" SizeChanged="PageScroller_SizeChanged">
+    <Grid x:Name="RootLayout" Margin="0,0,14,14" VerticalAlignment="Top" Height="700" LayoutUpdated="RootLayout_LayoutUpdated">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -140,7 +146,7 @@
 
         <ui:TextBox x:Name="SearchTextBox" Grid.Row="7" Margin="0,0,0,16" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />
 
-        <DataGrid Name="DataGrid" Grid.Row="8" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
+        <DataGrid Name="DataGrid" Grid.Row="8" MinHeight="320" controls:ScrollBubbling.Enabled="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CellEditEnding="DataGrid_CellEditEnding" CanUserReorderColumns="False">
             <DataGrid.Style>
                 <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                     <Setter Property="Background" Value="Transparent" />
@@ -193,4 +199,5 @@
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
+    </ScrollViewer>
 </ui:UiPage>

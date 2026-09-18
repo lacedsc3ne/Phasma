@@ -181,7 +181,10 @@ namespace PhasmaStrap
 
             using var interlock = new InterProcessLock("Settings");
 
-            if (interlock.IsAcquired)
+            // UI-test hook: a hidden background window may open next to the user's real one
+            bool uiTest = Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1";
+
+            if (interlock.IsAcquired || uiTest)
             {
                 bool showAlreadyRunningWarning = Process.GetProcessesByName(App.ProjectName).Length > 1;
 
