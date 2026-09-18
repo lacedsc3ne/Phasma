@@ -157,6 +157,18 @@
                     <ComboBox Width="140" ItemsSource="{Binding QualityOptions, Mode=OneTime}" SelectedItem="{Binding SelectedQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
 
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_EncodeGraphicsCard}" Description="{x:Static resources:Strings.Menu_Capture_FramesStayGPUAreEncodedAs}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=InstantReplayOption, Mode=OneWay}">
+                    <ui:ToggleSwitch IsChecked="{Binding GpuEncoding, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RecordGameSound}" Description="{x:Static resources:Strings.Menu_Capture_OnlyWhatRobloxItselfPlaysNot}" IsEnabled="{Binding SoundAvailable, Mode=OneWay}">
+                    <ui:ToggleSwitch IsChecked="{Binding RecordSound, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RecordMyMicrophoneToo}" Description="{x:Static resources:Strings.Menu_Capture_MixesDefaultMicrophoneIntoClipOff}" IsEnabled="{Binding SoundAvailable, Mode=OneWay}">
+                    <ui:ToggleSwitch IsChecked="{Binding RecordMicrophone, Mode=TwoWay}" />
+                </controls:OptionControl>
+
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_CopyNewClipsClipboard}" Description="{x:Static resources:Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied}">
                     <ui:ToggleSwitch IsChecked="{Binding CopyReplayToClipboard, Mode=TwoWay}" />
                 </controls:OptionControl>

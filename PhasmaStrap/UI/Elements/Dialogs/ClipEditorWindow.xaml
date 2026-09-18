@@ -41,7 +41,7 @@
             <Grid>
                 <Viewbox Stretch="Uniform" Margin="4">
                     <Grid x:Name="Surface" Width="1280" Height="720">
-                        <MediaElement x:Name="Player" Stretch="Fill" LoadedBehavior="Manual" UnloadedBehavior="Close" ScrubbingEnabled="True" IsMuted="True"
+                        <MediaElement x:Name="Player" Stretch="Fill" LoadedBehavior="Manual" UnloadedBehavior="Close" ScrubbingEnabled="True" IsMuted="False" Volume="0.6"
                                       MediaOpened="Player_MediaOpened" MediaFailed="Player_MediaFailed" />
                         <Image x:Name="StillImage" Stretch="Fill" Visibility="Collapsed" />
                         <Canvas x:Name="CropCanvas" Background="Transparent" ClipToBounds="True"

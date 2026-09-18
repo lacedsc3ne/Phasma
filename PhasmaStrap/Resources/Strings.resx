@@ -5266,4 +5266,22 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Rendering.WhereCurrentGameServerSuchAs" xml:space="preserve">
     <value>Where the current game server is, such as Frankfurt, DE. Also shown in the tray menu, with the ping. Takes effect from the next game you join.</value>
   </data>
+  <data name="Menu.Capture.EncodeGraphicsCard" xml:space="preserve">
+    <value>Encode on the graphics card</value>
+  </data>
+  <data name="Menu.Capture.FramesStayGPUAreEncodedAs" xml:space="preserve">
+    <value>Frames stay on the GPU and are encoded as you play: far less CPU use, a much smaller buffer, and clips save in a fraction of a second. If your graphics card can't do it, PhasmaStrap switches to the CPU recorder by itself. Takes effect from the next game you join.</value>
+  </data>
+  <data name="Menu.Capture.RecordGameSound" xml:space="preserve">
+    <value>Record game sound</value>
+  </data>
+  <data name="Menu.Capture.OnlyWhatRobloxItselfPlaysNot" xml:space="preserve">
+    <value>Only what Roblox itself plays - not Discord, music or anything else on your speakers. Needs encoding on the graphics card. Takes effect from the next game you join.</value>
+  </data>
+  <data name="Menu.Capture.RecordMyMicrophoneToo" xml:space="preserve">
+    <value>Record my microphone too</value>
+  </data>
+  <data name="Menu.Capture.MixesDefaultMicrophoneIntoClipOff" xml:space="preserve">
+    <value>Mixes your default microphone into the clip. Off unless you switch it on. Takes effect from the next game you join.</value>
+  </data>
 </root>
