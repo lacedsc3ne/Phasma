@@ -145,11 +145,11 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FramerateBufferPercentage_Title}">
-                    <ui:NumberBox Width="140" Min="0" Max="100" Value="{Binding FPSBufferPercentage, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="100" Value="{Binding FPSBufferPercentage, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FramerateLimitFFlag_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FramerateLimitFFlag_Description}">
-                    <ui:NumberBox Width="140" Min="0" Max="2000" Value="{Binding FramerateLimit, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="2000" Value="{Binding FramerateLimit, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MinimalRendering_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_MinimalRendering_Description}">
@@ -181,7 +181,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MeshQualityLevel_Title}" Visibility="{Binding MeshQualityEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ui:NumberBox Width="140" Min="0" Max="3" Value="{Binding MeshQuality, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="3" Value="{Binding MeshQuality, Mode=TwoWay}" />
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
@@ -329,7 +329,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ShadersRoughnessClamp_Title}">
-                    <ui:NumberBox Width="160" Min="-64000000" Max="0" Value="{Binding ShadersLimit, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="160" Min="-64000000" Max="0" Value="{Binding ShadersLimit, Mode=TwoWay}" />
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
@@ -343,11 +343,11 @@
             </ui:CardExpander.Header>
             <StackPanel>
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MinGrassDistance_Title}">
-                    <ui:NumberBox Width="140" Min="0" Max="5000" Value="{Binding MinGrassDistance, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="5000" Value="{Binding MinGrassDistance, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MaxGrassDistance_Title}">
-                    <ui:NumberBox Width="140" Min="0" Max="5000" Value="{Binding MaxGrassDistance, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="5000" Value="{Binding MaxGrassDistance, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_GrassMovementFactor_Title}">
@@ -444,11 +444,11 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MtuSize_Title}">
-                    <ui:NumberBox Width="140" Min="0" Max="1500" Value="{Binding MtuSize, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="1500" Value="{Binding MtuSize, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ResendBufferArrayLength_Title}">
-                    <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding BufferArrayLength, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="160" Min="0" Max="2147483647" Value="{Binding BufferArrayLength, Mode=TwoWay}" />
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
@@ -473,7 +473,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_UIFontSizePadding_Title}">
-                    <ui:NumberBox Width="140" Min="1" Max="20" Value="{Binding FontSize, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="1" Max="20" Value="{Binding FontSize, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_LanguageSelector_Title}">
@@ -647,7 +647,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_HideGUIGroup_Description}">
-                    <ui:NumberBox Width="160" Min="0" Max="2147483647" Value="{Binding HideGUI, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="160" Min="0" Max="2147483647" Value="{Binding HideGUI, Mode=TwoWay}" />
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>

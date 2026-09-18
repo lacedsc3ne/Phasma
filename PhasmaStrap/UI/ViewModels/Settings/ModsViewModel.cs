@@ -909,6 +909,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // on HomepageBackgroundPreviewWindow and Integrations.Overlays.OverlayCompositor for why.
         #region Overlays - homepage background
 
+        public bool TopBarPhasmaLogo
+        {
+            get => App.Settings.Prop.TopBarPhasmaLogo;
+            set { App.Settings.Prop.TopBarPhasmaLogo = value; OnPropertyChanged(nameof(TopBarPhasmaLogo)); }
+        }
+
         public bool HomepageBackgroundEnabled
         {
             get => App.Settings.Prop.HomepageBackgroundEnabled;

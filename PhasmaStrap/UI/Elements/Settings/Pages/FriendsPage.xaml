@@ -31,7 +31,7 @@
             </controls:OptionControl>
             <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_CheckEvery}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal">
-                    <ui:NumberBox Width="100" Min="20" Max="600" Value="{Binding PollSeconds, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="100" Min="20" Max="600" Value="{Binding PollSeconds, Mode=TwoWay}" />
                     <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{x:Static resources:Strings.Menu_Friends_Seconds}" />
                 </StackPanel>
             </controls:OptionControl>

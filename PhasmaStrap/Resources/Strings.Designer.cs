@@ -14714,5 +14714,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlagEditor.RobloxOnlyReadsFastFlagsWhenStarts", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PhasmaStrap logo on the in-game top bar.
+        /// </summary>
+        public static string Menu_Mods_PhasmaStrapLogoGameTopBar {
+            get {
+                return ResourceManager.GetString("Menu.Mods.PhasmaStrapLogoGameTopBar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the PhasmaStrap mark instead of the Roblox logo on the round menu button at the top left of every game. Applied wh.
+        /// </summary>
+        public static string Menu_Mods_ShowsPhasmaStrapMarkInsteadRobloxLogo {
+            get {
+                return ResourceManager.GetString("Menu.Mods.ShowsPhasmaStrapMarkInsteadRobloxLogo", resourceCulture);
+            }
+        }
     }
 }

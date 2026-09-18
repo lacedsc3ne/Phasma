@@ -72,11 +72,11 @@
                 </ui:CardExpander.Header>
                 <StackPanel>
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_FrameRateLimit_Description}">
-                        <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding FrameRateLimit, Mode=TwoWay}" />
+                        <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="1000" Value="{Binding FrameRateLimit, Mode=TwoWay}" />
                     </controls:OptionControl>
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BackgroundFrameRateLimit_Description}">
-                        <ui:NumberBox Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
+                        <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="1000" Value="{Binding BackgroundFrameRateLimit, Mode=TwoWay}" />
                     </controls:OptionControl>
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Title}" Description="{x:Static resources:Strings.Menu_Nvidia_BenchmarkOverlay_Description}">

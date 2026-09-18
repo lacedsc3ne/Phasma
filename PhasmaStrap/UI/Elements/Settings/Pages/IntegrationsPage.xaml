@@ -244,7 +244,7 @@
                             <CheckBox Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Integrations_RunMinimized}" IsChecked="{Binding SelectedCustomIntegration.RunMinimized}" />
 
                             <TextBlock Margin="0,8,0,0" Text="{x:Static resources:Strings.Menu_Integrations_LaunchDelayMs}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                            <ui:NumberBox Margin="0,4,0,0" Min="0" Max="30000" Value="{Binding SelectedCustomIntegration.Delay}" />
+                            <ui:NumberBox IntegersOnly="True" Margin="0,4,0,0" Min="0" Max="30000" Value="{Binding SelectedCustomIntegration.Delay}" />
                         </StackPanel>
                         <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Text="{x:Static resources:Strings.Menu_Integrations_Custom_NoneSelected}" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock.Style>
