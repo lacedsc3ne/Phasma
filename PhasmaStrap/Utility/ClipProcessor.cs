@@ -312,6 +312,164 @@ namespace PhasmaStrap.Utility
             }
         }
 
+        // Same trim / crop / speed as Export, written as an animated GIF (see GifWriter). Source
+        // frames are picked on a fixed grid of the GIF's frame rate; each one is held until the
+        // next picked frame really appears, so a clip with uneven timing keeps its pacing.
+        public static void ExportGif(string source, string destination, ClipEditOptions options, GifExportOptions gif, Action<double>? progress = null, CancellationToken cancel = default)
+        {
+            Startup();
+            bool finished = false;
+
+            try
+            {
+                using Reader reader = Reader.Open(source);
+                ClipInfo info = reader.Info;
+
+                double speed = Math.Clamp(options.Speed, 0.25, 4.0);
+                long startTicks = Math.Max(0, options.Start.Ticks);
+                long endTicks = options.End == TimeSpan.MaxValue ? long.MaxValue : options.End.Ticks;
+                if (endTicks <= startTicks)
+                    throw new ArgumentException("The trim end has to be after the trim start.");
+
+                int cropX = 0, cropY = 0, cropW = info.Width, cropH = info.Height;
+                if (options.CropWidth > 0 && options.CropHeight > 0)
+                {
+                    cropX = Math.Clamp(options.CropX, 0, info.Width - 2);
+                    cropY = Math.Clamp(options.CropY, 0, info.Height - 2);
+                    cropW = Math.Clamp(options.CropWidth, 2, info.Width - cropX);
+                    cropH = Math.Clamp(options.CropHeight, 2, info.Height - cropY);
+                }
+
+                int outW = cropW, outH = cropH;
+                if (gif.MaxWidth > 0 && cropW > gif.MaxWidth)
+                {
+                    outW = gif.MaxWidth;
+                    outH = Math.Max(1, (int)Math.Round(cropH * (double)outW / cropW));
+                }
+
+                int fps = Math.Clamp(gif.Fps, 1, 50);
+                long interval = 10_000_000 / fps;
+                long sourceSpan = Math.Min(endTicks, info.Duration.Ticks) - startTicks;
+
+                Log?.Invoke($"ExportGif {source} -> {destination}: {startTicks / 1e7:0.00}s-{(endTicks == long.MaxValue ? info.Duration.TotalSeconds : endTicks / 1e7):0.00}s crop={cropX},{cropY} {cropW}x{cropH} -> {outW}x{outH} speed={speed} fps={fps} dither={gif.Dither}");
+
+                byte[] full = new byte[cropW * cropH * 4];
+                byte[] scaled = outW == cropW && outH == cropH ? full : new byte[outW * outH * 4];
+                byte[] pending = new byte[outW * outH * 4];
+                long pendingTime = -1;
+                long nextPick = 0;
+                long writtenCs = 0; // centiseconds handed out so far - rounding never accumulates
+
+                using (var file = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))
+                using (var writer = new GifWriter(file, outW, outH, gif.Dither))
+                {
+                    void Flush(long untilTime)
+                    {
+                        long targetCs = (long)Math.Round(untilTime / 100_000.0);
+                        int delay = (int)Math.Max(2, targetCs - writtenCs);
+                        writer.AddFrame(pending, delay);
+                        writtenCs += delay;
+                    }
+
+                    while (reader.Read(out IMFSample? sample, out long ts))
+                    {
+                        cancel.ThrowIfCancellationRequested();
+
+                        if (sample is null)
+                            continue;
+
+                        using (sample)
+                        {
+                            if (ts < startTicks)
+                                continue;
+                            if (ts >= endTicks)
+                                break;
+
+                            long outTime = (long)((ts - startTicks) / speed);
+                            if (outTime < nextPick)
+                                continue;
+
+                            while (nextPick <= outTime)
+                                nextPick += interval;
+
+                            if (pendingTime >= 0)
+                                Flush(outTime);
+
+                            reader.CopyFrame(sample, cropX, cropY, cropW, cropH, full);
+                            if (!ReferenceEquals(scaled, full))
+                                Downscale(full, cropW, cropH, scaled, outW, outH);
+
+                            Buffer.BlockCopy(scaled, 0, pending, 0, pending.Length);
+                            pendingTime = outTime;
+
+                            if (sourceSpan > 0)
+                                progress?.Invoke(Math.Clamp((double)(ts - startTicks) / sourceSpan, 0, 1));
+                        }
+                    }
+
+                    if (pendingTime < 0)
+                        throw new InvalidOperationException("There are no frames between the trim start and end.");
+
+                    // the last frame is held for one normal frame time
+                    Flush(pendingTime + interval);
+
+                    Log?.Invoke($"ExportGif wrote {writer.FrameCount} frame(s), {writtenCs / 100.0:0.00}s");
+                }
+
+                finished = true;
+                progress?.Invoke(1);
+            }
+            finally
+            {
+                Shutdown();
+
+                if (!finished)
+                {
+                    try { if (File.Exists(destination)) File.Delete(destination); } catch { }
+                }
+            }
+        }
+
+        // area-average downscale of top-down BGRA (a plain point or bilinear sample shimmers on
+        // game footage when shrinking by 2-4x)
+        private static void Downscale(byte[] source, int sw, int sh, byte[] destination, int dw, int dh)
+        {
+            int[] x0 = new int[dw + 1];
+            for (int x = 0; x <= dw; x++)
+                x0[x] = (int)((long)x * sw / dw);
+
+            for (int y = 0; y < dh; y++)
+            {
+                int top = (int)((long)y * sh / dh);
+                int bottom = Math.Max(top + 1, (int)((long)(y + 1) * sh / dh));
+
+                for (int x = 0; x < dw; x++)
+                {
+                    int left = x0[x];
+                    int right = Math.Max(left + 1, x0[x + 1]);
+
+                    int b = 0, g = 0, r = 0;
+                    for (int sy = top; sy < bottom; sy++)
+                    {
+                        int i = (sy * sw + left) * 4;
+                        for (int sx = left; sx < right; sx++, i += 4)
+                        {
+                            b += source[i];
+                            g += source[i + 1];
+                            r += source[i + 2];
+                        }
+                    }
+
+                    int n = (bottom - top) * (right - left);
+                    int o = (y * dw + x) * 4;
+                    destination[o] = (byte)(b / n);
+                    destination[o + 1] = (byte)(g / n);
+                    destination[o + 2] = (byte)(r / n);
+                    destination[o + 3] = 255;
+                }
+            }
+        }
+
         // ------------------------------------------------------------------ reader
 
         private sealed class Reader : IDisposable

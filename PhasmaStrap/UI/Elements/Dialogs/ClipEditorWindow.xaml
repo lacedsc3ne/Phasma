@@ -102,7 +102,7 @@
                     <ui:Button x:Name="ClearCropButton" Style="{StaticResource ToolButton}" Icon="DismissCircle24" Content="Clear crop" Click="ClearCrop_Click" Visibility="Collapsed" />
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,14,0">
                     <ui:SymbolIcon Symbol="TopSpeed24" Margin="0,0,6,0" VerticalAlignment="Center" />
                     <TextBlock Text="Speed" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     <ComboBox x:Name="SpeedBox" Width="96" SelectionChanged="SpeedBox_SelectionChanged" ToolTip="Slow motion or fast forward - the preview plays at this speed and the saved clip keeps it">
@@ -113,6 +113,26 @@
                         <ComboBoxItem Content="2×" Tag="2" />
                         <ComboBoxItem Content="4×" Tag="4" />
                     </ComboBox>
+                </StackPanel>
+
+                <StackPanel x:Name="GifTools" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="Gif24" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <ComboBox x:Name="GifWidthBox" Width="104" Margin="0,0,6,0" ToolTip="Width of the GIF - smaller means a much smaller file">
+                        <ComboBoxItem Content="320 px" Tag="320" />
+                        <ComboBoxItem Content="480 px" Tag="480" />
+                        <ComboBoxItem Content="640 px" Tag="640" IsSelected="True" />
+                        <ComboBoxItem Content="800 px" Tag="800" />
+                        <ComboBoxItem Content="Full size" Tag="0" />
+                    </ComboBox>
+                    <ComboBox x:Name="GifFpsBox" Width="92" Margin="0,0,6,0" ToolTip="Frames per second of the GIF - fewer means a smaller file">
+                        <ComboBoxItem Content="10 fps" Tag="10" />
+                        <ComboBoxItem Content="15 fps" Tag="15" IsSelected="True" />
+                        <ComboBoxItem Content="20 fps" Tag="20" />
+                        <ComboBoxItem Content="25 fps" Tag="25" />
+                        <ComboBoxItem Content="33 fps" Tag="33" />
+                    </ComboBox>
+                    <CheckBox x:Name="GifDitherBox" Content="Smooth colours" Margin="0,0,8,0" VerticalAlignment="Center" Focusable="False" ToolTip="Dither gradients such as skies so they don't band - the file gets around a third bigger" />
+                    <ui:Button x:Name="GifButton" Style="{StaticResource ToolButton}" Icon="ArrowExportLtr24" Content="Export GIF" Click="ExportGif_Click" ToolTip="Save the selection as an animated GIF next to the clip (keeps the trim, crop and speed) and copy it, ready to paste into a chat" />
                 </StackPanel>
             </WrapPanel>
         </Border>

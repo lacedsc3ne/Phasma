@@ -563,6 +563,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         {
             _busy = busy;
             FooterButtons.IsEnabled = !busy;
+            GifTools.IsEnabled = !busy;
             Timeline.IsEnabled = !busy;
             ExportProgress.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
             ExportProgress.Value = 0;
@@ -697,6 +698,58 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 {
                     await Task.Delay(150);
                 }
+            }
+        }
+
+        // ---------------------------------------------------------------- GIF
+
+        private static int TagOf(ComboBox box, int fallback) =>
+            box.SelectedItem is ComboBoxItem { Tag: string tag } && int.TryParse(tag, out int value) ? value : fallback;
+
+        private async void ExportGif_Click(object sender, RoutedEventArgs e)
+        {
+            if (_busy || _info is null)
+                return;
+
+            ClipEditOptions options = BuildOptions();
+            var gif = new GifExportOptions
+            {
+                MaxWidth = TagOf(GifWidthBox, 640),
+                Fps = TagOf(GifFpsBox, 15),
+                Dither = GifDitherBox.IsChecked == true,
+            };
+
+            string directory = System.IO.Path.GetDirectoryName(_path)!;
+            string stem = System.IO.Path.GetFileNameWithoutExtension(_path);
+            string destination = System.IO.Path.Combine(directory, stem + ".gif");
+            for (int n = 2; File.Exists(destination); n++)
+                destination = System.IO.Path.Combine(directory, $"{stem}_{n}.gif");
+
+            SetBusy(true);
+            UpdateStatus("making the GIF...");
+
+            try
+            {
+                await Task.Run(() => ClipProcessor.ExportGif(_path, destination, options, gif,
+                    progress => Dispatcher.BeginInvoke(new Action(() => ExportProgress.Value = progress))));
+
+                double megabytes = new FileInfo(destination).Length / 1048576.0;
+
+                ClipboardShare.Log ??= message => App.Logger.WriteLine("ClipboardShare", message);
+                bool copied = ClipboardShare.CopyFile(destination);
+
+                Saved = true;
+                App.Logger.WriteLine(LOG_IDENT, $"Exported {destination} ({megabytes:0.0} MB)");
+                SetBusy(false);
+
+                string note = megabytes > 10 ? " - over Discord's 10 MB limit; try a smaller width, fewer fps or a shorter trim" : "";
+                UpdateStatus($"saved {System.IO.Path.GetFileName(destination)} ({megabytes:0.0} MB){(copied ? ", copied - paste it with Ctrl+V" : "")}{note}");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"GIF export failed: {ex}");
+                SetBusy(false);
+                UpdateStatus($"couldn't make the GIF: {ex.Message}");
             }
         }
 
