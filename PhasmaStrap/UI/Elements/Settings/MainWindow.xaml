@@ -240,6 +240,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Capture_Capture}" PageType="{x:Type pages:CapturePage}" Icon="Camera24" PageTag="capture" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Accounts_Accounts}" PageType="{x:Type pages:AccountsPage}" Icon="PersonAccounts24" PageTag="accounts" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Friends_Friends}" PageType="{x:Type pages:FriendsPage}" Icon="People24" PageTag="friends" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Integrations_Tabs_Activity}" PageType="{x:Type pages:ActivityPage}" Icon="Timeline24" PageTag="activity" />
 
                     <ui:NavigationHeader Text="{x:Static resources:Strings.Menu_MainWindow_Configuration}" Icon="Settings24" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlagSettings_Title}" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />

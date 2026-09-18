@@ -1098,6 +1098,8 @@ namespace PhasmaStrap.Integrations.Overlays
             if (window <= 0.0)
                 return;
             double fps = frames / window;
+            FpsFeed.Report(FpsFeed.Source.Hud, fps);
+
             try
             {
                 var labels = new List<string> { "FPS" };

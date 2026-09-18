@@ -5284,4 +5284,52 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Capture.MixesDefaultMicrophoneIntoClipOff" xml:space="preserve">
     <value>Mixes your default microphone into the clip. Off unless you switch it on. Takes effect from the next game you join.</value>
   </data>
+  <data name="Menu.Activity.SessionsHowMuchYouPlayWho" xml:space="preserve">
+    <value>Your sessions, how much you play and who you played with. Everything here is kept on this PC only.</value>
+  </data>
+  <data name="Menu.Activity.Timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="Menu.Activity.NoSessionsYetTheyAppearHere" xml:space="preserve">
+    <value>No sessions yet - they appear here after you have played.</value>
+  </data>
+  <data name="Menu.Activity.FPSLineNeedsSomethingWatchesGame" xml:space="preserve">
+    <value>The FPS line needs something that watches the game's frames while you play: the overlay HUD or Instant Replay. Without either, a visit simply has no FPS reading.</value>
+  </data>
+  <data name="Menu.Activity.Playtime" xml:space="preserve">
+    <value>Playtime</value>
+  </data>
+  <data name="Menu.Activity.Last14Days" xml:space="preserve">
+    <value>Last 14 days</value>
+  </data>
+  <data name="Menu.Activity.Last12Weeks" xml:space="preserve">
+    <value>Last 12 weeks</value>
+  </data>
+  <data name="Menu.Activity.ByGame" xml:space="preserve">
+    <value>By game</value>
+  </data>
+  <data name="Menu.Activity.NothingPlayedPeriod" xml:space="preserve">
+    <value>Nothing played in this period.</value>
+  </data>
+  <data name="Menu.Activity.Played" xml:space="preserve">
+    <value>Played with</value>
+  </data>
+  <data name="Menu.Activity.NoteWhichFriendsShareMyServer" xml:space="preserve">
+    <value>Note which friends share my server</value>
+  </data>
+  <data name="Menu.Activity.WhileYouAreGamePhasmaStrapAsks" xml:space="preserve">
+    <value>While you are in a game, PhasmaStrap asks Roblox every 90 seconds where your friends are (with your login, read-only) and writes down the ones on your server. Only friends whose privacy settings let you join them can be recognised. Takes effect from the next time Roblox starts.</value>
+  </data>
+  <data name="Menu.Activity.KeepSessionHistory" xml:space="preserve">
+    <value>Keep a session history</value>
+  </data>
+  <data name="Menu.Activity.WritesDownEachServerYouJoin" xml:space="preserve">
+    <value>Writes down each server you join, how long you stayed, its region and FPS readings. Without it this page stays empty. Takes effect from the next time Roblox starts.</value>
+  </data>
+  <data name="Menu.Activity.DeleteHistory" xml:space="preserve">
+    <value>Delete the history</value>
+  </data>
+  <data name="Menu.Activity.RemovesEveryRecordedSessionScreenshotsClips" xml:space="preserve">
+    <value>Removes every recorded session. Screenshots, clips and the per-game totals on the Home page stay.</value>
+  </data>
 </root>

@@ -22,6 +22,15 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Action, Strings.Menu_Accounts_ImportSeveralAtOnceInstead, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_ImportAccountFromItsROBLOSECURITYCookie, "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Accounts_BulkImportFromCookies, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Accounts_ImportAll, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_BulkImportFromCookies, "", null, ""),
+            // ---- ActivityPage.xaml (ActivityPage) ----
+            new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Activity_Timeline, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Activity_Playtime, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Activity_Played, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Activity_NoteWhichFriendsShareMyServer, Strings.Menu_Activity_WhileYouAreGamePhasmaStrapAsks, typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, Strings.Menu_Activity_Played, "", "", null, ""),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_Notifications_History_Title, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Activity_KeepSessionHistory, Strings.Menu_Activity_WritesDownEachServerYouJoin, typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", Strings.Menu_Notifications_History_Title, "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Activity_DeleteHistory, Strings.Menu_Activity_RemovesEveryRecordedSessionScreenshotsClips, typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", Strings.Menu_Notifications_History_Title, "", null, ""),
             // ---- AppearancePage.xaml (AppearancePage) ----
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Appearance_Application_Title, "", typeof(AppearancePage), Strings.Menu_Appearance_Title, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Appearance_Application_Title, "", typeof(AppearancePage), Strings.Menu_Appearance_Title, Strings.Menu_Appearance_Application_Title, "", "", null, ""),
