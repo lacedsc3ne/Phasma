@@ -244,6 +244,12 @@ namespace PhasmaStrap.Models.Persistable
         public int InstantReplayFps { get; set; } = 30;
         public int InstantReplayMaxHeight { get; set; } = 0;
 
+        // put a fresh capture on the clipboard so it can be pasted straight into a chat
+        // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
+        // was copied a few seconds after the hotkey, which is easy to be surprised by)
+        public bool CaptureCopyScreenshotToClipboard { get; set; } = true;
+        public bool CaptureCopyReplayToClipboard { get; set; } = false;
+
         // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client, shortly
         // after launch - see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
         public bool DisableRobloxCrashHandler { get; set; } = false;

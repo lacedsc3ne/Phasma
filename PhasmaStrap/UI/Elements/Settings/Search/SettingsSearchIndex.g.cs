@@ -98,6 +98,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_TakeScreenshotNow, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_CopyNewScreenshotsClipboard, Strings.Menu_Capture_ScreenshotTakenHotkeyAlsoCopiedSo, typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenHotkeys, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_NoScreenshotsYet, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_InstantReplay, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
@@ -106,6 +107,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_FrameRate, Strings.Menu_Capture_HowManyFramesPerSecondClip, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Performance_InGameResolutionMode_Title, Strings.Menu_Capture_NativeRecordsGameAtExactlySize, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_Quality, Strings.Menu_Capture_PictureQualitySavedClipHigherMeans, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_CopyNewClipsClipboard, Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             // ---- ChannelPage.xaml (ChannelPage) ----
