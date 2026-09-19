@@ -382,6 +382,43 @@ namespace PhasmaStrap.Integrations
             }
         }
 
+        // The same search PickBestCoreAsync does, but handing back EVERY server it could place on
+        // the map (nearest first) instead of choosing one - for the join-time server picker, where
+        // the choosing is the player's. Blocked datacenters are left out; nothing else is filtered.
+        public static async Task<List<MatchmakerCandidate>> ListCandidatesAsync(long placeId, int maxCandidates, CancellationToken token)
+        {
+            string? cookie = RobloxCookie.Get();
+            if (string.IsNullOrEmpty(cookie))
+            {
+                App.Logger.WriteLine(LOG_IDENT, "No Roblox cookie found - the server picker needs you to be signed in");
+                return new List<MatchmakerCandidate>();
+            }
+
+            HashSet<string> blocked = GetBlockedDatacenters();
+            bool preferEmpty = App.Settings.Prop.MatchmakerPreferEmpty;
+
+            Task<UserGeo?> geoTask = GetUserGeoAsync(token);
+            Task<List<ServerListItem>> poolTask = ListPublicServersAsync(placeId, cookie, MaxServerListPages, preferEmpty, token);
+            Task csrfTask = PrimeCsrfAsync(placeId, cookie, token);
+            await Task.WhenAll(geoTask, poolTask, csrfTask);
+
+            UserGeo? geo = await geoTask;
+            List<ServerListItem> pool = await poolTask;
+            if (geo is null || pool.Count == 0)
+                return new List<MatchmakerCandidate>();
+
+            int budget = Math.Clamp(maxCandidates, MinCandidateCount, MaxCandidateCount);
+            List<ServerListItem> probeList = pool.Count > budget ? Stratify(pool, budget) : pool;
+
+            List<MatchmakerCandidate> probed = await ProbeAsync(placeId, probeList, cookie, geo, "", blocked, preferEmpty, EstimateRttMs(NearestDatacenterKm(geo)), token);
+
+            return probed
+                .Where(c => !blocked.Contains(DatacenterKey(c.Datacenter)))
+                .OrderBy(c => c.EstimatedPingMs)
+                .ThenByDescending(c => c.Playing)
+                .ToList();
+        }
+
         private static async Task<MatchmakerCandidate?> PickBestCoreAsync(long placeId, IEnumerable<string>? exclude, int maxCandidates, CancellationToken token)
         {
             var stageClock = System.Diagnostics.Stopwatch.StartNew();

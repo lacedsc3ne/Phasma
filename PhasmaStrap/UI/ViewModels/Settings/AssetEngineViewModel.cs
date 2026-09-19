@@ -396,6 +396,44 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(PacksEmptyVisibility));
         }
 
+        // ------------------------------------------------------------------ join-time server picker
+
+        private string _pickerStatus = "";
+        public string PickerStatus { get => _pickerStatus; private set { _pickerStatus = value; OnPropertyChanged(nameof(PickerStatus)); } }
+
+        public bool ServerPickerEnabled
+        {
+            get => App.Settings.Prop.JoinServerPickerEnabled;
+            set
+            {
+                App.Settings.Prop.JoinServerPickerEnabled = value;
+                App.Settings.Save();
+
+                // the hosts file has to gain (or lose) gamejoin.roblox.com - one elevation prompt
+                if (App.Settings.Prop.NetworkingProxyEnabled && !HostsFileManager.IsBlockCurrent())
+                {
+                    bool ok = HostsElevation.Apply(true, App.Settings.Prop.BlockRobloxTelemetry);
+
+                    if (!ok)
+                    {
+                        App.Settings.Prop.JoinServerPickerEnabled = !value;
+                        App.Settings.Save();
+                        PickerStatus = "The hosts file could not be updated (the Windows prompt was declined), so nothing was changed.";
+                    }
+                    else
+                    {
+                        PickerStatus = value ? "On. The next game you join from inside Roblox shows the picker." : "Off. Joins go straight to Roblox again.";
+                    }
+                }
+                else
+                {
+                    PickerStatus = App.Settings.Prop.NetworkingProxyEnabled ? "" : "Saved. It starts working once the proxy is switched on (Networking page).";
+                }
+
+                OnPropertyChanged(nameof(ServerPickerEnabled));
+            }
+        }
+
         // ------------------------------------------------------------------ traffic
 
         public bool TrafficEnabled

@@ -268,6 +268,11 @@ namespace PhasmaStrap.Models.Persistable
         public bool SwapPacksEnabled { get; set; } = true;
         public bool TrafficReportEnabled { get; set; } = true;
 
+        // Join-time server picker (Networking.JoinPickerPolicy): holds the game's join request and
+        // lets the player choose the server. Needs gamejoin.roblox.com redirected to the proxy, which
+        // only happens while this is on.
+        public bool JoinServerPickerEnabled { get; set; } = false;
+
         // Diagnostics > Crashes: when Roblox closes without its normal shutdown, look at its log and
         // at Windows' event logs for the reason. Local and read-only.
         public bool CrashAnalyzerEnabled { get; set; } = true;
