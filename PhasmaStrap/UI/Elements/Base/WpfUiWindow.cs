@@ -12,7 +12,10 @@ namespace PhasmaStrap.UI.Elements.Base
 {
     public abstract class WpfUiWindow : UiWindow
     {
-        private readonly IThemeService _themeService = new ThemeService();
+        private static readonly IThemeService _themeService = new ThemeService();
+
+        // what ApplyAppTheme last put in place - see there
+        private static string? _appliedThemeKey;
 
         // Phasma brand accent (coral-red), matches PhasmaMacro's --accent
         private static readonly Color PhasmaAccent = Color.FromRgb(0xF4, 0x55, 0x4B);
@@ -42,7 +45,10 @@ namespace PhasmaStrap.UI.Elements.Base
 
         public WpfUiWindow()
         {
-            ApplyTheme();
+            // only when something changed: a dialog opening must not make the settings window
+            // re-resolve every resource it has (that was a visible freeze on every dialog)
+            ApplyAppTheme(force: false);
+            ApplyWindowTheme();
 
             // FontFamily is an inherited DP, so setting it here cascades to every
             // child control that doesn't set its own FontFamily explicitly (e.g. icon glyphs)
@@ -70,9 +76,26 @@ namespace PhasmaStrap.UI.Elements.Base
             _entranceTranslate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(18, 0, TimeSpan.FromSeconds(0.35)) { EasingFunction = scaleEase });
         }
 
+        /// <summary>Re-applies the theme (app-wide resources, then this window's own layers).</summary>
         public void ApplyTheme()
         {
+            ApplyAppTheme(force: true);
+            ApplyWindowTheme();
+        }
+
+        // The theme lives in Application.Current.Resources. Replacing those dictionaries makes EVERY
+        // open window re-resolve every DynamicResource it uses - for the settings window, with all
+        // its pages, that takes long enough to see. So it is only done when the theme or colour
+        // theme choice changed since last time, or when a theme edit forces it.
+        private static void ApplyAppTheme(bool force)
+        {
             const int customThemeIndex = 2; // index for CustomTheme merged dictionary
+
+            string key = $"{App.Settings.Prop.Theme.GetFinal()}|{App.Settings.Prop.CustomColorThemeEnabled}";
+            if (!force && key == _appliedThemeKey)
+                return;
+
+            _appliedThemeKey = key;
 
             _themeService.SetTheme(App.Settings.Prop.Theme.GetFinal() == Enums.Theme.Dark ? ThemeType.Dark : ThemeType.Light);
             _themeService.SetAccent(PhasmaAccent);
@@ -82,7 +105,10 @@ namespace PhasmaStrap.UI.Elements.Base
             Application.Current.Resources.MergedDictionaries[customThemeIndex] = dict;
 
             ApplyAppColorTheme();
+        }
 
+        private void ApplyWindowTheme()
+        {
             if (_tintLayer is not null)
                 _tintLayer.Background = CurrentGlassTint;
 
@@ -117,7 +143,7 @@ namespace PhasmaStrap.UI.Elements.Base
             Wpf.Ui.Appearance.Accent.Apply(accent, Wpf.Ui.Appearance.Theme.GetAppTheme());
         }
 
-        private void ApplyAppColorTheme()
+        private static void ApplyAppColorTheme()
         {
             var dictionaries = Application.Current.Resources.MergedDictionaries;
 
@@ -143,10 +169,13 @@ namespace PhasmaStrap.UI.Elements.Base
         /// </summary>
         public static void ApplyThemeToAllOpenWindows()
         {
+            // the app-wide part once, not once per window
+            ApplyAppTheme(force: true);
+
             foreach (Window window in Application.Current.Windows)
             {
                 if (window is WpfUiWindow wpfUiWindow)
-                    wpfUiWindow.ApplyTheme();
+                    wpfUiWindow.ApplyWindowTheme();
             }
         }
 
