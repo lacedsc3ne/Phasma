@@ -32,6 +32,15 @@ namespace PhasmaStrap.Networking
         public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform, Func<ProxiedRequest, ProxiedResponse?>? TryServeFromCache)> InterceptedHosts
             = new(StringComparer.OrdinalIgnoreCase);
 
+        // hostname -> a handler that may answer a request entirely by itself (null = not mine, carry
+        // on with the transforms above). Asynchronous, because what it does is download and cache
+        // asset content (AssetContentService) - the synchronous cache hook is no place for that.
+        public static readonly Dictionary<string, Func<ProxiedRequest, CancellationToken, Task<ProxiedResponse?>>> AsyncHandlers
+            = new(StringComparer.OrdinalIgnoreCase);
+
+        // how long a kept-alive connection may sit idle before the proxy hangs up
+        private const int KeepAliveIdleMs = 30_000;
+
         // headers that describe THIS hop's connection rather than the request itself; forwarding
         // them verbatim would either be meaningless upstream or (Accept-Encoding, Expect)
         // actively break the body handling below
@@ -173,42 +182,90 @@ namespace PhasmaStrap.Networking
                     return;
                 }
 
-                ProxiedRequest? request = await ReadRequestAsync(new RawHttpReader(sslStream), sslStream, sniHost, token);
-                if (request is null)
-                    return;
+                // One reader for the life of the connection: it may have read ahead into the next
+                // request. Ordinary (API) requests are answered and the connection closed, as
+                // always. Asset requests keep it open - a game loads thousands of small assets,
+                // and a fresh TLS handshake for each would cost more than the download.
+                var reader = new RawHttpReader(sslStream);
+                bool keepAlive;
+                bool first = true;
 
-                var (requestTransform, responseTransform, tryServeFromCache) = InterceptedHosts[sniHost];
-
-                if (requestTransform is not null)
+                do
                 {
-                    byte[]? transformed = requestTransform(request);
-                    if (transformed is not null)
-                        request = request with { Body = transformed };
-                }
+                    keepAlive = false;
 
-                ProxiedResponse? response = tryServeFromCache?.Invoke(request);
-                bool servedFromCache = response is not null;
+                    ProxiedRequest? request;
+                    if (first)
+                    {
+                        request = await ReadRequestAsync(reader, sslStream, sniHost, token);
+                    }
+                    else
+                    {
+                        using var idle = CancellationTokenSource.CreateLinkedTokenSource(token);
+                        idle.CancelAfter(KeepAliveIdleMs);
 
-                if (response is null)
-                {
-                    response = await ForwardToUpstreamAsync(request, token);
+                        try
+                        {
+                            request = await ReadRequestAsync(reader, sslStream, sniHost, idle.Token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
+                    }
+
+                    first = false;
+
+                    if (request is null)
+                        return;
+
+                    if (AsyncHandlers.TryGetValue(sniHost, out var handler))
+                    {
+                        ProxiedResponse? handled = await handler(request, token);
+                        if (handled is not null)
+                        {
+                            keepAlive = !(request.Headers.TryGetValue("Connection", out string? connection) && connection.Contains("close", StringComparison.OrdinalIgnoreCase));
+
+                            ProxyTrafficLog.Record(request.Host, request.Method, request.Path.Length > 60 ? request.Path[..60] + "..." : request.Path, handled.StatusCode, false, handled.Body.Length);
+                            await WriteResponseAsync(sslStream, handled, request.Method, keepAlive, token);
+                            continue;
+                        }
+                    }
+
+                    var (requestTransform, responseTransform, tryServeFromCache) = InterceptedHosts[sniHost];
+
+                    if (requestTransform is not null)
+                    {
+                        byte[]? transformed = requestTransform(request);
+                        if (transformed is not null)
+                            request = request with { Body = transformed };
+                    }
+
+                    ProxiedResponse? response = tryServeFromCache?.Invoke(request);
+                    bool servedFromCache = response is not null;
+
                     if (response is null)
                     {
-                        await WriteSimpleResponseAsync(sslStream, 502, "Bad Gateway", token);
-                        return;
+                        response = await ForwardToUpstreamAsync(request, token);
+                        if (response is null)
+                        {
+                            await WriteSimpleResponseAsync(sslStream, 502, "Bad Gateway", token);
+                            return;
+                        }
                     }
+
+                    if (!servedFromCache && responseTransform is not null)
+                    {
+                        byte[]? transformed = responseTransform(request, response);
+                        if (transformed is not null)
+                            response = response with { Body = transformed };
+                    }
+
+                    ProxyTrafficLog.Record(request.Host, request.Method, request.Path, response.StatusCode, servedFromCache, response.Body.Length);
+
+                    await WriteResponseAsync(sslStream, response, request.Method, false, token);
                 }
-
-                if (!servedFromCache && responseTransform is not null)
-                {
-                    byte[]? transformed = responseTransform(request, response);
-                    if (transformed is not null)
-                        response = response with { Body = transformed };
-                }
-
-                ProxyTrafficLog.Record(request.Host, request.Method, request.Path, response.StatusCode, servedFromCache, response.Body.Length);
-
-                await WriteResponseAsync(sslStream, response, request.Method, token);
+                while (keepAlive);
             }
             catch (Exception ex)
             {
@@ -587,7 +644,7 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        private static async Task WriteResponseAsync(Stream stream, ProxiedResponse response, string requestMethod, CancellationToken token)
+        private static async Task WriteResponseAsync(Stream stream, ProxiedResponse response, string requestMethod, bool keepAlive, CancellationToken token)
         {
             bool bodyless = requestMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase) || response.StatusCode == 204 || response.StatusCode == 304;
 
@@ -607,7 +664,11 @@ namespace PhasmaStrap.Networking
             if (!bodyless || response.StatusCode == 304)
                 builder.Append($"Content-Length: {response.Body.Length}\r\n");
 
-            builder.Append("Connection: close\r\n\r\n");
+            // a kept-alive answer always has to say how long it is, even when that is "0"
+            if (keepAlive && bodyless && response.StatusCode != 304)
+                builder.Append("Content-Length: 0\r\n");
+
+            builder.Append(keepAlive ? "Connection: keep-alive\r\n\r\n" : "Connection: close\r\n\r\n");
 
             await stream.WriteAsync(Encoding.ASCII.GetBytes(builder.ToString()), token);
             if (!bodyless && response.Body.Length > 0)

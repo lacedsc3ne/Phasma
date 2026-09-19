@@ -193,16 +193,34 @@ namespace PhasmaStrap.Networking
         private static void RegisterAssetWarpHosts()
         {
             AssetProxyServer.InterceptedHosts.TryGetValue(AssetWarpPolicy.Host, out var existingDelivery);
+            // order matters: the preload cache stores the batch answer as ROBLOX gave it (its signed
+            // URLs are what a later session needs refreshed, not PhasmaStrap's rewritten ones), and
+            // only then are the locations pointed at the proxy
             AssetProxyServer.InterceptedHosts[AssetWarpPolicy.Host] = (
                 AssetWarpPolicy.TransformRequest,
-                CombineResponseTransforms(existingDelivery.ResponseTransform, AssetPreloadCache.CacheResponse),
-                AssetPreloadCache.TryServeFromCache);
+                CombineResponseTransforms(CombineResponseTransforms(existingDelivery.ResponseTransform, AssetPreloadCache.CacheResponse), AssetContentService.RewriteBatch),
+                ServeBatchFromPreloadCache);
+
+            // asset content that was routed through the proxy (cache, texture shrinker, swap packs)
+            AssetProxyServer.AsyncHandlers[AssetWarpPolicy.Host] = AssetContentService.HandleAsync;
 
             AssetProxyServer.InterceptedHosts.TryGetValue(AssetWarpThumbnailPolicy.Host, out var existingThumbnails);
             AssetProxyServer.InterceptedHosts[AssetWarpThumbnailPolicy.Host] = (
                 existingThumbnails.RequestTransform,
                 CombineResponseTransforms(existingThumbnails.ResponseTransform, AssetWarpThumbnailPolicy.ProcessResponse),
                 existingThumbnails.TryServeFromCache);
+        }
+
+        // the proxy skips response transforms for answers that came out of a cache, so a preloaded
+        // batch answer has its locations rewritten here instead
+        private static ProxiedResponse? ServeBatchFromPreloadCache(ProxiedRequest request)
+        {
+            ProxiedResponse? cached = AssetPreloadCache.TryServeFromCache(request);
+            if (cached is null)
+                return null;
+
+            byte[]? rewritten = AssetContentService.RewriteBatch(request, cached);
+            return rewritten is null ? cached : cached with { Body = rewritten };
         }
 
         // both transforms get a chance: the second sees the first's output, so e.g. a username
