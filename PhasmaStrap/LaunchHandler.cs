@@ -203,6 +203,16 @@ namespace PhasmaStrap
                     return;
                 }
 
+                // UI-test hook: the launch (bootstrapper) dialog on its own, in the background
+                if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "BootstrapperDialog")
+                {
+                    var dialog = new UI.Elements.Bootstrapper.FluentDialog(false) { Message = "Connecting to Roblox...", ProgressValue = 42 };
+                    ApplyUiTestBackground(dialog);
+                    dialog.ShowDialog();
+                    App.Terminate();
+                    return;
+                }
+
                 var window = new UI.Elements.Settings.MainWindow(showAlreadyRunningWarning);
                 if (ApplyUiTestBackground(window) && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") is string pageName)
                 {
