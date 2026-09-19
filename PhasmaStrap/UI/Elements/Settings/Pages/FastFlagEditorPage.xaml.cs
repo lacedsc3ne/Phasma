@@ -531,7 +531,25 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 ImportJSON(dialog.JsonTextBox.Text);
         }
 
-        // also the search database's "add" callback
+        // the search database's add: no message boxes (it reports back in its own status line)
+        private string? AddFromDatabase(string name, string value)
+        {
+            if (ScopeHas(name))
+                return "already there";
+
+            if (FlagValidation.Problem(name, value) is string problem)
+                return problem.TrimEnd('.');
+
+            SetInScope(name, value);
+
+            if (!MatchesSearch(name))
+                ClearSearch(false);
+
+            ReloadList();
+            UpdateScopeUi();
+            return null;
+        }
+
         private void AddSingle(string name, string value)
         {
             if (ScopeHas(name))
@@ -726,7 +744,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void SearchDatabaseButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new FFlagSearchDialog(AddSingle) { Owner = Owner };
+            FlagProfile? profile = Profile;
+            string target = profile is null ? "your flags" : $"profile \"{profile.Name}\"";
+
+            var dialog = new FFlagSearchDialog(AddFromDatabase, target) { Owner = Owner };
             dialog.ShowDialog();
         }
 

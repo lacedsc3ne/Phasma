@@ -80,13 +80,22 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private int _searchGeneration;
 
-        private readonly Action<string, string>? _addFlagCallback;
+        // adds one flag to wherever the editor is pointed; returns null when it was added,
+        // otherwise why not (already there, invalid value)
+        private readonly Func<string, string, string?>? _addFlagCallback;
 
-        public FFlagSearchDialog(Action<string, string>? addFlagCallback = null)
+        // "your flags" or "profile \"X\"" - shown on the Add buttons and in the result line
+        private readonly string _targetName;
+
+        public FFlagSearchDialog(Func<string, string, string?>? addFlagCallback = null, string targetName = "your flags")
         {
             _addFlagCallback = addFlagCallback;
+            _targetName = targetName;
 
             InitializeComponent();
+
+            AddFromSearchButton.Content = $"Add to {_targetName}";
+            AddFromBrowseButton.Content = $"Add to {_targetName}";
 
             SearchResultsDataGrid.ItemsSource = _searchResults;
             ValidationResultsDataGrid.ItemsSource = _validationResults;
@@ -674,28 +683,57 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
         }
 
-        private void AddFromSearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SearchResultsDataGrid.SelectedItem is FlagSearchResult result)
-                _addFlagCallback?.Invoke(result.Name, result.Value);
-        }
+        private void AddFromSearchButton_Click(object sender, RoutedEventArgs e) => AddSelected(SearchResultsDataGrid);
 
-        private void AddFromBrowseButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (BrowseResultsDataGrid.SelectedItem is FlagSearchResult result)
-                _addFlagCallback?.Invoke(result.Name, result.Value);
-        }
+        private void AddFromBrowseButton_Click(object sender, RoutedEventArgs e) => AddSelected(BrowseResultsDataGrid);
 
-        private void SearchResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (SearchResultsDataGrid.SelectedItem is FlagSearchResult result)
-                _addFlagCallback?.Invoke(result.Name, result.Value);
-        }
+        private void SearchResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e) => AddSelected(SearchResultsDataGrid);
 
-        private void BrowseResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void BrowseResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e) => AddSelected(BrowseResultsDataGrid);
+
+        // Adds every selected row (Ctrl/Shift+click for several). With nothing selected but only
+        // one result, that one is meant. Always says what happened - it used to add nothing,
+        // silently, unless a row had been clicked first.
+        private void AddSelected(DataGrid grid)
         {
-            if (BrowseResultsDataGrid.SelectedItem is FlagSearchResult result)
-                _addFlagCallback?.Invoke(result.Name, result.Value);
+            if (_addFlagCallback is null)
+                return;
+
+            List<FlagSearchResult> picked = grid.SelectedItems.OfType<FlagSearchResult>().ToList();
+            if (picked.Count == 0 && grid.Items.Count == 1 && grid.Items[0] is FlagSearchResult only)
+                picked.Add(only);
+
+            if (picked.Count == 0)
+            {
+                StatusText.Text = grid.Items.Count == 0
+                    ? "Search for a flag first, then pick it in the list."
+                    : "Click a flag in the list first (Ctrl+click picks several), then Add.";
+                return;
+            }
+
+            var added = new List<string>();
+            var skipped = new List<string>();
+
+            foreach (FlagSearchResult result in picked)
+            {
+                string? problem = _addFlagCallback(result.Name, result.Value ?? "");
+                if (problem is null)
+                    added.Add(result.Name);
+                else
+                    skipped.Add($"{result.Name} ({problem})");
+            }
+
+            string text = added.Count switch
+            {
+                0 => "Nothing added.",
+                1 => $"Added {added[0]} to {_targetName}.",
+                _ => $"Added {added.Count} flags to {_targetName}.",
+            };
+
+            if (skipped.Count > 0)
+                text += " Skipped: " + string.Join("; ", skipped.Take(3)) + (skipped.Count > 3 ? $" and {skipped.Count - 3} more" : "");
+
+            StatusText.Text = text;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
