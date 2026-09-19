@@ -8,6 +8,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         {
             DataContext = new RenderingViewModel();
             InitializeComponent();
+
+            // low-end mode has its own view model
+            LowEndRoot.DataContext = new LowEndModeViewModel();
         }
     }
 }

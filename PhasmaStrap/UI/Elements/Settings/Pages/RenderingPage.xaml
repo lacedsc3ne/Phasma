@@ -26,6 +26,65 @@
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0" DataContext="{Binding Performance}">
+                    <!-- one-click low-end mode (own view model, see RenderingPage.xaml.cs) -->
+                    <Border x:Name="LowEndRoot" Margin="0,0,0,12" Padding="14,12" CornerRadius="8" BorderThickness="1"
+                            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <StackPanel>
+                            <TextBlock FontSize="16" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Rendering_LowEndMode}" />
+                            <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       Text="{x:Static resources:Strings.Menu_Rendering_OneClickMakeRobloxRunWeak}" />
+
+                            <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Text="{Binding HardwareText}" />
+                            <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Text="{Binding RecommendationText}" />
+
+                            <WrapPanel Margin="0,10,0,0">
+                            <ui:Button Icon="TopSpeed24" Content="{x:Static resources:Strings.Enums_Theme_Light}" Command="{Binding ApplyCommand, Mode=OneTime}" CommandParameter="Light">
+                                <ui:Button.Style>
+                                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                        <Setter Property="Appearance" Value="Secondary" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActiveLevel}" Value="Light">
+                                                <Setter Property="Appearance" Value="Primary" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:Button.Style>
+                            </ui:Button>
+                            <ui:Button Margin="8,0,0,0" Icon="TopSpeed24" Content="{x:Static resources:Strings.Menu_Rendering_Strong}" Command="{Binding ApplyCommand, Mode=OneTime}" CommandParameter="Strong">
+                                <ui:Button.Style>
+                                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                        <Setter Property="Appearance" Value="Secondary" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActiveLevel}" Value="Strong">
+                                                <Setter Property="Appearance" Value="Primary" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:Button.Style>
+                            </ui:Button>
+                                <ui:Button Margin="8,0,0,0" Icon="ArrowUndo24" Content="{x:Static resources:Strings.Menu_Rendering_TurnOff}" Appearance="Transparent" Visibility="{Binding TurnOffVisibility}" Command="{Binding TurnOffCommand, Mode=OneTime}" />
+                                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding StatusText}" />
+                            </WrapPanel>
+
+                            <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding ChangesHeader}" />
+                                <ui:Button Margin="10,0,0,0" Padding="8,2" FontSize="12" Appearance="Transparent" Content="{x:Static resources:Strings.Menu_Rendering_ShowLight}" Command="{Binding ShowCommand, Mode=OneTime}" CommandParameter="Light" />
+                                <ui:Button Padding="8,2" FontSize="12" Appearance="Transparent" Content="{x:Static resources:Strings.Menu_Rendering_ShowStrong}" Command="{Binding ShowCommand, Mode=OneTime}" CommandParameter="Strong" />
+                            </StackPanel>
+                            <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding Changes}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,1,0,1" TextWrapping="Wrap" FontSize="13">
+                                            <Run Text="{Binding Area, Mode=OneWay}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                            <Run Text="  " />
+                                            <Run Text="{Binding What, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
                     <ui:CardExpander Margin="0,0,0,0" Icon="Wrench24" IsExpanded="True">
                         <ui:CardExpander.Header>
                             <StackPanel>

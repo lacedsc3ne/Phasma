@@ -104,6 +104,12 @@ namespace PhasmaStrap.Models.Persistable
         // background process started at Windows sign-in
         public bool AccountGuardEnabled { get; set; } = false;
         public bool AccountGuardBackground { get; set; } = false;
+
+        // low-end mode (Rendering > Performance, Utility/LowEndMode): "" = off, "Light", "Strong";
+        // the backups hold what it replaced (setting name -> JSON, flag name -> old value or null)
+        public string LowEndModeLevel { get; set; } = "";
+        public Dictionary<string, string> LowEndBackupSettings { get; set; } = new();
+        public Dictionary<string, string?> LowEndBackupFlags { get; set; } = new();
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();
 

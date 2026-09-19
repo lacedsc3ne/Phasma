@@ -16568,5 +16568,59 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Accounts.RecentWarnings", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low-end mode.
+        /// </summary>
+        public static string Menu_Rendering_LowEndMode {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.LowEndMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One click to make Roblox run on a weak PC: lower graphics, a tuned Roblox process, and PhasmaStrap's own heavy extras of.
+        /// </summary>
+        public static string Menu_Rendering_OneClickMakeRobloxRunWeak {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.OneClickMakeRobloxRunWeak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strong.
+        /// </summary>
+        public static string Menu_Rendering_Strong {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Strong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turn off.
+        /// </summary>
+        public static string Menu_Rendering_TurnOff {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.TurnOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Light.
+        /// </summary>
+        public static string Menu_Rendering_ShowLight {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ShowLight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Strong.
+        /// </summary>
+        public static string Menu_Rendering_ShowStrong {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ShowStrong", resourceCulture);
+            }
+        }
     }
 }
