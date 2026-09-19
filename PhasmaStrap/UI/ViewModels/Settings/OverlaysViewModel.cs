@@ -135,6 +135,51 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.Crosshair = value; OverlayHub.Refresh(); }
         }
 
+        // ---- the crosshair editor
+
+        public System.Windows.Media.ImageSource? CrosshairPreview
+        {
+            get
+            {
+                var style = PhasmaStrap.Integrations.Overlays.CrosshairStyles.Current;
+                using System.Drawing.Bitmap bitmap = PhasmaStrap.Integrations.Overlays.CrosshairRenderer.Render(style, 96);
+                var data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, 96, 96), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                try
+                {
+                    var source = System.Windows.Media.Imaging.BitmapSource.Create(96, 96, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null, data.Scan0, data.Stride * 96, data.Stride);
+                    source.Freeze();
+                    return source;
+                }
+                finally
+                {
+                    bitmap.UnlockBits(data);
+                }
+            }
+        }
+
+        public string CrosshairName
+        {
+            get
+            {
+                var style = PhasmaStrap.Integrations.Overlays.CrosshairStyles.Current;
+                return style.Name.Length > 0 ? style.Name : "Your crosshair";
+            }
+        }
+
+        public ICommand OpenCrosshairEditorCommand => new RelayCommand(() =>
+        {
+            var editor = new PhasmaStrap.UI.Elements.Dialogs.CrosshairEditorWindow
+            {
+                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault()
+            };
+
+            editor.ShowDialog();
+
+            OnPropertyChanged(nameof(CrosshairPreview));
+            OnPropertyChanged(nameof(CrosshairName));
+            OverlayHub.Refresh();
+        });
+
         public int CrosshairShapeIndex
         {
             get => App.Settings.Prop.CrosshairShapeIndex;

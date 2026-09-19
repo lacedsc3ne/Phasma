@@ -203,6 +203,16 @@ namespace PhasmaStrap
                     return;
                 }
 
+                // UI-test hook: the crosshair editor on its own, in the background
+                if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "CrosshairEditor")
+                {
+                    var crosshairEditor = new UI.Elements.Dialogs.CrosshairEditorWindow();
+                    ApplyUiTestBackground(crosshairEditor);
+                    crosshairEditor.ShowDialog();
+                    App.Terminate();
+                    return;
+                }
+
                 // UI-test hook: the join-time server picker with made-up servers, in the background
                 if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "ServerPicker")
                 {

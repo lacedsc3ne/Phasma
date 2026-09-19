@@ -15848,5 +15848,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Appearance.PauseVideoBackgroundWhileSettingsWindow", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shown at its real size. Build your own from arms, a centre dot and a ring - with outline, rotation, T-shape and opacity .
+        /// </summary>
+        public static string Menu_Rendering_ShownAtItsRealSizeBuild {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ShownAtItsRealSizeBuild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the crosshair editor.
+        /// </summary>
+        public static string Menu_Rendering_OpenCrosshairEditor {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.OpenCrosshairEditor", resourceCulture);
+            }
+        }
     }
 }

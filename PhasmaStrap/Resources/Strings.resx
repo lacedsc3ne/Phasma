@@ -5560,4 +5560,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Appearance.PauseVideoBackgroundWhileSettingsWindow" xml:space="preserve">
     <value>Pause a video background while the settings window is not the one in front - it then costs nothing while you play</value>
   </data>
+  <data name="Menu.Rendering.ShownAtItsRealSizeBuild" xml:space="preserve">
+    <value>Shown at its real size. Build your own from arms, a centre dot and a ring - with outline, rotation, T-shape and opacity - save designs, and share them as a short code.</value>
+  </data>
+  <data name="Menu.Rendering.OpenCrosshairEditor" xml:space="preserve">
+    <value>Open the crosshair editor</value>
+  </data>
 </root>

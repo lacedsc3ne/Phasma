@@ -14,8 +14,9 @@ namespace PhasmaStrap.Integrations.Overlays
     /// </summary>
     internal sealed class OverlayCrosshair
     {
-        public const int TexWidth = 128;
-        public const int TexHeight = 128;
+        // room for the largest design the editor allows (CrosshairRenderer.MaxRadius)
+        public const int TexWidth = 256;
+        public const int TexHeight = 256;
 
         private ID3D11Device _device = null!;
         private ID3D11Texture2D? _tex;
@@ -53,7 +54,7 @@ namespace PhasmaStrap.Integrations.Overlays
         {
             try
             {
-                return OverlayHub.InGame && OverlaySettings.CrosshairEnabled && App.Settings?.Prop?.CrosshairShapeIndex != 3;
+                return OverlayHub.InGame && OverlaySettings.CrosshairEnabled && CrosshairStyles.Current.HasVisibleParts;
             }
             catch
             {
@@ -66,79 +67,17 @@ namespace PhasmaStrap.Integrations.Overlays
             if (_tex == null || _bitmap == null || _graphics == null)
                 return;
 
-            var prop = App.Settings.Prop;
-            int shape = Math.Clamp(prop.CrosshairShapeIndex, 0, 2);
-            int size = Math.Clamp(prop.CrosshairSize, 2, 60);
-            int thickness = Math.Clamp(prop.CrosshairLineThickness, 1, 16);
-            int gap = Math.Clamp(prop.CrosshairGap, 0, 40);
-            double opacity = Math.Clamp(prop.CrosshairOpacity, 0.05, 1.0);
-            string signature = $"{shape}|{size}|{thickness}|{gap}|{opacity:0.00}|{prop.CrosshairColorHex}|{prop.CrosshairOutlineColorHex}";
+            CrosshairStyle style = CrosshairStyles.Current;
+            string signature = style.Signature;
             if (signature == _last)
                 return;
             _last = signature;
 
-            Color fill = ParseColor(prop.CrosshairColorHex, Color.Lime, opacity);
-            Color outline = ParseColor(prop.CrosshairOutlineColorHex, Color.Black, opacity);
-
+            // the same drawing code as the editor's preview
             _graphics.Clear(Color.Transparent);
-            using (var fillBrush = new SolidBrush(fill))
-            using (var outlinePen = new Pen(outline, Math.Max(1f, thickness * 0.5f)))
-            using (var fillPen = new Pen(fill, thickness))
-            {
-                float cx = TexWidth / 2f;
-                float cy = TexHeight / 2f;
-                if (shape == 0)
-                {
-                    float inner = gap;
-                    float outer = gap + size;
-                    DrawArm(outlinePen, fillPen, cx, cy - inner, cx, cy - outer);
-                    DrawArm(outlinePen, fillPen, cx, cy + inner, cx, cy + outer);
-                    DrawArm(outlinePen, fillPen, cx - inner, cy, cx - outer, cy);
-                    DrawArm(outlinePen, fillPen, cx + inner, cy, cx + outer, cy);
-                }
-                else if (shape == 1)
-                {
-                    float r = Math.Max(1f, size * 0.5f);
-                    _graphics.FillEllipse(fillBrush, cx - r, cy - r, r * 2f, r * 2f);
-                    _graphics.DrawEllipse(outlinePen, cx - r, cy - r, r * 2f, r * 2f);
-                }
-                else
-                {
-                    float r = Math.Max(1f, size * 0.5f);
-                    _graphics.DrawEllipse(outlinePen, cx - r, cy - r, r * 2f, r * 2f);
-                    _graphics.DrawEllipse(fillPen, cx - r, cy - r, r * 2f, r * 2f);
-                }
-            }
+            CrosshairRenderer.Draw(_graphics, style, TexWidth / 2, TexHeight / 2);
 
             Upload(context);
-        }
-
-        private void DrawArm(Pen outlinePen, Pen fillPen, float x1, float y1, float x2, float y2)
-        {
-            _graphics!.DrawLine(outlinePen, x1, y1, x2, y2);
-            _graphics.DrawLine(fillPen, x1, y1, x2, y2);
-        }
-
-        private static Color ParseColor(string? hex, Color fallback, double opacity)
-        {
-            Color parsed = fallback;
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(hex))
-                {
-                    string trimmed = hex.TrimStart('#');
-                    if (trimmed.Length == 6 && int.TryParse(trimmed, System.Globalization.NumberStyles.HexNumber, null, out int rgb))
-                        parsed = Color.FromArgb(255, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
-                    else if (trimmed.Length == 8 && uint.TryParse(trimmed, System.Globalization.NumberStyles.HexNumber, null, out uint argb))
-                        parsed = Color.FromArgb((int)((argb >> 24) & 0xFF), (int)((argb >> 16) & 0xFF), (int)((argb >> 8) & 0xFF), (int)(argb & 0xFF));
-                }
-            }
-            catch
-            {
-                parsed = fallback;
-            }
-            int alpha = (int)Math.Round(parsed.A * opacity);
-            return Color.FromArgb(Math.Clamp(alpha, 0, 255), parsed.R, parsed.G, parsed.B);
         }
 
         private void Upload(ID3D11DeviceContext context)
