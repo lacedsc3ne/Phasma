@@ -12,7 +12,8 @@ using System.Windows.Media;
 //
 // This trimmed port keeps only the visible payoff: a static or animated-GIF image plus a dimming
 // overlay, built as plain elements that WpfUiWindow inserts directly into its root Grid (the same
-// place it already inserts its glass tint Border) - no window reparenting, no video support.
+// place it already inserts its glass tint Border) - no window reparenting. Videos are played by
+// VideoBackground, a self-contained element of the same kind.
 namespace PhasmaStrap.UI
 {
     internal static class GlobalBackground
@@ -25,6 +26,16 @@ namespace PhasmaStrap.UI
             {
                 if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
                     return null;
+
+                var overlayLayer = new Border
+                {
+                    Background = Brushes.Black,
+                    Opacity = Math.Clamp(overlayOpacity, 0.0, 1.0),
+                    IsHitTestVisible = false
+                };
+
+                if (BackgroundLibrary.IsVideo(filePath))
+                    return (new VideoBackground(filePath), overlayLayer);
 
                 var image = new Image
                 {

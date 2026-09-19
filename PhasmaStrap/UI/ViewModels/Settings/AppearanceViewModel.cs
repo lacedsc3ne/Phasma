@@ -461,6 +461,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             public string Path { get; init; } = "";
             public string Name { get; init; } = "";
             public bool IsAnimated { get; init; }
+            public bool IsVideo { get; init; }
 
             // a file outside the library (set by an older version, or by hand in Settings.json)
             public bool IsLinked { get; init; }
@@ -530,12 +531,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Path = path,
                 Name = BackgroundLibrary.DisplayName(path),
                 IsAnimated = string.Equals(System.IO.Path.GetExtension(path), ".gif", StringComparison.OrdinalIgnoreCase),
+                IsVideo = BackgroundLibrary.IsVideo(path),
                 IsLinked = !BackgroundLibrary.Contains(path),
                 IsSelected = selected,
             };
 
             // thumbnails decode off the UI thread and pop in when ready
-            Task.Run(() => GifImageBehavior.LoadThumbnail(path, 320)).ContinueWith(task =>
+            Task.Run(() => BackgroundLibrary.LoadThumbnail(path, 320)).ContinueWith(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion && task.Result is not null)
                     System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() => item.Thumbnail = task.Result));
@@ -544,12 +546,29 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return item;
         }
 
-        private void AddBackground()
+        public bool VideoPauseInactive
         {
+            get => App.Settings.Prop.GlobalBackgroundVideoPauseInactive;
+            set { App.Settings.Prop.GlobalBackgroundVideoPauseInactive = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(VideoPauseInactive)); }
+        }
+
+        private bool _importing;
+        public bool NotImporting => !_importing;
+
+        private string _backgroundStatus = "";
+        public string BackgroundStatus { get => _backgroundStatus; private set { _backgroundStatus = value; OnPropertyChanged(nameof(BackgroundStatus)); } }
+
+        private async void AddBackground()
+        {
+            if (_importing)
+                return;
+
             var dialog = new OpenFileDialog
             {
                 Multiselect = true,
-                Filter = $"{Strings.FileTypes_ImageFiles}|{string.Join(";", BackgroundLibrary.Extensions.Select(e => "*" + e))}"
+                Filter = $"Images, GIFs and videos|{string.Join(";", BackgroundLibrary.Extensions.Select(e => "*" + e))}"
+                    + $"|{Strings.FileTypes_ImageFiles}|{string.Join(";", BackgroundLibrary.ImageExtensions.Select(e => "*" + e))}"
+                    + $"|Videos|{string.Join(";", BackgroundLibrary.VideoExtensions.Select(e => "*" + e))}"
             };
 
             if (dialog.ShowDialog() != true)
@@ -557,11 +576,24 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             string? last = null;
 
+            _importing = true;
+            OnPropertyChanged(nameof(NotImporting));
+
             foreach (string file in dialog.FileNames)
             {
                 try
                 {
-                    string imported = BackgroundLibrary.Import(file);
+                    long size = new FileInfo(file).Length;
+                    BackgroundStatus = BackgroundLibrary.IsVideo(file)
+                        ? $"Checking and copying {System.IO.Path.GetFileName(file)} ({size / 1048576.0:0} MB)..."
+                        : "";
+
+                    // copying (and for a video, test-opening) a big file must not freeze the window
+                    string imported = await Task.Run(() => BackgroundLibrary.Import(file));
+
+                    BackgroundStatus = BackgroundLibrary.IsVideo(file) && size > BackgroundLibrary.LargeVideoBytes
+                        ? $"Added. It is a large video ({size / 1048576.0:0} MB) - a short loop of a few MB looks the same and is lighter on the PC."
+                        : "";
 
                     if (!Backgrounds.Any(b => string.Equals(b.Path, imported, StringComparison.OrdinalIgnoreCase)))
                         Backgrounds.Insert(0, CreateBackgroundItem(imported, false));
@@ -571,10 +603,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 catch (Exception ex)
                 {
                     App.Logger.WriteLine("AppearanceViewModel::AddBackground", $"Could not add '{file}': {ex.Message}");
+                    BackgroundStatus = "";
                     Frontend.ShowMessageBox($"That file could not be added as a background:\n\n{ex.Message}", System.Windows.MessageBoxImage.Warning);
                 }
             }
 
+            _importing = false;
+            OnPropertyChanged(nameof(NotImporting));
             OnPropertyChanged(nameof(HasBackgrounds));
 
             if (last is null)

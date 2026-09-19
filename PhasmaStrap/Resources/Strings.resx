@@ -5551,4 +5551,13 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.AssetEngine.LetMeChooseServerWhenI" xml:space="preserve">
     <value>Let me choose the server when I join a game</value>
   </data>
+  <data name="Menu.Appearance.AddImageGIFVideo" xml:space="preserve">
+    <value>Add image, GIF or video</value>
+  </data>
+  <data name="Menu.Appearance.VIDEO" xml:space="preserve">
+    <value>VIDEO</value>
+  </data>
+  <data name="Menu.Appearance.PauseVideoBackgroundWhileSettingsWindow" xml:space="preserve">
+    <value>Pause a video background while the settings window is not the one in front - it then costs nothing while you play</value>
+  </data>
 </root>

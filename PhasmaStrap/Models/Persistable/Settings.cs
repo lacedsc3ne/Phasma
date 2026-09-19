@@ -332,6 +332,10 @@ namespace PhasmaStrap.Models.Persistable
         public string GlobalBackgroundFilePath { get; set; } = "";
         public double GlobalBackgroundOverlayOpacity { get; set; } = 0.55;
 
+        // video backgrounds (UI.VideoBackground): stop decoding while the settings window is not the
+        // one in front, so a looping video costs nothing while playing
+        public bool GlobalBackgroundVideoPauseInactive { get; set; } = true;
+
         // decorative animated snow overlay on the settings window (cosmetic, off by default)
         public bool SnowEffectEnabled { get; set; } = false;
 

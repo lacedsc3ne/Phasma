@@ -1,4 +1,4 @@
-﻿<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.LaunchMenuDialog"
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.LaunchMenuDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -23,7 +23,7 @@
     <Window.Resources>
         <BlurEffect x:Key="MistBlurLarge" Radius="70" />
 
-        <Storyboard x:Key="MistDrift" RepeatBehavior="Forever">
+        <Storyboard x:Key="MistDrift" Timeline.DesiredFrameRate="30" RepeatBehavior="Forever">
             <DoubleAnimation
                 Storyboard.TargetName="MistTranslate1"
                 Storyboard.TargetProperty="X"

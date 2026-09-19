@@ -11,7 +11,58 @@ namespace PhasmaStrap.UI
     {
         private const string LOG_IDENT = "BackgroundLibrary";
 
-        public static readonly string[] Extensions = { ".gif", ".png", ".jpg", ".jpeg", ".bmp" };
+        public static readonly string[] ImageExtensions = { ".gif", ".png", ".jpg", ".jpeg", ".bmp" };
+
+        // what Windows Media Foundation (and with it WPF's MediaElement) can play without extra
+        // codecs. WebM / MKV only work when the codec is installed, which Import checks by opening
+        // the file.
+        public static readonly string[] VideoExtensions = { ".mp4", ".m4v", ".mov", ".wmv", ".webm", ".mkv" };
+
+        public static readonly string[] Extensions = ImageExtensions.Concat(VideoExtensions).ToArray();
+
+        // above this a background is more likely a whole film than a loop - still allowed, but the
+        // copy takes a while and the user is told
+        public const long LargeVideoBytes = 300L * 1024 * 1024;
+
+        public static bool IsVideo(string? path) =>
+            !string.IsNullOrEmpty(path) && VideoExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
+
+        // a still for the gallery: the picture itself, or a frame one second into a video
+        public static System.Windows.Media.Imaging.BitmapSource? LoadThumbnail(string path, int width)
+        {
+            if (!IsVideo(path))
+                return GifImageBehavior.LoadThumbnail(path, width);
+
+            try
+            {
+                PhasmaStrap.Utility.ClipProcessor.Log ??= message => App.Logger.WriteLine("ClipProcessor", message);
+                PhasmaStrap.Utility.ClipInfo info = PhasmaStrap.Utility.ClipProcessor.Probe(path);
+                TimeSpan at = TimeSpan.FromSeconds(Math.Min(1.0, info.Duration.TotalSeconds / 2));
+
+                byte[]? pixels = PhasmaStrap.Utility.ClipProcessor.GrabFrame(path, at, out int w, out int h);
+                if (pixels is null || w <= 0 || h <= 0)
+                    return null;
+
+                var frame = System.Windows.Media.Imaging.BitmapSource.Create(w, h, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null, pixels, w * 4);
+
+                System.Windows.Media.Imaging.BitmapSource result = frame;
+                if (w > width)
+                {
+                    double scale = (double)width / w;
+                    result = new System.Windows.Media.Imaging.TransformedBitmap(frame, new System.Windows.Media.ScaleTransform(scale, scale));
+                }
+
+                // materialise it, so the full-size frame is not kept alive behind the scaled view
+                var copy = new System.Windows.Media.Imaging.WriteableBitmap(result);
+                copy.Freeze();
+                return copy;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Video thumbnail failed for '{Path.GetFileName(path)}': {ex.Message}");
+                return null;
+            }
+        }
 
         public static string Directory => Path.Combine(Paths.Base, "Backgrounds");
 
@@ -57,6 +108,23 @@ namespace PhasmaStrap.UI
         // twice returns the existing copy.
         public static string Import(string source)
         {
+            // a video Windows cannot decode would only ever show as a black window
+            if (IsVideo(source))
+            {
+                PhasmaStrap.Utility.ClipInfo info;
+                try
+                {
+                    info = PhasmaStrap.Utility.ClipProcessor.Probe(source);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidDataException($"Windows cannot play this video ({ex.Message.Trim()}). MP4 with H.264 always works; WebM and MKV need the matching codec from the Microsoft Store.", ex);
+                }
+
+                if (info.Width <= 0 || info.Height <= 0)
+                    throw new InvalidDataException("This file has no video picture Windows can read.");
+            }
+
             System.IO.Directory.CreateDirectory(Directory);
 
             string hash;
