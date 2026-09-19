@@ -1,4 +1,4 @@
-<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow"
+﻿<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -111,6 +111,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="StatusText" Grid.Column="0" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Margin="0,0,8,0" Content="Make GIF" Icon="Gif24" ToolTip="Turn this screenshot (with your edits) into a GIF - zoom, pan, or a slideshow with other screenshots" Click="MakeGif_Click" />
                 <ui:Button Margin="0,0,8,0" Content="Copy" Icon="Copy24" ToolTip="Copy the edited image to the clipboard (Ctrl+C)" Click="Copy_Click" />
                 <ui:Button Margin="0,0,8,0" Content="Save as copy" Icon="Save24" ToolTip="Keep the original and write a new file next to it" Click="SaveCopy_Click" />
                 <ui:Button Margin="0,0,8,0" Content="Save" Icon="Save24" Appearance="Primary" ToolTip="Overwrite the original screenshot (Ctrl+S)" Click="Save_Click" />

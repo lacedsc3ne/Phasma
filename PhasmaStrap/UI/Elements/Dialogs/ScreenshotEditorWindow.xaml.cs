@@ -656,8 +656,16 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Surface.Arrange(new Rect(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight));
             Surface.UpdateLayout();
 
+            // through a VisualBrush: rendering Surface itself would include where it sits in the
+            // window (it's centred when the picture is smaller than the view), shifting the result
+            // off the bitmap - a small or cropped screenshot came out all black
+            var sheet = new DrawingVisual();
+            using (DrawingContext dc = sheet.RenderOpen())
+                dc.DrawRectangle(new VisualBrush(Surface) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top },
+                    null, new Rect(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight));
+
             var target = new RenderTargetBitmap(_bitmap.PixelWidth, _bitmap.PixelHeight, 96, 96, PixelFormats.Pbgra32);
-            target.Render(Surface);
+            target.Render(sheet);
             target.Freeze();
 
             Surface.LayoutTransform = zoom;
@@ -673,6 +681,20 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             encoder.Frames.Add(BitmapFrame.Create(image));
             using FileStream stream = File.Create(path);
             encoder.Save(stream);
+        }
+
+        private void MakeGif_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var maker = new GifMakerWindow(RenderResult(), System.IO.Path.GetFileNameWithoutExtension(_path)) { Owner = this };
+                maker.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException(LOG_IDENT, ex);
+                UpdateStatus($"couldn't open the GIF maker: {ex.Message}");
+            }
         }
 
         private void Copy_Click(object sender, RoutedEventArgs e)
