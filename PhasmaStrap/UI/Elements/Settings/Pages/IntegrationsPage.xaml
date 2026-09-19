@@ -114,6 +114,13 @@
                     </controls:OptionControl>
 
                     <controls:OptionControl
+                        Header="{x:Static resources:Strings.Menu_Integrations_UseDiscordSOwnJoinButton}"
+                        Description="{x:Static resources:Strings.Menu_Integrations_FriendsGetDiscordSJoinButton}"
+                        IsEnabled="{Binding DiscordActivityJoinEnabled, Mode=OneWay}">
+                        <ui:ToggleSwitch IsChecked="{Binding DiscordNativeJoin, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl
                         Header="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
                         Description="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}">
                         <ui:Button Content="{x:Static resources:Strings.Menu_Integrations_View}" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />

@@ -161,7 +161,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool DiscordActivityJoinEnabled
         {
             get => !App.Settings.Prop.HideRPCButtons;
-            set => App.Settings.Prop.HideRPCButtons = !value;
+            set { App.Settings.Prop.HideRPCButtons = !value; OnPropertyChanged(nameof(DiscordActivityJoinEnabled)); }
+        }
+
+        public bool DiscordNativeJoin
+        {
+            get => App.Settings.Prop.DiscordNativeJoin;
+            set => App.Settings.Prop.DiscordNativeJoin = value;
         }
 
         public bool DiscordAccountOnProfile
