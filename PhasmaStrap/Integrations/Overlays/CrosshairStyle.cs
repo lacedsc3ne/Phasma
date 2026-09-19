@@ -98,12 +98,24 @@ namespace PhasmaStrap.Integrations.Overlays
             return CodePrefix + Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
-        public static CrosshairStyle? FromShareCode(string? code)
+        // the code is found inside whatever was pasted (backticks, quotes, a sentence) - see
+        // FlagLayers.FindCodes
+        public static CrosshairStyle? FromShareCode(string? pasted)
+        {
+            foreach (string code in PhasmaStrap.Utility.FlagLayers.FindCodes(pasted, CodePrefix))
+            {
+                if (Decode(code) is CrosshairStyle style)
+                    return style;
+            }
+
+            return null;
+        }
+
+        private static CrosshairStyle? Decode(string text)
         {
             try
             {
-                string text = (code ?? "").Trim();
-                if (!text.StartsWith(CodePrefix, StringComparison.OrdinalIgnoreCase) || text.Length > 2000)
+                if (text.Length > 2000)
                     return null;
 
                 string body = text[CodePrefix.Length..].Replace('-', '+').Replace('_', '/');

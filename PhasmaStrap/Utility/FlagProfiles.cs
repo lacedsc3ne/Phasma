@@ -187,12 +187,41 @@ namespace PhasmaStrap.Utility
             return CodePrefix + Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
-        public static FlagProfile? FromShareCode(string? code)
+        // Codes get pasted the way people share them: in Discord backticks or a code block, in
+        // quotes, in the middle of a sentence, or broken over lines. Find the code in the text first.
+        public static IEnumerable<string> FindCodes(string? pasted, string prefix)
+        {
+            string text = pasted ?? "";
+            var pattern = new Regex(Regex.Escape(prefix) + "[A-Za-z0-9_-]+", RegexOptions.IgnoreCase);
+
+            foreach (Match match in pattern.Matches(text))
+                yield return match.Value;
+
+            // a code wrapped over several lines
+            string joined = new string(text.Where(c => !char.IsWhiteSpace(c)).ToArray());
+            if (joined != text)
+            {
+                foreach (Match match in pattern.Matches(joined))
+                    yield return match.Value;
+            }
+        }
+
+        public static FlagProfile? FromShareCode(string? pasted)
+        {
+            foreach (string code in FindCodes(pasted, CodePrefix))
+            {
+                if (Decode(code) is FlagProfile profile)
+                    return profile;
+            }
+
+            return null;
+        }
+
+        private static FlagProfile? Decode(string text)
         {
             try
             {
-                string text = new string((code ?? "").Where(c => !char.IsWhiteSpace(c)).ToArray());
-                if (!text.StartsWith(CodePrefix, StringComparison.OrdinalIgnoreCase) || text.Length > 200_000)
+                if (text.Length > 200_000)
                     return null;
 
                 string body = text[CodePrefix.Length..].Replace('-', '+').Replace('_', '/');
