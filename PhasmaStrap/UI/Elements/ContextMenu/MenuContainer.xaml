@@ -156,6 +156,18 @@
                     </Grid>
                 </MenuItem.Header>
             </MenuItem>
+            <MenuItem x:Name="MeasurePerformanceMenuItem" Visibility="Collapsed" Click="MeasurePerformanceMenuItem_Click">
+                <MenuItem.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Pulse24"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4,0,0,0" Text="Measure performance (60 s)" />
+                    </Grid>
+                </MenuItem.Header>
+            </MenuItem>
             <MenuItem x:Name="CleanRamMenuItem" Click="CleanRamMenuItem_Click">
                 <MenuItem.Header>
                     <Grid>

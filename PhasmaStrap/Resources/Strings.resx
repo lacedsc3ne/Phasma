@@ -5380,4 +5380,55 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Diagnostics.RunsAnalysisWhenRobloxEndsWithout" xml:space="preserve">
     <value>Runs the analysis when Roblox ends without its normal shutdown and shows what it found. A normal exit is never reported.</value>
   </data>
+  <data name="Menu.Diagnostics.Stutter" xml:space="preserve">
+    <value>Stutter</value>
+  </data>
+  <data name="Menu.Diagnostics.TimesEveryFrameGameWhileWatches" xml:space="preserve">
+    <value>Times every frame of the game for a while and watches memory, the processor and other programs next to it, then says what was going on when it hitched. It runs inside your game session: order it here (or from the tray menu), then play. Only time with Roblox as the window in front counts.</value>
+  </data>
+  <data name="Menu.Diagnostics.MeasureMyGame" xml:space="preserve">
+    <value>Measure my game</value>
+  </data>
+  <data name="Menu.Diagnostics.NothingMeasuredYet" xml:space="preserve">
+    <value>Nothing measured yet.</value>
+  </data>
+  <data name="Menu.Diagnostics.DeleteMeasurement" xml:space="preserve">
+    <value>Delete this measurement</value>
+  </data>
+  <data name="Menu.Diagnostics.FastFlagAutoTuner" xml:space="preserve">
+    <value>FastFlag auto-tuner</value>
+  </data>
+  <data name="Menu.Diagnostics.FindsOutWhetherFastFlagSetReally" xml:space="preserve">
+    <value>Finds out whether a FastFlag set really makes the game run better - by measuring, not by reputation. Roblox only reads flags when it starts, so every run is one game launch that YOU do: PhasmaStrap puts a set in place, you join the same game and play, it measures, and at the end the sets are compared against the noise between runs. PhasmaStrap never starts or restarts Roblox for this.</value>
+  </data>
+  <data name="Menu.Diagnostics.WhichFlagSetsShouldBeCompared" xml:space="preserve">
+    <value>Which flag sets should be compared?</value>
+  </data>
+  <data name="Menu.Diagnostics.TwoFourOtherSetsHaveExist" xml:space="preserve">
+    <value>Two to four. Other sets have to exist as FastFlag snapshots first (FastFlag editor &gt; Snapshots).</value>
+  </data>
+  <data name="Menu.Diagnostics.StartExperiment" xml:space="preserve">
+    <value>Start the experiment</value>
+  </data>
+  <data name="Menu.Diagnostics.FLAGSET" xml:space="preserve">
+    <value>FLAG SET</value>
+  </data>
+  <data name="Menu.Diagnostics.SLOWEST1" xml:space="preserve">
+    <value>SLOWEST 1 %</value>
+  </data>
+  <data name="Menu.Diagnostics.AVERAGE" xml:space="preserve">
+    <value>AVERAGE</value>
+  </data>
+  <data name="Menu.Diagnostics.STUTTERS" xml:space="preserve">
+    <value>STUTTERS</value>
+  </data>
+  <data name="Menu.Diagnostics.RUNS" xml:space="preserve">
+    <value>RUNS</value>
+  </data>
+  <data name="Menu.Diagnostics.EndExperimentKeep" xml:space="preserve">
+    <value>End the experiment and keep:</value>
+  </data>
+  <data name="Menu.Diagnostics.Finish" xml:space="preserve">
+    <value>Finish</value>
+  </data>
 </root>

@@ -252,6 +252,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
                 ServerDetailsMenuItem.Visibility = Visibility.Visible;
                 SessionInfoMenuItem.Visibility = Visibility.Visible;
+                MeasurePerformanceMenuItem.Visibility = Visibility.Visible;
                 UpdateServerLine(data);
                 PlayTimeTextBlock.Text = "Play time: 00:00:00";
                 _sessionTimer.Start();
@@ -269,6 +270,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 ServerDetailsMenuItem.Visibility = Visibility.Collapsed;
                 JoinClosestServerMenuItem.Visibility = Visibility.Collapsed;
                 SessionInfoMenuItem.Visibility = Visibility.Collapsed;
+                MeasurePerformanceMenuItem.Visibility = Visibility.Collapsed;
                 CurrentGameMenuItem.Visibility = Visibility.Collapsed;
                 CurrentGameIcon.Source = null;
                 CurrentGameNameTextBlock.Text = "";
@@ -390,6 +392,10 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             if (location is not null)
                 Utilities.ShellExecute(location);
         }
+
+        // the result arrives as a toast and on Diagnostics > Stutter
+        private void MeasurePerformanceMenuItem_Click(object sender, RoutedEventArgs e) =>
+            PhasmaStrap.Utility.PerformanceRuns.WriteRequest(new PhasmaStrap.Utility.MeasureRequest { Label = "Measured from the tray", Seconds = 60 });
 
         // ---- Switch account: the saved logins from the Accounts page. Picking one restarts Roblox
         // on that account, through a separate process (this one ends when Roblox closes).

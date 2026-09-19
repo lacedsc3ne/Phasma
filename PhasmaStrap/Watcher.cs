@@ -26,6 +26,9 @@ namespace PhasmaStrap
 
         public readonly SessionTracker? SessionTracker;
 
+        // Diagnostics > Stutter / auto-tuner: measures when the settings window (or the tray) orders it
+        private readonly PerformanceMeasurer? _performanceMeasurer;
+
         public readonly GameChatIntegration? GameChat;
 
         private readonly GlobalHotkeyManager? _hotkeys;
@@ -118,6 +121,8 @@ namespace PhasmaStrap
 
                 if (App.Settings.Prop.SessionHistoryEnabled)
                     SessionTracker = new(ActivityWatcher);
+
+                _performanceMeasurer = new(ActivityWatcher);
 
                 if (App.Settings.Prop.FakeExclusiveFullscreen)
                 {
@@ -623,6 +628,7 @@ namespace PhasmaStrap
             IntegrationWatcher?.Dispose();
             PlayTimeWatcher?.Dispose();
             SessionTracker?.Dispose();
+            _performanceMeasurer?.Dispose();
             PlayTimeStore.Shutdown();
             FakeExclusiveFullscreen.Shutdown();
             AudioDucker.Shutdown();
