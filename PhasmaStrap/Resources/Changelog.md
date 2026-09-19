@@ -2,6 +2,15 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.3
+- **Fixed: "FastFlag profile is not active" when it was.** PhasmaStrap now checks the flags file the open Roblox actually started with, instead of a note that could go stale when Roblox was still closing during a launch.
+- **Fixed: the proxy said everything was patched when Roblox wasn't using it.**
+  - The status now says whether Roblox really connected through the proxy, and tells you to restart Roblox when it was opened before its certificate bundle was patched.
+  - Opening the Networking page no longer quietly creates a new certificate.
+  - Every PhasmaStrap process picks up a new certificate instead of signing with an old one.
+  - The "Roblox rejected the proxy certificate" notification only says "re-added" when it re-added something.
+  - Fixed: the proxy would have stopped working in its certificate's second year.
+
 ## 2.17.2
 - **Fixed: the settings window couldn't be resized** after it reopened maximized and was then made smaller.
 

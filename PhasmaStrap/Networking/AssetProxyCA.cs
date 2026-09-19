@@ -18,6 +18,11 @@ namespace PhasmaStrap.Networking
 
         private static X509Certificate2? _cached;
 
+        // ca.pfx's write time when _cached was read. Every PhasmaStrap process (settings window,
+        // game watcher) holds its own copy: when one of them makes a new CA, the others notice
+        // here instead of signing with - and reporting on - the old one for the rest of their life
+        private static DateTime _cachedWriteTimeUtc;
+
         private static readonly Dictionary<string, X509Certificate2> LeafCache = new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly object Sync = new();
@@ -26,36 +31,66 @@ namespace PhasmaStrap.Networking
         {
             lock (Sync)
             {
-                if (_cached is not null)
-                    return _cached;
+                X509Certificate2? existing = LoadRoot();
+                if (existing is not null)
+                    return existing;
 
                 string path = CertificateFile;
-
-                if (File.Exists(path))
-                {
-                    try
-                    {
-                        var existing = new X509Certificate2(path, (string?)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
-                        if (existing.NotAfter > DateTime.Now.AddDays(7))
-                        {
-                            _cached = existing;
-                            return existing;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, $"Existing CA could not be loaded, regenerating: {ex.Message}");
-                    }
-                }
-
                 var created = CreateRootCertificate();
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 File.WriteAllBytes(path, created.Export(X509ContentType.Pfx));
                 App.Logger.WriteLine(LOG_IDENT, $"Generated new local proxy CA, valid until {created.NotAfter}");
 
+                ForgetDerived();
                 _cached = created;
+                _cachedWriteTimeUtc = File.GetLastWriteTimeUtc(path);
                 return created;
             }
+        }
+
+        // the CA on disk, or null when there is none (or it's unusable) - never makes one, so the
+        // status texts can't quietly replace the CA that Windows and Roblox were given
+        private static X509Certificate2? LoadRoot()
+        {
+            lock (Sync)
+            {
+                string path = CertificateFile;
+                if (!File.Exists(path))
+                    return null;
+
+                DateTime writeTime = File.GetLastWriteTimeUtc(path);
+                if (_cached is not null && writeTime == _cachedWriteTimeUtc)
+                    return _cached;
+
+                try
+                {
+                    var existing = new X509Certificate2(path, (string?)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
+                    if (existing.NotAfter <= DateTime.Now.AddDays(7))
+                        return null;
+
+                    if (_cached is not null)
+                        App.Logger.WriteLine(LOG_IDENT, "The proxy CA was replaced by another PhasmaStrap process - using the new one");
+
+                    ForgetDerived();
+                    _cached = existing;
+                    _cachedWriteTimeUtc = writeTime;
+                    return existing;
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Existing CA could not be loaded, regenerating: {ex.Message}");
+                    return null;
+                }
+            }
+        }
+
+        // everything worked out from the old CA
+        private static void ForgetDerived()
+        {
+            LeafCache.Clear();
+            _rootPemCached = null;
+            _trustStoreCached = null;
+            BundleStateCache.Clear();
         }
 
         private static X509Certificate2 CreateRootCertificate()
@@ -79,10 +114,10 @@ namespace PhasmaStrap.Networking
         {
             lock (Sync)
             {
+                X509Certificate2 root = GetOrCreateRootCertificate();
+
                 if (LeafCache.TryGetValue(hostname, out var existing) && existing.NotAfter > DateTime.Now.AddDays(1))
                     return existing;
-
-                X509Certificate2 root = GetOrCreateRootCertificate();
 
                 using RSA rsa = RSA.Create(2048);
                 var request = new CertificateRequest($"CN={hostname}", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
@@ -95,7 +130,14 @@ namespace PhasmaStrap.Networking
                 request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection { new Oid("1.3.6.1.5.5.7.3.1") }, false));
 
                 byte[] serial = RandomNumberGenerator.GetBytes(16);
-                X509Certificate2 leaf = request.Create(root, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(1), serial);
+                // a leaf can't outlive its CA: in the CA's last year a flat "one year" is refused
+                // and every handshake would fail
+                DateTimeOffset notAfter = DateTimeOffset.Now.AddYears(1);
+                DateTimeOffset rootEnd = new DateTimeOffset(root.NotAfter).AddMinutes(-1);
+                if (notAfter > rootEnd)
+                    notAfter = rootEnd;
+
+                X509Certificate2 leaf = request.Create(root, DateTimeOffset.Now.AddDays(-1), notAfter, serial);
                 X509Certificate2 leafWithKey = leaf.CopyWithPrivateKey(rsa);
 
                 var exportable = new X509Certificate2(leafWithKey.Export(X509ContentType.Pfx), (string?)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
@@ -105,20 +147,26 @@ namespace PhasmaStrap.Networking
         }
 
         // the status texts on the Networking/Asset Warp pages evaluate this on every binding
-        // refresh - opening the user's root store each time is slow, so cache until we change it
+        // refresh - opening the user's root store each time is slow, so it's cached briefly (the
+        // store can change outside this process: certmgr, another PhasmaStrap process)
         private static bool? _trustStoreCached;
+        private static DateTime _trustStoreCheckedUtc;
 
         public static bool IsInstalledInTrustStore()
         {
             lock (Sync)
             {
-                if (_trustStoreCached.HasValue)
+                X509Certificate2? root = LoadRoot();
+                if (root is null)
+                    return false;
+
+                if (_trustStoreCached.HasValue && (DateTime.UtcNow - _trustStoreCheckedUtc).TotalSeconds < 10)
                     return _trustStoreCached.Value;
 
                 using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
-                X509Certificate2 root = GetOrCreateRootCertificate();
                 _trustStoreCached = store.Certificates.Find(X509FindType.FindByThumbprint, root.Thumbprint, false).Count > 0;
+                _trustStoreCheckedUtc = DateTime.UtcNow;
                 return _trustStoreCached.Value;
             }
         }
@@ -134,7 +182,7 @@ namespace PhasmaStrap.Networking
                 using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadWrite);
                 store.Add(root);
-                lock (Sync) _trustStoreCached = true;
+                lock (Sync) { _trustStoreCached = true; _trustStoreCheckedUtc = DateTime.UtcNow; }
                 App.Logger.WriteLine(LOG_IDENT, "Root CA installed to CurrentUser trust store");
                 return true;
             }
@@ -149,11 +197,14 @@ namespace PhasmaStrap.Networking
         {
             try
             {
-                X509Certificate2 root = GetOrCreateRootCertificate();
+                X509Certificate2? root = LoadRoot();
+                if (root is null)
+                    return true;
+
                 using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadWrite);
                 store.Remove(root);
-                lock (Sync) _trustStoreCached = false;
+                lock (Sync) { _trustStoreCached = false; _trustStoreCheckedUtc = DateTime.UtcNow; }
                 App.Logger.WriteLine(LOG_IDENT, "Root CA removed from CurrentUser trust store");
                 return true;
             }
@@ -177,14 +228,14 @@ namespace PhasmaStrap.Networking
 
         private static string? _rootPemCached;
 
-        private static string RootPem()
+        private static string RootPem() => RootPem(GetOrCreateRootCertificate());
+
+        private static string RootPem(X509Certificate2 root)
         {
             lock (Sync)
             {
-                if (_rootPemCached is not null)
+                if (_rootPemCached is not null && ReferenceEquals(root, _cached))
                     return _rootPemCached;
-
-                X509Certificate2 root = GetOrCreateRootCertificate();
                 string base64 = Convert.ToBase64String(root.Export(X509ContentType.Cert));
 
                 var sb = new StringBuilder();
@@ -313,7 +364,11 @@ namespace PhasmaStrap.Networking
         {
             try
             {
-                string pem = RootPem();
+                X509Certificate2? root = LoadRoot();
+                if (root is null)
+                    return false;
+
+                string pem = RootPem(root);
                 bool any = false;
 
                 foreach (string bundle in FindTrustBundles())
@@ -345,6 +400,46 @@ namespace PhasmaStrap.Networking
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        // Whether the Roblox that's open now read a bundle with the CA in it: false when its bundle
+        // lacks the CA or was patched after that Roblox started (it reads the file once, at
+        // start); null when no Roblox is running. A patched file alone says nothing about a Roblox
+        // that was already open.
+        public static bool? RunningRobloxTrustsProxy()
+        {
+            try
+            {
+                X509Certificate2? root = LoadRoot();
+                var running = Utility.ProcessImage.RunningRoblox();
+                if (running.Count == 0)
+                    return null;
+                if (root is null)
+                    return false;
+
+                string pem = RootPem(root);
+
+                foreach (var (folder, started) in running)
+                {
+                    string bundle = Path.Combine(folder, "ssl", "cacert.pem");
+                    if (!File.Exists(bundle))
+                        return false;
+
+                    if (!File.ReadAllText(bundle).Replace("\r\n", "\n").Contains(pem, StringComparison.Ordinal))
+                        return false;
+
+                    // the bundle can't be older than the patch that added the CA, so a write after
+                    // the start means this Roblox read it without
+                    if (File.GetLastWriteTimeUtc(bundle) > started)
+                        return false;
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

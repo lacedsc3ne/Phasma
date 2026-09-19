@@ -369,7 +369,9 @@ namespace PhasmaStrap
 
                     bool flagsWritten = await WriteLaunchFlagsAsync(profile);
 
-                    if (startsNewClient)
+                    // the Watcher checks the running Roblox's own flags file at the join; this note
+                    // is its fallback when that file can't tell (see FlagProfileSession)
+                    if (startsNewClient || flagsWritten)
                         Utility.FlagProfileSession.RecordLaunch(flagsWritten ? wanted : Utility.FlagProfileSession.Wanted.None);
 
                     // fire-and-forget: warms the AssetWarp preload cache ahead of the game

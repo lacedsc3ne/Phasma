@@ -112,7 +112,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!App.Settings.Prop.NetworkingProxyEnabled)
                     return "Off";
 
-                if (!AssetProxyServer.IsRunning)
+                if (!ProxyHealth.IsHostedAnywhere())
                     return "Enabled, but the local listener isn't running - check the log";
 
                 if (!HostsFileManager.IsBlockPresent())
@@ -127,7 +127,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!AssetProxyCA.IsRobloxTrustBundlePatched())
                     return "Running - Roblox's own certificate bundle will be patched on the next launch";
 
-                return "Running - hosts entries present, certificate trusted by Windows and by Roblox";
+                // the files being right isn't the same as Roblox using them
+                return ProxyHealth.RobloxVerdict()
+                    ?? "Ready - hosts entries and certificates are in place; open a game to see whether Roblox connects through it";
             }
         }
 
@@ -140,9 +142,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!IsCertificateInstalled)
                     return "Not installed - the proxy can't work until it is; enabling the proxy installs it automatically";
 
-                return AssetProxyCA.IsRobloxTrustBundlePatched()
-                    ? "Installed to your Windows certificate store (current user only) and to Roblox's own certificate bundle"
-                    : "Installed to your Windows certificate store (current user only); Roblox's own bundle is patched the next time Roblox launches";
+                if (!AssetProxyCA.IsRobloxTrustBundlePatched())
+                    return "Installed to your Windows certificate store (current user only); Roblox's own bundle is patched the next time Roblox launches";
+
+                return AssetProxyCA.RunningRobloxTrustsProxy() == false
+                    ? "Installed to your Windows certificate store and Roblox's bundle - but the open Roblox started before that, so restart it"
+                    : "Installed to your Windows certificate store (current user only) and to Roblox's own certificate bundle";
             }
         }
 

@@ -97,6 +97,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!AssetProxyCA.IsRobloxTrustBundlePatched())
                     return "Proxy is running, but Roblox's own certificate bundle isn't patched yet - it will be on the next launch.";
 
+                string? verdict = ProxyHealth.RobloxVerdict();
+                if (verdict is not null && !verdict.StartsWith("Working", StringComparison.Ordinal))
+                    return verdict + ".";
+
                 return "Local proxy is running - spoofed values apply to this client only, the next time Roblox asks for them.";
             }
         }

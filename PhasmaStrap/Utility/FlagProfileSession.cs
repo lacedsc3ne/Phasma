@@ -174,15 +174,29 @@ namespace PhasmaStrap.Utility
                 return;
 
             FlagProfileData profiles = FlagProfileManager.ReadFromDisk();
-            Wanted wanted = Wanted.Of(FlagLayers.ProfileFor(profiles, data.PlaceId, data.UniverseId));
+            FlagProfile? profile = FlagLayers.ProfileFor(profiles, data.PlaceId, data.UniverseId);
+            Wanted wanted = Wanted.Of(profile);
 
             // only worth a mention when this game HAS a profile that isn't running; a profile left
             // over from the previous game is not something to nag about
             if (wanted.IsNone)
                 return;
 
+            // The flags file Roblox actually read decides it, when it can be known: the running
+            // Roblox's own ClientAppSettings.json, unchanged since that Roblox started. (The marker
+            // below was only updated when a launch looked like it would start a new Roblox, so a
+            // launch while an old one was still closing left it behind - a warning with the
+            // profile's flags plainly working.)
+            bool? inRunning = ProfileInRunningRoblox(profile!);
+            if (inRunning == true)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Joined place {data.PlaceId}: profile \"{wanted.ProfileName}\" is in the flags Roblox started with");
+                RecordLaunch(wanted);
+                return;
+            }
+
             Marker marker = Read();
-            if (string.Equals(wanted.Signature, marker.Signature, StringComparison.Ordinal))
+            if (inRunning is null && string.Equals(wanted.Signature, marker.Signature, StringComparison.Ordinal))
                 return;
 
             lock (_notifiedPlaces)
@@ -233,6 +247,49 @@ namespace PhasmaStrap.Utility
                     Interlocked.Exchange(ref _restarting, 0);
                 }
             });
+        }
+
+        // true / false when the running Roblox's flags file shows it; null when that can't be
+        // known (no Roblox, or the file was rewritten after that Roblox started)
+        private static bool? ProfileInRunningRoblox(FlagProfile profile)
+        {
+            bool? answer = null;
+
+            foreach (var (folder, started) in ProcessImage.RunningRoblox())
+            {
+                bool? has = ProfileInFlagsFile(profile, Path.Combine(folder, "ClientSettings", "ClientAppSettings.json"), started);
+
+                // any running Roblox with the profile counts (a second window, say)
+                if (has == true)
+                    return true;
+                answer ??= has;
+            }
+
+            return answer;
+        }
+
+        private static bool? ProfileInFlagsFile(FlagProfile profile, string file, DateTime startedUtc)
+        {
+            try
+            {
+                if (!File.Exists(file))
+                    return profile.Flags.Count > 0 ? false : null;
+
+                // written after this Roblox started: not what it read
+                if (File.GetLastWriteTimeUtc(file) > startedUtc.AddSeconds(1))
+                    return null;
+
+                var flags = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllText(file)) ?? new();
+                var values = flags.ToDictionary(kv => kv.Key, kv => kv.Value.ValueKind == JsonValueKind.String ? kv.Value.GetString() ?? "" : kv.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+
+                return profile.Flags.All(kv => values.TryGetValue(kv.Key, out string? v) && string.Equals(v, kv.Value, StringComparison.OrdinalIgnoreCase))
+                    && profile.Remove.All(name => !values.ContainsKey(name));
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not read the running Roblox's flags: {ex.Message}");
+                return null;
+            }
         }
 
         private static string Describe(string profile, string signature) => signature.Length > 0 ? $"profile \"{profile}\"" : "just your own flags";
