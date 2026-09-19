@@ -16982,5 +16982,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.EveryClipSearchFiltersRename", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Screenshots.
+        /// </summary>
+        public static string Menu_Capture_Screenshots {
+            get {
+                return ResourceManager.GetString("Menu.Capture.Screenshots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Menu_Capture_Settings {
+            get {
+                return ResourceManager.GetString("Menu.Capture.Settings", resourceCulture);
+            }
+        }
     }
 }
