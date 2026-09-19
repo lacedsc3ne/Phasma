@@ -2,6 +2,9 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.2
+- **Fixed: the settings window couldn't be resized** after it reopened maximized and was then made smaller.
+
 ## 2.17.1
 - **Monitors show their real names** in the in-game resolution settings (e.g. "1. 25G3ZM · 1920x1080 @ 240Hz · main") instead of "Generic PnP Monitor", numbered like Windows' display settings.
 
