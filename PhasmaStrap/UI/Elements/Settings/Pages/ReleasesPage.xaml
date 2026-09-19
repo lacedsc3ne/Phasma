@@ -16,6 +16,18 @@
         <TextBlock Text="{x:Static resources:Strings.Menu_Releases_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Releases_Description}" />
 
+        <!-- this version's changes, from the changelog built into the app (works offline) -->
+        <Border Margin="0,12,0,0" Padding="16,14" CornerRadius="8" BorderThickness="1" Visibility="{Binding WhatsNewVisibility}"
+                BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="Sparkle24" FontSize="18" Margin="0,0,8,0" Foreground="{DynamicResource AccentFillColorDefaultBrush}" />
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding WhatsNewTitle, Mode=OneTime}" />
+                </StackPanel>
+                <controls:MarkdownTextBlock Margin="0,10,0,0" TextWrapping="Wrap" MarkdownText="{Binding WhatsNew}" />
+            </StackPanel>
+        </Border>
+
         <Grid Margin="0,12,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

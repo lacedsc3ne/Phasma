@@ -35,7 +35,7 @@
                     <ColumnDefinition Width="250" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <ListBox x:Name="RPCTemplatesListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" ItemsSource="{Binding RPCTemplates, Mode=OneWay}" DisplayMemberPath="GameID" SelectionChanged="RPCTemplateSelection" SelectedIndex="{Binding SelectedRPCTemplateIndex, Mode=TwoWay}" />
+                <ListBox x:Name="RPCTemplatesListBox" Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" Height="300" ItemsSource="{Binding RPCTemplates, Mode=OneWay}" DisplayMemberPath="GameID" SelectionChanged="RPCTemplateSelection" SelectedIndex="{Binding SelectedRPCTemplateIndex, Mode=TwoWay}" />
                 <Grid Grid.Row="1" Grid.Column="0" Margin="0,8,4,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

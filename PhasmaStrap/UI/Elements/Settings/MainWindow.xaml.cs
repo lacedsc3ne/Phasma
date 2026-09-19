@@ -417,25 +417,132 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         #endregion Pinned nav items
 
+        // ---- window placement. It lives in its own file, written only by this window: State.json
+        // is also saved by the launcher and the background updater, which wrote back the size
+        // they had read at startup - so the window "sometimes" came back at an old size. It is
+        // saved as it changes (not only on a real close - closing to the tray, logging off or a
+        // crash used to lose it), and it remembers being maximized.
+
+        private static string PlacementPath => Path.Combine(Paths.Base, "SettingsWindow.json");
+
+        private static bool IsUiTest => Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1";
+
+        private System.Windows.Threading.DispatcherTimer? _placementTimer;
+
+        private Models.Persistable.WindowState ReadPlacement()
+        {
+            try
+            {
+                if (File.Exists(PlacementPath))
+                    return JsonSerializer.Deserialize<Models.Persistable.WindowState>(File.ReadAllText(PlacementPath)) ?? new();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("MainWindow", $"Window placement unreadable: {ex.Message}");
+            }
+
+            // first run with this file: what State.json had
+            return new Models.Persistable.WindowState { Width = _state.Width, Height = _state.Height, Left = _state.Left, Top = _state.Top };
+        }
+
         public void LoadState()
         {
-            if (_state.Left > SystemParameters.VirtualScreenWidth)
-                _state.Left = 0;
+            Models.Persistable.WindowState placement = ReadPlacement();
 
-            if (_state.Top > SystemParameters.VirtualScreenHeight)
-                _state.Top = 0;
-
-            if (_state.Width > 0)
-                this.Width = _state.Width;
-
-            if (_state.Height > 0)
-                this.Height = _state.Height;
-
-            if (_state.Left > 0 && _state.Top > 0)
+            if (placement.Width >= MinWidth && placement.Height >= MinHeight && IsOnAScreen(placement.Left, placement.Top, placement.Width, placement.Height))
             {
-                this.WindowStartupLocation = WindowStartupLocation.Manual;
-                this.Left = _state.Left;
-                this.Top = _state.Top;
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                Left = placement.Left;
+                Top = placement.Top;
+                Width = placement.Width;
+                Height = placement.Height;
+            }
+            else if (placement.Width >= MinWidth && placement.Height >= MinHeight)
+            {
+                // the monitor it was on is gone: keep the size, centre it
+                Width = Math.Min(placement.Width, SystemParameters.WorkArea.Width);
+                Height = Math.Min(placement.Height, SystemParameters.WorkArea.Height);
+            }
+
+            if (placement.Maximized)
+                WindowState = System.Windows.WindowState.Maximized;
+
+            _placementTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _placementTimer.Tick += (_, _) =>
+            {
+                _placementTimer.Stop();
+                SavePlacement();
+            };
+
+            void Changed(object? sender, EventArgs e)
+            {
+                if (!IsLoaded)
+                    return;
+                _placementTimer.Stop();
+                _placementTimer.Start();
+            }
+
+            SizeChanged += Changed;
+            LocationChanged += Changed;
+            StateChanged += Changed;
+
+            if (Application.Current is not null)
+                Application.Current.SessionEnding += (_, _) => SavePlacement();
+        }
+
+        // at least 120 x 80 of it on one of the screens, in this window's units
+        private static bool IsOnAScreen(double left, double top, double width, double height)
+        {
+            try
+            {
+                double scale;
+                using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+                    scale = g.DpiX / 96.0;
+
+                foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+                {
+                    var area = screen.WorkingArea;
+                    double l = area.Left / scale, t = area.Top / scale, r = area.Right / scale, b = area.Bottom / scale;
+                    double overlapW = Math.Min(left + width, r) - Math.Max(left, l);
+                    double overlapH = Math.Min(top + height, b) - Math.Max(top, t);
+                    if (overlapW >= 120 && overlapH >= 80)
+                        return true;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return false;
+        }
+
+        private void SavePlacement()
+        {
+            // UI tests run a second copy of this window - it must not move the real one
+            if (IsUiTest || WindowState == System.Windows.WindowState.Minimized && !IsVisible)
+                return;
+
+            try
+            {
+                Rect bounds = WindowState == System.Windows.WindowState.Normal ? new Rect(Left, Top, ActualWidth, ActualHeight) : RestoreBounds;
+                if (bounds.IsEmpty || bounds.Width < 100 || bounds.Height < 100)
+                    return;
+
+                var placement = new Models.Persistable.WindowState
+                {
+                    Left = bounds.Left,
+                    Top = bounds.Top,
+                    Width = bounds.Width,
+                    Height = bounds.Height,
+                    Maximized = WindowState == System.Windows.WindowState.Maximized,
+                };
+
+                Directory.CreateDirectory(Paths.Base);
+                File.WriteAllText(PlacementPath, JsonSerializer.Serialize(placement));
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("MainWindow", $"Window placement not saved: {ex.Message}");
             }
         }
 
@@ -495,6 +602,8 @@ namespace PhasmaStrap.UI.Elements.Settings
                 && !viewModel.LaunchAfterClose
                 && !App.LaunchSettings.TestModeFlag.Active;
 
+            SavePlacement();
+
             if (shouldMinimizeToTray)
             {
                 // nothing is discarded by hiding the window, so skip the unsaved-changes prompt below
@@ -511,12 +620,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                     e.Cancel = true;
             }
             
-            _state.Width = this.Width;
-            _state.Height = this.Height;
-
-            _state.Top = this.Top;
-            _state.Left = this.Left;
-
             App.State.Save();
         }
 
@@ -546,7 +649,9 @@ namespace PhasmaStrap.UI.Elements.Settings
         private void RestoreFromTray()
         {
             Show();
-            WindowState = System.Windows.WindowState.Normal;
+            // keep it maximized if it was
+            if (WindowState == System.Windows.WindowState.Minimized)
+                WindowState = ReadPlacement().Maximized ? System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal;
             Activate();
 
             _trayIcon?.Dispose();

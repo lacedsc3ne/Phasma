@@ -23,6 +23,14 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public static bool AnyEnabled => OverlayHub.InGame && GameEffectsEnabled;
 
+        // effects that work on a copy of the game's picture. Without them (HUD / crosshair only)
+        // the overlay is transparent and needs no screen capture at all.
+        public static bool NeedsCapture =>
+            App.Settings.Prop.RiShadeEnabled ||
+            (App.Settings.Prop.AntiAliasingEnabled && App.Settings.Prop.AntiAliasingMethodIndex > 0) ||
+            FrameGeneration.FrameGenSettings.ModeIndex > 0 ||
+            App.Settings.Prop.StreamSafeEnabled;
+
         /// <summary>
         /// Whether the stats HUD should actually be drawn right now, folding in Overlay Focus Mode
         /// (a manual, hotkey/toggle-driven "hide overlays for a moment" switch - not automatic

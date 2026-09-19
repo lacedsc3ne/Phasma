@@ -31,7 +31,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 TagName = release.TagName ?? "";
                 Name = string.IsNullOrWhiteSpace(release.Name) ? TagName : release.Name;
-                Body = string.IsNullOrWhiteSpace(release.Body) ? Strings.Menu_Releases_NoNotes : release.Body;
+                string body = StripBoilerplate(release.Body);
+                Body = string.IsNullOrWhiteSpace(body) ? Strings.Menu_Releases_NoNotes : body;
                 IsInstalled = isInstalled;
                 HtmlUrl = $"https://github.com/{App.ProjectRepository}/releases/tag/{TagName}";
                 AssetCount = release.Assets?.Count ?? 0;
@@ -42,6 +43,76 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 else
                     PublishedText = release.CreatedAt ?? "";
             }
+        }
+
+        // every release body ends with the same two download notes (unsigned build, .NET 6) -
+        // they're not news
+        private static string StripBoilerplate(string? body)
+        {
+            if (string.IsNullOrWhiteSpace(body))
+                return "";
+
+            var kept = body.Replace("\r\n", "\n").Split("\n\n")
+                .Where(p => !p.TrimStart().StartsWith("**Note:** this build is unsigned", StringComparison.OrdinalIgnoreCase)
+                         && !p.TrimStart().StartsWith("**Requires the [.NET", StringComparison.OrdinalIgnoreCase));
+            return string.Join("\n\n", kept).Trim();
+        }
+
+        // ---- "What's new": this version's section of the changelog built into the app
+
+        public string WhatsNewTitle { get; } = $"What's new in {App.Version}";
+
+        private string _whatsNew = "";
+        public string WhatsNew
+        {
+            get => _whatsNew;
+            private set { _whatsNew = value; OnPropertyChanged(nameof(WhatsNew)); OnPropertyChanged(nameof(WhatsNewVisibility)); }
+        }
+
+        public System.Windows.Visibility WhatsNewVisibility => WhatsNew.Length > 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+        private async Task LoadWhatsNewAsync()
+        {
+            try
+            {
+                string changelog = await Resource.GetString("Changelog.md");
+                WhatsNew = ChangelogSection(changelog, App.Version);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Changelog unreadable: {ex.Message}");
+            }
+        }
+
+        // the "## <version>" section's text (without its heading); the newest section when the
+        // version has none
+        public static string ChangelogSection(string changelog, string version)
+        {
+            var sections = new List<(string Version, string Text)>();
+            string? current = null;
+            var text = new StringBuilder();
+
+            foreach (string raw in changelog.Replace("\r\n", "\n").Split('\n'))
+            {
+                if (raw.StartsWith("## "))
+                {
+                    if (current is not null)
+                        sections.Add((current, text.ToString().Trim()));
+                    current = raw[3..].Trim();
+                    text.Clear();
+                }
+                else if (current is not null)
+                {
+                    text.AppendLine(raw);
+                }
+            }
+            if (current is not null)
+                sections.Add((current, text.ToString().Trim()));
+
+            string wanted = version.TrimStart('v');
+            return sections.FirstOrDefault(s => s.Version.TrimStart('v') == wanted).Text
+                ?? sections.FirstOrDefault().Text
+                ?? "";
         }
 
         private List<ReleaseItem> _allReleases = new();
@@ -97,6 +168,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ReleasesViewModel()
         {
+            _ = LoadWhatsNewAsync();
             _ = LoadAsync();
         }
 
@@ -107,7 +179,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             try
             {
-                var releases = await Http.GetJson<GithubRelease[]>($"https://api.github.com/repos/{App.ProjectRepository}/releases");
+                var releases = await Http.GetJson<GithubRelease[]>($"https://api.github.com/repos/{App.ProjectRepository}/releases?per_page={MaxReleasesToShow}");
 
                 _allReleases = (releases ?? Array.Empty<GithubRelease>())
                     .Take(MaxReleasesToShow)

@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
 
 using PhasmaStrap.Integrations.FrameGeneration;
+using PhasmaStrap.Models.Persistable;
 using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
@@ -303,7 +304,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // --- multi-monitor / forced in-game resolution (ported from Voidstrap DisplaySystem /
         // InGameResolutionApplier) ---
 
-        public List<DisplayInfo> MonitorOptions => DisplaySystem.GetDisplays();
+        // The lists are built once and the selections are always items OF those lists: a combo
+        // box only shows a selection that is one of its own items, and these used to be rebuilt
+        // on every read - so nothing could ever be selected.
+        private List<DisplayInfo>? _monitorOptions;
+        public List<DisplayInfo> MonitorOptions => _monitorOptions ??= DisplaySystem.GetDisplays();
 
         public DisplayInfo? SelectedMonitor
         {
@@ -312,14 +317,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 ?? MonitorOptions.FirstOrDefault();
             set
             {
-                App.Settings.Prop.InGameResolutionMonitor = value?.DeviceName ?? "";
+                if (value is null || value.DeviceName == App.Settings.Prop.InGameResolutionMonitor)
+                    return;
+                App.Settings.Prop.InGameResolutionMonitor = value.DeviceName;
+                _modeOptions = null;
                 OnPropertyChanged(nameof(SelectedMonitor));
                 OnPropertyChanged(nameof(ModeOptions));
                 OnPropertyChanged(nameof(SelectedMode));
             }
         }
 
-        public List<DisplayMode> ModeOptions => DisplaySystem.GetModes(SelectedMonitor?.DeviceName);
+        private List<DisplayMode>? _modeOptions;
+        public List<DisplayMode> ModeOptions => _modeOptions ??= DisplaySystem.GetModes(SelectedMonitor?.DeviceName)
+            .OrderByDescending(m => m.Width * m.Height).ThenByDescending(m => m.RefreshRate).ToList();
 
         public DisplayMode? SelectedMode
         {
@@ -344,11 +354,104 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.ForceInGameResolution;
             set
             {
+                if (App.Settings.Prop.ForceInGameResolution == value)
+                    return;
                 App.Settings.Prop.ForceInGameResolution = value;
-                if (!value)
-                    Integrations.ForcedResolution.Shutdown();
+                OnPropertyChanged(nameof(ForceInGameResolution));
             }
         }
+
+        // ---- per-game resolutions: the monitor + resolution chosen above, for one game
+
+        public sealed record ResolutionGameChoice(string PlaceId, string Name)
+        {
+            public override string ToString() => Name;
+        }
+
+        // games played recently, to pick from instead of typing a place ID
+        public List<ResolutionGameChoice> ResolutionRecentGames { get; } = Integrations.PlayTimeStore.GetAll()
+            .Where(e => e.PlaceId > 0)
+            .Take(30)
+            .Select(e => new ResolutionGameChoice(e.PlaceId.ToString(), $"{(e.Name.Length > 0 ? e.DisplayName : "Place")}  ({e.PlaceId})"))
+            .ToList();
+
+        public ResolutionGameChoice? ResolutionPickedGame
+        {
+            get => null;
+            set
+            {
+                if (value is null)
+                    return;
+                ResolutionAssignPlaceId = value.PlaceId;
+            }
+        }
+
+        public sealed record ResolutionPlaceAssignment(string PlaceId, string Game, InGameResolutionProfile Profile)
+        {
+            public string Display => $"{Game} → {Profile.Width}x{Profile.Height} @ {Profile.RefreshRate}Hz";
+        }
+
+        private static string GameNameFor(string placeId) =>
+            Integrations.PlayTimeStore.GetAll().FirstOrDefault(e => e.PlaceId.ToString() == placeId) is { Name.Length: > 0 } entry ? entry.DisplayName : $"Place {placeId}";
+
+        public ObservableCollection<ResolutionPlaceAssignment> ResolutionPlaceAssignments { get; } = new(
+            App.Settings.Prop.InGameResolutionPlaceProfiles.Select(kv => new ResolutionPlaceAssignment(kv.Key, GameNameFor(kv.Key), kv.Value)));
+
+        private string _resolutionAssignPlaceId = "";
+        public string ResolutionAssignPlaceId
+        {
+            get => _resolutionAssignPlaceId;
+            set { _resolutionAssignPlaceId = value; OnPropertyChanged(nameof(ResolutionAssignPlaceId)); }
+        }
+
+        private string _resolutionAssignStatus = "";
+        public string ResolutionAssignStatus
+        {
+            get => _resolutionAssignStatus;
+            private set { _resolutionAssignStatus = value; OnPropertyChanged(nameof(ResolutionAssignStatus)); }
+        }
+
+        public ICommand AddResolutionPlaceCommand => new RelayCommand(() =>
+        {
+            string id = ResolutionAssignPlaceId.Trim();
+            if (!long.TryParse(id, out long place) || place <= 0)
+            {
+                ResolutionAssignStatus = "Pick a game from the list, or type its place ID (the number in its roblox.com/games/ link).";
+                return;
+            }
+
+            DisplayMode? mode = SelectedMode;
+            if (mode is null)
+            {
+                ResolutionAssignStatus = "Pick a resolution above first - the game gets that monitor and resolution.";
+                return;
+            }
+
+            var profile = new InGameResolutionProfile
+            {
+                Monitor = SelectedMonitor?.DeviceName ?? "",
+                Width = mode.Width,
+                Height = mode.Height,
+                RefreshRate = mode.RefreshRate,
+            };
+
+            var existing = ResolutionPlaceAssignments.FirstOrDefault(a => a.PlaceId == id);
+            if (existing is not null)
+                ResolutionPlaceAssignments.Remove(existing);
+
+            ResolutionPlaceAssignments.Add(new ResolutionPlaceAssignment(id, GameNameFor(id), profile));
+            App.Settings.Prop.InGameResolutionPlaceProfiles[id] = profile;
+            ResolutionAssignPlaceId = "";
+            ResolutionAssignStatus = $"{GameNameFor(id)} will use {mode}. Press Save to keep it.";
+        });
+
+        public ICommand RemoveResolutionPlaceCommand => new RelayCommand<ResolutionPlaceAssignment>(assignment =>
+        {
+            if (assignment is null)
+                return;
+            ResolutionPlaceAssignments.Remove(assignment);
+            App.Settings.Prop.InGameResolutionPlaceProfiles.Remove(assignment.PlaceId);
+        });
 
         public ICommand IdentifyDisplaysCommand => new RelayCommand(() => DisplaySystem.IdentifyDisplays());
     }
