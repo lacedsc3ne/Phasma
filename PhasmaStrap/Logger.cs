@@ -4,7 +4,7 @@ namespace PhasmaStrap
 
     public class Logger
     {
-        private readonly SemaphoreSlim _semaphore = new(1, 1);
+        private readonly object _writeLock = new();
         private FileStream? _filestream;
 
         public readonly List<string> History = new();
@@ -137,21 +137,25 @@ namespace PhasmaStrap
             Thread.CurrentThread.CurrentUICulture = Locale.CurrentCulture;
         }
 
-        private async void WriteToLog(string message)
+        // written and flushed before returning: the async version lost whatever was logged just
+        // before Environment.Exit (App.Terminate) - e.g. every line of an upgrade that then handed
+        // over to an already open window
+        private void WriteToLog(string message)
         {
             if (!Initialized)
                 return;
 
-            try
+            lock (_writeLock)
             {
-                await _semaphore.WaitAsync();
-                await _filestream!.WriteAsync(Encoding.UTF8.GetBytes($"{message}\r\n"));
-
-                _ = _filestream.FlushAsync();
-            }
-            finally
-            {
-                _semaphore.Release();
+                try
+                {
+                    _filestream!.Write(Encoding.UTF8.GetBytes($"{message}\r\n"));
+                    _filestream.Flush();
+                }
+                catch (Exception)
+                {
+                    // a full or vanished disk must never take the app down with it
+                }
             }
         }
     }
