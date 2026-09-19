@@ -147,7 +147,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int InstantReplayClipSeconds
         {
             get => App.Settings.Prop.InstantReplayClipSeconds;
-            set { App.Settings.Prop.InstantReplayClipSeconds = value; ReplaySettingChanged(nameof(InstantReplayClipSeconds)); }
+            set { App.Settings.Prop.InstantReplayClipSeconds = value; ReplaySettingChanged(nameof(InstantReplayClipSeconds)); OnPropertyChanged(nameof(ClipLengthText)); }
+        }
+
+        public int MaxClipSeconds => InstantReplayRecorder.MaxClipSeconds;
+
+        // "45s" under a minute, "2:30" from there
+        public string ClipLengthText
+        {
+            get
+            {
+                int seconds = App.Settings.Prop.InstantReplayClipSeconds;
+                return seconds < 60 ? $"{seconds}s" : $"{seconds / 60}:{seconds % 60:00}";
+            }
         }
 
         public string[] QualityOptions { get; } = { "Low", "Medium", "High" };

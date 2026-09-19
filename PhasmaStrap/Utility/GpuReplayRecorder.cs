@@ -86,7 +86,13 @@ namespace PhasmaStrap.Utility
         private long _presentedSince;
 
         // stats
-        private long _statFrames, _statDropped;
+        private long _statFrames, _statDropped, _statRepeated;
+
+        // the newest picture of the game, kept so a tick with no new frame repeats it: clips are
+        // then exactly the chosen frame rate, even when the game draws fewer frames than that
+        private ID3D11Texture2D? _last;
+        private int _lastWidth, _lastHeight;
+        private bool _lastValid;
         private DateTime _statSinceUtc;
 
         public bool IsRunning => _running;
@@ -127,6 +133,7 @@ namespace PhasmaStrap.Utility
             public int SourceWidth, SourceHeight, Width, Height, Fps, Bitrate;
             public long StartTicks = -1, EndTicks;
             public int Frames;
+            public long LastSlot = -1;   // frame number (at the clip's fps) of the last frame written
             public Task? Finalizing;
             public bool Ok;
 
@@ -206,7 +213,7 @@ namespace PhasmaStrap.Utility
                         }
 
                         double slackMs = Math.Max(0, nextMs - clock.Elapsed.TotalMilliseconds);
-                        bool active = CaptureOnce(settings, fps, (int)Math.Ceiling(slackMs + intervalMs));
+                        bool active = CaptureOnce(settings, fps, (int)Math.Ceiling(slackMs + intervalMs / 2));
 
                         if (!active)
                         {
@@ -282,11 +289,11 @@ namespace PhasmaStrap.Utility
         private bool CaptureOnce(Settings settings, int fps, int frameWaitMs)
         {
             IntPtr hwnd = ResolveWindow(settings.ProcessName);
-            if (hwnd == IntPtr.Zero || IsIconic(hwnd) || GetForegroundWindow() != hwnd)
+            if (hwnd == IntPtr.Zero || IsIconic(hwnd) || GetForegroundWindow() != hwnd || !GetClientRect(hwnd, out RECT client))
+            {
+                _lastValid = false;
                 return false;
-
-            if (!GetClientRect(hwnd, out RECT client))
-                return false;
+            }
 
             var origin = new POINT();
             ClientToScreen(hwnd, ref origin);
@@ -309,6 +316,7 @@ namespace PhasmaStrap.Utility
 
             try
             {
+                bool fresh = false;
                 try
                 {
                     _duplication!.AcquireNextFrame(Math.Clamp(frameWaitMs, 0, 100), out OutduplFrameInfo info, out resource);
@@ -318,41 +326,54 @@ namespace PhasmaStrap.Utility
                     CountPresented((int)info.AccumulatedFrames);
 
                     // a mouse-only update carries no new image
-                    if (info.LastPresentTime == 0)
-                        return true;
+                    fresh = info.LastPresentTime != 0 && resource is not null;
                 }
                 catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.WaitTimeout)
                 {
-                    return true;
+                    // nothing new on screen this tick - the last picture is written again below
                 }
                 catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.AccessLost)
                 {
                     // resolution / fullscreen change or the secure desktop - rebuilt on the next tick
                     ReleaseDuplication();
+                    _lastValid = false;
                     return true;
                 }
 
-                if (resource is null)
-                    return true;
+                if (fresh)
+                {
+                    using ID3D11Texture2D desktop = resource!.QueryInterface<ID3D11Texture2D>();
+                    Texture2DDescription desc = desktop.Description;
 
-                using ID3D11Texture2D desktop = resource.QueryInterface<ID3D11Texture2D>();
-                Texture2DDescription desc = desktop.Description;
+                    if (desc.Format != Format.B8G8R8A8_UNorm)
+                        throw new NotSupportedException($"the desktop surface is {desc.Format} (HDR), not BGRA8");
 
-                if (desc.Format != Format.B8G8R8A8_UNorm)
-                    throw new NotSupportedException($"the desktop surface is {desc.Format} (HDR), not BGRA8");
+                    int left = Math.Max(0, origin.X - _outputLeft);
+                    int top = Math.Max(0, origin.Y - _outputTop);
+                    int grabWidth = (Math.Min(left + wantWidth, (int)desc.Width) - left) & ~1;
+                    int grabHeight = (Math.Min(top + wantHeight, (int)desc.Height) - top) & ~1;
+                    if (grabWidth < 64 || grabHeight < 64)
+                        return true;
 
-                int left = Math.Max(0, origin.X - _outputLeft);
-                int top = Math.Max(0, origin.Y - _outputTop);
-                int width = (Math.Min(left + wantWidth, (int)desc.Width) - left) & ~1;
-                int height = (Math.Min(top + wantHeight, (int)desc.Height) - top) & ~1;
-                if (width < 64 || height < 64)
-                    return true;
+                    KeepLast(desktop, left, top, grabWidth, grabHeight);
+                }
+                else
+                {
+                    // a repeat is only right while the window is the size it was
+                    if (!_lastValid || (wantWidth & ~1) < _lastWidth || (wantHeight & ~1) < _lastHeight)
+                        return true;
+                    _statRepeated++;
+                }
 
+                int width = _lastWidth, height = _lastHeight;
+
+                // "Native" is the game's own size; any other choice is exactly that height (the
+                // width follows the game's shape), scaled up or down as needed
                 int outWidth = width, outHeight = height;
-                if (settings.MaxHeight > 0 && height > settings.MaxHeight)
+                if (settings.MaxHeight > 0)
                 {
                     outHeight = settings.MaxHeight & ~1;
-                    outWidth = (int)Math.Round(width * (double)outHeight / height) & ~1;
+                    outWidth = Math.Min(8192, (int)Math.Round(width * (double)outHeight / height)) & ~1;
                 }
 
                 int bitrate = settings.BitrateFor(outWidth, outHeight, fps);
@@ -380,26 +401,23 @@ namespace PhasmaStrap.Utility
                     Prepare(width, height, outWidth, outHeight, fps, bitrate);
                 }
 
-                PoolItem? item = Rent(width, height);
-                if (item is null)
+                // every frame sits on the clip's own frame grid (1/fps apart): a constant frame rate
+                long frameTicks = 10_000_000L / fps;
+                // (a tick may wait up to half a frame for a new picture, and may fire a little early:
+                // both land on the tick's own step)
+                long slot = (long)Math.Floor((now - _current.StartTicks) / (double)frameTicks + 0.25);
+                if (slot <= _current.LastSlot)
+                    return true; // this grid step already has its frame
+
+                // the loop ran late (a hitch): fill the steps it missed, up to a quarter second
+                long missed = Math.Min(slot - _current.LastSlot - 1, Math.Max(1, fps / 4));
+                for (long s = slot - missed; s < slot; s++)
                 {
-                    _statDropped++;
-                    return true;
+                    if (!WriteLast(s, frameTicks, width, height))
+                        break;
                 }
 
-                _context!.CopySubresourceRegion(item.Texture, 0, 0, 0, 0, desktop, 0, new Vortice.Mathematics.Box(left, top, 0, left + width, top + height, 1));
-
-                using IMFSample sample = MediaFactory.MFCreateSample();
-                sample.AddBuffer(item.Buffer);
-                sample.SampleTime = now - _current.StartTicks;
-                sample.SampleDuration = 10_000_000L / fps;
-
-                _current.Writer!.WriteSample(_current.Stream, sample);
-                _current.Frames++;
-                _everWorked = true;
-                _failures = 0;
-                Interlocked.Increment(ref _statFrames);
-
+                WriteLast(slot, frameTicks, width, height);
                 return true;
             }
             finally
@@ -411,6 +429,57 @@ namespace PhasmaStrap.Utility
                     try { _duplication?.ReleaseFrame(); } catch { }
                 }
             }
+        }
+
+        private void KeepLast(ID3D11Texture2D desktop, int left, int top, int width, int height)
+        {
+            if (_last is null || _lastWidth != width || _lastHeight != height)
+            {
+                _last?.Dispose();
+                _last = _device!.CreateTexture2D(new Texture2DDescription
+                {
+                    Width = width,
+                    Height = height,
+                    MipLevels = 1,
+                    ArraySize = 1,
+                    Format = Format.B8G8R8A8_UNorm,
+                    SampleDescription = new SampleDescription(1, 0),
+                    Usage = ResourceUsage.Default,
+                    BindFlags = BindFlags.ShaderResource,
+                    CpuAccessFlags = CpuAccessFlags.None,
+                });
+                _lastWidth = width;
+                _lastHeight = height;
+            }
+
+            _context!.CopySubresourceRegion(_last, 0, 0, 0, 0, desktop, 0, new Vortice.Mathematics.Box(left, top, 0, left + width, top + height, 1));
+            _lastValid = true;
+        }
+
+        // hands the kept picture to the encoder as frame number `slot` of the current segment
+        private bool WriteLast(long slot, long frameTicks, int width, int height)
+        {
+            PoolItem? item = Rent(width, height);
+            if (item is null)
+            {
+                _statDropped++;
+                return false;
+            }
+
+            _context!.CopyResource(item.Texture, _last!);
+
+            using IMFSample sample = MediaFactory.MFCreateSample();
+            sample.AddBuffer(item.Buffer);
+            sample.SampleTime = slot * frameTicks;
+            sample.SampleDuration = frameTicks;
+
+            _current!.Writer!.WriteSample(_current.Stream, sample);
+            _current.Frames++;
+            _current.LastSlot = slot;
+            _everWorked = true;
+            _failures = 0;
+            Interlocked.Increment(ref _statFrames);
+            return true;
         }
 
         private void CountPresented(int frames)
@@ -440,23 +509,27 @@ namespace PhasmaStrap.Utility
             // 1080p above ~170fps is outside every H.264 level; an encoder that enforces levels
             // refuses it, so the stream is then declared as 60fps - frames keep their real
             // timestamps, only the nominal rate in the header differs
-            var attempts = new List<(Guid Input, int DeclaredFps)>
+            // before that, the highest H.264 levels are asked for outright (6.2, then 5.2) - some
+            // encoders pick a level from the size and rate themselves, some need to be told
+            var attempts = new List<(Guid Input, int DeclaredFps, int Level)>
             {
-                (VideoFormatGuids.Argb32, fps),
-                (VideoFormatGuids.Rgb32, fps),
+                (VideoFormatGuids.Argb32, fps, 0),
+                (VideoFormatGuids.Rgb32, fps, 0),
             };
 
             if (fps > 60)
             {
-                attempts.Add((VideoFormatGuids.Argb32, 60));
-                attempts.Add((VideoFormatGuids.Rgb32, 60));
+                attempts.Add((VideoFormatGuids.Argb32, fps, 62));
+                attempts.Add((VideoFormatGuids.Argb32, fps, 52));
+                attempts.Add((VideoFormatGuids.Argb32, 60, 0));
+                attempts.Add((VideoFormatGuids.Rgb32, 60, 0));
             }
 
             Exception? last = null;
             string step = "";
             var failures = new List<string>();
 
-            foreach ((Guid input, int declaredFps) in attempts)
+            foreach ((Guid input, int declaredFps, int level) in attempts)
             {
                 var segment = new Segment { SourceWidth = sourceWidth, SourceHeight = sourceHeight, Width = width, Height = height, Fps = fps, Bitrate = bitrate };
 
@@ -483,6 +556,11 @@ namespace PhasmaStrap.Utility
                     MfInterop.SetUInt64(output, MediaTypeAttributeKeys.FrameSize, MfInterop.Pack((uint)width, (uint)height));
                     MfInterop.SetUInt64(output, MediaTypeAttributeKeys.FrameRate, MfInterop.Pack((uint)declaredFps, 1));
                     MfInterop.SetUInt64(output, MediaTypeAttributeKeys.PixelAspectRatio, MfInterop.Pack(1, 1));
+                    if (level > 0)
+                    {
+                        output.Set(MediaTypeAttributeKeys.Mpeg2Profile, 100u); // High
+                        output.Set(MediaTypeAttributeKeys.Mpeg2Level, (uint)level);
+                    }
 
                     using IMFMediaType inputType = MediaFactory.MFCreateMediaType();
                     inputType.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video);
@@ -500,14 +578,14 @@ namespace PhasmaStrap.Utility
                     segment.Writer.BeginWriting();
 
                     if (last is not null)
-                        Log?.Invoke($"Segment writer settled on {(input == VideoFormatGuids.Argb32 ? "ARGB32" : "RGB32")} input, stream declared as {declaredFps}fps");
+                        Log?.Invoke($"Segment writer settled on {(input == VideoFormatGuids.Argb32 ? "ARGB32" : "RGB32")} input, stream declared as {declaredFps}fps{(level > 0 ? $", H.264 level {level / 10.0:0.0}" : "")}");
 
                     return segment;
                 }
                 catch (Exception ex)
                 {
                     last = ex;
-                    failures.Add($"{(input == VideoFormatGuids.Argb32 ? "ARGB32" : "RGB32")}@{declaredFps}: {step} 0x{ex.HResult:X8}");
+                    failures.Add($"{(input == VideoFormatGuids.Argb32 ? "ARGB32" : "RGB32")}@{declaredFps}{(level > 0 ? $" L{level}" : "")}: {step} 0x{ex.HResult:X8}");
                     segment.Dispose();
                 }
             }
@@ -815,7 +893,7 @@ namespace PhasmaStrap.Utility
                 }
 
                 CloseCurrent(realTime ? Now() : start + frames * frameTicks);
-                return TakeCut(int.MaxValue / 20_000_000);
+                return TakeCut(1_000_000); // everything that was made
             }
             finally
             {
@@ -988,6 +1066,10 @@ namespace PhasmaStrap.Utility
             _pool.Clear();
             _poolWidth = _poolHeight = 0;
 
+            _last?.Dispose();
+            _last = null;
+            _lastValid = false;
+
             ReleaseDuplication();
 
             if (_deviceManager != IntPtr.Zero)
@@ -1046,6 +1128,7 @@ namespace PhasmaStrap.Utility
 
             long frames = Interlocked.Exchange(ref _statFrames, 0);
             long dropped = Interlocked.Exchange(ref _statDropped, 0);
+            long repeated = Interlocked.Exchange(ref _statRepeated, 0);
             _statSinceUtc = DateTime.UtcNow;
 
             int segments;
@@ -1059,7 +1142,7 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            Log?.Invoke($"{frames / seconds:0.0} fps encoded / {fps} target, {dropped} dropped, {segments} segment(s) buffered = {bytes / 1048576.0:0.0} MB, {_pool.Count} pooled texture(s)");
+            Log?.Invoke($"{frames / seconds:0.0} fps encoded / {fps} target ({repeated} repeated because the game drew fewer), {dropped} dropped, {segments} segment(s) buffered = {bytes / 1048576.0:0.0} MB, {_pool.Count} pooled texture(s)");
         }
 
         [StructLayout(LayoutKind.Sequential)]

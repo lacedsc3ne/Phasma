@@ -13,8 +13,8 @@ namespace PhasmaStrap.Utility
     //
     // Frame rate, resolution and quality are three separate settings, all re-read live:
     //   InstantReplayFps        target capture rate (15 ... 240)
-    //   InstantReplayMaxHeight  0 = the game's own resolution, otherwise frames taller than this
-    //                           are scaled down (1080/720/480)
+    //   InstantReplayMaxHeight  0 = the game's own resolution, otherwise exactly this height
+    //                           (1440/1080/720/480, scaled up or down; width keeps the shape)
     //   InstantReplayQuality    0-2, picks the H.264 bitrate and the buffer's JPEG quality
     //
     // Capture has two paths:
@@ -115,7 +115,10 @@ namespace PhasmaStrap.Utility
         public const int MaxFps = 240;
 
         // 0 = native
-        public static readonly int[] MaxHeightOptions = { 0, 1080, 720, 480 };
+        public static readonly int[] MaxHeightOptions = { 0, 1440, 1080, 720, 480 };
+
+        // how long a clip can be (the settings page's slider goes this far)
+        public const int MaxClipSeconds = 300;
 
         private static int TargetFps => Math.Clamp(App.Settings.Prop.InstantReplayFps, 5, MaxFps);
 
@@ -156,7 +159,7 @@ namespace PhasmaStrap.Utility
         {
             Fps = TargetFps,
             MaxHeight = MaxHeight,
-            ClipSeconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120),
+            ClipSeconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, MaxClipSeconds),
             ProcessName = App.RobloxPlayerAppName,
             BitrateFor = (width, height, fps) => BitrateFor(width, height, fps, Quality),
         };
@@ -189,7 +192,7 @@ namespace PhasmaStrap.Utility
             if (App.Settings.Prop.InstantReplayAudio)
             {
                 _audio = new ReplayAudio(
-                    () => Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120) + GpuReplayRecorder.SegmentSeconds + 2,
+                    () => Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, MaxClipSeconds) + GpuReplayRecorder.SegmentSeconds + 2,
                     App.RobloxPlayerAppName,
                     App.Settings.Prop.InstantReplayMicrophone,
                     App.Settings.Prop.InstantReplayMicrophoneDevice);
@@ -198,7 +201,7 @@ namespace PhasmaStrap.Utility
 
             gpu.Start();
 
-            App.Logger.WriteLine(LOG_IDENT, $"Started on the GPU path ({TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, sound {(_audio is null ? "off" : App.Settings.Prop.InstantReplayMicrophone ? "game + microphone" : "game")})");
+            App.Logger.WriteLine(LOG_IDENT, $"Started on the GPU path ({TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"{MaxHeight}p")}, quality {Quality}, sound {(_audio is null ? "off" : App.Settings.Prop.InstantReplayMicrophone ? "game + microphone" : "game")})");
         }
 
         private void StopGpu()
@@ -215,7 +218,7 @@ namespace PhasmaStrap.Utility
         private string? SaveGpuClip(GpuReplayRecorder gpu, ReplayAudio? audio)
         {
             var timer = Stopwatch.StartNew();
-            int seconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120);
+            int seconds = Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, MaxClipSeconds);
 
             using GpuReplayRecorder.Cut? cut = gpu.TakeCut(seconds);
             if (cut is null)
@@ -291,7 +294,7 @@ namespace PhasmaStrap.Utility
             _captureThread = new Thread(CaptureLoop) { IsBackground = true, Name = "InstantReplayCapture" };
             _captureThread.Start(_queue);
 
-            App.Logger.WriteLine(LOG_IDENT, $"Started ({EncodeWorkers} compression workers, {TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"max {MaxHeight}p")}, quality {Quality}, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
+            App.Logger.WriteLine(LOG_IDENT, $"Started ({EncodeWorkers} compression workers, {TargetFps} fps target, {(MaxHeight == 0 ? "native resolution" : $"{MaxHeight}p")}, quality {Quality}, up to {App.Settings.Prop.InstantReplayClipSeconds}s buffered)");
         }
 
         public void Stop()
@@ -536,7 +539,7 @@ namespace PhasmaStrap.Utility
                         int maxHeight = MaxHeight;
                         Bitmap? scaled = null;
 
-                        if (maxHeight > 0 && source.Height > maxHeight)
+                        if (maxHeight > 0 && source.Height != maxHeight)
                         {
                             int h = maxHeight & ~1;
                             int w = Math.Max(2, (int)Math.Round(source.Width * (double)h / source.Height)) & ~1;

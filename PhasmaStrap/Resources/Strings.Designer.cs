@@ -11827,7 +11827,7 @@ namespace PhasmaStrap.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Seconds of buffered gameplay to keep, and to save when triggered..
+        ///   Looks up a localized string similar to How much gameplay is kept and saved when you press the hotkey - up to 5 minutes. Longer clips hold more in memory (the estimate below says how much)..
         /// </summary>
         public static string Menu_Capture_SecondsBufferedGameplayKeepSaveWhen {
             get {
