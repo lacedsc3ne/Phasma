@@ -54,7 +54,7 @@
                                         </Border>
 
                                         <StackPanel Margin="12,8,12,0">
-                                            <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                                            <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayName}" />
                                             <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="11" Margin="0,2,0,0">
                                                 <Run Text="{Binding TotalTimeText, Mode=OneWay}" />
                                                 <Run Text="{x:Static resources:Strings.Menu_Home_Played}" />
@@ -70,7 +70,7 @@
                                             </Grid.ColumnDefinitions>
 
                                             <ui:Button Grid.Column="0" Icon="Play24" IconFilled="True" Appearance="Success" Foreground="White" IconForeground="White"
-                                                       HorizontalAlignment="Stretch" ToolTip="{Binding Name, StringFormat='Play {0}'}"
+                                                       HorizontalAlignment="Stretch" ToolTip="{Binding DisplayName, StringFormat='Play {0}'}"
                                                        Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
 
                                             <ui:Button Grid.Column="2" Icon="Copy24" Appearance="Secondary" ToolTip="{x:Static resources:Strings.Menu_Home_CopyGameLink}"
