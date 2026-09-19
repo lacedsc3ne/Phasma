@@ -5722,4 +5722,52 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.ServerBrowser.BrowseServers" xml:space="preserve">
     <value>Browse servers</value>
   </data>
+  <data name="Menu.Behaviour.RobloxVersion" xml:space="preserve">
+    <value>Roblox version</value>
+  </data>
+  <data name="Menu.RobloxVersions.NormallyPhasmaStrapInstallsEveryRobloxUpdate" xml:space="preserve">
+    <value>Normally PhasmaStrap installs every Roblox update. Here you can stay on the version you have, go back to an earlier one that's still on this PC, and find out when an update removes flags you use.</value>
+  </data>
+  <data name="Menu.RobloxVersions.WhichVersionUse" xml:space="preserve">
+    <value>Which version to use</value>
+  </data>
+  <data name="Menu.RobloxVersions.AlwaysNewestNormal" xml:space="preserve">
+    <value>Always the newest (normal)</value>
+  </data>
+  <data name="Menu.RobloxVersions.StayVersionIHaveNowDon" xml:space="preserve">
+    <value>Stay on the version I have now - don't install updates</value>
+  </data>
+  <data name="Menu.RobloxVersions.UseVersion" xml:space="preserve">
+    <value>Use this version:</value>
+  </data>
+  <data name="Menu.RobloxVersions.RobloxOnlyLetsRecentVersionsInto" xml:space="preserve">
+    <value>Roblox only lets recent versions into games. If an old version stops joining (an "out of date" message, or games that won't load), switch back to Always the newest. If the chosen version isn't on this PC any more, the newest is used.</value>
+  </data>
+  <data name="Menu.RobloxVersions.KeepPreviousVersionAfterUpdate" xml:space="preserve">
+    <value>Keep the previous version after an update</value>
+  </data>
+  <data name="Menu.RobloxVersions.RobloxWonTHandOutOld" xml:space="preserve">
+    <value>Roblox won't hand out old versions again, so going back is only possible to one that's still on this PC. This keeps the one before each update (about 300 MB more on disk).</value>
+  </data>
+  <data name="Menu.RobloxVersions.VersionsPC" xml:space="preserve">
+    <value>Versions on this PC</value>
+  </data>
+  <data name="Menu.RobloxVersions.OnlyVersionUseHereKeepPrevious" xml:space="preserve">
+    <value>Only the version in use is here. With Keep the previous version on, the one it replaces stays after the next update.</value>
+  </data>
+  <data name="Menu.RobloxVersions.UseVersion2" xml:space="preserve">
+    <value>Use this version</value>
+  </data>
+  <data name="Menu.RobloxVersions.FlagsUpdates" xml:space="preserve">
+    <value>Your flags and updates</value>
+  </data>
+  <data name="Menu.RobloxVersions.TellMeWhenUpdateRemovesFlags" xml:space="preserve">
+    <value>Tell me when an update removes flags I use</value>
+  </data>
+  <data name="Menu.RobloxVersions.AfterEachUpdateNewVersionCompared" xml:space="preserve">
+    <value>After each update the new version is compared with the one it replaced. Flags that were in the old one and aren't in the new one are listed here, and a notification says so. Flags that live in Roblox's scripts can't be checked this way and are never reported.</value>
+  </data>
+  <data name="Menu.RobloxVersions.CompareOtherVersionPC" xml:space="preserve">
+    <value>Compare with the other version on this PC</value>
+  </data>
 </root>

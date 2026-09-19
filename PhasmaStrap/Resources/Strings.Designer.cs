@@ -16334,5 +16334,149 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.ServerBrowser.BrowseServers", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox version.
+        /// </summary>
+        public static string Menu_Behaviour_RobloxVersion {
+            get {
+                return ResourceManager.GetString("Menu.Behaviour.RobloxVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Normally PhasmaStrap installs every Roblox update. Here you can stay on the version you have, go back to an earlier one .
+        /// </summary>
+        public static string Menu_RobloxVersions_NormallyPhasmaStrapInstallsEveryRobloxUpdate {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.NormallyPhasmaStrapInstallsEveryRobloxUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which version to use.
+        /// </summary>
+        public static string Menu_RobloxVersions_WhichVersionUse {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.WhichVersionUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always the newest (normal).
+        /// </summary>
+        public static string Menu_RobloxVersions_AlwaysNewestNormal {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.AlwaysNewestNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stay on the version I have now - don't install updates.
+        /// </summary>
+        public static string Menu_RobloxVersions_StayVersionIHaveNowDon {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.StayVersionIHaveNowDon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use this version:.
+        /// </summary>
+        public static string Menu_RobloxVersions_UseVersion {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.UseVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox only lets recent versions into games. If an old version stops joining (an "out of date" message, or games that wo.
+        /// </summary>
+        public static string Menu_RobloxVersions_RobloxOnlyLetsRecentVersionsInto {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.RobloxOnlyLetsRecentVersionsInto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep the previous version after an update.
+        /// </summary>
+        public static string Menu_RobloxVersions_KeepPreviousVersionAfterUpdate {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.KeepPreviousVersionAfterUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox won't hand out old versions again, so going back is only possible to one that's still on this PC. This keeps the .
+        /// </summary>
+        public static string Menu_RobloxVersions_RobloxWonTHandOutOld {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.RobloxWonTHandOutOld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Versions on this PC.
+        /// </summary>
+        public static string Menu_RobloxVersions_VersionsPC {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.VersionsPC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only the version in use is here. With Keep the previous version on, the one it replaces stays after the next update..
+        /// </summary>
+        public static string Menu_RobloxVersions_OnlyVersionUseHereKeepPrevious {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.OnlyVersionUseHereKeepPrevious", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use this version.
+        /// </summary>
+        public static string Menu_RobloxVersions_UseVersion2 {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.UseVersion2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your flags and updates.
+        /// </summary>
+        public static string Menu_RobloxVersions_FlagsUpdates {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.FlagsUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tell me when an update removes flags I use.
+        /// </summary>
+        public static string Menu_RobloxVersions_TellMeWhenUpdateRemovesFlags {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.TellMeWhenUpdateRemovesFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to After each update the new version is compared with the one it replaced. Flags that were in the old one and aren't in the.
+        /// </summary>
+        public static string Menu_RobloxVersions_AfterEachUpdateNewVersionCompared {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.AfterEachUpdateNewVersionCompared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compare with the other version on this PC.
+        /// </summary>
+        public static string Menu_RobloxVersions_CompareOtherVersionPC {
+            get {
+                return ResourceManager.GetString("Menu.RobloxVersions.CompareOtherVersionPC", resourceCulture);
+            }
+        }
     }
 }
