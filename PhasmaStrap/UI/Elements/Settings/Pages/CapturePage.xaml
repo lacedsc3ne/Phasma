@@ -165,8 +165,12 @@
                     <ui:ToggleSwitch IsChecked="{Binding RecordSound, Mode=TwoWay}" />
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RecordMyMicrophoneToo}" Description="{x:Static resources:Strings.Menu_Capture_MixesDefaultMicrophoneIntoClipOff}" IsEnabled="{Binding SoundAvailable, Mode=OneWay}">
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RecordMyMicrophoneToo}" Description="{x:Static resources:Strings.Menu_Capture_MixesMicrophoneIntoClipExactlyAs}" IsEnabled="{Binding SoundAvailable, Mode=OneWay}">
                     <ui:ToggleSwitch IsChecked="{Binding RecordMicrophone, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_Microphone}" Description="{x:Static resources:Strings.Menu_Capture_WhichMicrophoneRecordWindowsDefaultOne}" IsEnabled="{Binding MicrophonePickerEnabled, Mode=OneWay}">
+                    <ComboBox Width="260" Padding="10,5,10,5" ItemsSource="{Binding MicrophoneOptions, Mode=OneTime}" SelectedItem="{Binding SelectedMicrophone, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_CopyNewClipsClipboard}" Description="{x:Static resources:Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied}">

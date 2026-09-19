@@ -382,14 +382,17 @@ namespace PhasmaStrap
 
             if (Interlocked.CompareExchange(ref _replaySaving, 1, 0) != 0)
             {
-                NotificationCenter.Notify("Still saving the last clip", "Give it a few seconds before pressing the hotkey again.", NotificationCategory.General);
+                NotificationCenter.Notify("Still saving the last clip", "Give it a moment before pressing the hotkey again.", NotificationCategory.General);
                 return;
             }
 
             // encoding takes a few seconds - it must never run on this thread (the hotkey/message
             // thread), or every later hotkey press and tray interaction queues up behind it
+            // on the graphics card the clip is already encoded and saves in a fraction of a second -
+            // only the "Replay saved" notification is shown then
             int seconds = App.Settings.Prop.InstantReplayClipSeconds;
-            NotificationCenter.Notify("Saving replay...", $"Encoding the last {seconds}s to MP4 - this takes a few seconds.", NotificationCategory.General, 4);
+            if (!_instantReplay.OnGpu)
+                NotificationCenter.Notify("Saving replay...", $"Encoding the last {seconds}s to MP4 - this takes a few seconds.", NotificationCategory.General, 4);
             App.Logger.WriteLine(LOG_IDENT, "Encoding clip on a background thread");
 
             _ = Task.Run(() =>

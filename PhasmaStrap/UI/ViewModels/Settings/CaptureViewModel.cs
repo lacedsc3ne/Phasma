@@ -209,7 +209,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool GpuEncoding
         {
             get => App.Settings.Prop.InstantReplayGpuEncoding;
-            set { App.Settings.Prop.InstantReplayGpuEncoding = value; ReplaySettingChanged(nameof(GpuEncoding)); OnPropertyChanged(nameof(SoundAvailable)); }
+            set { App.Settings.Prop.InstantReplayGpuEncoding = value; ReplaySettingChanged(nameof(GpuEncoding)); OnPropertyChanged(nameof(SoundAvailable)); OnPropertyChanged(nameof(MicrophonePickerEnabled)); }
         }
 
         public bool SoundAvailable => App.Settings.Prop.InstantReplayGpuEncoding;
@@ -223,7 +223,47 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool RecordMicrophone
         {
             get => App.Settings.Prop.InstantReplayMicrophone;
-            set { App.Settings.Prop.InstantReplayMicrophone = value; ReplaySettingChanged(nameof(RecordMicrophone)); }
+            set { App.Settings.Prop.InstantReplayMicrophone = value; ReplaySettingChanged(nameof(RecordMicrophone)); OnPropertyChanged(nameof(MicrophonePickerEnabled)); }
+        }
+
+        public bool MicrophonePickerEnabled => SoundAvailable && RecordMicrophone;
+
+        public sealed record MicrophoneOption(string Id, string Name)
+        {
+            public override string ToString() => Name;
+        }
+
+        private List<MicrophoneOption>? _microphones;
+
+        // Windows' default first, then every recording device that's plugged in
+        public List<MicrophoneOption> MicrophoneOptions
+        {
+            get
+            {
+                if (_microphones is not null)
+                    return _microphones;
+
+                _microphones = new() { new MicrophoneOption("", "Windows default microphone") };
+                _microphones.AddRange(ReplayAudio.ListMicrophones().Select(m => new MicrophoneOption(m.Id, m.Unprocessed ? m.Name : $"{m.Name}  (keeps its own processing)")));
+
+                string saved = App.Settings.Prop.InstantReplayMicrophoneDevice;
+                if (saved.Length > 0 && !_microphones.Any(m => m.Id == saved))
+                    _microphones.Add(new MicrophoneOption(saved, "Chosen microphone (not plugged in)"));
+
+                return _microphones;
+            }
+        }
+
+        public MicrophoneOption? SelectedMicrophone
+        {
+            get => MicrophoneOptions.FirstOrDefault(m => m.Id == App.Settings.Prop.InstantReplayMicrophoneDevice) ?? MicrophoneOptions[0];
+            set
+            {
+                if (value is null || value.Id == App.Settings.Prop.InstantReplayMicrophoneDevice)
+                    return;
+                App.Settings.Prop.InstantReplayMicrophoneDevice = value.Id;
+                ReplaySettingChanged(nameof(SelectedMicrophone));
+            }
         }
 
         // what the current choices cost, worked out for this PC's main screen
