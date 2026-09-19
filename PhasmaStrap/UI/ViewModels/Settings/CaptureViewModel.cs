@@ -46,7 +46,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
     }
 
-    public sealed class ReplayClipItem
+    public sealed class ReplayClipItem : NotifyPropertyChangedViewModel
     {
         public string Path { get; init; } = "";
         public string FileName => System.IO.Path.GetFileName(Path);
@@ -58,6 +58,31 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool IsGif => Path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
         public System.Windows.Visibility EditVisibility => IsGif ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
         public Wpf.Ui.Common.SymbolRegular Symbol => IsGif ? Wpf.Ui.Common.SymbolRegular.Gif24 : Wpf.Ui.Common.SymbolRegular.VideoClip24;
+
+        private System.Windows.Media.Imaging.BitmapSource? _thumbnail;
+        private bool _thumbnailRequested;
+
+        // made in the background the first time the list asks for it (Utility/ClipThumbnails)
+        public System.Windows.Media.Imaging.BitmapSource? Thumbnail
+        {
+            get
+            {
+                if (!_thumbnailRequested)
+                {
+                    _thumbnailRequested = true;
+                    var dispatcher = System.Windows.Application.Current.Dispatcher;
+                    ClipThumbnails.Request(Path, image => dispatcher.BeginInvoke(() =>
+                    {
+                        _thumbnail = image;
+                        OnPropertyChanged(nameof(Thumbnail));
+                        OnPropertyChanged(nameof(PlaceholderVisibility));
+                    }));
+                }
+                return _thumbnail;
+            }
+        }
+
+        public System.Windows.Visibility PlaceholderVisibility => _thumbnail is null ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
     }
 
     public class CaptureViewModel : NotifyPropertyChangedViewModel
@@ -427,7 +452,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void RefreshReplays()
         {
-            Replays.Clear();
+            // clips that haven't changed keep their item, so their thumbnail isn't made again
+            var known = Replays.ToDictionary(r => r.Path, StringComparer.OrdinalIgnoreCase);
+            var fresh = new List<ReplayClipItem>();
 
             if (Directory.Exists(InstantReplayRecorder.ClipsDir))
             {
@@ -438,7 +465,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     .OrderByDescending(f => f.LastWriteTime);
 
                 foreach (FileInfo file in files)
-                    Replays.Add(new ReplayClipItem { Path = file.FullName, Taken = file.LastWriteTime, Bytes = file.Length });
+                {
+                    fresh.Add(known.TryGetValue(file.FullName, out ReplayClipItem? item) && item.Bytes == file.Length && item.Taken == file.LastWriteTime
+                        ? item
+                        : new ReplayClipItem { Path = file.FullName, Taken = file.LastWriteTime, Bytes = file.Length });
+                }
+            }
+
+            if (!fresh.SequenceEqual(Replays))
+            {
+                Replays.Clear();
+                foreach (ReplayClipItem item in fresh)
+                    Replays.Add(item);
             }
 
             OnPropertyChanged(nameof(HasReplays));
@@ -504,6 +542,65 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             RefreshGallery();
             RefreshReplays();
+            WatchFolders();
+        }
+
+        // ---- new clips and screenshots show up by themselves. They're saved by the Watcher (the
+        // process that runs while you play), so this page watches the folders instead of being told.
+
+        private readonly List<FileSystemWatcher> _watchers = new();
+        private System.Windows.Threading.DispatcherTimer? _clipsDebounce;
+        private System.Windows.Threading.DispatcherTimer? _screenshotsDebounce;
+
+        private void WatchFolders()
+        {
+            _clipsDebounce = Debouncer(RefreshReplays);
+            _screenshotsDebounce = Debouncer(RefreshGallery);
+            Watch(InstantReplayRecorder.ClipsDir, _clipsDebounce);
+            Watch(ScreenshotCapture.ScreenshotsDir, _screenshotsDebounce);
+        }
+
+        // a clip is written over a moment - refresh once it has been quiet for a second
+        private static System.Windows.Threading.DispatcherTimer Debouncer(Action refresh)
+        {
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                refresh();
+            };
+            return timer;
+        }
+
+        private void Watch(string folder, System.Windows.Threading.DispatcherTimer debounce)
+        {
+            try
+            {
+                Directory.CreateDirectory(folder);
+                var watcher = new FileSystemWatcher(folder)
+                {
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size,
+                    IncludeSubdirectories = false,
+                };
+
+                var dispatcher = System.Windows.Application.Current.Dispatcher;
+                void Changed(object? sender, FileSystemEventArgs e) => dispatcher.BeginInvoke(() =>
+                {
+                    debounce.Stop();
+                    debounce.Start();
+                });
+
+                watcher.Created += Changed;
+                watcher.Changed += Changed;
+                watcher.Deleted += Changed;
+                watcher.Renamed += (s, e) => Changed(s, e);
+                watcher.EnableRaisingEvents = true;
+                _watchers.Add(watcher);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("CaptureViewModel", $"Can't watch {folder} for new files: {ex.Message}");
+            }
         }
 
         private void TakeScreenshot()
@@ -523,7 +620,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void RefreshGallery()
         {
-            Screenshots.Clear();
+            // unchanged screenshots keep their item (and decoded thumbnail)
+            var known = Screenshots.ToDictionary(s => s.Path, StringComparer.OrdinalIgnoreCase);
+            var fresh = new List<ScreenshotItem>();
 
             if (Directory.Exists(ScreenshotCapture.ScreenshotsDir))
             {
@@ -532,7 +631,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     .OrderByDescending(f => f.LastWriteTime);
 
                 foreach (FileInfo file in files)
-                    Screenshots.Add(new ScreenshotItem { Path = file.FullName, Taken = file.LastWriteTime });
+                {
+                    fresh.Add(known.TryGetValue(file.FullName, out ScreenshotItem? item) && item.Taken == file.LastWriteTime
+                        ? item
+                        : new ScreenshotItem { Path = file.FullName, Taken = file.LastWriteTime });
+                }
+            }
+
+            if (!fresh.SequenceEqual(Screenshots))
+            {
+                Screenshots.Clear();
+                foreach (ScreenshotItem item in fresh)
+                    Screenshots.Add(item);
             }
 
             OnPropertyChanged(nameof(HasScreenshots));
