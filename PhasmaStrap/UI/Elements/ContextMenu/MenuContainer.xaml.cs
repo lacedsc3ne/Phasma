@@ -451,7 +451,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             try
             {
                 // closing Roblox mid-game on purpose is not a crash - no auto-rejoin on the old account
-                PhasmaStrap.Utility.FastFlagPresetSession.MarkIntentionalRestart();
+                PhasmaStrap.Utility.FlagProfileSession.MarkIntentionalRestart();
 
                 Process.Start(Paths.Process, $"-switchaccount {account.UserId}");
             }

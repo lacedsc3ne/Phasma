@@ -1,0 +1,190 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagGamesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="900" d:DesignWidth="800"
+      Title="FastFlagGamesPage"
+      Loaded="Page_Loaded"
+      Unloaded="Page_Unloaded">
+    <ui:UiPage.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:UiPage.Resources>
+    <!-- Which games get which FastFlag profile. The profiles' flags are edited on the Fast Flag
+         Editor tab; this page only pairs games with them. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,14,14">
+            <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagGames_PerGameFlags}" FontSize="20" FontWeight="Medium" />
+            <TextBlock Margin="0,4,0,0" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Text="{x:Static resources:Strings.Menu_FastFlagGames_GiveGameItsOwnFlagsWhen}" />
+
+            <ui:InfoBar Margin="0,12,0,0" Padding="8" Severity="Warning" IsOpen="True" IsClosable="False" Visibility="{Binding ManagerDisabledVisibility, Mode=OneTime}"
+                        Title="{x:Static resources:Strings.Menu_FastFlagEditor_PhasmaStrapIsnTManagingFastFlagsRight}"
+                        Message="{x:Static resources:Strings.Menu_FastFlagEditor_AllowPhasmaStrapManageFFlagsOffEngine}" />
+
+            <Border Margin="0,12,0,0" Padding="12,8" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}" Visibility="{Binding StatusVisibility}">
+                <TextBlock TextWrapping="Wrap" Text="{Binding Status}" />
+            </Border>
+
+            <!-- ============================================================ games with a profile -->
+            <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_Games}" />
+
+            <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoRulesVisibility}"
+                       Text="{x:Static resources:Strings.Menu_FastFlagGames_NoGameHasItsOwnFlags}" />
+
+            <ItemsControl ItemsSource="{Binding Rules}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,8" Padding="12,10" CornerRadius="8" BorderThickness="1"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Width="48" Height="48" CornerRadius="6" ClipToBounds="True" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                    <Image Source="{Binding IconUrl, TargetNullValue={x:Null}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Text="{Binding Title}" />
+                                    <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Subtitle}" />
+                                    <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding ProfileSummary}" />
+                                </StackPanel>
+
+                                <WrapPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <ComboBox Width="190" Margin="0,2,8,2" ToolTip="{x:Static resources:Strings.Menu_FastFlagGames_ProfileGameUses}"
+                                              ItemsSource="{Binding Profiles}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding ProfileId, Mode=TwoWay}" />
+                                    <ui:Button Margin="0,2,6,2" Padding="10,6" Icon="Edit16" Content="{x:Static resources:Strings.Menu_FastFlagEditor_EditFlags}" ToolTip="{x:Static resources:Strings.Menu_FastFlagGames_OpenGameSProfileFastFlag}"
+                                               Command="{Binding DataContext.EditProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <ui:Button Margin="0,2,6,2" Padding="8,6" Icon="Eye24" ToolTip="{x:Static resources:Strings.Menu_FastFlagGames_SeeEveryFlagGameStarts}"
+                                               Command="{Binding DataContext.PreviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                    <ui:Button Margin="0,2,0,2" Padding="8,6" Icon="Delete24" Appearance="Transparent" ToolTip="{x:Static resources:Strings.Menu_FastFlagGames_StopGivingGameItsOwnFlags}"
+                                               Command="{Binding DataContext.RemoveCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                                </WrapPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ============================================================ add a game -->
+            <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_AddGame}" />
+
+            <Border Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox x:Name="SearchBox" Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagGames_GameNameGameLinkPlaceID}"
+                                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" KeyDown="SearchBox_KeyDown" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="Search24" Content="{x:Static resources:Strings.Menu_FastFlagGames_Find}" Appearance="Primary" Command="{Binding SearchCommand, Mode=OneTime}" />
+                    </Grid>
+
+                    <DockPanel Margin="0,12,0,6">
+                        <ui:ProgressRing DockPanel.Dock="Right" Width="16" Height="16" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock FontSize="13" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ResultsHeader}" />
+                    </DockPanel>
+
+                    <ItemsControl ItemsSource="{Binding Results}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Margin="0,0,8,8" Cursor="Hand" ToolTip="{Binding Name}" AutomationProperties.Name="{Binding Name}"
+                                        Command="{Binding DataContext.SelectGameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Tile" Width="132" Padding="6" CornerRadius="6" BorderThickness="1"
+                                                    Background="{DynamicResource ControlFillColorSecondaryBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Tile" Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                                    <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                    <StackPanel>
+                                        <Border Width="118" Height="118" CornerRadius="4" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                            <Image Source="{Binding IconUrl, TargetNullValue={x:Null}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        </Border>
+                                        <TextBlock Margin="0,6,0,0" FontSize="12" Height="32" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
+                                        <TextBlock FontSize="11" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding Tag}" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- the picked game -->
+                    <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1" Visibility="{Binding SelectedVisibility}"
+                            BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="6" ClipToBounds="True" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                    <Image Source="{Binding Selected.IconUrl, TargetNullValue={x:Null}}" Stretch="UniformToFill" />
+                                </Border>
+                                <TextBlock Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Text="{Binding Selected.Name}" />
+                                <ui:Button Grid.Column="2" Padding="6" Icon="Dismiss16" Appearance="Transparent" ToolTip="{x:Static resources:Strings.Menu_FastFlagGames_PickAnotherGame}" Command="{Binding CancelAddCommand, Mode=OneTime}" />
+                            </Grid>
+
+                            <TextBlock Margin="0,14,0,4" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_FastFlagGames_WhereShouldApply}" />
+                            <RadioButton GroupName="FlagRuleScope" Content="{x:Static resources:Strings.Menu_FastFlagGames_WholeGameEveryPlaceRecommended}" IsChecked="{Binding WholeGame, Mode=TwoWay}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <RadioButton GroupName="FlagRuleScope" VerticalAlignment="Center" Content="{x:Static resources:Strings.Menu_FastFlagGames_OnlyOnePlace}" IsChecked="{Binding OnePlace, Mode=TwoWay}" />
+                                <ComboBox Width="260" Margin="8,0,0,0" IsEnabled="{Binding OnePlace}" ItemsSource="{Binding Places}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedPlace, Mode=TwoWay}" />
+                                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding PlacesStatus}" />
+                            </StackPanel>
+                            <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                       Text="{x:Static resources:Strings.Menu_FastFlagGames_MostGamesAreMadeSeveralPlaces}" />
+
+                            <TextBlock Margin="0,14,0,4" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_FastFlagGames_WhichFlags}" />
+                            <ComboBox Width="320" HorizontalAlignment="Left" ItemsSource="{Binding AddProfileOptions}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding AddProfileId, Mode=TwoWay}" />
+                            <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                       Text="{x:Static resources:Strings.Menu_FastFlagGames_NewProfileStartsEmptyOpensFast}" />
+
+                            <TextBlock Margin="0,10,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SystemFillColorCautionBrush}" Visibility="{Binding ExistingNoteVisibility}" Text="{Binding ExistingNote}" />
+
+                            <ui:Button Margin="0,14,0,0" Icon="Checkmark24" Appearance="Primary" Content="{x:Static resources:Strings.Menu_FastFlagGames_GiveGameItsOwnFlags}" Command="{Binding AddCommand, Mode=OneTime}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ============================================================ already running -->
+            <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_WhenRobloxAlreadyOpen}" />
+
+            <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Text="{x:Static resources:Strings.Menu_FastFlagGames_RobloxOnlyReadsFastFlagsWhenStarts}" />
+
+            <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource SystemFillColorCautionBrush}" Visibility="{Binding TrackingOffVisibility, Mode=OneTime}"
+                       Text="{x:Static resources:Strings.Menu_FastFlagGames_ActivityTrackingOffIntegrationsPageSo}" />
+
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlagGames_CloseRobloxFirstWhenLaunchNeeds}"
+                                    Description="{x:Static resources:Strings.Menu_FastFlagGames_WhenYouClickPlayWebsiteLink}">
+                <ui:ToggleSwitch IsChecked="{Binding CloseRunningRoblox, Mode=TwoWay}" />
+            </controls:OptionControl>
+        </StackPanel>
+    </ScrollViewer>
+</ui:UiPage>

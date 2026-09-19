@@ -64,6 +64,9 @@ namespace PhasmaStrap
 
         public static readonly FastFlagManager FastFlags = new();
 
+        // FastFlag profiles and which games use them (see Utility/FlagProfiles.cs)
+        public static readonly Utility.FlagProfileManager FlagProfiles = new();
+
         public static readonly HttpClient HttpClient = new(
             new HttpClientLoggingHandler(
                 new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All }
@@ -440,6 +443,11 @@ namespace PhasmaStrap
                 Settings.Load();
                 State.Load();
                 FastFlags.Load();
+                FlagProfiles.Load(false);
+
+                // presets from before profiles existed become profiles, once
+                if (Settings.Prop.FastFlagPlacePresets.Count > 0)
+                    FlagProfiles.MigrateFromPlacePresets();
 
                 // UI polish (ported from Voidstrap): smooth ProgressBar value transitions,
                 // installed as a WPF class handler so it applies to every ProgressBar

@@ -354,7 +354,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 int seconds = TunerLengthSeconds[Math.Max(0, Array.IndexOf(TunerLengthOptions, _tunerLength))];
 
                 TunerExperiment experiment = FlagTuner.Start(chosen, rounds, seconds);
-                TunerMessage = $"Your current flags are saved as the snapshot \"{experiment.BackupSnapshot}\".";
+                TunerMessage = $"Your current flags are saved as the snapshot \"{experiment.BackupSnapshot}\"."
+                    + (App.FlagProfiles.Prop.Rules.Count > 0 ? " Note: games with their own FastFlag profile (Per-game flags) get that profile on top of every set tested here - test in a game without one for a clean comparison." : "");
             }
             catch (Exception ex)
             {

@@ -5566,4 +5566,106 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Rendering.OpenCrosshairEditor" xml:space="preserve">
     <value>Open the crosshair editor</value>
   </data>
+  <data name="Menu.FastFlagEditor.Editing" xml:space="preserve">
+    <value>Editing</value>
+  </data>
+  <data name="Menu.FastFlagEditor.NewProfile" xml:space="preserve">
+    <value>New profile</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ProfileHoldsFlagChangesChosenGames" xml:space="preserve">
+    <value>A profile holds flag changes for chosen games only. Give it to games on the Per-game flags tab.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ProfileOptions" xml:space="preserve">
+    <value>Profile options</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ChooseGames" xml:space="preserve">
+    <value>Choose games</value>
+  </data>
+  <data name="Menu.FastFlagEditor.TurnOffOneFlags" xml:space="preserve">
+    <value>Turn off one of your flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.PickFlagsFromOwnListProfile" xml:space="preserve">
+    <value>Pick flags from your own list that this profile's games should NOT get.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ShowQuickSettingsFlags" xml:space="preserve">
+    <value>Show Quick settings flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.FlagsSetByTogglesRobloxFFlags" xml:space="preserve">
+    <value>Flags set by the toggles on the Roblox FFlags tab are hidden here unless this is on.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.Note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="Menu.FastFlagGames.PerGameFlags" xml:space="preserve">
+    <value>Per-game flags</value>
+  </data>
+  <data name="Menu.FastFlagGames.GiveGameItsOwnFlagsWhen" xml:space="preserve">
+    <value>Give a game its own flags. When you launch it through PhasmaStrap, it starts with your flags plus the changes in its profile - flags added, values changed, or some of yours turned off. Other games are not affected.</value>
+  </data>
+  <data name="Menu.FastFlagGames.Games" xml:space="preserve">
+    <value>Your games</value>
+  </data>
+  <data name="Menu.FastFlagGames.NoGameHasItsOwnFlags" xml:space="preserve">
+    <value>No game has its own flags yet. Add one below.</value>
+  </data>
+  <data name="Menu.FastFlagGames.ProfileGameUses" xml:space="preserve">
+    <value>The profile this game uses</value>
+  </data>
+  <data name="Menu.FastFlagGames.OpenGameSProfileFastFlag" xml:space="preserve">
+    <value>Open this game's profile in the Fast Flag Editor</value>
+  </data>
+  <data name="Menu.FastFlagGames.SeeEveryFlagGameStarts" xml:space="preserve">
+    <value>See every flag this game starts with</value>
+  </data>
+  <data name="Menu.FastFlagGames.StopGivingGameItsOwnFlags" xml:space="preserve">
+    <value>Stop giving this game its own flags</value>
+  </data>
+  <data name="Menu.FastFlagGames.AddGame" xml:space="preserve">
+    <value>Add a game</value>
+  </data>
+  <data name="Menu.FastFlagGames.GameNameGameLinkPlaceID" xml:space="preserve">
+    <value>Game name, game link or place ID</value>
+  </data>
+  <data name="Menu.FastFlagGames.Find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="Menu.FastFlagGames.PickAnotherGame" xml:space="preserve">
+    <value>Pick another game</value>
+  </data>
+  <data name="Menu.FastFlagGames.WhereShouldApply" xml:space="preserve">
+    <value>Where should it apply?</value>
+  </data>
+  <data name="Menu.FastFlagGames.WholeGameEveryPlaceRecommended" xml:space="preserve">
+    <value>The whole game - every place in it (recommended)</value>
+  </data>
+  <data name="Menu.FastFlagGames.OnlyOnePlace" xml:space="preserve">
+    <value>Only one place:</value>
+  </data>
+  <data name="Menu.FastFlagGames.MostGamesAreMadeSeveralPlaces" xml:space="preserve">
+    <value>Most games are made of several places (a lobby, maps, a trading hub). A one-place choice wins over the whole-game one for that place.</value>
+  </data>
+  <data name="Menu.FastFlagGames.WhichFlags" xml:space="preserve">
+    <value>Which flags?</value>
+  </data>
+  <data name="Menu.FastFlagGames.NewProfileStartsEmptyOpensFast" xml:space="preserve">
+    <value>A new profile starts empty and opens in the Fast Flag Editor, so you can add this game's flags right away. Several games can share one profile.</value>
+  </data>
+  <data name="Menu.FastFlagGames.GiveGameItsOwnFlags" xml:space="preserve">
+    <value>Give this game its own flags</value>
+  </data>
+  <data name="Menu.FastFlagGames.WhenRobloxAlreadyOpen" xml:space="preserve">
+    <value>When Roblox is already open</value>
+  </data>
+  <data name="Menu.FastFlagGames.RobloxOnlyReadsFastFlagsWhenStarts" xml:space="preserve">
+    <value>Roblox only reads FastFlags when it starts. If you join a game from inside Roblox, or Roblox was started for another game, the running Roblox keeps its old flags. PhasmaStrap then shows a notification you can click to restart Roblox into the same server with the right flags. It never restarts Roblox by itself.</value>
+  </data>
+  <data name="Menu.FastFlagGames.ActivityTrackingOffIntegrationsPageSo" xml:space="preserve">
+    <value>Activity tracking is off (Integrations page), so PhasmaStrap can't see which game you joined from inside Roblox, and that notification won't appear.</value>
+  </data>
+  <data name="Menu.FastFlagGames.CloseRobloxFirstWhenLaunchNeeds" xml:space="preserve">
+    <value>Close Roblox first when a launch needs other flags</value>
+  </data>
+  <data name="Menu.FastFlagGames.WhenYouClickPlayWebsiteLink" xml:space="preserve">
+    <value>When you click Play on a website or a link while Roblox is open with a different profile, close that Roblox first so the new game gets its flags. You leave the game you were in.</value>
+  </data>
 </root>

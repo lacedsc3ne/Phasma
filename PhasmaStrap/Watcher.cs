@@ -153,12 +153,12 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
-                // a game joined from inside the Roblox app (or by following a friend) never went
-                // through a launch that could apply its FastFlag preset - see FastFlagPresetSession
+                // a game joined from inside the Roblox app never went through a launch that could
+                // apply its FastFlag profile - see FlagProfileSession
                 ActivityWatcher.OnGameJoin += (sender, _) =>
                 {
                     if (sender is ActivityWatcher watcher)
-                        Utility.FastFlagPresetSession.OnGameJoined(watcher.Data);
+                        Utility.FlagProfileSession.OnGameJoined(watcher.Data);
                 };
 
                 // the Capture page saves the toggle immediately and this process reloads the file
@@ -472,8 +472,8 @@ namespace PhasmaStrap
             // reading process exit codes (which Roblox's own client doesn't set meaningfully anyway).
             bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
 
-            // not a crash if FastFlagPresetSession just closed Roblox on purpose to restart it
-            bool intentional = Utility.FastFlagPresetSession.RestartedRecently || _killedOnPurpose;
+            // not a crash if FlagProfileSession just closed Roblox on purpose to restart it
+            bool intentional = Utility.FlagProfileSession.RestartedRecently || _killedOnPurpose;
             if (possibleCrash && intentional)
                 possibleCrash = false;
 

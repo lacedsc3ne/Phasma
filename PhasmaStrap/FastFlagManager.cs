@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Enums.FlagPresets;
+using PhasmaStrap.Enums.FlagPresets;
 
 namespace PhasmaStrap
 {
@@ -462,7 +462,7 @@ namespace PhasmaStrap
             {
                 if (Prop.ContainsKey(key))
                 {
-                    if (key == Prop[key].ToString())
+                    if (Prop[key]?.ToString() == value.ToString())
                         return;
 
                     App.Logger.WriteLine(LOG_IDENT, $"Changing of '{key}' from '{Prop[key]}' to '{value}' is pending");
@@ -552,11 +552,12 @@ namespace PhasmaStrap
         {
             bool result = base.Load(alertFailure);
 
-            // clone the dictionary
-            OriginalProp = new(Prop);
-
             if (GetPreset("Rendering.ManualFullscreen") != "False")
                 SetPreset("Rendering.ManualFullscreen", "False");
+
+            // clone the dictionary - after the forced flag above, so a fresh load doesn't count as
+            // an unsaved change
+            OriginalProp = new(Prop);
 
             return result;
         }

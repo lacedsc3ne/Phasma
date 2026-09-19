@@ -90,10 +90,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 {
                     App.Settings.FileLocation,
                     App.State.FileLocation,
-                    App.FastFlags.FileLocation
+                    App.FastFlags.FileLocation,
+                    App.FlagProfiles.FileLocation
                 };
 
-                AddFilesToZipStream(zipStream, files, "Config/");
+                AddFilesToZipStream(zipStream, files.Where(File.Exists), "Config/");
             }
 
             if (ShouldExportLogs && Directory.Exists(Paths.Logs))
@@ -165,6 +166,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 (App.Settings.FileLocation, "Settings", Wpf.Ui.Common.SymbolRegular.Settings24),
                 (App.FastFlags.FileLocation, "FastFlags", Wpf.Ui.Common.SymbolRegular.Flag24),
+                (App.FlagProfiles.FileLocation, "FastFlag profiles", Wpf.Ui.Common.SymbolRegular.Games24),
             };
 
             var items = new List<BackupItem>();
@@ -179,7 +181,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     int differences = -1;
                     try { differences = PhasmaStrap.Utility.SettingsBackups.CountDifferences(File.ReadAllText(backup.Path), current); } catch { }
 
-                    string what = source.Label == "Settings" ? "setting" : "flag";
+                    string what = source.Label switch { "Settings" => "setting", "FastFlags" => "flag", _ => "entry" };
                     string detail = differences switch
                     {
                         0 => "same as now",
@@ -225,6 +227,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 // what is in memory by then
                 if (item.Location == App.Settings.FileLocation)
                     App.Settings.Load(false);
+                else if (item.Location == App.FlagProfiles.FileLocation)
+                    App.FlagProfiles.Load(false);
                 else
                     App.FastFlags.Load(false);
 
@@ -267,6 +271,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 [Path.GetFileName(App.Settings.FileLocation)] = App.Settings.FileLocation,
                 [Path.GetFileName(App.State.FileLocation)] = App.State.FileLocation,
                 [Path.GetFileName(App.FastFlags.FileLocation)] = App.FastFlags.FileLocation,
+                [Path.GetFileName(App.FlagProfiles.FileLocation)] = App.FlagProfiles.FileLocation,
             };
 
             int imported = 0;
@@ -311,6 +316,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.Settings.Load(alertFailure: false);
             App.State.Load(alertFailure: false);
             App.FastFlags.Load(alertFailure: false);
+            App.FlagProfiles.Load(alertFailure: false);
+            App.FlagProfiles.NotifyEdited();
 
             Frontend.ShowMessageBox($"Imported {imported} config file(s).", MessageBoxImage.Information);
         }

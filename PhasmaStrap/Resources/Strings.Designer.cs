@@ -15866,5 +15866,311 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Rendering.OpenCrosshairEditor", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Editing.
+        /// </summary>
+        public static string Menu_FastFlagEditor_Editing {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.Editing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New profile.
+        /// </summary>
+        public static string Menu_FastFlagEditor_NewProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.NewProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A profile holds flag changes for chosen games only. Give it to games on the Per-game flags tab..
+        /// </summary>
+        public static string Menu_FastFlagEditor_ProfileHoldsFlagChangesChosenGames {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ProfileHoldsFlagChangesChosenGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Profile options.
+        /// </summary>
+        public static string Menu_FastFlagEditor_ProfileOptions {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ProfileOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose games.
+        /// </summary>
+        public static string Menu_FastFlagEditor_ChooseGames {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ChooseGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turn off one of your flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_TurnOffOneFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.TurnOffOneFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick flags from your own list that this profile's games should NOT get..
+        /// </summary>
+        public static string Menu_FastFlagEditor_PickFlagsFromOwnListProfile {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.PickFlagsFromOwnListProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Quick settings flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_ShowQuickSettingsFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ShowQuickSettingsFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flags set by the toggles on the Roblox FFlags tab are hidden here unless this is on..
+        /// </summary>
+        public static string Menu_FastFlagEditor_FlagsSetByTogglesRobloxFFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.FlagsSetByTogglesRobloxFFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note.
+        /// </summary>
+        public static string Menu_FastFlagEditor_Note {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.Note", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Per-game flags.
+        /// </summary>
+        public static string Menu_FastFlagGames_PerGameFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.PerGameFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Give a game its own flags. When you launch it through PhasmaStrap, it starts with your flags plus the changes in its pro.
+        /// </summary>
+        public static string Menu_FastFlagGames_GiveGameItsOwnFlagsWhen {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.GiveGameItsOwnFlagsWhen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your games.
+        /// </summary>
+        public static string Menu_FastFlagGames_Games {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.Games", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No game has its own flags yet. Add one below..
+        /// </summary>
+        public static string Menu_FastFlagGames_NoGameHasItsOwnFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.NoGameHasItsOwnFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The profile this game uses.
+        /// </summary>
+        public static string Menu_FastFlagGames_ProfileGameUses {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.ProfileGameUses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open this game's profile in the Fast Flag Editor.
+        /// </summary>
+        public static string Menu_FastFlagGames_OpenGameSProfileFastFlag {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.OpenGameSProfileFastFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See every flag this game starts with.
+        /// </summary>
+        public static string Menu_FastFlagGames_SeeEveryFlagGameStarts {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.SeeEveryFlagGameStarts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop giving this game its own flags.
+        /// </summary>
+        public static string Menu_FastFlagGames_StopGivingGameItsOwnFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.StopGivingGameItsOwnFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a game.
+        /// </summary>
+        public static string Menu_FastFlagGames_AddGame {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.AddGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game name, game link or place ID.
+        /// </summary>
+        public static string Menu_FastFlagGames_GameNameGameLinkPlaceID {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.GameNameGameLinkPlaceID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find.
+        /// </summary>
+        public static string Menu_FastFlagGames_Find {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.Find", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick another game.
+        /// </summary>
+        public static string Menu_FastFlagGames_PickAnotherGame {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.PickAnotherGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where should it apply?.
+        /// </summary>
+        public static string Menu_FastFlagGames_WhereShouldApply {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.WhereShouldApply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The whole game - every place in it (recommended).
+        /// </summary>
+        public static string Menu_FastFlagGames_WholeGameEveryPlaceRecommended {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.WholeGameEveryPlaceRecommended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one place:.
+        /// </summary>
+        public static string Menu_FastFlagGames_OnlyOnePlace {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.OnlyOnePlace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most games are made of several places (a lobby, maps, a trading hub). A one-place choice wins over the whole-game one fo.
+        /// </summary>
+        public static string Menu_FastFlagGames_MostGamesAreMadeSeveralPlaces {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.MostGamesAreMadeSeveralPlaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which flags?.
+        /// </summary>
+        public static string Menu_FastFlagGames_WhichFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.WhichFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new profile starts empty and opens in the Fast Flag Editor, so you can add this game's flags right away. Several games.
+        /// </summary>
+        public static string Menu_FastFlagGames_NewProfileStartsEmptyOpensFast {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.NewProfileStartsEmptyOpensFast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Give this game its own flags.
+        /// </summary>
+        public static string Menu_FastFlagGames_GiveGameItsOwnFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.GiveGameItsOwnFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When Roblox is already open.
+        /// </summary>
+        public static string Menu_FastFlagGames_WhenRobloxAlreadyOpen {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.WhenRobloxAlreadyOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox only reads FastFlags when it starts. If you join a game from inside Roblox, or Roblox was started for another gam.
+        /// </summary>
+        public static string Menu_FastFlagGames_RobloxOnlyReadsFastFlagsWhenStarts {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.RobloxOnlyReadsFastFlagsWhenStarts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Activity tracking is off (Integrations page), so PhasmaStrap can't see which game you joined from inside Roblox, and tha.
+        /// </summary>
+        public static string Menu_FastFlagGames_ActivityTrackingOffIntegrationsPageSo {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.ActivityTrackingOffIntegrationsPageSo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close Roblox first when a launch needs other flags.
+        /// </summary>
+        public static string Menu_FastFlagGames_CloseRobloxFirstWhenLaunchNeeds {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.CloseRobloxFirstWhenLaunchNeeds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When you click Play on a website or a link while Roblox is open with a different profile, close that Roblox first so the.
+        /// </summary>
+        public static string Menu_FastFlagGames_WhenYouClickPlayWebsiteLink {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagGames.WhenYouClickPlayWebsiteLink", resourceCulture);
+            }
+        }
     }
 }

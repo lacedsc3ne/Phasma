@@ -417,16 +417,14 @@ namespace PhasmaStrap.Models.Persistable
         // by HotkeyGesture.TryParse. Unbound (missing/empty) actions register nothing.
         public Dictionary<string, string> HotkeyBindings { get; set; } = new();
 
-        // per-place FastFlag presets (Fast Flag Editor page): places with an entry here get that
-        // saved snapshot's flags applied for that one launch only - the user's actual saved
-        // FastFlags.json is never touched, same as the per-game engine preset scoping this
-        // replaced. Keyed by placeId (string), value is a FastFlagSnapshotManager snapshot name.
-        // See Bootstrapper.TryApplyFastFlagPlacePresetAsync.
+        // OLD per-place FastFlag presets (placeId -> FastFlagSnapshots name). Only read once, to
+        // move them into FastFlag profiles (FlagProfileManager.MigrateFromPlacePresets), then
+        // emptied. Profiles and game rules live in FastFlagProfiles.json now.
         public Dictionary<string, string> FastFlagPlacePresets { get; set; } = new();
 
-        // when a launch (browser Play, a link) needs a different preset than the one the already
-        // running Roblox started with, close that Roblox first so the new flags are actually read.
-        // Off by default - nothing restarts on its own. See Utility/FastFlagPresetSession.
+        // when a launch (browser Play, a link) needs a different FastFlag profile than the one the
+        // already running Roblox started with, close that Roblox first so the new flags are read.
+        // Off by default - nothing restarts on its own. See Utility/FlagProfileSession.
         public bool FastFlagPresetCloseRunningRoblox { get; set; } = false;
 
         // bootstrapper theme editor (BootstrapperEditorWindow): remembers which detected external
