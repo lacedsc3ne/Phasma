@@ -5680,4 +5680,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.FastFlagEditor.ListOwnFlagsAsWellSo" xml:space="preserve">
     <value>List your own flags as well, so you see everything these games start with. Turn off to see only this profile's changes.</value>
   </data>
+  <data name="Menu.Integrations.UseDiscordSOwnJoinButton" xml:space="preserve">
+    <value>Use Discord's own Join button</value>
+  </data>
+  <data name="Menu.Integrations.FriendsGetDiscordSJoinButton" xml:space="preserve">
+    <value>Friends get Discord's Join button on your profile instead of a link, and land straight in your server. They need PhasmaStrap too. Public servers only - a private server's code is never shared this way.</value>
+  </data>
 </root>

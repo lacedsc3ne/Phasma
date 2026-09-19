@@ -48,6 +48,9 @@ namespace PhasmaStrap.Integrations
         private DiscordRPC.RichPresence? _currentPresence;
         private DiscordRPC.RichPresence? _originalPresence;
 
+        // the current game's player limit, for the Discord party (DiscordJoin)
+        private int _maxPlayers;
+
         private FixedSizeList<ThumbnailCacheEntry> _thumbnailCache = new FixedSizeList<ThumbnailCacheEntry>(20);
 
         private ulong? _smallImgBeingFetched = null;
@@ -100,6 +103,10 @@ namespace PhasmaStrap.Integrations
 
             _rpcClient.OnClose += (_, e) =>
                 App.Logger.WriteLine(LOG_IDENT, $"Lost connection to Discord RPC - {e.Reason} ({e.Code})");
+
+            // a friend's Discord Join lands here when this PhasmaStrap is the one connected
+            _rpcClient.OnJoin += (_, e) => DiscordJoin.Launch(e.Secret);
+            DiscordJoin.Subscribe(_rpcClient, ResolveApplicationId());
 
             _rpcClient.Initialize();
 
@@ -483,6 +490,7 @@ namespace PhasmaStrap.Integrations
             };
 
             string universeName = universeDetails.Data.Name;
+            _maxPlayers = universeDetails.Data.MaxPlayers;
 
             if (universeName.Length < 2)
                 universeName = $"{universeName}\x2800\x2800\x2800";
@@ -634,6 +642,7 @@ namespace PhasmaStrap.Integrations
 
             if (_visible)
             {
+                DiscordJoin.Apply(_currentPresence, _activityWatcher.Data, _maxPlayers);
                 _rpcClient.SetPresence(_currentPresence);
 
                 // fire-and-forget: send the untranslated presence immediately (above), then swap

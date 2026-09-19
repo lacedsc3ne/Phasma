@@ -16208,5 +16208,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlagEditor.ListOwnFlagsAsWellSo", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Discord's own Join button.
+        /// </summary>
+        public static string Menu_Integrations_UseDiscordSOwnJoinButton {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.UseDiscordSOwnJoinButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Friends get Discord's Join button on your profile instead of a link, and land straight in your server. They need PhasmaS.
+        /// </summary>
+        public static string Menu_Integrations_FriendsGetDiscordSJoinButton {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.FriendsGetDiscordSJoinButton", resourceCulture);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 
 namespace PhasmaStrap.Utility
 {
@@ -38,6 +38,9 @@ namespace PhasmaStrap.Utility
         {
             RegisterProtocol("roblox", "Roblox", handler, handlerParam);
             RegisterProtocol("roblox-player", "Roblox", handler, handlerParam);
+
+            // so a friend's Discord Join can start PhasmaStrap (Integrations.DiscordJoin)
+            Integrations.DiscordJoin.RegisterLaunchCommands();
         }
 
         /// <summary>

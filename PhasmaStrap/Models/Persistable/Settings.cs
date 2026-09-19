@@ -85,6 +85,10 @@ namespace PhasmaStrap.Models.Persistable
         // registered with. On = PhasmaStrap's own application ("Playing PhasmaStrap" with the
         // logo); off = the shared "Roblox" application Bloxstrap uses.
         public bool DiscordShowAsPhasmaStrap { get; set; } = true;
+
+        // Discord's own Join button (party + join secret) instead of the "Join server" link button;
+        // needs PhasmaStrap on the friend's PC too. See Integrations/DiscordJoin.
+        public bool DiscordNativeJoin { get; set; } = false;
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();
 

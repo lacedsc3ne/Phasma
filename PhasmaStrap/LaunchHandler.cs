@@ -54,6 +54,11 @@ namespace PhasmaStrap
                 App.Logger.WriteLine(LOG_IDENT, "Switching account");
                 LaunchAccountSwitch(App.LaunchSettings.SwitchAccountFlag.Data);
             }
+            else if (App.LaunchSettings.DiscordJoinFlag.Active)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Joining a friend from Discord");
+                Integrations.DiscordJoin.RunJoinHandler(App.LaunchSettings.DiscordJoinFlag.Data);
+            }
             else if (App.LaunchSettings.EditClipFlag.Active)
             {
                 App.Logger.WriteLine(LOG_IDENT, "Opening clip editor");

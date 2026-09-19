@@ -54,6 +54,10 @@ namespace PhasmaStrap
         // (the tray menu's "Switch account" - see Utility.AccountQuickSwitch)
         public LaunchFlag SwitchAccountFlag         { get; } = new("switchaccount");
 
+        // -discordjoin <application id>: started by Discord when a friend's Join button is clicked
+        // (see Integrations.DiscordJoin)
+        public LaunchFlag DiscordJoinFlag           { get; } = new("discordjoin");
+
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");
