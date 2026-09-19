@@ -5938,4 +5938,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Capture.EveryClipSearchFiltersRename" xml:space="preserve">
     <value>Every clip, with search, filters and rename</value>
   </data>
+  <data name="Menu.Capture.Screenshots" xml:space="preserve">
+    <value>Screenshots</value>
+  </data>
+  <data name="Menu.Capture.Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>
