@@ -464,8 +464,17 @@ namespace PhasmaStrap.UI.Elements.Settings
                 Height = Math.Min(placement.Height, SystemParameters.WorkArea.Height);
             }
 
+            // maximized only once the window is up: made maximized before it's shown, WPF's
+            // custom window frame (WindowChrome) loses its resize edges after un-maximizing
             if (placement.Maximized)
-                WindowState = System.Windows.WindowState.Maximized;
+            {
+                void MaximizeOnce(object? sender, EventArgs e)
+                {
+                    ContentRendered -= MaximizeOnce;
+                    Dispatcher.BeginInvoke(() => WindowState = System.Windows.WindowState.Maximized, System.Windows.Threading.DispatcherPriority.Background);
+                }
+                ContentRendered += MaximizeOnce;
+            }
 
             _placementTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _placementTimer.Tick += (_, _) =>
