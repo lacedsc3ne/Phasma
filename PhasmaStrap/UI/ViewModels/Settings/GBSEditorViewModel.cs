@@ -148,7 +148,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int FramerateCap
         {
             get => _gbs.GetInt("FramerateCap", 0);
-            set => Write("FramerateCap", value, nameof(FramerateCap));
+            // the number box writes its value back on load - don't turn "not set" into a real 0
+            set
+            {
+                if (value != FramerateCap)
+                    Write("FramerateCap", value, nameof(FramerateCap));
+            }
         }
 
         public int GraphicsQuality
