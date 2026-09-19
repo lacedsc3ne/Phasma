@@ -7,8 +7,8 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>PhasmaStrap.ico</ApplicationIcon>
-    <Version>2.16.1</Version>
-    <FileVersion>2.16.1</FileVersion>
+    <Version>2.17.0</Version>
+    <FileVersion>2.17.0</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\CustomBootstrapperSchema.json" />
+    <EmbeddedResource Include="Resources\Changelog.md" />
     <EmbeddedResource Include="Resources\CustomBootstrapperTemplate_Blank.xml" />
     <EmbeddedResource Include="Resources\CustomBootstrapperTemplate_Simple.xml" />
     <EmbeddedResource Include="Resources\PhasmaStrapStudio.luau" />
