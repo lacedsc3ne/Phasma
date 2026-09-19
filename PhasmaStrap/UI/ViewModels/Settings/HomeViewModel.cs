@@ -98,6 +98,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (PlayTimeEntry entry in PlayTimeStore.GetAll().OrderByDescending(x => x.LastPlayed).Take(MaxContinuePlaying))
                 ContinuePlaying.Add(entry);
 
+            _ = FillPlaceNamesAsync();
+
             StatusText = ContinuePlaying.Count == 0
                 ? "No games played yet - games you play will show up here."
                 : $"Showing your {ContinuePlaying.Count} most recently played game(s).";
@@ -105,12 +107,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(IsEmpty));
         }
 
+        // names the places of games that show up more than once, then shows the list again
+        private async Task FillPlaceNamesAsync()
+        {
+            if (await PhasmaStrap.Utility.PlaceNames.FillAsync(ContinuePlaying.ToList()))
+                LoadEntries();
+        }
+
         private static void Launch(PlayTimeEntry? entry)
         {
             if (entry is null || entry.PlaceId <= 0)
                 return;
 
-            LaunchDeepLink($"roblox://experiences/start?placeId={entry.PlaceId}");
+            LaunchDeepLink($"roblox://experiences/start?placeId={PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId)}");
         }
 
         private static void CopyLink(PlayTimeEntry? entry)

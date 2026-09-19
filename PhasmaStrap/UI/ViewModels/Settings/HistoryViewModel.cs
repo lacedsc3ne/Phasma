@@ -37,9 +37,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (PlayTimeEntry entry in PlayTimeStore.GetAll())
                 Entries.Add(entry);
 
+            _ = FillPlaceNamesAsync();
+
             StatusText = Entries.Count == 0
                 ? "No games played yet - your play time will show up here once you've played something."
                 : $"{Entries.Count} game(s) tracked.";
+        }
+
+        // names the places of games that show up more than once, then shows the list again
+        private async Task FillPlaceNamesAsync()
+        {
+            if (await PhasmaStrap.Utility.PlaceNames.FillAsync(Entries.ToList()))
+                LoadEntries();
         }
 
         private static void Launch(PlayTimeEntry? entry)
@@ -47,7 +56,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (entry is null || entry.PlaceId <= 0)
                 return;
 
-            string uri = $"roblox://experiences/start?placeId={entry.PlaceId}";
+            string uri = $"roblox://experiences/start?placeId={PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId)}";
             Process.Start(Paths.Process, $"-player \"{uri}\"");
         }
 

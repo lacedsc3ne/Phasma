@@ -36,7 +36,7 @@
                             </Border>
 
                             <StackPanel Grid.Column="1" Margin="16,8,12,8" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding DisplayName}" FontSize="16" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}">
                                     <Run Text="{Binding TotalTimeText, Mode=OneWay}" />
                                     <Run Text="{x:Static resources:Strings.Menu_History_PlayedLastPlayed}" />
