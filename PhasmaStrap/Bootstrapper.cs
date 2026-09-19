@@ -59,6 +59,10 @@ namespace PhasmaStrap
         private string _latestVersionGuid = null!;
         private string _latestVersionDirectory = null!;
         private PackageManifest _versionPackageManifest = null!;
+
+        // version manager: this launch uses a held/pinned version from disk instead of the latest
+        private bool _usingKeptVersion;
+        private string _versionManifestText = "";
         private bool _channelFetched = false;
 
         private bool _isInstalling = false;
@@ -274,6 +278,10 @@ namespace PhasmaStrap
 
             if (!_noConnection)
             {
+                // a held/pinned version that's already on disk is switched to, not installed
+                if (_usingKeptVersion && AppData.DistributionState.VersionGuid != _latestVersionGuid)
+                    SwitchToKeptVersion();
+
                 if (AppData.DistributionState.VersionGuid != _latestVersionGuid || _mustUpgrade)
                 {
                     bool backgroundUpdaterMutexOpen = !App.LaunchSettings.BackgroundUpdaterFlag.Active && Utilities.DoesMutexExist(BackgroundUpdaterMutexName);
@@ -507,6 +515,25 @@ namespace PhasmaStrap
 
                 newVersionGuid = clientVersion.VersionGuid;
                 newVersion = Utilities.ParseVersionSafe(clientVersion.Version);
+
+                if (_launchMode == LaunchMode.Player)
+                {
+                    Utility.RobloxVersions.RecordLatest(newVersionGuid, clientVersion.Version);
+
+                    // version manager: hold the installed version, or use a pinned one from disk
+                    string? chosen = Utility.RobloxVersions.Choose(newVersionGuid, AppData.DistributionState.VersionGuid, out string? why);
+
+                    if (why is not null)
+                        App.Logger.WriteLine(LOG_IDENT, $"Version manager: {why}");
+
+                    if (chosen is not null)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Version manager: using {chosen} instead of the latest ({newVersionGuid})");
+                        newVersionGuid = chosen;
+                        newVersion = Utilities.ParseVersionSafe(Utility.RobloxVersions.FileVersionOf(chosen));
+                        _usingKeptVersion = true;
+                    }
+                }
             }
             else
             {
@@ -522,9 +549,20 @@ namespace PhasmaStrap
 
                 _latestVersionDirectory = Path.Combine(Paths.Versions, _latestVersionGuid);
 
-                string pkgManifestUrl = Deployment.GetLocation($"/{_latestVersionGuid}-rbxPkgManifest.txt");
-                var pkgManifestData = await App.HttpClient.GetStringAsync(pkgManifestUrl);
+                // Roblox stops serving a version's package list soon after a newer one ships, so a
+                // held or pinned version uses the copy kept in its own folder
+                string? pkgManifestData = _usingKeptVersion ? Utility.RobloxVersions.ReadManifestCopy(_latestVersionGuid) : null;
 
+                if (pkgManifestData is null)
+                {
+                    string pkgManifestUrl = Deployment.GetLocation($"/{_latestVersionGuid}-rbxPkgManifest.txt");
+                    pkgManifestData = await App.HttpClient.GetStringAsync(pkgManifestUrl);
+
+                    // the installed version keeps a copy while it can still be had
+                    Utility.RobloxVersions.SaveManifestCopy(_latestVersionGuid, pkgManifestData);
+                }
+
+                _versionManifestText = pkgManifestData;
                 _versionPackageManifest = new(pkgManifestData);
             }
 
@@ -565,6 +603,21 @@ namespace PhasmaStrap
                     HandleConnectionError(ex);
                 }
             }
+        }
+
+        private void SwitchToKeptVersion()
+        {
+            const string LOG_IDENT = "Bootstrapper::SwitchToKeptVersion";
+
+            App.Logger.WriteLine(LOG_IDENT, $"Switching from {AppData.DistributionState.VersionGuid} to {_latestVersionGuid}, which is already on disk");
+
+            AppData.DistributionState.VersionGuid = _latestVersionGuid;
+            AppData.DistributionState.PackageHashes.Clear();
+
+            foreach (var package in _versionPackageManifest)
+                AppData.DistributionState.PackageHashes.Add(package.Name, package.Signature);
+
+            AppData.DistributionStateManager.Save();
         }
 
         private bool IsEligibleForBackgroundUpdate()
@@ -1263,11 +1316,14 @@ namespace PhasmaStrap
                 return;
             }
 
+            // versions the version manager keeps (a pinned one, the previous one)
+            HashSet<string> keep = Utility.RobloxVersions.FoldersToKeep(App.PlayerState.Prop.VersionGuid);
+
             foreach (string dir in Directory.GetDirectories(Paths.Versions))
             {
                 string dirName = Path.GetFileName(dir);
 
-                if (dirName != App.PlayerState.Prop.VersionGuid && dirName != App.StudioState.Prop.VersionGuid)
+                if (dirName != App.PlayerState.Prop.VersionGuid && dirName != App.StudioState.Prop.VersionGuid && !keep.Contains(dirName))
                 {
                     // TODO: this is too expensive
                     //Filesystem.AssertReadOnlyDirectory(dir);
@@ -1583,7 +1639,18 @@ namespace PhasmaStrap
 
             MigrateCompatibilityFlags();
 
+            string previousVersionGuid = AppData.DistributionState.VersionGuid;
             AppData.DistributionState.VersionGuid = _latestVersionGuid;
+
+            // version manager: remember this version (and the one it replaced) so the clean-up
+            // below can keep the previous one, then see which of your flags it no longer has
+            if (_launchMode == LaunchMode.Player)
+            {
+                Utility.RobloxVersions.RecordInstall(_latestVersionGuid, _versionManifestText, previousVersionGuid);
+
+                if (App.Settings.Prop.RobloxCheckFlagsAfterUpdate && !string.IsNullOrEmpty(previousVersionGuid))
+                    Utility.RobloxVersions.CheckFlagsAfterInstall(_latestVersionGuid, previousVersionGuid);
+            }
 
             AppData.DistributionState.PackageHashes.Clear();
 

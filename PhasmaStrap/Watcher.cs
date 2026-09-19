@@ -153,6 +153,13 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
+                // an update that dropped some of your flags is mentioned once (RobloxVersions)
+                _ = Task.Run(() =>
+                {
+                    try { Utility.RobloxVersions.ShowPendingFlagNotice(); }
+                    catch (Exception ex) { App.Logger.WriteLine("Watcher", $"Flag notice failed: {ex.Message}"); }
+                });
+
                 // a game joined from inside the Roblox app never went through a launch that could
                 // apply its FastFlag profile - see FlagProfileSession
                 ActivityWatcher.OnGameJoin += (sender, _) =>

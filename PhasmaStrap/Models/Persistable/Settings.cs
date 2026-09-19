@@ -89,6 +89,15 @@ namespace PhasmaStrap.Models.Persistable
         // Discord's own Join button (party + join secret) instead of the "Join server" link button;
         // needs PhasmaStrap on the friend's PC too. See Integrations/DiscordJoin.
         public bool DiscordNativeJoin { get; set; } = false;
+
+        // Roblox version manager (Behaviour > Roblox version, Utility/RobloxVersions):
+        // "Latest" (normal), "Hold" (keep the installed version) or "Pin" (RobloxPinnedVersion)
+        public string RobloxVersionMode { get; set; } = "Latest";
+        public string RobloxPinnedVersion { get; set; } = "";
+        // keep the previous version's folder after an update, so it can be gone back to
+        public bool RobloxKeepPreviousVersion { get; set; } = false;
+        // after an update, check which of your flags the new version no longer has
+        public bool RobloxCheckFlagsAfterUpdate { get; set; } = false;
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();
 
