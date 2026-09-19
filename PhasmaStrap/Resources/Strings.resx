@@ -6058,4 +6058,10 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Rendering.ResetHUDLook" xml:space="preserve">
     <value>Reset the HUD look</value>
   </data>
+  <data name="Menu.PhasmaStrap.DoubleClickTrayIcon" xml:space="preserve">
+    <value>Double-click the tray icon to</value>
+  </data>
+  <data name="Menu.PhasmaStrap.WhatDoubleClickingPhasmaStrapSIcon" xml:space="preserve">
+    <value>What double-clicking PhasmaStrap's icon in the taskbar tray does while Roblox is running.</value>
+  </data>
 </root>

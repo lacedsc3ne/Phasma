@@ -269,6 +269,9 @@ namespace PhasmaStrap.Models.Persistable
         // minimize to the tray instead of exiting - see MainWindowViewModel's window-closing handling
         public bool MinimizeToTrayOnClose { get; set; } = false;
 
+        // what double-clicking the tray icon does while Roblox runs - see NotifyIconWrapper
+        public TrayDoubleClickAction TrayDoubleClickAction { get; set; } = TrayDoubleClickAction.OpenSettings;
+
         // place IDs the matchmaker should never suggest as a candidate, regardless of MatchmakerAutoCandidates
         public List<string> MatchmakerExcludedPlaces { get; set; } = new();
 

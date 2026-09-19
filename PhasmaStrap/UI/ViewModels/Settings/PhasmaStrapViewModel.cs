@@ -49,6 +49,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.MinimizeToTrayOnClose = value;
         }
 
+        public TrayDoubleClickAction[] TrayDoubleClickActions { get; } = Enum.GetValues<TrayDoubleClickAction>();
+
+        public TrayDoubleClickAction TrayDoubleClickAction
+        {
+            get => App.Settings.Prop.TrayDoubleClickAction;
+            set
+            {
+                App.Settings.Prop.TrayDoubleClickAction = value;
+                // saved right away so the tray icon of a game that's already running follows it
+                App.Settings.SaveDeferred();
+                OnPropertyChanged(nameof(TrayDoubleClickAction));
+            }
+        }
+
         public WebEnvironment WebEnvironment
         {
             get => App.Settings.Prop.WebEnvironment;

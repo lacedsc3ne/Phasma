@@ -381,7 +381,45 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void RichPresenceMenuItem_Click(object sender, RoutedEventArgs e) => _watcher.RichPresence?.SetVisibility(((MenuItem)sender).IsChecked);
 
-        private void InviteDeeplinkMenuItem_Click(object sender, RoutedEventArgs e) => Clipboard.SetDataObject(_activityWatcher?.Data.GetInviteDeeplink());
+        private void InviteDeeplinkMenuItem_Click(object sender, RoutedEventArgs e) => CopyInviteLink();
+
+        public void CopyInviteLink()
+        {
+            string? link = _activityWatcher?.Data.GetInviteDeeplink();
+            if (string.IsNullOrEmpty(link))
+                return;
+
+            Clipboard.SetDataObject(link);
+            NotificationCenter.Notify("Invite link copied", "Anyone with PhasmaStrap or Roblox can open it to join your server.", NotificationCategory.General);
+        }
+
+        // the tray double-click counts as the user's own input, so Windows lets this process move
+        // another window to the front
+        public void BringRobloxToFront()
+        {
+            int pid = _watcher.RobloxProcessId;
+            if (pid == 0)
+                return;
+
+            using Process process = Process.GetProcessById(pid);
+            IntPtr window = process.MainWindowHandle;
+            if (window == IntPtr.Zero)
+                return;
+
+            if (IsIconic(window))
+                ShowWindow(window, 9 /* SW_RESTORE */);
+
+            SetForegroundWindow(window);
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr window);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr window, int command);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr window);
 
         private void ServerDetailsMenuItem_Click(object sender, RoutedEventArgs e) => ShowServerInformationWindow();
 

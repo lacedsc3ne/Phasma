@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Integrations;
+using PhasmaStrap.Integrations;
 using PhasmaStrap.UI.Elements.About;
 using PhasmaStrap.UI.Elements.ContextMenu;
 
@@ -34,6 +34,7 @@ namespace PhasmaStrap.UI
             };
 
             _notifyIcon.MouseClick += MouseClickEventHandler;
+            _notifyIcon.MouseDoubleClick += MouseDoubleClickEventHandler;
 
             if (_activityWatcher is not null && App.Settings.Prop.ShowServerDetails)
                 _activityWatcher.OnGameJoin += OnGameJoin;
@@ -56,8 +57,64 @@ namespace PhasmaStrap.UI
             if (e.Button != System.Windows.Forms.MouseButtons.Right)
                 return;
 
+            OpenMenu();
+        }
+
+        private void OpenMenu()
+        {
             _menuContainer.Activate();
             _menuContainer.ContextMenu.IsOpen = true;
+        }
+
+        public void MouseDoubleClickEventHandler(object? sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button != System.Windows.Forms.MouseButtons.Left)
+                return;
+
+            TrayDoubleClickAction action = App.Settings.Prop.TrayDoubleClickAction;
+            App.Logger.WriteLine("NotifyIconWrapper::DoubleClick", $"Tray icon double-clicked: {action}");
+
+            try
+            {
+                switch (action)
+                {
+                    case TrayDoubleClickAction.OpenSettings:
+                        Process.Start(Paths.Process, "-settings");
+                        break;
+
+                    case TrayDoubleClickAction.ShowRoblox:
+                        _menuContainer.BringRobloxToFront();
+                        break;
+
+                    case TrayDoubleClickAction.OpenMenu:
+                        OpenMenu();
+                        break;
+
+                    case TrayDoubleClickAction.TakeScreenshot:
+                        _watcher.TakeScreenshot();
+                        break;
+
+                    case TrayDoubleClickAction.SaveReplay:
+                        _watcher.SaveInstantReplay();
+                        break;
+
+                    case TrayDoubleClickAction.ServerDetails:
+                        _menuContainer.ShowServerInformationWindow();
+                        break;
+
+                    case TrayDoubleClickAction.CopyInviteLink:
+                        _menuContainer.CopyInviteLink();
+                        break;
+
+                    case TrayDoubleClickAction.CleanRam:
+                        _watcher.CleanRamNow();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("NotifyIconWrapper::DoubleClick", ex);
+            }
         }
         #endregion
 

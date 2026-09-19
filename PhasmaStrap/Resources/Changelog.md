@@ -2,6 +2,9 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.6
+- **Choose what double-clicking the tray icon does** while Roblox is running (PhasmaStrap › Startup & updates): open settings (the default), bring Roblox to the front, open the tray menu, take a screenshot, save an instant replay, show server details, copy the invite link or clean RAM.
+
 ## 2.17.5
 - **Fixed: logs could miss their last lines** when PhasmaStrap closed right after something happened (like an update), which made problems hard to track down.
 
