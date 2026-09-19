@@ -162,6 +162,13 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Group, Strings.Menu_DeveloperTools_StudioPluginInstaller, Strings.Menu_DeveloperTools_InstallAnyStudioPluginByIts, typeof(DeveloperToolsPage), Strings.Menu_DeveloperTools_DeveloperTools, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Installer_Install_Title, "", typeof(DeveloperToolsPage), Strings.Menu_DeveloperTools_DeveloperTools, "", "", Strings.Menu_DeveloperTools_StudioPluginInstaller, null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_DeveloperTools_OpenPluginsFolder, "", typeof(DeveloperToolsPage), Strings.Menu_DeveloperTools_DeveloperTools, "", "", Strings.Menu_DeveloperTools_StudioPluginInstaller, null, ""),
+            // ---- DiagnosticsPage.xaml (DiagnosticsPage) ----
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Diagnostics_HealthCheck, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_RunCheck, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_HealthCheck, "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Diagnostics_Connection, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_TestConnection, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Connection, "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_Stop, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Connection, "", "", null, ""),
+            new(SettingsSearchEntryKind.Group, Strings.Menu_Diagnostics_RouteStationByStation, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Connection, "", "", null, ""),
             // ---- ExtensionsPage.xaml (ExtensionsPage) ----
             new(SettingsSearchEntryKind.Action, Strings.Menu_Extensions_BrowseProject, "", typeof(ModsPage), Strings.Menu_Mods_Title, "", "", "", typeof(ExtensionsPage), Strings.Installer_Extensions_Title),
             new(SettingsSearchEntryKind.Action, Strings.Uninstaller_Uninstall, "", typeof(ModsPage), Strings.Menu_Mods_Title, "", "", "", typeof(ExtensionsPage), Strings.Installer_Extensions_Title),

@@ -44,6 +44,22 @@ namespace PhasmaStrap.Utility
 
         private static async Task LoopAsync(string address, CancellationToken token)
         {
+            // Roblox game servers ignore pings; a machine beside it in the same datacenter answers
+            // and sits at the end of the same route (see ConnectionDoctor.FindPingableAsync)
+            try
+            {
+                string? pingable = await ConnectionDoctor.FindPingableAsync(address, token).ConfigureAwait(false);
+                if (pingable is not null && pingable != address)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"{address} does not answer pings - measuring {pingable} in the same datacenter instead");
+                    address = pingable;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
             using var ping = new Ping();
 
             while (!token.IsCancellationRequested)

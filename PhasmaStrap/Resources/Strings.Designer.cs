@@ -15164,5 +15164,77 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Activity.RemovesEveryRecordedSessionScreenshotsClips", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tools that find out what is wrong and say it in plain words: the installation, the connection, crashes, stutter and whic.
+        /// </summary>
+        public static string Menu_Diagnostics_ToolsFindOutWhatWrongSay {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.ToolsFindOutWhatWrongSay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Health check.
+        /// </summary>
+        public static string Menu_Diagnostics_HealthCheck {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.HealthCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run the check.
+        /// </summary>
+        public static string Menu_Diagnostics_RunCheck {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.RunCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection.
+        /// </summary>
+        public static string Menu_Diagnostics_Connection {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Connection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test the connection.
+        /// </summary>
+        public static string Menu_Diagnostics_TestConnection {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.TestConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string Menu_Diagnostics_Stop {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The route, station by station.
+        /// </summary>
+        public static string Menu_Diagnostics_RouteStationByStation {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.RouteStationByStation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roblox game servers ignore pings, so a machine beside the server in the same datacenter is measured - the way there is t.
+        /// </summary>
+        public static string Menu_Diagnostics_RobloxGameServersIgnorePingsSo {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.RobloxGameServersIgnorePingsSo", resourceCulture);
+            }
+        }
     }
 }

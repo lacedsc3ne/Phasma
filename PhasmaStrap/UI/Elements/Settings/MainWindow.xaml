@@ -255,6 +255,7 @@
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" PageType="{x:Type pages:NetworkingPage}" Icon="Globe24" PageTag="networking" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_Hotkeys_Hotkeys}" PageType="{x:Type pages:HotkeysPage}" Icon="Keyboard24" PageTag="hotkeys" />
                     <ui:NavigationItem Content="{x:Static resources:Strings.Menu_DeveloperTools_DeveloperTools}" PageType="{x:Type pages:DeveloperToolsPage}" Icon="Code24" PageTag="developertools" />
+                    <ui:NavigationItem Content="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Header}" PageType="{x:Type pages:DiagnosticsPage}" Icon="Stethoscope24" PageTag="diagnostics" />
                 </ui:NavigationFluent.Items>
                 <ui:NavigationFluent.Footer>
                     <!-- Footer isn't pinned to the bottom of the window in this narrow sidebar - it
