@@ -1,0 +1,72 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.PrivateServersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      d:DesignHeight="700" d:DesignWidth="800"
+      Title="PrivateServersPage">
+    <ui:UiPage.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <DataTemplate x:Key="ServerTemplate">
+            <Border Margin="0,0,0,8" Padding="12,10" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Width="44" Height="44" CornerRadius="6" ClipToBounds="True" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                        <Image Source="{Binding IconUrl, TargetNullValue={x:Null}}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                        <TextBlock FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Text="{Binding Title}" />
+                        <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Subtitle}" />
+                        <TextBlock FontSize="12" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding StatusText}" />
+                    </StackPanel>
+
+                    <WrapPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <ui:Button Margin="0,2,6,2" Icon="Play24" Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Appearance="Primary" IsEnabled="{Binding CanJoin}"
+                                   Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+                        <ui:Button Margin="0,2,6,2" Icon="Link24" Content="{x:Static resources:Strings.Menu_History_CopyLink}" Visibility="{Binding OwnerVisibility}" ToolTip="{x:Static resources:Strings.Menu_PrivateServers_CopyServerSInviteLink}"
+                                   Command="{Binding DataContext.CopyLinkCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+                        <ui:Button Margin="0,2,6,2" Icon="ArrowSync24" Content="{x:Static resources:Strings.Menu_PrivateServers_NewLink}" Visibility="{Binding OwnerVisibility}" ToolTip="{x:Static resources:Strings.Menu_PrivateServers_MakeNewInviteLinkOldOne}"
+                                   Command="{Binding DataContext.NewLinkCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+                        <ui:Button Margin="0,2,0,2" Padding="8,6" Icon="Open24" ToolTip="{x:Static resources:Strings.Menu_PrivateServers_OpenGameSServerListRoblox}"
+                                   Command="{Binding DataContext.OpenOnRobloxCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+                    </WrapPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ui:UiPage.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,14,14">
+            <TextBlock Text="{x:Static resources:Strings.Menu_PrivateServers_PrivateServers}" FontSize="20" FontWeight="Medium" />
+            <TextBlock Margin="0,4,0,0" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Text="{x:Static resources:Strings.Menu_PrivateServers_OwnPrivateServersOnesSharedYou}" />
+
+            <DockPanel Margin="0,12,0,0">
+                <ui:Button DockPanel.Dock="Left" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_PrivateServers_LoadMyPrivateServers}" Appearance="Primary" IsEnabled="{Binding NotBusy}" Command="{Binding LoadCommand, Mode=OneTime}" />
+                <ui:ProgressRing DockPanel.Dock="Left" Margin="12,0,0,0" Width="18" Height="18" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Status}" />
+            </DockPanel>
+
+            <StackPanel Visibility="{Binding ListsVisibility}">
+                <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_Yours}" />
+                <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoOwnedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_YouDonTOwnAnyPrivate}" />
+                <ItemsControl ItemsSource="{Binding Owned}" ItemTemplate="{StaticResource ServerTemplate}" />
+
+                <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_SharedYou}" />
+                <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoSharedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_NobodyHasAddedYouTheirPrivate}" />
+                <ItemsControl ItemsSource="{Binding Shared}" ItemTemplate="{StaticResource ServerTemplate}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</ui:UiPage>

@@ -10,7 +10,17 @@
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance dmodels:ServerBrowserViewModel, IsDesignTimeCreatable=True}"
       Title="ServerBrowserPage"
-      Scrollable="True">
+      Scrollable="False">
+    <!-- two tabs: the public server browser (below) and your private servers (its own page) -->
+    <TabControl Margin="0,0,14,14">
+        <TabItem>
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="Server24" Margin="0,0,6,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_ServerBrowser_BrowseServers}" />
+                </StackPanel>
+            </TabItem.Header>
+            <ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="0,0,14,14">
         <!-- The automatic matchmaker (enable/prefer-empty/preferred datacenter/candidate count/
              allow-block grid/excluded games) moved to the Behaviour page's "Matchmaker" tab, to
@@ -60,4 +70,21 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <TabItem>
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="LockClosed24" Margin="0,0,6,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_PrivateServers_PrivateServers}" />
+                </StackPanel>
+            </TabItem.Header>
+            <Frame Margin="0,10,0,0"
+                   Source="PrivateServersPage.xaml"
+                   NavigationUIVisibility="Hidden"
+                   JournalOwnership="OwnsJournal"
+                   Background="Transparent" />
+        </TabItem>
+    </TabControl>
 </ui:UiPage>
