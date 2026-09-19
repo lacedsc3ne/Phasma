@@ -2,6 +2,9 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.5
+- **Fixed: logs could miss their last lines** when PhasmaStrap closed right after something happened (like an update), which made problems hard to track down.
+
 ## 2.17.4
 - **Fixed: auto-update often didn't update.**
   - It skipped the update whenever another PhasmaStrap was running (the tray icon, the settings window or a game), which is most of the time.
