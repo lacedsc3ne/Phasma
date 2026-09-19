@@ -24,7 +24,7 @@ namespace PhasmaStrap
         // PhasmaStrap's own server (VpsServer/ in the repo): answers release questions from a copy
         // of GitHub's, so auto-update and the News page don't run into GitHub's limit of 60
         // requests an hour per IP address. Empty = ask GitHub directly.
-        public const string ServerBase = "";
+        public const string ServerBase = "https://api.phasmastrap.com";
         public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/Phasma";
         public const string ProjectHelpLink = "https://github.com/lacedsc3ne/Phasma/wiki";
         public const string ProjectSupportLink = "https://github.com/lacedsc3ne/Phasma/issues/new";
