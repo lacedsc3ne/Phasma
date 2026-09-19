@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using PhasmaStrap.UI.Elements.About;
 using CommunityToolkit.Mvvm.Input;
@@ -55,6 +55,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.Settings.Save();
             App.State.Save();
             App.FastFlags.Save();
+            App.FlagProfiles.Save();
 
             foreach (var pair in App.PendingSettingTasks)
             {

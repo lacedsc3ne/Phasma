@@ -29,7 +29,7 @@ namespace PhasmaStrap.Utility
             public long Bytes;
         }
 
-        private static readonly string[] Tracked = { "Settings.json", "ClientAppSettings.json" };
+        private static readonly string[] Tracked = { "Settings.json", "ClientAppSettings.json", "FastFlagProfiles.json" };
 
         public static bool IsTracked(string fileLocation) =>
             Tracked.Contains(System.IO.Path.GetFileName(fileLocation), StringComparer.OrdinalIgnoreCase);

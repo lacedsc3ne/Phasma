@@ -1,8 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 
 using PhasmaStrap.UI.ViewModels.Settings;
-using Wpf.Ui.Mvvm.Contracts;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
@@ -31,11 +30,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DataContext = _viewModel;
         }
 
-        private void OpenFlagEditor(object? sender, EventArgs e)
-        {
-            if (Window.GetWindow(this) is INavigationWindow window)
-                    window.Navigate(typeof(FastFlagEditorPage));
-        }
+        // the editor is the next tab over
+        private void OpenFlagEditor(object? sender, EventArgs e) => FastFlagSettingsPage.SelectTab(this, "FastFlagEditorPage");
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {

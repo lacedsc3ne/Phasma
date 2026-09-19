@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -1106,7 +1106,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand OpenFastFlagEditorCommand => new RelayCommand(OpenFastFlagEditor);
 
-        public Visibility CanShowFastFlagEditor => App.IsStudioInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility CanShowFastFlagEditor => Visibility.Visible;
 
         public bool UseFastFlagManager
         {
@@ -1179,7 +1179,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     break;
             }
 
-            App.FastFlags.Save();
+            // like every other change here, kept when the window's Save button is pressed
             System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() => RequestPageReloadEvent?.Invoke(this, EventArgs.Empty)));
         }
 

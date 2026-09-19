@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -503,7 +503,7 @@ namespace PhasmaStrap.UI.Elements.Settings
                 return;
             }
 
-            if (App.FastFlags.Changed || App.PendingSettingTasks.Any())
+            if (App.FastFlags.Changed || App.FlagProfiles.Changed || App.PendingSettingTasks.Any())
             {
                 var result = Frontend.ShowMessageBox(Strings.Menu_UnsavedChanges, MessageBoxImage.Warning, MessageBoxButton.YesNo);
 

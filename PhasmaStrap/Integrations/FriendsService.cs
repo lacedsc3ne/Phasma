@@ -27,6 +27,7 @@ namespace PhasmaStrap.Integrations
         public string LastLocation { get; init; } = "";
         public long PlaceId { get; init; }
         public long RootPlaceId { get; init; }
+        public long UniverseId { get; init; }
         public string GameId { get; init; } = "";
         public string? AvatarUrl { get; set; }
 
@@ -191,6 +192,7 @@ namespace PhasmaStrap.Integrations
                             LastLocation = el.TryGetProperty("lastLocation", out var locEl) ? (locEl.GetString() ?? "") : "",
                             PlaceId = el.TryGetProperty("placeId", out var pEl) && pEl.ValueKind == JsonValueKind.Number ? pEl.GetInt64() : 0,
                             RootPlaceId = el.TryGetProperty("rootPlaceId", out var rpEl) && rpEl.ValueKind == JsonValueKind.Number ? rpEl.GetInt64() : 0,
+                            UniverseId = el.TryGetProperty("universeId", out var uEl) && uEl.ValueKind == JsonValueKind.Number ? uEl.GetInt64() : 0,
                             GameId = el.TryGetProperty("gameId", out var gEl) ? (gEl.GetString() ?? "") : "",
                         };
                     }

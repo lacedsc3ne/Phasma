@@ -11,9 +11,8 @@
       Title="FastFlagSettingsPage"
       Scrollable="False">
     <!--
-        Consolidated nav page: hosts the previously-separate FastFlagsPage ("Engine Settings")
-        and NvidiaPage as tabs, plus a new Asset Warp tab, mirroring Voidstrap's
-        FastFlagsPage.xaml tab layout. The two existing pages are embedded via Frame/Source
+        Consolidated nav page: the FastFlag quick settings, the editor, per-game flags, NVIDIA
+        driver settings, Asset Warp and the Asset Engine as tabs. The two existing pages are embedded via Frame/Source
         rather than having their (large, independently maintained) XAML/ViewModel content
         copied in - each keeps constructing and owning its own ViewModel exactly as it does
         when it's its own top-level nav page today, so nothing about how they work changes.
@@ -34,6 +33,34 @@
                 </TabItem.Header>
                 <Frame Margin="0,10,0,0"
                        Source="FastFlagsPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Edit24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagEditor_Title}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="FastFlagEditorPage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Games24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagGames_PerGameFlags}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="FastFlagGamesPage.xaml"
                        NavigationUIVisibility="Hidden"
                        JournalOwnership="OwnsJournal"
                        Background="Transparent" />
@@ -234,19 +261,6 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="Flag24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagEditor_Title}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <Frame Margin="0,10,0,0"
-                       Source="FastFlagEditorPage.xaml"
-                       NavigationUIVisibility="Hidden"
-                       JournalOwnership="OwnsJournal"
-                       Background="Transparent" />
-            </TabItem>
 
             <TabItem>
                 <TabItem.Header>

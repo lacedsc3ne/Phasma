@@ -350,16 +350,19 @@ namespace PhasmaStrap
                     if (App.Settings.Prop.MatchmakerEnabled)
                         await TryApplyMatchmakingAsync();
 
-                    long? launchPlaceId = TryResolveLaunchPlaceId();
+                    // which game this is, and so which FastFlag profile it gets (if any)
+                    LaunchGame game = App.Settings.Prop.UseFastFlagManager ? await ResolveLaunchGameAsync() : LaunchGame.Unknown;
+                    Utility.FlagProfile? profile = game.Known ? Utility.FlagLayers.ProfileFor(App.FlagProfiles.Prop, game.PlaceId, game.UniverseId) : null;
+                    var wanted = Utility.FlagProfileSession.Wanted.Of(profile);
 
                     // if Roblox is already open with different flags it has to go first - otherwise it
                     // just takes this join over and never reads what is about to be written
-                    bool startsNewClient = await Utility.FastFlagPresetSession.PrepareLaunchAsync(launchPlaceId);
+                    bool startsNewClient = await Utility.FlagProfileSession.PrepareLaunchAsync(wanted, game.Known);
 
-                    string appliedPreset = await TryApplyFastFlagPlacePresetAsync(launchPlaceId);
+                    bool flagsWritten = await WriteLaunchFlagsAsync(profile);
 
                     if (startsNewClient)
-                        Utility.FastFlagPresetSession.RecordLaunch(appliedPreset);
+                        Utility.FlagProfileSession.RecordLaunch(flagsWritten ? wanted : Utility.FlagProfileSession.Wanted.None);
 
                     // fire-and-forget: warms the AssetWarp preload cache ahead of the game
                     // actually asking, never something a launch should wait on or fail over
@@ -738,9 +741,8 @@ namespace PhasmaStrap
             App.Logger.WriteLine(LOG_IDENT, $"Redirecting to {winner.DatacenterName} (about {winner.EstimatedPingMs}ms), JobId {winner.JobId}");
         }
 
-        // shared with TryApplyEngineSettingsScopeAsync below - needs the placeId from the same
-        // "roblox://experiences/start?placeId=X" deep link format, independent of whether the
-        // matchmaker itself is enabled
+        // the place this launch is for, from the "roblox://experiences/start?placeId=X" deep link
+        // or the legacy ticket format - independent of whether the matchmaker is enabled
         private long? TryResolveLaunchPlaceId()
         {
             Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
@@ -756,7 +758,7 @@ namespace PhasmaStrap
 
             // legacy ticket-based launch format - same extraction as TryApplyLegacyTicketMatchmakingAsync,
             // since a real browser Play click just as often lands here as on the modern deep-link format
-            // above, and Engine Settings scope needs to resolve a place ID for either
+            // above
             Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
             if (!ticketMatch.Success)
                 return null;
@@ -775,71 +777,118 @@ namespace PhasmaStrap
             return null;
         }
 
-        // applies a saved FastFlag preset (Fast Flag Editor page's Presets section) for this one
-        // launch, if the launched place has an assignment - replaces the already-materialized
-        // ClientAppSettings.json's flags with the snapshot's, the same "full replace, not a merge"
-        // semantics FastFlagSnapshotManager.Apply uses for the live A/B toggle, just written
-        // directly to this launch's file instead of the user's global flag file. Never touches
-        // App.FastFlags.Prop/FastFlags.json, so the Fast Flag Editor still shows your real,
-        // un-scoped saved flags afterward. Replaced the old per-game "Engine Settings" scope
-        // (strip curated toggles for/except listed places) with this more general place-to-preset
-        // mechanism instead.
-        // returns the name of the preset that was written, or "" when the launch uses the global flags
-        private async Task<string> TryApplyFastFlagPlacePresetAsync(long? placeId)
+        private readonly record struct LaunchGame(long PlaceId, long UniverseId)
         {
-            const string LOG_IDENT = "Bootstrapper::TryApplyFastFlagPlacePresetAsync";
+            public static readonly LaunchGame Unknown = new(0, 0);
+            public bool Known => PlaceId > 0;
+        }
 
-            if (placeId is null || !App.Settings.Prop.UseFastFlagManager)
-                return "";
+        // Works out which game this launch is for. A normal launch names the place; a "join a
+        // friend" launch only names the friend, so their presence says where they are. The game
+        // (universe) a place belongs to is only looked up when a whole-game rule could match.
+        private async Task<LaunchGame> ResolveLaunchGameAsync()
+        {
+            const string LOG_IDENT = "Bootstrapper::ResolveLaunchGameAsync";
 
-            if (!App.Settings.Prop.FastFlagPlacePresets.TryGetValue(placeId.Value.ToString(), out string? presetName) || string.IsNullOrEmpty(presetName))
-                return "";
+            Utility.FlagProfileData profiles = App.FlagProfiles.Prop;
+            if (profiles.Rules.Count == 0)
+                return new LaunchGame(TryResolveLaunchPlaceId() ?? 0, 0);
 
-            Utility.FastFlagSnapshot? snapshot = Utility.FastFlagSnapshotManager.List().FirstOrDefault(s => s.Name == presetName);
-            if (snapshot is null)
+            long placeId = TryResolveLaunchPlaceId() ?? 0;
+            long universeId = 0;
+
+            if (placeId == 0)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} is assigned preset '{presetName}', but that snapshot no longer exists");
-                return "";
+                long? userId = TryResolveFollowedUserId();
+                if (userId is not null)
+                {
+                    var where = await Utility.GameLookup.WhereIsUserAsync(userId.Value, TimeSpan.FromSeconds(5));
+                    if (where is not null)
+                    {
+                        (placeId, universeId) = where.Value;
+                        App.Logger.WriteLine(LOG_IDENT, $"Following user {userId}, who is in place {placeId}");
+                    }
+                    else
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Following user {userId}, but where they are playing isn't visible - launching with your own flags");
+                    }
+                }
             }
+
+            if (placeId > 0 && universeId == 0 && Utility.FlagLayers.NeedsUniverse(profiles, placeId))
+                universeId = await Utility.GameLookup.UniverseOfAsync(placeId, TimeSpan.FromSeconds(4)) ?? 0;
+
+            return new LaunchGame(placeId, universeId);
+        }
+
+        // "join a friend" links: roblox://experiences/start?userId=X, or the legacy ticket format
+        // with request=RequestFollowUser&userId=X
+        private long? TryResolveFollowedUserId()
+        {
+            Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
+            if (uriMatch.Success)
+            {
+                var queryParams = HttpUtility.ParseQueryString(uriMatch.Groups[1].Value);
+                return long.TryParse(queryParams["userId"], out long userId) && userId > 0 ? userId : null;
+            }
+
+            Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
+            if (!ticketMatch.Success)
+                return null;
+
+            string decodedUrl = HttpUtility.UrlDecode(ticketMatch.Groups[1].Value);
+            int queryIndex = decodedUrl.IndexOf('?');
+            if (queryIndex < 0)
+                return null;
+
+            var ticketQuery = HttpUtility.ParseQueryString(decodedUrl[(queryIndex + 1)..]);
+            if (!string.Equals(ticketQuery["request"], "RequestFollowUser", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return long.TryParse(ticketQuery["userId"], out long followed) && followed > 0 ? followed : null;
+        }
+
+        // Writes the flags this launch starts with into the version folder: your flags, with the
+        // game's profile (if any) on top. Always written from scratch, so a profile from an earlier
+        // launch can never linger into a game that has none. The settings' own flag file is never
+        // touched. Returns false when no flags were written (manager off, mods not applied to the
+        // player, or the write failed).
+        private async Task<bool> WriteLaunchFlagsAsync(Utility.FlagProfile? profile)
+        {
+            const string LOG_IDENT = "Bootstrapper::WriteLaunchFlagsAsync";
+
+            if (!App.Settings.Prop.UseFastFlagManager || !ModsTargetThisLaunch)
+                return false;
+
+            if (string.IsNullOrEmpty(_latestVersionDirectory) || !Directory.Exists(_latestVersionDirectory))
+                return false;
 
             try
             {
                 string filePath = Path.Combine(_latestVersionDirectory, "ClientSettings", "ClientAppSettings.json");
 
-                // the preset goes ON TOP of the global flags ApplyModifications already wrote - a
-                // preset only holds the place-specific flags, so replacing the file would silently
-                // drop every global flag for that session
-                var merged = new Dictionary<string, object>();
-                try
+                Dictionary<string, string> flags = Utility.FlagLayers.Compose(App.FastFlags.Prop, profile);
+                string contents = JsonSerializer.Serialize(flags, new JsonSerializerOptions { WriteIndented = true });
+
+                if (!File.Exists(filePath) || await File.ReadAllTextAsync(filePath) != contents)
                 {
-                    if (File.Exists(filePath))
-                    {
-                        var existing = JsonSerializer.Deserialize<Dictionary<string, object>>(await File.ReadAllTextAsync(filePath));
-                        if (existing is not null)
-                            foreach (var kv in existing)
-                                merged[kv.Key] = kv.Value;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    App.Logger.WriteLine(LOG_IDENT, $"Could not read the existing flag file, preset will be applied alone: {ex.Message}");
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                    Filesystem.AssertReadOnly(filePath);
+                    await File.WriteAllTextAsync(filePath, contents);
+                    Filesystem.AssertReadOnly(filePath);
                 }
 
-                foreach (var kv in snapshot.Flags)
-                    merged[kv.Key] = kv.Value;
+                if (profile is null)
+                    App.Logger.WriteLine(LOG_IDENT, $"Launching with your {flags.Count} flag(s), no game profile");
+                else
+                    App.Logger.WriteLine(LOG_IDENT, $"Launching with profile '{profile.Name}' ({profile.Flags.Count} added/changed, {profile.Remove.Count} turned off) - {flags.Count} flag(s) in total");
 
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                Filesystem.AssertReadOnly(filePath);
-                await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(merged, new JsonSerializerOptions { WriteIndented = true }));
-                Filesystem.AssertReadOnly(filePath);
-
-                App.Logger.WriteLine(LOG_IDENT, $"Applied FastFlag preset '{presetName}' ({snapshot.Flags.Count} flag(s) on top of {merged.Count - snapshot.Flags.Count} global) for place {placeId}");
-                return presetName;
+                return true;
             }
             catch (Exception ex)
             {
-                App.Logger.WriteLine(LOG_IDENT, $"Failed to apply FastFlag preset '{presetName}', launching with the global flag set: {ex.Message}");
-                return "";
+                App.Logger.WriteLine(LOG_IDENT, $"Could not write this launch's flags: {ex.Message}");
+                return false;
             }
         }
 
@@ -1607,6 +1656,13 @@ namespace PhasmaStrap
             Process.Start(Paths.Process, $"-backgroundupdater {_launchMode}");
         }
 
+        private bool ModsTargetThisLaunch => App.Settings.Prop.ModApplyTarget switch
+        {
+            ModApplyTarget.Player => !IsStudioLaunch,
+            ModApplyTarget.Studio => IsStudioLaunch,
+            _ => true
+        };
+
         private async Task<bool> ApplyModifications()
         {
             const string LOG_IDENT = "Bootstrapper::ApplyModifications";
@@ -1617,14 +1673,7 @@ namespace PhasmaStrap
 
             // Preset Mod tab's "Mod apply target": skip applying mods entirely when this launch's
             // executable isn't in scope for the configured target
-            bool modsTargetThisLaunch = App.Settings.Prop.ModApplyTarget switch
-            {
-                ModApplyTarget.Player => !IsStudioLaunch,
-                ModApplyTarget.Studio => IsStudioLaunch,
-                _ => true
-            };
-
-            if (!modsTargetThisLaunch)
+            if (!ModsTargetThisLaunch)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Skipping mod application - ModApplyTarget is {App.Settings.Prop.ModApplyTarget} and this is a {(IsStudioLaunch ? "Studio" : "Player")} launch");
                 return true;
