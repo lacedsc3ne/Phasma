@@ -167,6 +167,7 @@ namespace PhasmaStrap.Utility
         public static List<DisplayInfo> GetDisplays()
         {
             List<DisplayInfo> list = new List<DisplayInfo>();
+            Dictionary<string, string> monitorNames = MonitorNames.ByDeviceName();
             try
             {
                 for (uint i = 0; ; i++)
@@ -185,23 +186,34 @@ namespace PhasmaStrap.Utility
                     {
                         continue;
                     }
-                    string friendly = adapter.DeviceString;
+                    // the monitor's own name when Windows knows it (the device string is almost
+                    // always "Generic PnP Monitor")
+                    string name = adapter.DeviceString;
                     DISPLAY_DEVICE monitor = NewDisplayDevice();
                     if (EnumDisplayDevices(adapter.DeviceName, 0, ref monitor, 0) && !string.IsNullOrWhiteSpace(monitor.DeviceString))
                     {
-                        friendly = monitor.DeviceString;
+                        name = monitor.DeviceString;
                     }
+                    if (monitorNames.TryGetValue(adapter.DeviceName, out string? realName))
+                    {
+                        name = realName;
+                    }
+
+                    // Windows' own display number (\.\DISPLAY2 -> 2), as in Settings > Display
+                    int number = int.TryParse(new string(adapter.DeviceName.Reverse().TakeWhile(char.IsDigit).Reverse().ToArray()), out int n) ? n : list.Count + 1;
+                    bool primary = (adapter.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
+
                     list.Add(new DisplayInfo
                     {
                         DeviceName = adapter.DeviceName,
-                        FriendlyName = friendly,
+                        FriendlyName = $"{number}. {name}  ·  {dm.dmPelsWidth}x{dm.dmPelsHeight} @ {dm.dmDisplayFrequency}Hz{(primary ? "  ·  main" : "")}",
                         IsPrimary = (adapter.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0,
                         X = dm.dmPositionX,
                         Y = dm.dmPositionY,
                         Width = (int)dm.dmPelsWidth,
                         Height = (int)dm.dmPelsHeight,
                         RefreshRate = (int)dm.dmDisplayFrequency,
-                        Number = list.Count + 1
+                        Number = number
                     });
                 }
             }
