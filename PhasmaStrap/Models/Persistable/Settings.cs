@@ -257,6 +257,17 @@ namespace PhasmaStrap.Models.Persistable
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
         // was copied a few seconds after the hotkey, which is easy to be surprised by)
+        // AssetWarp content routing (AssetRoute / AssetContentService). Everything that makes asset
+        // DOWNLOADS pass through PhasmaStrap is opt-in: the proxy then sits in the game's loading
+        // path, and that should be a decision, not a default.
+        public bool AssetRouteEnabled { get; set; } = false;
+        public bool AssetCacheEnabled { get; set; } = true;
+        public int AssetCacheLimitMb { get; set; } = 4096;
+        public bool TextureShrinkEnabled { get; set; } = false;
+        public int TextureShrinkMaxSize { get; set; } = 512;
+        public bool SwapPacksEnabled { get; set; } = true;
+        public bool TrafficReportEnabled { get; set; } = true;
+
         // Diagnostics > Crashes: when Roblox closes without its normal shutdown, look at its log and
         // at Windows' event logs for the reason. Local and read-only.
         public bool CrashAnalyzerEnabled { get; set; } = true;
