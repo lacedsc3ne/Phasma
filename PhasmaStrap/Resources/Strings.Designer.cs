@@ -16910,5 +16910,32 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.PrivateServers.NoServersMatchTheseFilters", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mixes your microphone into the clip exactly as it sounds - no noise suppression, echo cancelling or other Windows proces.
+        /// </summary>
+        public static string Menu_Capture_MixesMicrophoneIntoClipExactlyAs {
+            get {
+                return ResourceManager.GetString("Menu.Capture.MixesMicrophoneIntoClipExactlyAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microphone.
+        /// </summary>
+        public static string Menu_Capture_Microphone {
+            get {
+                return ResourceManager.GetString("Menu.Capture.Microphone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which microphone to record. Windows default is the one set as Default Device in Windows' sound settings. A few microphones don't let apps skip their own processing - for those, turn off Audio enhancements for the microphone in Windows' sound settings. Noise cancelling built into the microphone itself can only be turned off in its own app..
+        /// </summary>
+        public static string Menu_Capture_WhichMicrophoneRecordWindowsDefaultOne {
+            get {
+                return ResourceManager.GetString("Menu.Capture.WhichMicrophoneRecordWindowsDefaultOne", resourceCulture);
+            }
+        }
     }
 }

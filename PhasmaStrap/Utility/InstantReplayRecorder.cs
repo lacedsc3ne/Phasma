@@ -98,6 +98,16 @@ namespace PhasmaStrap.Utility
 
         public bool IsRunning => _running;
 
+        // clips are encoded as you play, so saving one takes a moment rather than seconds
+        public bool OnGpu
+        {
+            get
+            {
+                lock (_modeLock)
+                    return _gpu is not null;
+            }
+        }
+
         // ------------------------------------------------------------------ settings
 
         public static readonly int[] FpsOptions = { 15, 24, 30, 60, 90, 120, 144, 165, 240 };
@@ -181,7 +191,8 @@ namespace PhasmaStrap.Utility
                 _audio = new ReplayAudio(
                     () => Math.Clamp(App.Settings.Prop.InstantReplayClipSeconds, 5, 120) + GpuReplayRecorder.SegmentSeconds + 2,
                     App.RobloxPlayerAppName,
-                    App.Settings.Prop.InstantReplayMicrophone);
+                    App.Settings.Prop.InstantReplayMicrophone,
+                    App.Settings.Prop.InstantReplayMicrophoneDevice);
                 _audio.Start();
             }
 

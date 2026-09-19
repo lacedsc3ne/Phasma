@@ -290,6 +290,8 @@ namespace PhasmaStrap.Models.Persistable
         public bool InstantReplayGpuEncoding { get; set; } = true;
         public bool InstantReplayAudio { get; set; } = true;
         public bool InstantReplayMicrophone { get; set; } = false;
+        // endpoint ID of the recording device (ReplayAudio.ListMicrophones); "" = Windows' default
+        public string InstantReplayMicrophoneDevice { get; set; } = "";
 
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever

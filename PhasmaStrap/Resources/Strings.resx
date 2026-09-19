@@ -5914,4 +5914,13 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.PrivateServers.NoServersMatchTheseFilters" xml:space="preserve">
     <value>No servers match these filters.</value>
   </data>
+  <data name="Menu.Capture.MixesMicrophoneIntoClipExactlyAs" xml:space="preserve">
+    <value>Mixes your microphone into the clip exactly as it sounds - no noise suppression, echo cancelling or other Windows processing. Off unless you switch it on. Takes effect from the next game you join.</value>
+  </data>
+  <data name="Menu.Capture.Microphone" xml:space="preserve">
+    <value>Microphone</value>
+  </data>
+  <data name="Menu.Capture.WhichMicrophoneRecordWindowsDefaultOne" xml:space="preserve">
+    <value>Which microphone to record. Windows default is the one set as Default Device in Windows' sound settings. A few microphones don't let apps skip their own processing - for those, turn off Audio enhancements for the microphone in Windows' sound settings. Noise cancelling built into the microphone itself can only be turned off in its own app.</value>
+  </data>
 </root>

@@ -26,14 +26,17 @@ namespace PhasmaStrap.Utility
         private readonly Func<int> _seconds;
         private readonly string _processName;
         private readonly bool _microphone;
+        private readonly string _microphoneId;
         private readonly List<Source> _sources = new();
         private volatile bool _running;
 
-        public ReplayAudio(Func<int> bufferSeconds, string processName, bool microphone = false)
+        // microphoneId: a recording device's endpoint ID from ListMicrophones, or "" for Windows' default
+        public ReplayAudio(Func<int> bufferSeconds, string processName, bool microphone = false, string microphoneId = "")
         {
             _seconds = bufferSeconds;
             _processName = processName;
             _microphone = microphone;
+            _microphoneId = microphoneId ?? "";
         }
 
         public void Start()
@@ -255,11 +258,16 @@ namespace PhasmaStrap.Utility
                 {
                     uint flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK | AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY;
                     string how;
+                    bool raw = false;
 
                     if (_kind == SourceKind.Microphone)
                     {
-                        client = ActivateEndpoint(capture: true);
-                        how = "default microphone";
+                        client = ActivateEndpoint(capture: true, _owner._microphoneId, out string device);
+
+                        // RAW: the microphone exactly as it is - none of Windows' or the driver's
+                        // noise suppression, echo cancelling, automatic gain or voice effects
+                        raw = TryRaw(client);
+                        how = $"{device}, {(raw ? "raw (no noise suppression or other processing)" : "this device can't turn off Windows' sound processing")}";
                     }
                     else
                     {
@@ -291,7 +299,16 @@ namespace PhasmaStrap.Utility
                     Marshal.WriteInt16(format, 14, 16);             // bits
                     Marshal.WriteInt16(format, 16, 0);
 
-                    Check(client.Initialize(0 /* shared */, flags, 2_000_000 /* 200 ms */, 0, format, IntPtr.Zero), "IAudioClient.Initialize");
+                    int initialized = client.Initialize(0 /* shared */, flags, 2_000_000 /* 200 ms */, 0, format, IntPtr.Zero);
+                    if (initialized < 0 && raw)
+                    {
+                        Log?.Invoke($"The microphone wouldn't open unprocessed (0x{initialized:X8}) - recording it with Windows' processing");
+                        Marshal.ReleaseComObject(client);
+                        client = ActivateEndpoint(capture: true, _owner._microphoneId, out _);
+                        how += " (unprocessed not accepted)";
+                        initialized = client.Initialize(0, flags, 2_000_000, 0, format, IntPtr.Zero);
+                    }
+                    Check(initialized, "IAudioClient.Initialize");
                     Check(client.SetEventHandle(ready), "SetEventHandle");
 
                     Guid iid = typeof(IAudioCaptureClient).GUID;
@@ -374,12 +391,34 @@ namespace PhasmaStrap.Utility
                 throw new COMException($"{what} failed (0x{hr:X8})", hr);
         }
 
-        private static IAudioClient ActivateEndpoint(bool capture)
+        private static IAudioClient ActivateEndpoint(bool capture) => ActivateEndpoint(capture, "", out _);
+
+        // a chosen device by its endpoint ID, or Windows' default device (the "Default Device" in
+        // Sound settings) when none is chosen or the chosen one isn't plugged in
+        private static IAudioClient ActivateEndpoint(bool capture, string deviceId, out string description)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorClass();
             try
             {
-                Check(enumerator.GetDefaultAudioEndpoint(capture ? 1 : 0, capture ? 2 /* communications */ : 0 /* console */, out IMMDevice device), "GetDefaultAudioEndpoint");
+                IMMDevice? device = null;
+                description = capture ? "default microphone" : "default output";
+
+                if (deviceId.Length > 0)
+                {
+                    if (enumerator.GetDevice(deviceId, out IMMDevice chosen) >= 0 && chosen.GetState(out int state) >= 0 && state == DEVICE_STATE_ACTIVE)
+                    {
+                        device = chosen;
+                        description = $"microphone \"{FriendlyName(chosen) ?? deviceId}\"";
+                    }
+                    else
+                    {
+                        Log?.Invoke("The chosen microphone isn't connected - using the default one");
+                    }
+                }
+
+                if (device is null)
+                    Check(enumerator.GetDefaultAudioEndpoint(capture ? 1 : 0, 0 /* console */, out device), "GetDefaultAudioEndpoint");
+
                 try
                 {
                     Guid iid = typeof(IAudioClient).GUID;
@@ -394,6 +433,132 @@ namespace PhasmaStrap.Utility
             finally
             {
                 Marshal.ReleaseComObject(enumerator);
+            }
+        }
+
+        // asks for the unprocessed stream; false when the device (or Windows) doesn't offer one
+        private static bool TryRaw(IAudioClient client)
+        {
+            try
+            {
+                if (client is not IAudioClient2 client2)
+                    return false;
+
+                var properties = new AudioClientProperties
+                {
+                    cbSize = (uint)Marshal.SizeOf<AudioClientProperties>(),
+                    bIsOffload = 0,
+                    eCategory = 0, // AudioCategory_Other - not "communications", which invites voice processing
+                    Options = AUDCLNT_STREAMOPTIONS_RAW,
+                };
+
+                return client2.SetClientProperties(ref properties) >= 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        // Unprocessed: the device lets apps skip Windows' and its driver's sound processing
+        public sealed record Microphone(string Id, string Name, bool Unprocessed);
+
+        // the recording devices that are plugged in, for the microphone picker
+        public static List<Microphone> ListMicrophones()
+        {
+            var result = new List<Microphone>();
+            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorClass();
+            try
+            {
+                if (enumerator.EnumAudioEndpoints(1 /* capture */, DEVICE_STATE_ACTIVE, out IMMDeviceCollection devices) < 0)
+                    return result;
+
+                try
+                {
+                    devices.GetCount(out uint count);
+                    for (uint i = 0; i < count; i++)
+                    {
+                        if (devices.Item(i, out IMMDevice device) < 0)
+                            continue;
+
+                        try
+                        {
+                            if (device.GetId(out string id) >= 0 && !string.IsNullOrEmpty(id))
+                                result.Add(new Microphone(id, FriendlyName(device) ?? id, RawSupported(device)));
+                        }
+                        finally
+                        {
+                            Marshal.ReleaseComObject(device);
+                        }
+                    }
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(devices);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log?.Invoke($"Could not list microphones: {ex.Message}");
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(enumerator);
+            }
+
+            return result.OrderBy(m => m.Name, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+
+        // PKEY_Devices_AudioDevice_RawProcessingSupported
+        private static bool RawSupported(IMMDevice device)
+        {
+            if (device.OpenPropertyStore(0, out IPropertyStore store) < 0)
+                return false;
+
+            try
+            {
+                var key = new PROPERTYKEY { fmtid = new Guid("8943b373-388c-4395-b557-bc6dbaffafdb"), pid = 2 };
+                if (store.GetValue(ref key, out PROPVARIANT value) < 0)
+                    return false;
+
+                try
+                {
+                    return value.vt == 11 /* VT_BOOL */ && (short)value.pointer.ToInt64() != 0;
+                }
+                finally
+                {
+                    PropVariantClear(ref value);
+                }
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(store);
+            }
+        }
+
+        private static string? FriendlyName(IMMDevice device)
+        {
+            if (device.OpenPropertyStore(0 /* STGM_READ */, out IPropertyStore store) < 0)
+                return null;
+
+            try
+            {
+                var key = new PROPERTYKEY { fmtid = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), pid = 14 }; // PKEY_Device_FriendlyName
+                if (store.GetValue(ref key, out PROPVARIANT value) < 0)
+                    return null;
+
+                try
+                {
+                    return value.vt == 31 /* VT_LPWSTR */ ? Marshal.PtrToStringUni(value.pointer) : null;
+                }
+                finally
+                {
+                    PropVariantClear(ref value);
+                }
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(store);
             }
         }
 
@@ -461,6 +626,36 @@ namespace PhasmaStrap.Utility
         private const uint AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM = 0x80000000;
         private const uint AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY = 0x08000000;
         private const uint AUDCLNT_BUFFERFLAGS_SILENT = 0x2;
+        private const int AUDCLNT_STREAMOPTIONS_RAW = 0x1;
+        private const int DEVICE_STATE_ACTIVE = 0x1;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct AudioClientProperties
+        {
+            public uint cbSize;
+            public int bIsOffload;
+            public int eCategory;
+            public int Options;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PROPERTYKEY
+        {
+            public Guid fmtid;
+            public int pid;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PROPVARIANT
+        {
+            public ushort vt;
+            public ushort reserved1, reserved2, reserved3;
+            public IntPtr pointer;
+            public IntPtr extra;
+        }
+
+        [DllImport("ole32.dll")]
+        private static extern int PropVariantClear(ref PROPVARIANT value);
 
         [DllImport("Mmdevapi.dll", ExactSpelling = true, PreserveSig = true)]
         private static extern int ActivateAudioInterfaceAsync([MarshalAs(UnmanagedType.LPWStr)] string deviceInterfacePath, ref Guid riid, IntPtr activationParams, IActivateAudioInterfaceCompletionHandler completionHandler, out IActivateAudioInterfaceAsyncOperation operation);
@@ -480,14 +675,53 @@ namespace PhasmaStrap.Utility
         [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IMMDeviceEnumerator
         {
-            [PreserveSig] int EnumAudioEndpoints(int dataFlow, int stateMask, out IntPtr devices);
+            [PreserveSig] int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDeviceCollection devices);
             [PreserveSig] int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice device);
+            [PreserveSig] int GetDevice([MarshalAs(UnmanagedType.LPWStr)] string id, out IMMDevice device);
+        }
+
+        [ComImport, Guid("0BD7A1BE-7A1A-44DB-8397-CC5392387B5E"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IMMDeviceCollection
+        {
+            [PreserveSig] int GetCount(out uint count);
+            [PreserveSig] int Item(uint index, out IMMDevice device);
         }
 
         [ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IMMDevice
         {
             [PreserveSig] int Activate(ref Guid iid, int clsCtx, IntPtr activationParams, [MarshalAs(UnmanagedType.IUnknown)] out object instance);
+            [PreserveSig] int OpenPropertyStore(int access, out IPropertyStore store);
+            [PreserveSig] int GetId([MarshalAs(UnmanagedType.LPWStr)] out string id);
+            [PreserveSig] int GetState(out int state);
+        }
+
+        [ComImport, Guid("886d8eeb-8cf2-4446-8d02-cdba1dbdcf99"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IPropertyStore
+        {
+            [PreserveSig] int GetCount(out uint count);
+            [PreserveSig] int GetAt(uint index, out PROPERTYKEY key);
+            [PreserveSig] int GetValue(ref PROPERTYKEY key, out PROPVARIANT value);
+        }
+
+        // IAudioClient's methods first (same vtable), then the one used here
+        [ComImport, Guid("726778CD-F60A-4eda-82DE-E47610CD78AA"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioClient2
+        {
+            [PreserveSig] int Initialize(int shareMode, uint streamFlags, long bufferDuration, long periodicity, IntPtr format, IntPtr audioSessionGuid);
+            [PreserveSig] int GetBufferSize(out uint frames);
+            [PreserveSig] int GetStreamLatency(out long latency);
+            [PreserveSig] int GetCurrentPadding(out uint padding);
+            [PreserveSig] int IsFormatSupported(int shareMode, IntPtr format, out IntPtr closestMatch);
+            [PreserveSig] int GetMixFormat(out IntPtr format);
+            [PreserveSig] int GetDevicePeriod(out long defaultPeriod, out long minimumPeriod);
+            [PreserveSig] int Start();
+            [PreserveSig] int Stop();
+            [PreserveSig] int Reset();
+            [PreserveSig] int SetEventHandle(IntPtr handle);
+            [PreserveSig] int GetService(ref Guid iid, [MarshalAs(UnmanagedType.IUnknown)] out object service);
+            [PreserveSig] int IsOffloadCapable(int category, out int offloadCapable);
+            [PreserveSig] int SetClientProperties(ref AudioClientProperties properties);
         }
 
         [ComImport, Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
