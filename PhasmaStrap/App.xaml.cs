@@ -156,12 +156,11 @@ namespace PhasmaStrap
 
         public static string ConstructPhasmaStrapWebUrl()
         {
-            // dont let user switch web environment if debug mode is not on
-            if (Settings.Prop.WebEnvironment == WebEnvironment.Production || !Settings.Prop.DeveloperMode)
-                return "services.bloxstraplabs.com";
-
-            string? sub = Settings.Prop.WebEnvironment.GetDescription();
-            return $"services-{sub}.bloxstraplabs.com";
+            // PhasmaStrap's own server, not the upstream Bloxstrap project's: install/upgrade
+            // counts and crash logs are this fork's business (and are off when you turn
+            // "Enable sending of analytics" off). The web environment setting upstream uses to
+            // pick a staging host has no meaning here - there is one server.
+            return "api.phasmastrap.com";
         }
 
         public static bool CanSendLogs()

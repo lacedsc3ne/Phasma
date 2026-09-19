@@ -2,6 +2,9 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.8
+- **Statistics and crash reports now go to PhasmaStrap's own server** instead of the upstream Bloxstrap project's. They are still anonymous, still off when you turn off "Enable sending of analytics", and the privacy page at phasmastrap.com/privacy says exactly what is sent.
+
 ## 2.17.7
 - **Updates and the News page now come from PhasmaStrap's own server** (api.phasmastrap.com) instead of GitHub's, which only allows 60 requests an hour per IP address - with a few people on one network, update checks used to quietly fail. If the server is down, PhasmaStrap asks GitHub like before. Downloads still come from GitHub.
 
