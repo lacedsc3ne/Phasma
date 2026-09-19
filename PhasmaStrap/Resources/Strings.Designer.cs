@@ -15236,5 +15236,77 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Diagnostics.RobloxGameServersIgnorePingsSo", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crashes.
+        /// </summary>
+        public static string Menu_Diagnostics_Crashes {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Crashes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When Roblox closes without its normal shutdown, PhasmaStrap reads Roblox's log and Windows' own event logs from that mom.
+        /// </summary>
+        public static string Menu_Diagnostics_WhenRobloxClosesWithoutItsNormal {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.WhenRobloxClosesWithoutItsNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Analyse the last session.
+        /// </summary>
+        public static string Menu_Diagnostics_AnalyseLastSession {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.AnalyseLastSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No crashes on record..
+        /// </summary>
+        public static string Menu_Diagnostics_NoCrashesRecord {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.NoCrashesRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What to try.
+        /// </summary>
+        public static string Menu_Diagnostics_WhatTry {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.WhatTry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Evidence.
+        /// </summary>
+        public static string Menu_Diagnostics_Evidence {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Evidence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Look into unexpected closes automatically.
+        /// </summary>
+        public static string Menu_Diagnostics_LookIntoUnexpectedClosesAutomatically {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.LookIntoUnexpectedClosesAutomatically", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runs the analysis when Roblox ends without its normal shutdown and shows what it found. A normal exit is never reported..
+        /// </summary>
+        public static string Menu_Diagnostics_RunsAnalysisWhenRobloxEndsWithout {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.RunsAnalysisWhenRobloxEndsWithout", resourceCulture);
+            }
+        }
     }
 }
