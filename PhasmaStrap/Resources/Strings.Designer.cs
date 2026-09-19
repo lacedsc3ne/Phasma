@@ -17342,5 +17342,23 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Rendering.ResetHUDLook", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Double-click the tray icon to.
+        /// </summary>
+        public static string Menu_PhasmaStrap_DoubleClickTrayIcon {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.DoubleClickTrayIcon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What double-clicking PhasmaStrap's icon in the taskbar tray does while Roblox is running..
+        /// </summary>
+        public static string Menu_PhasmaStrap_WhatDoubleClickingPhasmaStrapSIcon {
+            get {
+                return ResourceManager.GetString("Menu.PhasmaStrap.WhatDoubleClickingPhasmaStrapSIcon", resourceCulture);
+            }
+        }
     }
 }
