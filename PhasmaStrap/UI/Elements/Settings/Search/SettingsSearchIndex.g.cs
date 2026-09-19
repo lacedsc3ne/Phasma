@@ -582,6 +582,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, Strings.Menu_PhasmaStrap_Section_General_Header, Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_PhasmaStrap_SettingsHistory, null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, Strings.Menu_PhasmaStrap_Section_General_Header, Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_PhasmaStrap_SettingsHistory, null, ""),
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Channel_RobloxChannel, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, "", "", "", null, ""),
+            // ---- PrivateServersPage.xaml (PrivateServersPage) ----
+            new(SettingsSearchEntryKind.Action, Strings.Menu_PrivateServers_LoadMyPrivateServers, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_PrivateServers_Yours, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_PrivateServers_SharedYou, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
             // ---- ReleasesPage.xaml (ReleasesPage) ----
             new(SettingsSearchEntryKind.Action, Strings.Menu_Releases_Refresh, "", typeof(ReleasesPage), Strings.Menu_Releases_Title, "", "", "", null, ""),
             // ---- RenderingPage.xaml (RenderingPage) ----
@@ -661,8 +665,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Option, Strings.Menu_RiShade_Debanding, "", typeof(RenderingPage), Strings.Menu_FastFlags_Section_Rendering, Strings.Menu_RiShade_Title, Strings.Menu_Rendering_Effects, Strings.Menu_RiShade_DetailAndGlow, null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_RiShade_AmbientGlow, "", typeof(RenderingPage), Strings.Menu_FastFlags_Section_Rendering, Strings.Menu_RiShade_Title, Strings.Menu_Rendering_Effects, Strings.Menu_RiShade_DetailAndGlow, null, ""),
             // ---- ServerBrowserPage.xaml (ServerBrowserPage) ----
-            new(SettingsSearchEntryKind.Option, Strings.Menu_ServerBrowser_PlaceId_Title, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", null, ""),
-            new(SettingsSearchEntryKind.Action, Strings.Menu_ServerBrowser_JoinFastest, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_ServerBrowser_BrowseServers, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_ServerBrowser_Browser_Title, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, Strings.Menu_ServerBrowser_BrowseServers, "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_ServerBrowser_PlaceId_Title, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, Strings.Menu_ServerBrowser_BrowseServers, Strings.Menu_ServerBrowser_Browser_Title, "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_ServerBrowser_JoinFastest, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, Strings.Menu_ServerBrowser_BrowseServers, Strings.Menu_ServerBrowser_Browser_Title, "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_PrivateServers_PrivateServers, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", null, ""),
             // ---- ShortcutsPage.xaml (ShortcutsPage) ----
             new(SettingsSearchEntryKind.Option, Strings.Menu_Shortcuts_ExtractIcons_Title, "", typeof(ShortcutsPage), Strings.Common_Shortcuts, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Shortcuts_General_Title, "", typeof(ShortcutsPage), Strings.Common_Shortcuts, "", "", "", null, ""),

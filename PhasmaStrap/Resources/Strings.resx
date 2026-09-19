@@ -5686,4 +5686,40 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Integrations.FriendsGetDiscordSJoinButton" xml:space="preserve">
     <value>Friends get Discord's Join button on your profile instead of a link, and land straight in your server. They need PhasmaStrap too. Public servers only - a private server's code is never shared this way.</value>
   </data>
+  <data name="Menu.PrivateServers.CopyServerSInviteLink" xml:space="preserve">
+    <value>Copy this server's invite link</value>
+  </data>
+  <data name="Menu.PrivateServers.NewLink" xml:space="preserve">
+    <value>New link</value>
+  </data>
+  <data name="Menu.PrivateServers.MakeNewInviteLinkOldOne" xml:space="preserve">
+    <value>Make a new invite link - the old one stops working</value>
+  </data>
+  <data name="Menu.PrivateServers.OpenGameSServerListRoblox" xml:space="preserve">
+    <value>Open the game's server list on roblox.com</value>
+  </data>
+  <data name="Menu.PrivateServers.PrivateServers" xml:space="preserve">
+    <value>Private servers</value>
+  </data>
+  <data name="Menu.PrivateServers.OwnPrivateServersOnesSharedYou" xml:space="preserve">
+    <value>Your own private servers and the ones shared with you, in one list. Join straight in, copy a server's invite link, or replace a link that got around too far.</value>
+  </data>
+  <data name="Menu.PrivateServers.LoadMyPrivateServers" xml:space="preserve">
+    <value>Load my private servers</value>
+  </data>
+  <data name="Menu.PrivateServers.Yours" xml:space="preserve">
+    <value>Yours</value>
+  </data>
+  <data name="Menu.PrivateServers.YouDonTOwnAnyPrivate" xml:space="preserve">
+    <value>You don't own any private servers.</value>
+  </data>
+  <data name="Menu.PrivateServers.SharedYou" xml:space="preserve">
+    <value>Shared with you</value>
+  </data>
+  <data name="Menu.PrivateServers.NobodyHasAddedYouTheirPrivate" xml:space="preserve">
+    <value>Nobody has added you to their private server.</value>
+  </data>
+  <data name="Menu.ServerBrowser.BrowseServers" xml:space="preserve">
+    <value>Browse servers</value>
+  </data>
 </root>

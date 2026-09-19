@@ -16226,5 +16226,113 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Integrations.FriendsGetDiscordSJoinButton", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy this server's invite link.
+        /// </summary>
+        public static string Menu_PrivateServers_CopyServerSInviteLink {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.CopyServerSInviteLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New link.
+        /// </summary>
+        public static string Menu_PrivateServers_NewLink {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.NewLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make a new invite link - the old one stops working.
+        /// </summary>
+        public static string Menu_PrivateServers_MakeNewInviteLinkOldOne {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.MakeNewInviteLinkOldOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the game's server list on roblox.com.
+        /// </summary>
+        public static string Menu_PrivateServers_OpenGameSServerListRoblox {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.OpenGameSServerListRoblox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Private servers.
+        /// </summary>
+        public static string Menu_PrivateServers_PrivateServers {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.PrivateServers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your own private servers and the ones shared with you, in one list. Join straight in, copy a server's invite link, or re.
+        /// </summary>
+        public static string Menu_PrivateServers_OwnPrivateServersOnesSharedYou {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.OwnPrivateServersOnesSharedYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load my private servers.
+        /// </summary>
+        public static string Menu_PrivateServers_LoadMyPrivateServers {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.LoadMyPrivateServers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yours.
+        /// </summary>
+        public static string Menu_PrivateServers_Yours {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.Yours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You don't own any private servers..
+        /// </summary>
+        public static string Menu_PrivateServers_YouDonTOwnAnyPrivate {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.YouDonTOwnAnyPrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shared with you.
+        /// </summary>
+        public static string Menu_PrivateServers_SharedYou {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.SharedYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nobody has added you to their private server..
+        /// </summary>
+        public static string Menu_PrivateServers_NobodyHasAddedYouTheirPrivate {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.NobodyHasAddedYouTheirPrivate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse servers.
+        /// </summary>
+        public static string Menu_ServerBrowser_BrowseServers {
+            get {
+                return ResourceManager.GetString("Menu.ServerBrowser.BrowseServers", resourceCulture);
+            }
+        }
     }
 }
