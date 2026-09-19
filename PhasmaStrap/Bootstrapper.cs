@@ -1171,12 +1171,17 @@ namespace PhasmaStrap
         {
             const string LOG_IDENT = "Bootstrapper::CheckForUpdates";
             
-            // don't update if there's another instance running (likely running in the background)
-            // i don't like this, but there isn't much better way of doing it /shrug
-            if (Process.GetProcessesByName(App.ProjectName).Length > 1)
+            // Another PhasmaStrap running (the tray, the settings window, a game's watcher) used to
+            // skip the update altogether - and one is running most of the time, so updates silently
+            // never happened. The upgrade step now swaps the exe even while it's in use, so only
+            // an update that's already under way elsewhere is a reason to skip.
+            using (var probe = new InterProcessLock("AutoUpdater"))
             {
-                App.Logger.WriteLine(LOG_IDENT, $"More than one PhasmaStrap instance running, aborting update check");
-                return false;
+                if (!probe.IsAcquired)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, "Another PhasmaStrap is already updating, skipping the update check");
+                    return false;
+                }
             }
 
             App.Logger.WriteLine(LOG_IDENT, "Checking for updates...");
@@ -1220,20 +1225,42 @@ namespace PhasmaStrap
 
                 File.Copy(Paths.Process, downloadLocation, true);
 #else
-                var asset = releaseInfo.Assets![0];
+                var asset = releaseInfo.Assets!.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    ?? throw new InvalidDataException($"Release {releaseInfo.TagName} has no .exe to download");
 
                 string downloadLocation = Path.Combine(Paths.TempUpdates, asset.Name);
 
                 Directory.CreateDirectory(Paths.TempUpdates);
 
-                App.Logger.WriteLine(LOG_IDENT, $"Downloading {releaseInfo.TagName}...");
-                
+                // a download that failed or was cut off earlier used to be kept and started again on
+                // every launch (an HTML error page or half an exe) - only a complete, verified file counts
+                if (File.Exists(downloadLocation) && !IsCompleteDownload(downloadLocation, asset))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Discarding an incomplete earlier download of {asset.Name}");
+                    File.Delete(downloadLocation);
+                }
+
                 if (!File.Exists(downloadLocation))
                 {
-                    var response = await App.HttpClient.GetAsync(asset.BrowserDownloadUrl);
+                    App.Logger.WriteLine(LOG_IDENT, $"Downloading {releaseInfo.TagName} ({asset.Size / 1024 / 1024} MB)...");
 
-                    await using var fileStream = new FileStream(downloadLocation, FileMode.OpenOrCreate, FileAccess.Write);
-                    await response.Content.CopyToAsync(fileStream);
+                    string partial = downloadLocation + ".part";
+
+                    using (var response = await App.HttpClient.GetAsync(asset.BrowserDownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        response.EnsureSuccessStatusCode();
+
+                        await using var fileStream = new FileStream(partial, FileMode.Create, FileAccess.Write);
+                        await response.Content.CopyToAsync(fileStream);
+                    }
+
+                    if (!IsCompleteDownload(partial, asset))
+                    {
+                        File.Delete(partial);
+                        throw new InvalidDataException($"The download of {asset.Name} was incomplete or corrupted");
+                    }
+
+                    File.Move(partial, downloadLocation, true);
                 }
 #endif
 
@@ -1276,6 +1303,24 @@ namespace PhasmaStrap
             }
 
             return false;
+        }
+
+        // size, and the SHA-256 GitHub publishes for the asset when it has one
+        private static bool IsCompleteDownload(string path, GithubReleaseAsset asset)
+        {
+            var info = new FileInfo(path);
+            if (!info.Exists || info.Length == 0 || (asset.Size > 0 && info.Length != asset.Size))
+                return false;
+
+            if (asset.Digest is { } digest && digest.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase))
+            {
+                using var stream = File.OpenRead(path);
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                string hash = Convert.ToHexString(sha.ComputeHash(stream));
+                return string.Equals(hash, digest["sha256:".Length..], StringComparison.OrdinalIgnoreCase);
+            }
+
+            return true;
         }
         #endregion
 

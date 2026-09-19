@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using Microsoft.Win32;
 
 namespace PhasmaStrap
@@ -364,9 +364,92 @@ namespace PhasmaStrap
             App.SendStat("installAction", "uninstall");
         }
 
+        private const string ReplacedSuffix = ".old";
+
+        // Puts this exe in place of the installed one. The installed exe is usually still running
+        // (the tray icon, a game's watcher), which blocks overwriting it - but Windows does allow
+        // renaming a running exe, so it's moved aside and deleted on a later start.
+        private static bool ReplaceApplication(string LOG_IDENT)
+        {
+            for (int i = 1; i <= 6; i++)
+            {
+                try
+                {
+                    File.Copy(Paths.Process, Paths.Application, true);
+                    return true;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    if (i == 1)
+                        App.Logger.WriteLine(LOG_IDENT, "The installed exe is in use, waiting a moment");
+
+                    Thread.Sleep(500);
+                }
+            }
+
+            string aside = $"{Paths.Application}.{DateTime.Now:yyyyMMddHHmmss}{ReplacedSuffix}";
+
+            try
+            {
+                File.Move(Paths.Application, aside);
+                App.Logger.WriteLine(LOG_IDENT, "Moved the running installed exe aside to replace it");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Failed to update! (The installed exe could not be replaced or moved aside)");
+                App.Logger.WriteException(LOG_IDENT, ex);
+                return false;
+            }
+
+            try
+            {
+                File.Copy(Paths.Process, Paths.Application, true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Failed to update! (Could not copy the new version in)");
+                App.Logger.WriteException(LOG_IDENT, ex);
+
+                try { File.Move(aside, Paths.Application, true); }
+                catch (Exception restoreEx) { App.Logger.WriteException(LOG_IDENT, restoreEx); }
+
+                return false;
+            }
+        }
+
+        // exes moved aside by ReplaceApplication, once nothing runs them any more
+        private static void DeleteReplacedExecutables()
+        {
+            try
+            {
+                string? folder = Path.GetDirectoryName(Paths.Application);
+                if (folder is null || !Directory.Exists(folder))
+                    return;
+
+                foreach (string file in Directory.EnumerateFiles(folder, Path.GetFileName(Paths.Application) + ".*" + ReplacedSuffix))
+                {
+                    try { File.Delete(file); }
+                    catch (Exception) { /* still running - next time */ }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private static void UpgradeFailed(string? version)
+        {
+            Frontend.ShowMessageBox(
+                string.Format(Strings.Bootstrapper_AutoUpdateFailed, version ?? "?"),
+                MessageBoxImage.Warning);
+        }
+
         public static void HandleUpgrade()
         {
             const string LOG_IDENT = "Installer::HandleUpgrade";
+
+            DeleteReplacedExecutables();
 
             if (!File.Exists(Paths.Application) || Paths.Process == Paths.Application)
                 return;
@@ -416,39 +499,23 @@ namespace PhasmaStrap
             // executable became a cloud-only placeholder, hydrate it before we try to overwrite it
             CloudFiles.Hydrate(Paths.Application);
 
-            using (var ipl = new InterProcessLock("AutoUpdater", TimeSpan.FromSeconds(5)))
+            // the process that downloaded this update holds the lock until it exits; that can take
+            // longer than a few seconds (its window closing), and giving up here used to leave the
+            // old version installed without a word
+            using (var ipl = new InterProcessLock("AutoUpdater", TimeSpan.FromSeconds(30)))
             {
                 if (!ipl.IsAcquired)
                 {
                     App.Logger.WriteLine(LOG_IDENT, "Failed to update! (Could not obtain singleton mutex)");
+                    UpgradeFailed(currentVer);
                     return;
                 }
             }
 
-            // prior to 2.8.0, auto-updating was handled with this... bruteforce method
-            // now it's handled with the system mutex you see above, but we need to keep this logic for <2.8.0 versions
-            for (int i = 1; i <= 10; i++)
+            if (!ReplaceApplication(LOG_IDENT))
             {
-                try
-                {
-                    File.Copy(Paths.Process, Paths.Application, true);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    if (i == 1)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, "Waiting for write permissions to update version");
-                    }
-                    else if (i == 10)
-                    {
-                        App.Logger.WriteLine(LOG_IDENT, "Failed to update! (Could not get write permissions after 10 tries/5 seconds)");
-                        App.Logger.WriteException(LOG_IDENT, ex);
-                        return;
-                    }
-
-                    Thread.Sleep(500);
-                }
+                UpgradeFailed(currentVer);
+                return;
             }
 
             using (var uninstallKey = Registry.CurrentUser.CreateSubKey(App.UninstallKey))

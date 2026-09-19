@@ -2,6 +2,13 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.4
+- **Fixed: auto-update often didn't update.**
+  - It skipped the update whenever another PhasmaStrap was running (the tray icon, the settings window or a game), which is most of the time.
+  - The new version couldn't replace the installed one while it was running, and gave up silently. It now swaps it in anyway.
+  - A failed or cut-off download was kept and retried forever. Downloads are now checked against GitHub's size and checksum.
+  - If an update still fails, you now get a message instead of nothing.
+
 ## 2.17.3
 - **Fixed: "FastFlag profile is not active" when it was.** PhasmaStrap now checks the flags file the open Roblox actually started with, instead of a note that could go stale when Roblox was still closing during a launch.
 - **Fixed: the proxy said everything was patched when Roblox wasn't using it.**
