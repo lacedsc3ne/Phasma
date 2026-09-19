@@ -1,0 +1,148 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.GifMakerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        Title="Make a GIF"
+        Width="1080"
+        Height="720"
+        MinWidth="860"
+        MinHeight="560"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <base:WpfUiWindow.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,16,0,6" />
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Width" Value="110" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+    </base:WpfUiWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="Make a GIF" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <Grid Grid.Row="1" Margin="12,4,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ============================================================ live preview -->
+            <Grid Grid.Column="0" Margin="0,0,12,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="8" ClipToBounds="True" Background="#FF15171B" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Image x:Name="PreviewImage" Stretch="Uniform" Margin="8" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Border>
+                <TextBlock x:Name="InfoText" Grid.Row="1" Margin="2,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            </Grid>
+
+            <!-- ============================================================ settings -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Pictures" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="One picture makes a moving shot. Add more to make a slideshow - they play in this order." />
+
+                    <ListBox x:Name="PictureList" Margin="0,8,0,0" MaxHeight="230" SelectionChanged="PictureList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="64" Height="36" CornerRadius="4" ClipToBounds="True" Background="#FF24262C">
+                                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                                    </Border>
+                                    <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="200" Text="{Binding Name}" ToolTip="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <WrapPanel Margin="0,8,0,0">
+                        <ui:Button Margin="0,0,6,6" Content="Add screenshots" Icon="Add24" Click="Add_Click" />
+                        <ui:Button x:Name="UpButton" Margin="0,0,6,6" Padding="8,6" Icon="ArrowUp24" Appearance="Secondary" ToolTip="Earlier" Click="Up_Click" />
+                        <ui:Button x:Name="DownButton" Margin="0,0,6,6" Padding="8,6" Icon="ArrowDown24" Appearance="Secondary" ToolTip="Later" Click="Down_Click" />
+                        <ui:Button x:Name="RemoveButton" Margin="0,0,6,6" Padding="8,6" Icon="Delete24" Appearance="Secondary" ToolTip="Remove from the GIF" Click="Remove_Click" />
+                    </WrapPanel>
+
+                    <TextBlock Style="{StaticResource Section}" Text="Motion" />
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Movement" />
+                        <ComboBox x:Name="MotionBox" Width="190" SelectionChanged="Setting_Changed">
+                            <ComboBoxItem Content="None (still)" />
+                            <ComboBoxItem Content="Zoom in" />
+                            <ComboBoxItem Content="Zoom out" />
+                            <ComboBoxItem Content="Pan left to right" />
+                            <ComboBoxItem Content="Pan right to left" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Between pictures" />
+                        <ComboBox x:Name="TransitionBox" Width="190" SelectionChanged="Setting_Changed">
+                            <ComboBoxItem Content="Crossfade" />
+                            <ComboBoxItem Content="Cut" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Each picture" />
+                        <Slider x:Name="SecondsSlider" Width="150" Minimum="0.5" Maximum="6" TickFrequency="0.5" IsSnapToTickEnabled="True" Value="2" ValueChanged="Slider_Changed" />
+                        <TextBlock x:Name="SecondsText" Margin="8,0,0,0" VerticalAlignment="Center" FontFamily="Consolas" />
+                    </StackPanel>
+
+                    <TextBlock Style="{StaticResource Section}" Text="Size and smoothness" />
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Width" />
+                        <ComboBox x:Name="WidthBox" Width="190" SelectionChanged="Setting_Changed">
+                            <ComboBoxItem Content="320 px" Tag="320" />
+                            <ComboBoxItem Content="480 px" Tag="480" />
+                            <ComboBoxItem Content="640 px" Tag="640" />
+                            <ComboBoxItem Content="800 px" Tag="800" />
+                            <ComboBoxItem Content="960 px" Tag="960" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Frame rate" />
+                        <ComboBox x:Name="FpsBox" Width="190" SelectionChanged="Setting_Changed">
+                            <ComboBoxItem Content="10 fps (smallest)" Tag="10" />
+                            <ComboBoxItem Content="15 fps" Tag="15" />
+                            <ComboBoxItem Content="20 fps" Tag="20" />
+                            <ComboBoxItem Content="25 fps (smoothest)" Tag="25" />
+                        </ComboBox>
+                    </StackPanel>
+                    <CheckBox x:Name="DitherBox" Margin="110,8,0,0" Content="Smoother colours (bigger file)" Checked="Setting_Changed" Unchecked="Setting_Changed" />
+                    <TextBlock Margin="0,14,0,12" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                               Text="Saved GIFs go with your clips: Capture > Instant Replay > All clips (filter: GIFs)." />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="12,10,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <ProgressBar x:Name="SaveProgress" Width="160" Height="4" Margin="0,0,10,0" Maximum="1" Visibility="Collapsed" />
+                <TextBlock x:Name="StatusText" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button x:Name="RevealButton" Margin="0,0,8,0" Content="Show in folder" Icon="FolderOpen24" Visibility="Collapsed" Click="Reveal_Click" />
+                <ui:Button x:Name="SaveButton" Margin="0,0,8,0" Content="Save GIF" Icon="Gif24" Appearance="Primary" Click="Save_Click" />
+                <ui:Button Content="Close" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>
