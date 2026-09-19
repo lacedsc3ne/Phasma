@@ -179,7 +179,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             try
             {
-                var releases = await Http.GetJson<GithubRelease[]>($"https://api.github.com/repos/{App.ProjectRepository}/releases?per_page={MaxReleasesToShow}");
+                var releases = await App.GetReleaseJson<GithubRelease[]>("/v1/releases", $"/releases?per_page={MaxReleasesToShow}");
 
                 _allReleases = (releases ?? Array.Empty<GithubRelease>())
                     .Take(MaxReleasesToShow)
