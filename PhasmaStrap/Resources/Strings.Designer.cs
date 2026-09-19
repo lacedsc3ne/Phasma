@@ -15308,5 +15308,158 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Diagnostics.RunsAnalysisWhenRobloxEndsWithout", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stutter.
+        /// </summary>
+        public static string Menu_Diagnostics_Stutter {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Stutter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Times every frame of the game for a while and watches memory, the processor and other programs next to it, then says wha.
+        /// </summary>
+        public static string Menu_Diagnostics_TimesEveryFrameGameWhileWatches {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.TimesEveryFrameGameWhileWatches", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measure my game.
+        /// </summary>
+        public static string Menu_Diagnostics_MeasureMyGame {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.MeasureMyGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing measured yet..
+        /// </summary>
+        public static string Menu_Diagnostics_NothingMeasuredYet {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.NothingMeasuredYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this measurement.
+        /// </summary>
+        public static string Menu_Diagnostics_DeleteMeasurement {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.DeleteMeasurement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FastFlag auto-tuner.
+        /// </summary>
+        public static string Menu_Diagnostics_FastFlagAutoTuner {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.FastFlagAutoTuner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finds out whether a FastFlag set really makes the game run better - by measuring, not by reputation. Roblox only reads f.
+        /// </summary>
+        public static string Menu_Diagnostics_FindsOutWhetherFastFlagSetReally {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.FindsOutWhetherFastFlagSetReally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which flag sets should be compared?.
+        /// </summary>
+        public static string Menu_Diagnostics_WhichFlagSetsShouldBeCompared {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.WhichFlagSetsShouldBeCompared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two to four. Other sets have to exist as FastFlag snapshots first (FastFlag editor > Snapshots)..
+        /// </summary>
+        public static string Menu_Diagnostics_TwoFourOtherSetsHaveExist {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.TwoFourOtherSetsHaveExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start the experiment.
+        /// </summary>
+        public static string Menu_Diagnostics_StartExperiment {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.StartExperiment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FLAG SET.
+        /// </summary>
+        public static string Menu_Diagnostics_FLAGSET {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.FLAGSET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SLOWEST 1 %.
+        /// </summary>
+        public static string Menu_Diagnostics_SLOWEST1 {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.SLOWEST1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AVERAGE.
+        /// </summary>
+        public static string Menu_Diagnostics_AVERAGE {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.AVERAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to STUTTERS.
+        /// </summary>
+        public static string Menu_Diagnostics_STUTTERS {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.STUTTERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RUNS.
+        /// </summary>
+        public static string Menu_Diagnostics_RUNS {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.RUNS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End the experiment and keep:.
+        /// </summary>
+        public static string Menu_Diagnostics_EndExperimentKeep {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.EndExperimentKeep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        public static string Menu_Diagnostics_Finish {
+            get {
+                return ResourceManager.GetString("Menu.Diagnostics.Finish", resourceCulture);
+            }
+        }
     }
 }

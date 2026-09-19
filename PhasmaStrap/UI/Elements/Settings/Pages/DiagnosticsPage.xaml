@@ -197,6 +197,181 @@
                     </controls:OptionControl>
                 </StackPanel>
             </TabItem>
+            <!-- ============================================================ stutter -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Pulse24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Diagnostics_Stutter}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_TimesEveryFrameGameWhileWatches}" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <ComboBox Width="150" ItemsSource="{Binding MeasureOptions, Mode=OneTime}" SelectedItem="{Binding SelectedMeasure, Mode=TwoWay}" IsEnabled="{Binding MeasureIdle, Mode=OneWay}" />
+                        <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Diagnostics_MeasureMyGame}" Icon="Play24" Appearance="Primary" AutomationProperties.Name="Measure my game" Command="{Binding RequestMeasureCommand, Mode=OneTime}" IsEnabled="{Binding MeasureIdle, Mode=OneWay}" />
+                        <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_Cancel}" Icon="Dismiss24" Appearance="Secondary" AutomationProperties.Name="Cancel the measurement" Command="{Binding CancelMeasureCommand, Mode=OneTime}" Visibility="{Binding MeasurePendingVisibility, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <ProgressBar Margin="0,10,0,0" Height="4" Minimum="0" Maximum="1" Value="{Binding MeasureProgress, Mode=OneWay}" Visibility="{Binding MeasurePendingVisibility, Mode=OneWay}" />
+                    <TextBlock Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding MeasureStatusText, Mode=OneWay}" />
+
+                    <TextBlock Margin="2,14,0,6" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Visibility="{Binding RunsEmptyVisibility, Mode=OneWay}" Text="{x:Static resources:Strings.Menu_Diagnostics_NothingMeasuredYet}" />
+
+                    <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Runs, Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                            <ui:Button Grid.Column="1" Padding="4" Appearance="Transparent" Icon="Delete16" ToolTip="{x:Static resources:Strings.Menu_Diagnostics_DeleteMeasurement}" AutomationProperties.Name="Delete measurement"
+                                                       Command="{Binding DataContext.DeleteRunCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+                                        </Grid>
+                                        <TextBlock Margin="0,2,0,0" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Verdict}" />
+                                        <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Numbers}" />
+
+                                        <Viewbox Margin="0,10,0,0" Stretch="Fill" Height="70" HorizontalAlignment="Stretch">
+                                            <Canvas Width="900" Height="70" ClipToBounds="True">
+                                                <Polyline Points="{Binding Graph}" Stroke="{DynamicResource SystemAccentColorSecondaryBrush}" StrokeThickness="1.4" StrokeLineJoin="Round" />
+                                            </Canvas>
+                                        </Viewbox>
+                                        <TextBlock FontSize="10" HorizontalAlignment="Right" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding GraphScale}" />
+
+                                        <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding Findings}" Visibility="{Binding FindingsVisibility}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding StringFormat='•  {0}'}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- ============================================================ auto-tuner -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Beaker24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Diagnostics_FastFlagAutoTuner}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_FindsOutWhetherFastFlagSetReally}" />
+
+                    <!-- setup -->
+                    <StackPanel Margin="0,12,0,0" Visibility="{Binding TunerSetupVisibility, Mode=OneWay}">
+                        <TextBlock FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Diagnostics_WhichFlagSetsShouldBeCompared}" />
+                        <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_TwoFourOtherSetsHaveExist}" />
+
+                        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding TunerCandidates, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Margin="0,0,0,4" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                                        <StackPanel>
+                                            <TextBlock FontSize="13" Text="{Binding Title}" />
+                                            <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Detail}" />
+                                        </StackPanel>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <ComboBox Width="230" ItemsSource="{Binding TunerRoundOptions, Mode=OneTime}" SelectedItem="{Binding SelectedTunerRounds, Mode=TwoWay}" />
+                            <ComboBox Width="190" Margin="8,0,0,0" ItemsSource="{Binding TunerLengthOptions, Mode=OneTime}" SelectedItem="{Binding SelectedTunerLength, Mode=TwoWay}" />
+                            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Diagnostics_StartExperiment}" Icon="Beaker24" Appearance="Primary" AutomationProperties.Name="Start the experiment" Command="{Binding StartTunerCommand, Mode=OneTime}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- running -->
+                    <StackPanel Margin="0,12,0,0" Visibility="{Binding TunerRunningVisibility, Mode=OneWay}">
+                        <ItemsControl ItemsSource="{Binding TunerSteps, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <ui:SymbolIcon Symbol="{Binding Symbol}" Foreground="{Binding Color}" FontSize="18" Margin="0,0,8,0" />
+                                        <TextBlock FontSize="13" VerticalAlignment="Center" Text="{Binding Text}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource SystemAccentColorSecondaryBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <StackPanel>
+                                <TextBlock FontSize="13" TextWrapping="Wrap" Text="{Binding TunerNextText, Mode=OneWay}" />
+                                <ui:Button Margin="0,8,0,0" Content="{Binding TunerArmLabel, Mode=OneWay}" Icon="Flag24" Appearance="Primary" AutomationProperties.Name="Arm the next run" Visibility="{Binding TunerArmVisibility, Mode=OneWay}" Command="{Binding ArmTunerCommand, Mode=OneTime}" />
+                                <TextBlock Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding MeasureStatusText, Mode=OneWay}" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Margin="0,12,0,0" Visibility="{Binding TunerResultsVisibility, Mode=OneWay}">
+                            <TextBlock FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding TunerVerdict, Mode=OneWay}" />
+
+                            <Grid Margin="0,8,0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="150" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_FLAGSET}" />
+                                <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_SLOWEST1}" />
+                                <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_AVERAGE}" />
+                                <TextBlock Grid.Column="3" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_STUTTERS}" />
+                                <TextBlock Grid.Column="4" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_RUNS}" />
+                            </Grid>
+                            <ItemsControl ItemsSource="{Binding TunerResults, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="110" />
+                                                <ColumnDefinition Width="150" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" FontSize="13" FontWeight="{Binding Weight}" Text="{Binding Variant}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" FontSize="13" FontWeight="{Binding Weight}" Text="{Binding Low}" />
+                                            <TextBlock Grid.Column="2" FontSize="13" Text="{Binding Average}" />
+                                            <TextBlock Grid.Column="3" FontSize="13" Text="{Binding Stutters}" />
+                                            <TextBlock Grid.Column="4" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Runs}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding TunerNotes, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding StringFormat='•  {0}'}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Text="{x:Static resources:Strings.Menu_Diagnostics_EndExperimentKeep}" />
+                            <ComboBox Width="320" ItemsSource="{Binding TunerKeepOptions, Mode=OneWay}" SelectedItem="{Binding SelectedTunerKeep, Mode=TwoWay}" />
+                            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Diagnostics_Finish}" Icon="Checkmark24" AutomationProperties.Name="Finish the experiment" Command="{Binding FinishTunerCommand, Mode=OneTime}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding TunerMessage, Mode=OneWay}" />
+                </StackPanel>
+            </TabItem>
         </TabControl>
     </StackPanel>
 </ui:UiPage>

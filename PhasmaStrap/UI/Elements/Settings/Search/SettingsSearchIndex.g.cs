@@ -173,6 +173,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_AnalyseLastSession, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Crashes, "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Crashes, "", "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Diagnostics_LookIntoUnexpectedClosesAutomatically, Strings.Menu_Diagnostics_RunsAnalysisWhenRobloxEndsWithout, typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Crashes, "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Diagnostics_Stutter, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_MeasureMyGame, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_Stutter, "", "", null, ""),
+            new(SettingsSearchEntryKind.Tab, Strings.Menu_Diagnostics_FastFlagAutoTuner, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_StartExperiment, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_FastFlagAutoTuner, "", "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Diagnostics_Finish, "", typeof(DiagnosticsPage), Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Strings.Menu_Diagnostics_FastFlagAutoTuner, "", "", null, ""),
             // ---- ExtensionsPage.xaml (ExtensionsPage) ----
             new(SettingsSearchEntryKind.Action, Strings.Menu_Extensions_BrowseProject, "", typeof(ModsPage), Strings.Menu_Mods_Title, "", "", "", typeof(ExtensionsPage), Strings.Installer_Extensions_Title),
             new(SettingsSearchEntryKind.Action, Strings.Uninstaller_Uninstall, "", typeof(ModsPage), Strings.Menu_Mods_Title, "", "", "", typeof(ExtensionsPage), Strings.Installer_Extensions_Title),
