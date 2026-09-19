@@ -696,6 +696,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             {
                 if (File.Exists(_liveCookiePath))
                 {
+                    PhasmaStrap.Utility.AccountGuard.MarkOwnAccess();
                     File.Delete(_liveCookiePath);
                     _currentUserId = 0;
                     _currentInLibrary = false;
@@ -886,6 +887,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
         private static async Task CopyWithRetryAsync(string src, string dest, bool overwrite = false, int retries = 5)
         {
+            PhasmaStrap.Utility.AccountGuard.MarkOwnAccess();
             for (int i = 0; i < retries; i++)
             {
                 try
@@ -908,6 +910,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
         private async Task ReplaceLiveCookieAsync(string source)
         {
             string tmp = _liveCookiePath + ".tmp";
+            PhasmaStrap.Utility.AccountGuard.MarkOwnAccess();
 
             for (int i = 0; i < 5; i++)
             {

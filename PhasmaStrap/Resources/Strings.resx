@@ -5770,4 +5770,34 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.RobloxVersions.CompareOtherVersionPC" xml:space="preserve">
     <value>Compare with the other version on this PC</value>
   </data>
+  <data name="Menu.Accounts.AccountGuard" xml:space="preserve">
+    <value>Account guard</value>
+  </data>
+  <data name="Menu.Accounts.WarnsYouAboutWhatLoginStealers" xml:space="preserve">
+    <value>Warns you about what login stealers do: reading Roblox's sign-in file, sending roblox.com somewhere else, or planting a certificate to read your traffic. It can only warn - it can't stop a program that's already on your PC.</value>
+  </data>
+  <data name="Menu.Accounts.TurnAccountGuard" xml:space="preserve">
+    <value>Turn on the account guard</value>
+  </data>
+  <data name="Menu.Accounts.ChecksHostsFileTrustedCertificatesRoblox" xml:space="preserve">
+    <value>Checks your hosts file, trusted certificates, Roblox's certificate list and the Windows proxy each time you play, and tells you about anything new.</value>
+  </data>
+  <data name="Menu.Accounts.WatchSignFileBackground" xml:space="preserve">
+    <value>Watch the sign-in file in the background</value>
+  </data>
+  <data name="Menu.Accounts.RunsSmallPhasmaStrapProcessFromWhen" xml:space="preserve">
+    <value>Runs a small PhasmaStrap process from when you sign in to Windows. It notices another program opening Roblox's sign-in file while Roblox isn't running, and names the programs started just before. Stops when you turn this off.</value>
+  </data>
+  <data name="Menu.Accounts.CheckNow" xml:space="preserve">
+    <value>Check now</value>
+  </data>
+  <data name="Menu.Accounts.Fine" xml:space="preserve">
+    <value>This is fine</value>
+  </data>
+  <data name="Menu.Accounts.YouKnowAboutDonTMention" xml:space="preserve">
+    <value>You know about this - don't mention it again</value>
+  </data>
+  <data name="Menu.Accounts.RecentWarnings" xml:space="preserve">
+    <value>Recent warnings</value>
+  </data>
 </root>

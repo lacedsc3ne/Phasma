@@ -58,6 +58,9 @@ namespace PhasmaStrap
         // (see Integrations.DiscordJoin)
         public LaunchFlag DiscordJoinFlag           { get; } = new("discordjoin");
 
+        // -guard: the account guard's background process (Utility.AccountGuard), started at sign-in
+        public LaunchFlag GuardFlag                 { get; } = new("guard");
+
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 
         public LaunchFlag RemoveProxyHostsFlag      { get; } = new("removeproxyhosts");

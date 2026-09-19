@@ -22,6 +22,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Action, Strings.Menu_Accounts_ImportSeveralAtOnceInstead, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_ImportAccountFromItsROBLOSECURITYCookie, "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Accounts_BulkImportFromCookies, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Accounts_ImportAll, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_BulkImportFromCookies, "", null, ""),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_Accounts_AccountGuard, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Accounts_TurnAccountGuard, Strings.Menu_Accounts_ChecksHostsFileTrustedCertificatesRoblox, typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_AccountGuard, "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Accounts_WatchSignFileBackground, Strings.Menu_Accounts_RunsSmallPhasmaStrapProcessFromWhen, typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_AccountGuard, "", null, ""),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_Accounts_CheckNow, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", Strings.Menu_Accounts_AccountGuard, "", null, ""),
+            new(SettingsSearchEntryKind.Section, Strings.Menu_Accounts_RecentWarnings, "", typeof(AccountsPage), Strings.Menu_Accounts_Accounts, "", "", "", null, ""),
             // ---- ActivityPage.xaml (ActivityPage) ----
             new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Activity_Timeline, "", typeof(ActivityPage), Strings.Menu_Integrations_Tabs_Activity, "", "", "", null, ""),
