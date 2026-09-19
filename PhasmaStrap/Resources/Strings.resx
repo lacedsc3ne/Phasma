@@ -5332,4 +5332,28 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Activity.RemovesEveryRecordedSessionScreenshotsClips" xml:space="preserve">
     <value>Removes every recorded session. Screenshots, clips and the per-game totals on the Home page stay.</value>
   </data>
+  <data name="Menu.Diagnostics.ToolsFindOutWhatWrongSay" xml:space="preserve">
+    <value>Tools that find out what is wrong and say it in plain words: the installation, the connection, crashes, stutter and which FastFlags are really faster.</value>
+  </data>
+  <data name="Menu.Diagnostics.HealthCheck" xml:space="preserve">
+    <value>Health check</value>
+  </data>
+  <data name="Menu.Diagnostics.RunCheck" xml:space="preserve">
+    <value>Run the check</value>
+  </data>
+  <data name="Menu.Diagnostics.Connection" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="Menu.Diagnostics.TestConnection" xml:space="preserve">
+    <value>Test the connection</value>
+  </data>
+  <data name="Menu.Diagnostics.Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Menu.Diagnostics.RouteStationByStation" xml:space="preserve">
+    <value>The route, station by station</value>
+  </data>
+  <data name="Menu.Diagnostics.RobloxGameServersIgnorePingsSo" xml:space="preserve">
+    <value>Roblox game servers ignore pings, so a machine beside the server in the same datacenter is measured - the way there is the same. Stations in between often answer pings poorly on purpose; they only count when the far end suffers too.</value>
+  </data>
 </root>
