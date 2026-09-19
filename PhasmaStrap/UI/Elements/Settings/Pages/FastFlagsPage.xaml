@@ -25,10 +25,54 @@
             Header="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Title}"
             Description="{x:Static resources:Strings.Menu_FastFlags_EnginePreset_Description}">
             <StackPanel Orientation="Horizontal">
-                <ui:Button Content="{x:Static resources:Strings.Common_Default}" Appearance="Secondary" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Default" />
-                <ui:Button Content="{x:Static resources:Strings.Menu_FastFlags_Balanced}" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Balanced" />
-                <ui:Button Content="{x:Static resources:Strings.Menu_FastFlags_Performance}" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Performance" />
-                <ui:Button Content="{x:Static resources:Strings.Menu_Capture_Quality}" Appearance="Secondary" Margin="6,0,0,0" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Quality" />
+                <ui:Button Content="{x:Static resources:Strings.Common_Default}" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Default">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ActiveEnginePreset}" Value="Default">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Content="{x:Static resources:Strings.Menu_FastFlags_Balanced}" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Balanced" Margin="6,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ActiveEnginePreset}" Value="Balanced">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Content="{x:Static resources:Strings.Menu_FastFlags_Performance}" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Performance" Margin="6,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ActiveEnginePreset}" Value="Performance">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Content="{x:Static resources:Strings.Menu_Capture_Quality}" Command="{Binding ApplyEnginePresetCommand, Mode=OneTime}" CommandParameter="Quality" Margin="6,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ActiveEnginePreset}" Value="Quality">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
             </StackPanel>
         </controls:OptionControl>
 

@@ -22,6 +22,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void SetupViewModel()
         {
+            _viewModel?.Detach();
             _viewModel = new FastFlagsViewModel();
 
             _viewModel.OpenFlagEditorEvent += OpenFlagEditor;
