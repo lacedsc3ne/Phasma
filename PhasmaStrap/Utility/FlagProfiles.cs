@@ -172,89 +172,189 @@ namespace PhasmaStrap.Utility
         }
 
         // ------------------------------------------------------------------ share codes
+        //
+        // A code carries the whole profile - no server involved. Two formats:
+        //   PHF2-  (written now) the name on the first line, then one line per change:
+        //          "#37=0" / "FIntSomeFlag=5" to set, "-#12" / "-FIntSomeFlag" to turn off.
+        //          "#37" is FlagCodeNames.Names[37], so the flags behind the Roblox FFlags toggles
+        //          cost a few characters instead of their full names. Deflated, then URL-safe base64.
+        //   PHF1-  (older codes, still read) the profile as deflated JSON.
 
         private const string CodePrefix = "PHF1-";
+        private const string ShortPrefix = "PHF2-";
+
+        private static readonly string[] Prefixes = { ShortPrefix, CodePrefix };
 
         public static string ToShareCode(FlagProfile profile)
         {
-            var payload = new FlagProfile { Id = "", Name = profile.Name, Flags = profile.Flags, Remove = profile.Remove };
-            byte[] json = JsonSerializer.SerializeToUtf8Bytes(payload);
+            // a value spanning lines can't go in the line format - use the old one for that profile
+            if (profile.Flags.Values.Any(v => v.IndexOfAny(new[] { '\r', '\n' }) >= 0))
+            {
+                var payload = new FlagProfile { Id = "", Name = profile.Name, Flags = profile.Flags, Remove = profile.Remove };
+                return CodePrefix + Pack(JsonSerializer.SerializeToUtf8Bytes(payload));
+            }
 
+            var text = new StringBuilder((profile.Name ?? "").Replace('\r', ' ').Replace('\n', ' ').Trim());
+
+            foreach (var (key, value) in profile.Flags)
+                text.Append('\n').Append(Ref(key)).Append('=').Append(value);
+
+            foreach (string key in profile.Remove)
+                text.Append('\n').Append('-').Append(Ref(key));
+
+            return ShortPrefix + Pack(Encoding.UTF8.GetBytes(text.ToString()));
+        }
+
+        private static string Ref(string key) =>
+            FlagCodeNames.TryGetIndex(key, out int index) ? "#" + index.ToString(System.Globalization.CultureInfo.InvariantCulture) : key;
+
+        private static string? Unref(string text)
+        {
+            if (!text.StartsWith('#'))
+                return text;
+
+            return int.TryParse(text[1..], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int index)
+                && index >= 0 && index < FlagCodeNames.Names.Length
+                ? FlagCodeNames.Names[index]
+                : null;
+        }
+
+        // deflate + URL-safe base64 (no padding)
+        public static string Pack(byte[] data)
+        {
             using var output = new MemoryStream();
             using (var deflate = new System.IO.Compression.DeflateStream(output, System.IO.Compression.CompressionLevel.SmallestSize, leaveOpen: true))
-                deflate.Write(json);
+                deflate.Write(data);
 
-            return CodePrefix + Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+            return Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
-        // Codes get pasted the way people share them: in Discord backticks or a code block, in
-        // quotes, in the middle of a sentence, or broken over lines. Find the code in the text first.
-        public static IEnumerable<string> FindCodes(string? pasted, string prefix)
-        {
-            string text = pasted ?? "";
-            var pattern = new Regex(Regex.Escape(prefix) + "[A-Za-z0-9_-]+", RegexOptions.IgnoreCase);
-
-            foreach (Match match in pattern.Matches(text))
-                yield return match.Value;
-
-            // a code wrapped over several lines
-            string joined = new string(text.Where(c => !char.IsWhiteSpace(c)).ToArray());
-            if (joined != text)
-            {
-                foreach (Match match in pattern.Matches(joined))
-                    yield return match.Value;
-            }
-        }
-
-        public static FlagProfile? FromShareCode(string? pasted)
-        {
-            foreach (string code in FindCodes(pasted, CodePrefix))
-            {
-                if (Decode(code) is FlagProfile profile)
-                    return profile;
-            }
-
-            return null;
-        }
-
-        private static FlagProfile? Decode(string text)
+        // the reverse; null for anything that isn't a sound code (or inflates past maxBytes)
+        public static byte[]? Unpack(string body, int maxBytes)
         {
             try
             {
-                if (text.Length > 200_000)
-                    return null;
+                string base64 = body.Replace('-', '+').Replace('_', '/');
+                base64 += (base64.Length % 4) switch { 2 => "==", 3 => "=", _ => "" };
 
-                string body = text[CodePrefix.Length..].Replace('-', '+').Replace('_', '/');
-                body += (body.Length % 4) switch { 2 => "==", 3 => "=", _ => "" };
-
-                using var input = new MemoryStream(Convert.FromBase64String(body));
+                using var input = new MemoryStream(Convert.FromBase64String(base64));
                 using var deflate = new System.IO.Compression.DeflateStream(input, System.IO.Compression.CompressionMode.Decompress);
-                using var json = new MemoryStream();
+                using var output = new MemoryStream();
 
                 // a short code that inflates into megabytes is not a profile
                 byte[] buffer = new byte[8192];
                 int read;
                 while ((read = deflate.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    json.Write(buffer, 0, read);
-                    if (json.Length > 1_000_000)
+                    output.Write(buffer, 0, read);
+                    if (output.Length > maxBytes)
                         return null;
                 }
 
-                FlagProfile? profile = JsonSerializer.Deserialize<FlagProfile>(json.ToArray());
-                if (profile is null)
-                    return null;
-
-                profile.Id = FlagProfile.NewId();
-                profile.Name = (profile.Name ?? "").Trim();
-                profile.Flags = (profile.Flags ?? new()).Where(f => !string.IsNullOrWhiteSpace(f.Key)).ToDictionary(f => f.Key.Trim(), f => f.Value ?? "");
-                profile.Remove = (profile.Remove ?? new()).Where(k => !string.IsNullOrWhiteSpace(k)).Select(k => k.Trim()).Distinct().ToList();
-                return profile;
+                return output.ToArray();
             }
             catch
             {
                 return null;
             }
+        }
+
+        // Codes get pasted the way people share them: in Discord backticks or a code block, in
+        // quotes, in the middle of a sentence, or broken over lines. Find the code in the text first.
+        public static IEnumerable<string> FindCodes(string? pasted, params string[] prefixes)
+        {
+            string text = pasted ?? "";
+            string joined = new string(text.Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+            foreach (string prefix in prefixes)
+            {
+                var pattern = new Regex(Regex.Escape(prefix) + "[A-Za-z0-9_-]+", RegexOptions.IgnoreCase);
+
+                foreach (Match match in pattern.Matches(text))
+                    yield return match.Value;
+
+                // a code wrapped over several lines
+                if (joined != text)
+                {
+                    foreach (Match match in pattern.Matches(joined))
+                        yield return match.Value;
+                }
+            }
+        }
+
+        // the first profile code found in some pasted text, or "" (for pre-filling a paste box)
+        public static string FindProfileCode(string? pasted) => FindCodes(pasted, Prefixes).FirstOrDefault() ?? "";
+
+        public static FlagProfile? FromShareCode(string? pasted)
+        {
+            foreach (string code in FindCodes(pasted, Prefixes))
+            {
+                FlagProfile? profile = code.StartsWith(ShortPrefix, StringComparison.OrdinalIgnoreCase)
+                    ? DecodeShort(code[ShortPrefix.Length..])
+                    : DecodeJson(code[CodePrefix.Length..]);
+
+                if (profile is not null)
+                    return Tidy(profile);
+            }
+
+            return null;
+        }
+
+        private static FlagProfile? DecodeShort(string body)
+        {
+            if (body.Length > 200_000 || Unpack(body, 1_000_000) is not byte[] data)
+                return null;
+
+            string[] lines = Encoding.UTF8.GetString(data).Split('\n');
+            var profile = new FlagProfile { Name = lines[0] };
+
+            foreach (string line in lines.Skip(1))
+            {
+                if (line.Length == 0)
+                    continue;
+
+                if (line[0] == '-')
+                {
+                    // a name/index that doesn't resolve means a damaged (or newer) code - refuse it
+                    if (Unref(line[1..]) is not string removed)
+                        return null;
+
+                    profile.Remove.Add(removed);
+                    continue;
+                }
+
+                int equals = line.IndexOf('=');
+                if (equals <= 0 || Unref(line[..equals]) is not string key)
+                    return null;
+
+                profile.Flags[key] = line[(equals + 1)..];
+            }
+
+            return profile;
+        }
+
+        private static FlagProfile? DecodeJson(string body)
+        {
+            if (body.Length > 200_000 || Unpack(body, 1_000_000) is not byte[] data)
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<FlagProfile>(data);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static FlagProfile Tidy(FlagProfile profile)
+        {
+            profile.Id = FlagProfile.NewId();
+            profile.Name = (profile.Name ?? "").Trim();
+            profile.Flags = (profile.Flags ?? new()).Where(f => !string.IsNullOrWhiteSpace(f.Key)).ToDictionary(f => f.Key.Trim(), f => f.Value ?? "");
+            profile.Remove = (profile.Remove ?? new()).Where(k => !string.IsNullOrWhiteSpace(k)).Select(k => k.Trim()).Distinct().ToList();
+            return profile;
         }
     }
 

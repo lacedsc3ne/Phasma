@@ -319,7 +319,7 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             CrosshairStyle? style = CrosshairStyle.FromShareCode(_importCode);
             if (style is null)
             {
-                Status = "That is not a crosshair code (they start with PHX1-).";
+                Status = "That is not a crosshair code (they start with PHX).";
                 return;
             }
 
