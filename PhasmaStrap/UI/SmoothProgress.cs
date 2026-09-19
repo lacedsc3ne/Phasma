@@ -197,6 +197,8 @@ internal static class SmoothProgress
             Duration = TimeSpan.FromSeconds(Math.Clamp(distance / MarqueePixelsPerSecond, 0.9, 4.0)),
             RepeatBehavior = RepeatBehavior.Forever
         };
+        // uncapped, a running animation ticks at the monitor's refresh rate (240 on a 240 Hz screen)
+        Timeline.SetDesiredFrameRate(animation, 60);
         animation.Freeze();
         transform.BeginAnimation(TranslateTransform.XProperty, animation);
     }

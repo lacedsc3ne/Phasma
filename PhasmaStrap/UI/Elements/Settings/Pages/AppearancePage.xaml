@@ -120,8 +120,10 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                            Text="{x:Static resources:Strings.Menu_Appearance_ClickPictureUseImagesAnimatedGIFs}" />
-                                <ui:Button Grid.Column="1" Margin="12,0,0,0" Icon="Add24" Appearance="Primary" Content="{x:Static resources:Strings.Menu_Appearance_AddImageGIF}" Command="{Binding AddBackgroundCommand}" />
+                                <ui:Button Grid.Column="1" Margin="12,0,0,0" Icon="Add24" Appearance="Primary" Content="{x:Static resources:Strings.Menu_Appearance_AddImageGIFVideo}" Command="{Binding AddBackgroundCommand}" IsEnabled="{Binding NotImporting, Mode=OneWay}" />
                             </Grid>
+
+                            <TextBlock Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding BackgroundStatus, Mode=OneWay}" />
 
                             <TextBlock Margin="0,14,0,4" HorizontalAlignment="Center" Opacity="0.6" Text="{x:Static resources:Strings.Menu_Appearance_NoBackgroundsAddedYet}">
                                 <TextBlock.Style>
@@ -177,6 +179,22 @@
                                                         </Border.Style>
                                                         <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_GIF}" FontSize="10" FontWeight="SemiBold" Foreground="White" />
                                                     </Border>
+                                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Padding="5,1" CornerRadius="4" Background="#B0000000">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsVideo}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:SymbolIcon Symbol="Play12" FontSize="10" Foreground="White" Margin="0,0,3,0" />
+                                                            <TextBlock Text="{x:Static resources:Strings.Menu_Appearance_VIDEO}" FontSize="10" FontWeight="SemiBold" Foreground="White" />
+                                                        </StackPanel>
+                                                    </Border>
                                                 </Grid>
                                                 <Grid Margin="4,5,0,2">
                                                     <Grid.ColumnDefinitions>
@@ -206,6 +224,10 @@
                                 <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding GlobalBackgroundOverlayOpacity, Mode=TwoWay}" />
                                 <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,4,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_Appearance_GlobalBackground_OpacityDescription}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                             </Grid>
+
+                            <CheckBox Margin="0,12,0,0" IsChecked="{Binding VideoPauseInactive, Mode=TwoWay}">
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Appearance_PauseVideoBackgroundWhileSettingsWindow}" />
+                            </CheckBox>
                         </StackPanel>
                     </ui:CardExpander>
                 </StackPanel>

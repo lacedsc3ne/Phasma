@@ -93,7 +93,7 @@
         </Storyboard>
 
         <!--  continuous "still working" motion while Roblox loads: logo breathes, glow pulses, ring spins  -->
-        <Storyboard x:Key="LogoBreathe" BeginTime="0:0:0.95" RepeatBehavior="Forever" AutoReverse="True">
+        <Storyboard x:Key="LogoBreathe" Timeline.DesiredFrameRate="30" BeginTime="0:0:0.95" RepeatBehavior="Forever" AutoReverse="True">
             <DoubleAnimation
                 Storyboard.TargetName="LogoBreathScale"
                 Storyboard.TargetProperty="ScaleX"
@@ -112,7 +112,7 @@
             </DoubleAnimation>
         </Storyboard>
 
-        <Storyboard x:Key="LogoGlowPulse" RepeatBehavior="Forever" AutoReverse="True">
+        <Storyboard x:Key="LogoGlowPulse" Timeline.DesiredFrameRate="30" RepeatBehavior="Forever" AutoReverse="True">
             <DoubleAnimation
                 Storyboard.TargetName="LogoGlow"
                 Storyboard.TargetProperty="Opacity"
@@ -124,7 +124,7 @@
         </Storyboard>
 
         <!--  slow-drifting red mist blobs behind the glass, three independent loops so it never looks mechanical  -->
-        <Storyboard x:Key="MistDrift" RepeatBehavior="Forever">
+        <Storyboard x:Key="MistDrift" Timeline.DesiredFrameRate="30" RepeatBehavior="Forever">
             <DoubleAnimation
                 Storyboard.TargetName="MistTranslate1"
                 Storyboard.TargetProperty="X"

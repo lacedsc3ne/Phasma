@@ -171,6 +171,11 @@ namespace PhasmaStrap.UI.Elements.Base
 
             string wantedPath = App.Settings.Prop.GlobalBackgroundEnabled ? App.Settings.Prop.GlobalBackgroundFilePath ?? "" : "";
 
+            // UI-test hook: show a given file without touching the user's settings
+            string? testBackground = Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" ? Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUNDFILE") : null;
+            if (!string.IsNullOrEmpty(testBackground))
+                wantedPath = testBackground;
+
             // same picture as before (the dim slider moved, or an unrelated refresh): adjust the
             // overlay in place instead of tearing the image down and starting it again
             if (_backgroundImageLayer is not null && _backgroundOverlayLayer is not null
@@ -188,8 +193,8 @@ namespace PhasmaStrap.UI.Elements.Base
             _backgroundOverlayLayer = null;
             _backgroundPath = "";
 
-            var layers = App.Settings.Prop.GlobalBackgroundEnabled
-                ? PhasmaStrap.UI.GlobalBackground.TryCreateLayers(App.Settings.Prop.GlobalBackgroundFilePath, App.Settings.Prop.GlobalBackgroundOverlayOpacity)
+            var layers = wantedPath.Length > 0
+                ? PhasmaStrap.UI.GlobalBackground.TryCreateLayers(wantedPath, App.Settings.Prop.GlobalBackgroundOverlayOpacity)
                 : null;
 
             // the near-opaque glass tint would hide the picture almost entirely - while an image is
@@ -198,7 +203,10 @@ namespace PhasmaStrap.UI.Elements.Base
                 _tintLayer.Visibility = layers is null ? Visibility.Visible : Visibility.Collapsed;
 
             if (layers is null)
+            {
+                UpdateForegroundCache(false);
                 return;
+            }
 
             int rowSpan = Math.Max(1, _rootGrid.RowDefinitions.Count);
             int columnSpan = Math.Max(1, _rootGrid.ColumnDefinitions.Count);
@@ -220,6 +228,29 @@ namespace PhasmaStrap.UI.Elements.Base
             _backgroundImageLayer = layers.Value.Image;
             _backgroundOverlayLayer = layers.Value.Overlay;
             _backgroundPath = wantedPath;
+
+            UpdateForegroundCache(PhasmaStrap.UI.BackgroundLibrary.IsVideo(wantedPath) || wantedPath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Behind a moving background (GIF, video) every new frame would make WPF re-render the
+        // whole window on top of it - pages, text, shadows, blur - which measured at 50-70 % of a CPU
+        // core. Cached as bitmaps, the foreground is only re-rendered when it itself changes; a new
+        // background frame is then just composited underneath. Text renders identically.
+        private void UpdateForegroundCache(bool moving)
+        {
+            if (_rootGrid is null)
+                return;
+
+            foreach (UIElement child in _rootGrid.Children)
+            {
+                if (child == _tintLayer || child == _backgroundImageLayer || child == _backgroundOverlayLayer)
+                    continue;
+
+                if (moving)
+                    child.CacheMode ??= new BitmapCache { SnapsToDevicePixels = true };
+                else if (child.CacheMode is BitmapCache)
+                    child.CacheMode = null;
+            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)

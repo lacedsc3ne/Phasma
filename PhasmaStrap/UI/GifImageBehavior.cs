@@ -105,6 +105,14 @@ namespace PhasmaStrap.UI
                     time += media.Delays[i];
                 }
 
+                // Without this WPF ticks a running animation at the monitor's refresh rate - 240
+                // times a second on a 240 Hz screen - although a GIF rarely changes more than 10-25
+                // times a second. Every one of those ticks re-renders the settings window, which
+                // cost most of a CPU core for a 10 fps background. The animation needs no more ticks
+                // than its fastest frame.
+                double shortest = media.Delays.Where(d => d > TimeSpan.Zero).DefaultIfEmpty(TimeSpan.FromMilliseconds(100)).Min().TotalMilliseconds;
+                Timeline.SetDesiredFrameRate(animation, Math.Clamp((int)Math.Ceiling(1000.0 / shortest), 1, 60));
+
                 animation.Freeze();
 
                 // an animation started on an element that isn't in the tree yet can be dropped

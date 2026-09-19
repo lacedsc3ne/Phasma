@@ -15821,5 +15821,32 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.AssetEngine.LetMeChooseServerWhenI", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add image, GIF or video.
+        /// </summary>
+        public static string Menu_Appearance_AddImageGIFVideo {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.AddImageGIFVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VIDEO.
+        /// </summary>
+        public static string Menu_Appearance_VIDEO {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.VIDEO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause a video background while the settings window is not the one in front - it then costs nothing while you play.
+        /// </summary>
+        public static string Menu_Appearance_PauseVideoBackgroundWhileSettingsWindow {
+            get {
+                return ResourceManager.GetString("Menu.Appearance.PauseVideoBackgroundWhileSettingsWindow", resourceCulture);
+            }
+        }
     }
 }

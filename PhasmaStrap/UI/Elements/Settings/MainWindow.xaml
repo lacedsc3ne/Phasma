@@ -24,7 +24,7 @@
     <Window.Resources>
         <BlurEffect x:Key="MistBlurLarge" Radius="70" />
 
-        <Storyboard x:Key="MistDrift" RepeatBehavior="Forever">
+        <Storyboard x:Key="MistDrift" Timeline.DesiredFrameRate="30" RepeatBehavior="Forever">
             <DoubleAnimation
                 Storyboard.TargetName="MistTranslate1"
                 Storyboard.TargetProperty="X"
