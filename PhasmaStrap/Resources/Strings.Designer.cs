@@ -16172,5 +16172,41 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlagGames.WhenYouClickPlayWebsiteLink", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide toggle flags.
+        /// </summary>
+        public static string Menu_FastFlagEditor_HideToggleFlags {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.HideToggleFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Leave out the flags set by the toggles on the Roblox FFlags tab, to see only the ones you added yourself..
+        /// </summary>
+        public static string Menu_FastFlagEditor_LeaveOutFlagsSetByToggles {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.LeaveOutFlagsSetByToggles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show your flags too.
+        /// </summary>
+        public static string Menu_FastFlagEditor_ShowFlagsToo {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ShowFlagsToo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List your own flags as well, so you see everything these games start with. Turn off to see only this profile's changes..
+        /// </summary>
+        public static string Menu_FastFlagEditor_ListOwnFlagsAsWellSo {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagEditor.ListOwnFlagsAsWellSo", resourceCulture);
+            }
+        }
     }
 }

@@ -83,8 +83,10 @@
             </ui:Button>
             <ui:Button Icon="Search24" Content="{x:Static resources:Strings.Menu_FastFlagEditor_SearchDatabase}" Click="SearchDatabaseButton_Click" Margin="0,0,12,16" />
             <ui:Button Icon="ArrowExportRtl24" Content="{x:Static resources:Strings.Menu_FastFlagEditor_ExportJson}" Click="ExportJSONButton_Click" Margin="0,0,12,16" />
-            <ToggleButton x:Name="TogglePresetsButton" Content="{x:Static resources:Strings.Menu_FastFlagEditor_ShowQuickSettingsFlags}" Click="ToggleButton_Click" Margin="0,0,12,16"
-                          ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_FlagsSetByTogglesRobloxFFlags}" />
+            <ToggleButton x:Name="TogglePresetsButton" Content="{x:Static resources:Strings.Menu_FastFlagEditor_HideToggleFlags}" Click="ToggleButton_Click" Margin="0,0,12,16"
+                          ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_LeaveOutFlagsSetByToggles}" />
+            <ToggleButton x:Name="ShowYoursButton" Content="{x:Static resources:Strings.Menu_FastFlagEditor_ShowFlagsToo}" IsChecked="True" Click="ShowYoursButton_Click" Margin="0,0,12,16" Visibility="Collapsed"
+                          ToolTip="{x:Static resources:Strings.Menu_FastFlagEditor_ListOwnFlagsAsWellSo}" />
         </WrapPanel>
 
         <ui:TextBox x:Name="SearchTextBox" Grid.Row="5" Margin="0,0,0,12" Icon="Search32" PlaceholderText="{x:Static resources:Strings.Menu_FastFlagEditor_Search}" TextChanged="SearchTextBox_TextChanged" />

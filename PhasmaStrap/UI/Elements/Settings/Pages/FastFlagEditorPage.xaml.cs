@@ -27,6 +27,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         // a flag the profile turns off (it has no value of its own)
         public bool IsTurnedOff { get; set; }
 
+        // profile view: one of your own flags the profile doesn't touch, shown so the whole set the
+        // game gets can be seen and edited (a new value becomes a change for these games only)
+        public bool IsInherited { get; set; }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         private void Changed(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
@@ -55,7 +59,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private readonly ObservableCollection<FlagRow> _rows = new();
 
-        private bool _showQuickFlags = false;
+        // everything is listed by default - these only narrow the list down
+        private bool _hideQuickFlags = false;
+        private bool _showYoursInProfile = true;
         private string _searchFilter = "";
         private bool _refreshingScopes;
 
@@ -179,7 +185,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             FlagProfile? profile = Profile;
 
             TurnOffButton.Visibility = profile is null ? Visibility.Collapsed : Visibility.Visible;
-            TogglePresetsButton.Visibility = profile is null ? Visibility.Visible : Visibility.Collapsed;
+            ShowYoursButton.Visibility = profile is null ? Visibility.Collapsed : Visibility.Visible;
 
             if (profile is null)
             {
@@ -188,7 +194,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 return;
             }
 
-            ScopeText.Text = $"\"{profile.Name}\" only applies to the games it is given to. Those games start with your flags, plus the flags here. Flags marked \"turned off\" are taken away from your flags for those games.";
+            ScopeText.Text = $"\"{profile.Name}\" only applies to the games it is given to. The list shows everything those games start with: the profile's own flags, and your flags marked \"From your flags\". Change a value to change it for these games only; delete one of your flags here to turn it off for them.";
 
             List<string> games = App.FlagProfiles.RulesUsing(profile.Id).Select(DescribeRule).ToList();
             UsedByText.Text = games.Count == 0
@@ -364,43 +370,43 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             FlagProfile? profile = Profile;
 
+            var rows = new List<FlagRow>();
+
             if (profile is null)
             {
-                foreach (var (name, raw) in App.FastFlags.Prop.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
+                foreach (var (name, raw) in App.FastFlags.Prop)
                 {
                     bool quick = QuickFlagNames.Contains(name);
-                    if ((quick && !_showQuickFlags) || !MatchesSearch(name))
+                    if ((quick && _hideQuickFlags) || !MatchesSearch(name))
                         continue;
 
                     string value = raw?.ToString() ?? "";
                     string? problem = FlagValidation.Problem(name, value);
 
-                    _rows.Add(new FlagRow
+                    rows.Add(new FlagRow
                     {
                         Name = name,
                         Value = value,
-                        Note = problem ?? (quick ? "Set by Quick settings" : ""),
+                        Note = problem ?? (quick ? "Set by a Roblox FFlags toggle" : ""),
                         Tone = problem is null ? "" : "Problem",
                     });
                 }
             }
             else
             {
-                foreach (var (name, value) in profile.Flags.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
+                foreach (var (name, value) in profile.Flags)
                 {
-                    if (!MatchesSearch(name))
-                        continue;
-
-                    _rows.Add(ProfileRow(name, value));
+                    if (MatchesSearch(name))
+                        rows.Add(ProfileRow(name, value));
                 }
 
-                foreach (string name in profile.Remove.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                foreach (string name in profile.Remove)
                 {
                     if (!MatchesSearch(name) || profile.Flags.ContainsKey(name))
                         continue;
 
                     string? yours = App.FastFlags.GetValue(name);
-                    _rows.Add(new FlagRow
+                    rows.Add(new FlagRow
                     {
                         Name = name,
                         Value = "",
@@ -409,7 +415,32 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                         Tone = "Off",
                     });
                 }
+
+                // the rest of what these games get: your own flags the profile leaves alone
+                if (_showYoursInProfile)
+                {
+                    foreach (var (name, raw) in App.FastFlags.Prop)
+                    {
+                        if (profile.Flags.ContainsKey(name) || profile.Remove.Contains(name) || !MatchesSearch(name))
+                            continue;
+
+                        if (_hideQuickFlags && QuickFlagNames.Contains(name))
+                            continue;
+
+                        rows.Add(new FlagRow
+                        {
+                            Name = name,
+                            Value = raw?.ToString() ?? "",
+                            IsInherited = true,
+                            Note = "From your flags",
+                            Tone = "",
+                        });
+                    }
+                }
             }
+
+            foreach (FlagRow row in rows.OrderBy(r => r.Name, StringComparer.OrdinalIgnoreCase))
+                _rows.Add(row);
 
             UpdateEmptyText(profile);
 
@@ -434,8 +465,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                     text = "No flags match your search.";
                 else if (profile is not null)
                     text = "This profile is empty. Add flags with Add new or Search Database, or pick flags of yours this game shouldn't get with Turn off one of your flags. You can also right-click flags under \"Your flags\" to copy them here.";
-                else if (App.FastFlags.Prop.Count > 0 && !_showQuickFlags)
-                    text = "Only flags from the Quick settings toggles so far - Show Quick settings flags lists them. Add your own with Add new or Search Database.";
+                else if (App.FastFlags.Prop.Count > 0 && _hideQuickFlags)
+                    text = "Every flag you have comes from the Roblox FFlags toggles - turn off Hide toggle flags to see them. Add your own with Add new or Search Database.";
                 else
                     text = "No flags yet. Add one with Add new or Search Database.";
             }
@@ -556,10 +587,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             {
                 Frontend.ShowMessageBox(Strings.Menu_FastFlagEditor_AlreadyExists, MessageBoxImage.Information);
 
-                if (!EditingProfile && QuickFlagNames.Contains(name) && !_showQuickFlags)
+                if (QuickFlagNames.Contains(name) && _hideQuickFlags)
                 {
-                    TogglePresetsButton.IsChecked = true;
-                    _showQuickFlags = true;
+                    TogglePresetsButton.IsChecked = false;
+                    _hideQuickFlags = false;
                 }
 
                 ClearSearch();
@@ -668,6 +699,11 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             // a turned-off flag has no value; typing one turns it into a changed value instead
             if (e.Row.DataContext is FlagRow { IsTurnedOff: true } row && e.Column.DisplayIndex == 1)
                 row.Value = App.FastFlags.GetValue(row.Name) ?? "";
+
+            // one of your flags seen from a profile: its value can be changed for these games, but
+            // renaming it here would make no sense - that is done under "Your flags"
+            if (e.Row.DataContext is FlagRow { IsInherited: true } && e.Column.DisplayIndex == 0)
+                e.Cancel = true;
         }
 
         private void DataGrid_CellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
@@ -719,6 +755,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
             else if (e.Column.DisplayIndex == 1)
             {
+                // your own flag, left as it was - nothing to change for these games
+                if (row.IsInherited && text == row.Value)
+                    return;
+
                 if (FlagValidation.Problem(row.Name, text) is string problem)
                 {
                     Frontend.ShowMessageBox($"{row.Name}\n\n{problem}", MessageBoxImage.Warning);
@@ -730,6 +770,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 SetInScope(row.Name, text);
                 row.Value = text;
                 row.IsTurnedOff = false;
+                row.IsInherited = false;
             }
 
             // notes depend on the new name/value - refresh once the edit has been committed
@@ -753,10 +794,28 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            FlagProfile? profile = Profile;
+            bool turnedOff = false;
+
             foreach (FlagRow row in DataGrid.SelectedItems.OfType<FlagRow>().ToList())
             {
+                // one of your flags, seen from a profile: deleting it here means "not for these games"
+                if (profile is not null && row.IsInherited)
+                {
+                    if (!profile.Remove.Contains(row.Name))
+                        profile.Remove.Add(row.Name);
+                    turnedOff = true;
+                    continue;
+                }
+
                 _rows.Remove(row);
                 RemoveFromScope(row.Name);
+            }
+
+            if (turnedOff)
+            {
+                MarkProfilesEdited();
+                ReloadList();
             }
 
             UpdateScopeUi();
@@ -805,7 +864,13 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             if (sender is not ToggleButton button)
                 return;
 
-            _showQuickFlags = button.IsChecked ?? false;
+            _hideQuickFlags = button.IsChecked ?? false;
+            ReloadList();
+        }
+
+        private void ShowYoursButton_Click(object sender, RoutedEventArgs e)
+        {
+            _showYoursInProfile = ShowYoursButton.IsChecked ?? true;
             ReloadList();
         }
 
@@ -834,7 +899,12 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
             else
             {
-                List<FlagRow> valued = rows.Where(r => !r.IsTurnedOff).ToList();
+                List<FlagRow> valued = rows.Where(r => !r.IsTurnedOff && !r.IsInherited).ToList();
+                List<FlagRow> yours = rows.Where(r => r.IsInherited).ToList();
+
+                if (yours.Count > 0)
+                    menu.Items.Add(MenuItem(yours.Count == 1 ? "Turn this flag off for these games" : $"Turn these {yours.Count} flags off for these games", true, () => { TurnOffIn(yours, current); ReloadList(); }));
+
                 menu.Items.Add(MenuItem($"Copy {what} to your flags", valued.Count > 0, () => CopyRows(valued, null, move: false)));
                 menu.Items.Add(MenuItem($"Move {what} to your flags", valued.Count > 0, () => CopyRows(valued, null, move: true)));
                 menu.Items.Add(ProfileSubmenu($"Copy {what} to another profile", others, profile => CopyRows(rows, profile, move: false)));
