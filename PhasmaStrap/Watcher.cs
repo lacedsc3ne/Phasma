@@ -416,7 +416,11 @@ namespace PhasmaStrap
                 NotificationCategory.General);
         }
 
-        public void KillRobloxProcess() => CloseProcess(_watcherData!.ProcessId, true);
+        public void KillRobloxProcess()
+        {
+            _killedOnPurpose = true;
+            CloseProcess(_watcherData!.ProcessId, true);
+        }
 
         public void CloseProcess(int pid, bool force = false)
         {
@@ -464,8 +468,39 @@ namespace PhasmaStrap
             bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
 
             // not a crash if FastFlagPresetSession just closed Roblox on purpose to restart it
-            if (possibleCrash && Utility.FastFlagPresetSession.RestartedRecently)
+            bool intentional = Utility.FastFlagPresetSession.RestartedRecently || _killedOnPurpose;
+            if (possibleCrash && intentional)
                 possibleCrash = false;
+
+            bool crashToast = false;
+
+            if (App.Settings.Prop.CrashAnalyzerEnabled && !intentional)
+            {
+                CrashReport? crash = await AnalyzeExitAsync();
+
+                if (crash is not null)
+                {
+                    // the log ends with Roblox's regular shutdown and nothing else points at a crash:
+                    // the player simply closed the game while still in a server
+                    if (crash.CleanExit && crash.Confidence.Length == 0)
+                    {
+                        possibleCrash = false;
+                    }
+                    else
+                    {
+                        CrashReports.Save(crash);
+
+                        // an "unclear" ending outside a game is most likely someone ending the process -
+                        // written down for the Diagnostics page, but not worth interrupting anyone for
+                        if (possibleCrash || crash.Confidence != "Unclear")
+                        {
+                            NotificationCenter.Notify("Roblox closed unexpectedly", crash.Cause, NotificationCategory.General, 12,
+                                onClick: () => { try { Process.Start(Paths.Process, "-settings"); } catch { } });
+                            crashToast = true;
+                        }
+                    }
+                }
+            }
 
             if (possibleCrash && App.Settings.Prop.AutoRejoinOnCrash)
             {
@@ -477,6 +512,11 @@ namespace PhasmaStrap
                 // the dispatcher and returns immediately rather than waiting for the animation
                 await Task.Delay(TimeSpan.FromSeconds(6));
             }
+            else if (crashToast)
+            {
+                // same reason: let the toast be seen before this process goes away
+                await Task.Delay(TimeSpan.FromSeconds(12));
+            }
 
             if (_watcherData.AutoclosePids is not null)
             {
@@ -486,6 +526,33 @@ namespace PhasmaStrap
 
             if (App.LaunchSettings.TestModeFlag.Active)
                 Process.Start(Paths.Process, "-settings -testmode");
+        }
+
+        // set when PhasmaStrap itself ends Roblox (tray "Close Roblox") - not something to analyse
+        private bool _killedOnPurpose;
+
+        private async Task<CrashReport?> AnalyzeExitAsync()
+        {
+            const string LOG_IDENT = "Watcher::AnalyzeExit";
+
+            try
+            {
+                string? log = ActivityWatcher?.LogLocation ?? _watcherData?.LogFile;
+                if (string.IsNullOrEmpty(log) || !File.Exists(log))
+                    return null;
+
+                // Windows writes its "application fault" event a moment after the process is gone
+                await Task.Delay(2500);
+
+                CrashReport report = await Task.Run(() => CrashReports.Analyze(log));
+                App.Logger.WriteLine(LOG_IDENT, $"clean exit: {report.CleanExit}, confidence: '{report.Confidence}', cause: {report.Cause}");
+                return report;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Analysis failed: {ex.Message}");
+                return null;
+            }
         }
 
         private async Task TryAutoRejoinAsync()

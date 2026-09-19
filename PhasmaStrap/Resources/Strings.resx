@@ -5356,4 +5356,28 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Diagnostics.RobloxGameServersIgnorePingsSo" xml:space="preserve">
     <value>Roblox game servers ignore pings, so a machine beside the server in the same datacenter is measured - the way there is the same. Stations in between often answer pings poorly on purpose; they only count when the far end suffers too.</value>
   </data>
+  <data name="Menu.Diagnostics.Crashes" xml:space="preserve">
+    <value>Crashes</value>
+  </data>
+  <data name="Menu.Diagnostics.WhenRobloxClosesWithoutItsNormal" xml:space="preserve">
+    <value>When Roblox closes without its normal shutdown, PhasmaStrap reads Roblox's log and Windows' own event logs from that moment and says what most likely happened - and how sure it is. Nothing leaves this PC.</value>
+  </data>
+  <data name="Menu.Diagnostics.AnalyseLastSession" xml:space="preserve">
+    <value>Analyse the last session</value>
+  </data>
+  <data name="Menu.Diagnostics.NoCrashesRecord" xml:space="preserve">
+    <value>No crashes on record.</value>
+  </data>
+  <data name="Menu.Diagnostics.WhatTry" xml:space="preserve">
+    <value>What to try</value>
+  </data>
+  <data name="Menu.Diagnostics.Evidence" xml:space="preserve">
+    <value>Evidence</value>
+  </data>
+  <data name="Menu.Diagnostics.LookIntoUnexpectedClosesAutomatically" xml:space="preserve">
+    <value>Look into unexpected closes automatically</value>
+  </data>
+  <data name="Menu.Diagnostics.RunsAnalysisWhenRobloxEndsWithout" xml:space="preserve">
+    <value>Runs the analysis when Roblox ends without its normal shutdown and shows what it found. A normal exit is never reported.</value>
+  </data>
 </root>

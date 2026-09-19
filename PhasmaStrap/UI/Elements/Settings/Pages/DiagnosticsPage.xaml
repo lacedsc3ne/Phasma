@@ -129,6 +129,74 @@
                     <TextBlock Margin="2,10,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_RobloxGameServersIgnorePingsSo}" />
                 </StackPanel>
             </TabItem>
+            <!-- ============================================================ crashes -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Bug24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_Diagnostics_Crashes}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_WhenRobloxClosesWithoutItsNormal}" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <ui:Button Content="{x:Static resources:Strings.Menu_Diagnostics_AnalyseLastSession}" Icon="Search24" Appearance="Primary" AutomationProperties.Name="Analyse the last session" Command="{Binding AnalyzeLastSessionCommand, Mode=OneTime}" />
+                        <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCrashesCommand, Mode=OneTime}" />
+                    </StackPanel>
+                    <TextBlock Margin="0,6,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding CrashStatus, Mode=OneWay}" />
+
+                    <TextBlock Margin="2,14,0,6" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Visibility="{Binding CrashesEmptyVisibility, Mode=OneWay}" Text="{x:Static resources:Strings.Menu_Diagnostics_NoCrashesRecord}" />
+
+                    <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Crashes, Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding When}" />
+                                            <Border Grid.Column="1" Padding="8,2" CornerRadius="9" Background="{Binding ConfidenceColor}" Visibility="{Binding ConfidenceVisibility}">
+                                                <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="#101216" Text="{Binding Confidence}" />
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock Margin="0,4,0,0" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Text="{Binding Cause}" />
+
+                                        <StackPanel Margin="0,8,0,0" Visibility="{Binding SuggestionsVisibility}">
+                                            <TextBlock FontSize="12" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Diagnostics_WhatTry}" />
+                                            <ItemsControl ItemsSource="{Binding Suggestions}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Margin="0,3,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding StringFormat='•  {0}'}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
+                                        <StackPanel Margin="0,8,0,0" Visibility="{Binding EvidenceVisibility}">
+                                            <TextBlock FontSize="12" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Diagnostics_Evidence}" />
+                                            <ItemsControl ItemsSource="{Binding Evidence}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Margin="0,3,0,0" FontSize="11" FontFamily="Consolas" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <controls:OptionControl Margin="0,8,0,0" Header="{x:Static resources:Strings.Menu_Diagnostics_LookIntoUnexpectedClosesAutomatically}" Description="{x:Static resources:Strings.Menu_Diagnostics_RunsAnalysisWhenRobloxEndsWithout}">
+                        <ui:ToggleSwitch IsChecked="{Binding CrashAnalyzerEnabled, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                </StackPanel>
+            </TabItem>
         </TabControl>
     </StackPanel>
 </ui:UiPage>
