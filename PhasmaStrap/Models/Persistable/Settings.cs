@@ -108,6 +108,13 @@ namespace PhasmaStrap.Models.Persistable
         // low-end mode (Rendering > Performance, Utility/LowEndMode): "" = off, "Light", "Strong";
         // the backups hold what it replaced (setting name -> JSON, flag name -> old value or null)
         public string LowEndModeLevel { get; set; } = "";
+
+        // stream-safe mode (Rendering > Overlays, Integrations/Overlays/StreamSafe): a capturable
+        // "PhasmaStrap Stream View" window with these areas pixelated ("Pixelate") or blacked out
+        public bool StreamSafeEnabled { get; set; } = false;
+        public List<PhasmaStrap.Integrations.Overlays.StreamSafeRegion> StreamSafeRegions { get; set; } = PhasmaStrap.Integrations.Overlays.StreamSafe.Defaults();
+        public string StreamSafeStyle { get; set; } = "Pixelate";
+        public bool StreamSafeCrosshair { get; set; } = true;
         public Dictionary<string, string> LowEndBackupSettings { get; set; } = new();
         public Dictionary<string, string?> LowEndBackupFlags { get; set; } = new();
         public bool ShowServerDetails { get; set; } = false;

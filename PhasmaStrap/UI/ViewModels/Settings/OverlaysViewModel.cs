@@ -180,6 +180,70 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OverlayHub.Refresh();
         });
 
+        // ---- stream-safe mode (Integrations/Overlays/StreamSafe)
+
+        public bool StreamSafeEnabled
+        {
+            get => App.Settings.Prop.StreamSafeEnabled;
+            set
+            {
+                if (App.Settings.Prop.StreamSafeEnabled == value)
+                    return;
+                App.Settings.Prop.StreamSafeEnabled = value;
+                OnPropertyChanged(nameof(StreamSafeEnabled));
+                OverlayHub.Refresh();
+            }
+        }
+
+        public int StreamSafeStyleIndex
+        {
+            get => App.Settings.Prop.StreamSafeStyle == StreamSafe.StyleBlack ? 1 : 0;
+            set => App.Settings.Prop.StreamSafeStyle = value == 1 ? StreamSafe.StyleBlack : StreamSafe.StylePixelate;
+        }
+
+        public bool StreamSafeCrosshair
+        {
+            get => App.Settings.Prop.StreamSafeCrosshair;
+            set => App.Settings.Prop.StreamSafeCrosshair = value;
+        }
+
+        public string StreamSafeSummary
+        {
+            get
+            {
+                var names = StreamSafe.Regions.Select((r, i) => r.Name.Length > 0 ? r.Name : $"Area {i + 1}").ToList();
+                return names.Count switch
+                {
+                    0 => "Nothing is marked yet, so the stream shows the whole game.",
+                    1 => $"1 area hidden: {names[0]}.",
+                    _ => $"{names.Count} areas hidden: {string.Join(", ", names)}.",
+                };
+            }
+        }
+
+        public ICommand OpenStreamSafeEditorCommand => new RelayCommand(() =>
+        {
+            var editor = new PhasmaStrap.UI.Elements.Dialogs.StreamSafeEditorWindow
+            {
+                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault()
+            };
+
+            editor.ShowDialog();
+            OnPropertyChanged(nameof(StreamSafeSummary));
+        });
+
+        public ICommand CopyStreamViewNameCommand => new RelayCommand(() =>
+        {
+            try
+            {
+                System.Windows.Clipboard.SetText(StreamSafe.WindowTitle);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("OverlaysViewModel", $"Could not copy the window name: {ex.Message}");
+            }
+        });
+
         public int CrosshairShapeIndex
         {
             get => App.Settings.Prop.CrosshairShapeIndex;

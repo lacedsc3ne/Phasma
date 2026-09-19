@@ -63,7 +63,7 @@ namespace PhasmaStrap.Integrations.Overlays
     ///    paced by desktop duplication's own AcquireNextFrame wait, and the HUD's FPS figure is
     ///    the compositor's own local present rate.
     /// </summary>
-    internal sealed class OverlayCompositor
+    internal sealed partial class OverlayCompositor
     {
         private const string ClassName = "PhasmaStrapOverlayCompositor";
         private const string CaptureWindowName = "PhasmaStrap Overlay";
@@ -213,6 +213,7 @@ namespace PhasmaStrap.Integrations.Overlays
                     if (!UpdateVisibility(token))
                         continue;
 
+                    SyncStreamView();
                     FollowRoblox();
                     ReloadSettingsIfChanged();
                     RenderFrame(token);
@@ -667,8 +668,12 @@ namespace PhasmaStrap.Integrations.Overlays
                 {
                     _hiddenByFocus = false;
                     App.Logger.WriteLine(LOG_IDENT, "Roblox is in the foreground again, the overlay is rendering");
-                    Interop.ShowWindow(_hwnd, Interop.SW_SHOWNOACTIVATE);
-                    AssertZOrder();
+                    // stream-safe mode on its own keeps the overlay window hidden (SyncStreamView)
+                    if (!_overlayHiddenForStream)
+                    {
+                        Interop.ShowWindow(_hwnd, Interop.SW_SHOWNOACTIVATE);
+                        AssertZOrder();
+                    }
                 }
                 return true;
             }
@@ -704,6 +709,7 @@ namespace PhasmaStrap.Integrations.Overlays
             {
                 _pendingW = 0;
                 _pendingH = 0;
+                PositionStreamView();
                 return;
             }
 
@@ -759,6 +765,7 @@ namespace PhasmaStrap.Integrations.Overlays
                 }
             }
             AssertZOrder();
+            PositionStreamView();
         }
 
         private void AssertZOrder()
@@ -967,6 +974,21 @@ namespace PhasmaStrap.Integrations.Overlays
                 nextIsA = !nextIsA;
             }
 
+            // stream-safe mode: the same picture, with the marked areas hidden, in the window OBS
+            // captures. When nothing needs the overlay itself, the stream view paces the loop.
+            bool overlayShown = OverlaySettings.OverlayWindowNeeded;
+            if (StreamLive)
+                RenderStream(finalSrv, overlayShown ? 0 : 1);
+
+            if (!overlayShown)
+            {
+                // nothing presented, so nothing paces the loop - don't spin
+                if (!StreamLive)
+                    Thread.Sleep(16);
+                _framesPresented++;
+                return;
+            }
+
             DrawBlit(_psPass!, _backBufferRtv!, finalSrv);
 
             DrawHud();
@@ -1167,9 +1189,10 @@ namespace PhasmaStrap.Integrations.Overlays
             _context.PSSetShaderResources(0, _nullSrvs);
         }
 
-        private void DrawCrosshair()
+        private void DrawCrosshair(ID3D11RenderTargetView? target = null)
         {
-            if (_backBufferRtv == null || !OverlayCrosshair.IsEnabled())
+            target ??= _backBufferRtv;
+            if (target == null || !OverlayCrosshair.IsEnabled())
                 return;
             try
             {
@@ -1184,7 +1207,7 @@ namespace PhasmaStrap.Integrations.Overlays
                 float x = (_width - OverlayCrosshair.TexWidth) * 0.5f;
                 float y = (_height - OverlayCrosshair.TexHeight) * 0.5f;
                 _context!.OMSetBlendState(_hudBlend);
-                _context.OMSetRenderTargets(_backBufferRtv);
+                _context.OMSetRenderTargets(target);
                 _context.VSSetShader(_vs!);
                 _context.PSSetShader(_psOverlay!);
                 _context.PSSetSampler(0, _sampler);
@@ -1249,6 +1272,8 @@ namespace PhasmaStrap.Integrations.Overlays
 
         private void Cleanup()
         {
+            DestroyStreamView();
+
             try
             {
                 _duplication?.Dispose();

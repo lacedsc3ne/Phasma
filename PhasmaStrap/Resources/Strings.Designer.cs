@@ -16622,5 +16622,158 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Rendering.ShowStrong", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream-safe mode.
+        /// </summary>
+        public static string Menu_Rendering_StreamSafeMode {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.StreamSafeMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide chat and names on stream.
+        /// </summary>
+        public static string Menu_Rendering_HideChatNamesStream {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.HideChatNamesStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gives OBS its own copy of the game with the areas you mark pixelated. Your own screen stays the same..
+        /// </summary>
+        public static string Menu_Rendering_GivesOBSItsOwnCopyGame {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.GivesOBSItsOwnCopyGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hidden areas.
+        /// </summary>
+        public static string Menu_Rendering_HiddenAreas {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.HiddenAreas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit areas.
+        /// </summary>
+        public static string Menu_Rendering_EditAreas {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.EditAreas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How hidden areas look.
+        /// </summary>
+        public static string Menu_Rendering_HowHiddenAreasLook {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.HowHiddenAreasLook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pixelated keeps the colours but makes text unreadable. Black covers the area completely..
+        /// </summary>
+        public static string Menu_Rendering_PixelatedKeepsColoursButMakesText {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.PixelatedKeepsColoursButMakesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pixelated.
+        /// </summary>
+        public static string Menu_Rendering_Pixelated {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Pixelated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Black.
+        /// </summary>
+        public static string Menu_Rendering_Black {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Black", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show the crosshair on stream.
+        /// </summary>
+        public static string Menu_Rendering_ShowCrosshairStream {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ShowCrosshairStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Draws your crosshair into the stream picture as well, when the crosshair is on..
+        /// </summary>
+        public static string Menu_Rendering_DrawsCrosshairIntoStreamPictureAs {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.DrawsCrosshairIntoStreamPictureAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Setting up OBS.
+        /// </summary>
+        public static string Menu_Rendering_SettingUpOBS {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.SettingUpOBS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1. Join a game with this switched on and saved..
+        /// </summary>
+        public static string Menu_Rendering_N1JoinGameSwitchedSaved {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.N1JoinGameSwitchedSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2. In OBS, add a Window Capture source and pick the window called PhasmaStrap Stream View..
+        /// </summary>
+        public static string Menu_Rendering_N2OBSAddWindowCaptureSource {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.N2OBSAddWindowCaptureSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3. Set its capture method to Windows 10 (1903 and up), then remove or hide your old Roblox or screen capture..
+        /// </summary>
+        public static string Menu_Rendering_N3SetItsCaptureMethodWindows {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.N3SetItsCaptureMethodWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The stream view sits behind your other windows and only updates while Roblox is in front. When you tab out, the stream s.
+        /// </summary>
+        public static string Menu_Rendering_StreamViewSitsBehindOtherWindows {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.StreamViewSitsBehindOtherWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy window name.
+        /// </summary>
+        public static string Menu_Rendering_CopyWindowName {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.CopyWindowName", resourceCulture);
+            }
+        }
     }
 }
