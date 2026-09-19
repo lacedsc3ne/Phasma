@@ -16,21 +16,43 @@ namespace PhasmaStrap.Integrations
         private static string? _savedDevice;
         private static bool _applied;
 
-        public static void OnGameJoin()
+        // a game with its own resolution uses that; otherwise the general one, when it's on
+        public static void OnGameJoin(long placeId = 0)
         {
             lock (_sync)
             {
-                if (_applied)
-                    return;
+                string monitor;
+                int width, height, refreshRate;
 
-                string? device = string.IsNullOrWhiteSpace(App.Settings.Prop.InGameResolutionMonitor)
-                    ? null
-                    : App.Settings.Prop.InGameResolutionMonitor;
+                if (placeId > 0 && App.Settings.Prop.InGameResolutionPlaceProfiles.TryGetValue(placeId.ToString(), out InGameResolutionProfile? profile))
+                {
+                    monitor = profile.Monitor;
+                    width = profile.Width;
+                    height = profile.Height;
+                    refreshRate = profile.RefreshRate;
+                    App.Logger.WriteLine(LOG_IDENT, $"Place {placeId} has its own resolution: {width}x{height}@{refreshRate}");
+                }
+                else if (App.Settings.Prop.ForceInGameResolution)
+                {
+                    monitor = App.Settings.Prop.InGameResolutionMonitor;
+                    width = App.Settings.Prop.InGameResolutionWidth;
+                    height = App.Settings.Prop.InGameResolutionHeight;
+                    refreshRate = App.Settings.Prop.InGameResolutionRefreshRate;
+                }
+                else
+                {
+                    // switched to a game without one: put the screen back
+                    RestoreLocked();
+                    return;
+                }
+
+                // a server switch into a game with a different resolution
+                if (_applied)
+                    RestoreLocked();
+
+                string? device = string.IsNullOrWhiteSpace(monitor) ? null : monitor;
 
                 DisplayMode? current = DisplaySystem.GetCurrentMode(device);
-                int width = App.Settings.Prop.InGameResolutionWidth;
-                int height = App.Settings.Prop.InGameResolutionHeight;
-                int refreshRate = App.Settings.Prop.InGameResolutionRefreshRate;
 
                 if (current != null && current.Width == width && current.Height == height && current.RefreshRate == refreshRate)
                 {
@@ -59,6 +81,11 @@ namespace PhasmaStrap.Integrations
         public static void Restore()
         {
             lock (_sync)
+                RestoreLocked();
+        }
+
+        private static void RestoreLocked()
+        {
             {
                 if (!_applied || _savedMode == null)
                 {

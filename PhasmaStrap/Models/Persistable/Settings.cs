@@ -193,6 +193,20 @@ namespace PhasmaStrap.Models.Persistable
 
         // overlays: GPU compositor (HUD, crosshair) drawn on top of the Roblox window
         public bool OverlayHudEnabled { get; set; } = false;
+
+        // how the HUD looks and where it sits (Integrations/Overlays/OverlayHud.cs HudStyle)
+        public string OverlayHudPosition { get; set; } = "TopLeft";
+        public int OverlayHudOffsetX { get; set; } = 18;
+        public int OverlayHudOffsetY { get; set; } = 18;
+        public int OverlayHudBackgroundOpacity { get; set; } = 75;
+        public string OverlayHudBackgroundColor { get; set; } = "#0C0D10";
+        public string OverlayHudLabelColor { get; set; } = "#E2E5E9";
+        public string OverlayHudValueColor { get; set; } = "#96E296";
+        public int OverlayHudScale { get; set; } = 100;
+        public string OverlayHudLayout { get; set; } = "List";
+        public bool OverlayHudShowLabels { get; set; } = true;
+        public bool OverlayHudTextShadow { get; set; } = true;
+        public int OverlayHudCornerRadius { get; set; } = 6;
         public bool OverlayDiagnosticsEnabled { get; set; } = true;
         public bool Crosshair { get; set; } = false;
         public int CrosshairShapeIndex { get; set; } = 0;
@@ -421,6 +435,8 @@ namespace PhasmaStrap.Models.Persistable
         public int InGameResolutionWidth { get; set; } = 1920;
         public int InGameResolutionHeight { get; set; } = 1080;
         public int InGameResolutionRefreshRate { get; set; } = 60;
+        // per game (place ID): its own resolution, used instead of the one above - on or off
+        public Dictionary<string, InGameResolutionProfile> InGameResolutionPlaceProfiles { get; set; } = new();
 
         // app UI colour theme (AppColorTheme, ported from Voidstrap's custom theme editor) - a
         // user-edited colour/brush override merged on top of the active Dark/Light skin, saved to

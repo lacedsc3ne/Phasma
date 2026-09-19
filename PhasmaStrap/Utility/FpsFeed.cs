@@ -29,6 +29,13 @@ namespace PhasmaStrap.Utility
             }
         }
 
+        /// <summary>One source's reading, or 0 when it hasn't reported in the last few seconds.</summary>
+        public static double Get(Source source)
+        {
+            lock (_lock)
+                return _stamp[(int)source] != 0 && Environment.TickCount64 - _stamp[(int)source] <= FreshMs ? _value[(int)source] : 0;
+        }
+
         /// <summary>The newest reading, or 0 when nothing has reported in the last few seconds.</summary>
         public static double Latest
         {

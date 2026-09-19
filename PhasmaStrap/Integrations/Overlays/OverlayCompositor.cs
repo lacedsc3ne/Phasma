@@ -110,8 +110,22 @@ namespace PhasmaStrap.Integrations.Overlays
         private bool _hudPainted;
         private double _hudLastMs;
         private long _hudFramesBase;
-        private static readonly int HudX = 18;
-        private static readonly int HudY = 18;
+        // the game's own frames, counted from the screen capture's AccumulatedFrames (every time
+        // the game shows a new picture) - not how often this overlay redraws
+        private long _gameFrames, _gameFramesBase;
+        private bool _countedGameFrames;
+
+        // HUD / crosshair only: a transparent overlay, redrawn when something on it changes
+        private bool _overlayDirty = true;
+        private double _lastOverlayPresentMs;
+        private long _nextCountDuplicationMs;
+
+        // the Instant Replay recorder's picture of the game, when it holds the screen capture
+        private ID3D11Texture2D? _sharedTex;
+        private IDXGIKeyedMutex? _sharedMutex;
+        private IntPtr _sharedHandle;
+        private long _sharedVersion = -1;
+        private bool _loggedShared;
 
         private ID3D11Texture2D? _rawTex;
         private ID3D11ShaderResourceView? _rawSrv;
@@ -216,7 +230,10 @@ namespace PhasmaStrap.Integrations.Overlays
                     SyncStreamView();
                     FollowRoblox();
                     ReloadSettingsIfChanged();
-                    RenderFrame(token);
+                    if (OverlaySettings.NeedsCapture)
+                        RenderFrame(token);
+                    else
+                        RenderOverlayOnly(token);
                     UpdateHudIfDue();
                 }
             }
@@ -348,6 +365,11 @@ namespace PhasmaStrap.Integrations.Overlays
 
         private void CreateCapture()
         {
+            // Instant Replay holds the monitor's capture (its frames are used), and HUD / crosshair
+            // alone take one only to count frames, made on first use
+            if (SharedGameFrame.RecorderActive || !OverlaySettings.NeedsCapture)
+                return;
+
             if (!CreateDuplicationForRect(_rectLeft, _rectTop))
                 App.Logger.WriteLine(LOG_IDENT, "Could not create desktop duplication, will retry while running");
         }
@@ -667,6 +689,7 @@ namespace PhasmaStrap.Integrations.Overlays
                 if (_hiddenByFocus)
                 {
                     _hiddenByFocus = false;
+                    _overlayDirty = true;
                     App.Logger.WriteLine(LOG_IDENT, "Roblox is in the foreground again, the overlay is rendering");
                     // stream-safe mode on its own keeps the overlay window hidden (SyncStreamView)
                     if (!_overlayHiddenForStream)
@@ -732,6 +755,7 @@ namespace PhasmaStrap.Integrations.Overlays
             _height = h;
             _pendingW = 0;
             _pendingH = 0;
+            _overlayDirty = true;
 
             if (sizeChanged)
             {
@@ -827,6 +851,14 @@ namespace PhasmaStrap.Integrations.Overlays
             if (_rawTex == null)
                 return false;
 
+            // the Instant Replay recorder owns the screen capture: read its picture instead of
+            // fighting it for one (Windows gives a process only one per monitor)
+            if (SharedGameFrame.RecorderActive)
+            {
+                ReleaseOwnDuplication();
+                return CaptureFromRecorder();
+            }
+
             if (_duplication == null)
                 return HandleCaptureUnstable("Screen capture not available");
 
@@ -850,6 +882,8 @@ namespace PhasmaStrap.Integrations.Overlays
                 if (desktopResource == null)
                     return HandleCaptureUnstable("Capture access lost");
                 acquired = true;
+                _gameFrames += frameInfo.AccumulatedFrames;
+                _countedGameFrames = true;
                 _stableCaptureFrames++;
                 if (_stableCaptureFrames >= 15)
                 {
@@ -897,6 +931,152 @@ namespace PhasmaStrap.Integrations.Overlays
                 desktopResource?.Dispose();
                 if (acquired)
                     _duplication.ReleaseFrame();
+            }
+        }
+
+        private void ReleaseOwnDuplication()
+        {
+            if (_duplication == null)
+                return;
+            _duplication.Dispose();
+            _duplication = null;
+            App.Logger.WriteLine(LOG_IDENT, "Instant Replay is capturing the screen - the overlay uses its frames instead of its own capture");
+        }
+
+        private bool CaptureFromRecorder()
+        {
+            if (!SharedGameFrame.TryGet(out IntPtr handle, out int width, out int height))
+            {
+                Thread.Sleep(4);
+                return false;
+            }
+
+            try
+            {
+                if (handle != _sharedHandle || _sharedTex == null)
+                {
+                    _sharedMutex?.Dispose();
+                    _sharedTex?.Dispose();
+                    _sharedTex = _device!.OpenSharedResource<ID3D11Texture2D>(handle);
+                    _sharedMutex = _sharedTex.QueryInterface<IDXGIKeyedMutex>();
+                    _sharedHandle = handle;
+                    _sharedVersion = -1;
+                    if (!_loggedShared)
+                    {
+                        _loggedShared = true;
+                        App.Logger.WriteLine(LOG_IDENT, $"Reading the game picture from Instant Replay ({width}x{height})");
+                    }
+                }
+
+                long version = SharedGameFrame.Version;
+                if (version == _sharedVersion)
+                {
+                    Thread.Sleep(1);
+                    return false;
+                }
+
+                if (KeyedMutexLock.Acquire(_sharedMutex!, 0, 8) != KeyedMutexLock.Acquired)
+                    return false;
+                try
+                {
+                    int w = Math.Min(width, _width), h = Math.Min(height, _height);
+                    _context!.CopySubresourceRegion(_rawTex!, 0, 0, 0, 0, _sharedTex, 0, new Box(0, 0, 0, w, h, 1));
+                }
+                finally
+                {
+                    _sharedMutex!.ReleaseSync(0);
+                }
+
+                _sharedVersion = version;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not read Instant Replay's picture: {ex.Message}");
+                _sharedMutex?.Dispose();
+                _sharedTex?.Dispose();
+                _sharedMutex = null;
+                _sharedTex = null;
+                _sharedHandle = IntPtr.Zero;
+                Thread.Sleep(50);
+                return false;
+            }
+        }
+
+        // HUD and crosshair only: nothing of the game is copied - the overlay is see-through and
+        // is redrawn when its content changes. A screen capture is still held (when Instant Replay
+        // isn't) just to count the game's frames for the FPS readout.
+        private void RenderOverlayOnly(CancellationToken token)
+        {
+            bool counted = CountGameFrames();
+
+            double now = _clock.Elapsed.TotalMilliseconds;
+            if (!_overlayDirty && now - _lastOverlayPresentMs < 1000)
+            {
+                if (!counted)
+                    token.WaitHandle.WaitOne(8);
+                return;
+            }
+
+            _context!.ClearRenderTargetView(_backBufferRtv!, new Color4(0, 0, 0, 0));
+            DrawHud();
+            DrawCrosshair();
+            if (!Present())
+                return;
+
+            _overlayDirty = false;
+            _lastOverlayPresentMs = now;
+            _framesPresented++;
+        }
+
+        // true when it waited on the capture (which then paces the loop)
+        private bool CountGameFrames()
+        {
+            if (SharedGameFrame.RecorderActive)
+            {
+                // the recorder counts them (FpsFeed) - and holds the only capture there can be
+                ReleaseOwnDuplication();
+                return false;
+            }
+
+            long nowMs = Environment.TickCount64;
+            if (_duplication == null)
+            {
+                if (nowMs < _nextCountDuplicationMs)
+                    return false;
+                _nextCountDuplicationMs = nowMs + 2000;
+                if (!CreateDuplicationForRect(_rectLeft, _rectTop))
+                    return false;
+            }
+
+            IDXGIResource? resource = null;
+            bool acquired = false;
+            try
+            {
+                _duplication!.AcquireNextFrame(8, out OutduplFrameInfo info, out resource);
+                acquired = true;
+                _gameFrames += info.AccumulatedFrames;
+                _countedGameFrames = true;
+                return true;
+            }
+            catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.WaitTimeout)
+            {
+                _countedGameFrames = true; // nothing new on screen is a count too (zero)
+                return true;
+            }
+            catch (Exception)
+            {
+                _duplication?.Dispose();
+                _duplication = null;
+                return false;
+            }
+            finally
+            {
+                resource?.Dispose();
+                if (acquired)
+                {
+                    try { _duplication?.ReleaseFrame(); } catch { }
+                }
             }
         }
 
@@ -1114,13 +1294,20 @@ namespace PhasmaStrap.Integrations.Overlays
             if (now - _hudLastMs < 1000.0)
                 return;
             double window = (now - _hudLastMs) / 1000.0;
-            long frames = _framesPresented - _hudFramesBase;
+            long gameFrames = _gameFrames - _gameFramesBase;
+            bool counted = _countedGameFrames;
             _hudLastMs = now;
             _hudFramesBase = _framesPresented;
+            _gameFramesBase = _gameFrames;
+            _countedGameFrames = false;
             if (window <= 0.0)
                 return;
-            double fps = frames / window;
-            FpsFeed.Report(FpsFeed.Source.Hud, fps);
+
+            // the game's frames as the screen shows them (so never above the monitor's refresh
+            // rate); while Instant Replay holds the capture, its own count of the same thing
+            double fps = counted ? gameFrames / window : FpsFeed.Get(FpsFeed.Source.Recorder);
+            if (counted)
+                FpsFeed.Report(FpsFeed.Source.Hud, fps);
 
             try
             {
@@ -1163,6 +1350,7 @@ namespace PhasmaStrap.Integrations.Overlays
 
                 _hud.Update(_context!, labels.ToArray(), values.ToArray());
                 _hudPainted = true;
+                _overlayDirty = true;
             }
             catch (Exception ex)
             {
@@ -1181,7 +1369,8 @@ namespace PhasmaStrap.Integrations.Overlays
             _context.PSSetSampler(0, _sampler);
             _context.IASetInputLayout(null);
             _context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            _context.RSSetViewport(new Viewport(HudX, HudY, _hud.TexWidth, _hud.TexHeight, 0, 1));
+            (int hudX, int hudY) = HudStyle.Current.Place(_width, _height, _hud.TexWidth, _hud.TexHeight);
+            _context.RSSetViewport(new Viewport(hudX, hudY, _hud.TexWidth, _hud.TexHeight, 0, 1));
             _context.PSSetShaderResources(0, _nullSrvs);
             _context.PSSetShaderResource(0, _hud.Srv);
             _context.Draw(3, 0);
@@ -1262,6 +1451,7 @@ namespace PhasmaStrap.Integrations.Overlays
                 {
                     _settingsFileTimeUtc = stamp;
                     App.Settings.Load();
+                    _overlayDirty = true;
                     App.Logger.WriteLine(LOG_IDENT, "Settings changed on disk, reloaded so overlay toggles apply live");
                 }
             }
@@ -1273,6 +1463,11 @@ namespace PhasmaStrap.Integrations.Overlays
         private void Cleanup()
         {
             DestroyStreamView();
+
+            _sharedMutex?.Dispose();
+            _sharedTex?.Dispose();
+            _sharedMutex = null;
+            _sharedTex = null;
 
             try
             {

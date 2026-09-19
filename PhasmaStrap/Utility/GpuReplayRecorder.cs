@@ -91,6 +91,7 @@ namespace PhasmaStrap.Utility
         // the newest picture of the game, kept so a tick with no new frame repeats it: clips are
         // then exactly the chosen frame rate, even when the game draws fewer frames than that
         private ID3D11Texture2D? _last;
+        private IDXGIKeyedMutex? _lastMutex;   // _last is shared with the overlay compositor
         private int _lastWidth, _lastHeight;
         private bool _lastValid;
         private DateTime _statSinceUtc;
@@ -162,6 +163,10 @@ namespace PhasmaStrap.Utility
 
             _running = true;
             _statSinceUtc = DateTime.UtcNow;
+
+            // the overlay lets go of its own screen capture and reads ours (SharedGameFrame)
+            SharedGameFrame.RecorderActive = true;
+
             _thread = new Thread(CaptureLoop) { IsBackground = true, Name = "GpuReplayCapture" };
             _thread.Start();
         }
@@ -307,7 +312,9 @@ namespace PhasmaStrap.Utility
 
             if (!EnsureDuplication(origin.X + wantWidth / 2, origin.Y + wantHeight / 2))
             {
-                _duplicationRetryUtc = DateTime.UtcNow.AddSeconds(10);
+                // the overlay may still be holding the monitor's capture for a moment - it lets
+                // go as soon as it sees the recorder running, so try again soon
+                _duplicationRetryUtc = DateTime.UtcNow.AddSeconds(1);
                 return false;
             }
 
@@ -435,6 +442,8 @@ namespace PhasmaStrap.Utility
         {
             if (_last is null || _lastWidth != width || _lastHeight != height)
             {
+                SharedGameFrame.Withdraw();
+                _lastMutex?.Dispose();
                 _last?.Dispose();
                 _last = _device!.CreateTexture2D(new Texture2DDescription
                 {
@@ -445,15 +454,40 @@ namespace PhasmaStrap.Utility
                     Format = Format.B8G8R8A8_UNorm,
                     SampleDescription = new SampleDescription(1, 0),
                     Usage = ResourceUsage.Default,
-                    BindFlags = BindFlags.ShaderResource,
+                    BindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget,
                     CpuAccessFlags = CpuAccessFlags.None,
+                    OptionFlags = ResourceOptionFlags.SharedKeyedMutex,
                 });
+                _lastMutex = _last.QueryInterface<IDXGIKeyedMutex>();
                 _lastWidth = width;
                 _lastHeight = height;
+
+                using IDXGIResource shared = _last.QueryInterface<IDXGIResource>();
+                SharedGameFrame.Publish(shared.SharedHandle, width, height);
             }
 
-            _context!.CopySubresourceRegion(_last, 0, 0, 0, 0, desktop, 0, new Vortice.Mathematics.Box(left, top, 0, left + width, top + height, 1));
+            if (!LockLast())
+                return;
+            try
+            {
+                _context!.CopySubresourceRegion(_last, 0, 0, 0, 0, desktop, 0, new Vortice.Mathematics.Box(left, top, 0, left + width, top + height, 1));
+            }
+            finally
+            {
+                _lastMutex!.ReleaseSync(0);
+            }
+
             _lastValid = true;
+            SharedGameFrame.Updated();
+        }
+
+        // the overlay reads _last from its own device; the keyed mutex keeps us from writing
+        // while it copies (it holds it for one copy - well under a millisecond)
+        private bool LockLast()
+        {
+            if (_lastMutex is null)
+                return false;
+            return KeyedMutexLock.Acquire(_lastMutex, 0, 50) == KeyedMutexLock.Acquired;
         }
 
         // hands the kept picture to the encoder as frame number `slot` of the current segment
@@ -466,7 +500,19 @@ namespace PhasmaStrap.Utility
                 return false;
             }
 
-            _context!.CopyResource(item.Texture, _last!);
+            if (!LockLast())
+            {
+                _statDropped++;
+                return false;
+            }
+            try
+            {
+                _context!.CopyResource(item.Texture, _last!);
+            }
+            finally
+            {
+                _lastMutex!.ReleaseSync(0);
+            }
 
             using IMFSample sample = MediaFactory.MFCreateSample();
             sample.AddBuffer(item.Buffer);
@@ -1066,6 +1112,10 @@ namespace PhasmaStrap.Utility
             _pool.Clear();
             _poolWidth = _poolHeight = 0;
 
+            SharedGameFrame.Withdraw();
+            SharedGameFrame.RecorderActive = false;
+            _lastMutex?.Dispose();
+            _lastMutex = null;
             _last?.Dispose();
             _last = null;
             _lastValid = false;

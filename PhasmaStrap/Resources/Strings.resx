@@ -5944,4 +5944,118 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Capture.Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="Menu.Integrations.JoinButtonTypeCustomTextPer" xml:space="preserve">
+    <value>Join button type, custom text per game, Studio and translation.</value>
+  </data>
+  <data name="Menu.Integrations.ShowRobloxStudioProfile" xml:space="preserve">
+    <value>Show Roblox Studio on your profile</value>
+  </data>
+  <data name="Menu.Integrations.WhileYouBuildRobloxStudioDiscord" xml:space="preserve">
+    <value>While you build in Roblox Studio, Discord shows what you're working on (needs the Studio companion plugin - Shortcuts page).</value>
+  </data>
+  <data name="Menu.Integrations.TranslateGameSStatusText" xml:space="preserve">
+    <value>Translate the game's status text</value>
+  </data>
+  <data name="Menu.Integrations.GameNamesStatusLinesOtherLanguages" xml:space="preserve">
+    <value>Game names and status lines in other languages are shown in English on your profile.</value>
+  </data>
+  <data name="Menu.Rendering.PerGame" xml:space="preserve">
+    <value>Per game</value>
+  </data>
+  <data name="Menu.Rendering.GiveGameItsOwnResolutionPick" xml:space="preserve">
+    <value>Give a game its own resolution: pick the monitor and resolution above, choose the game, press Add. It's used in that game even with the switch above off, and the screen goes back when you leave.</value>
+  </data>
+  <data name="Menu.Rendering.RecentlyPlayedGames" xml:space="preserve">
+    <value>Recently played games</value>
+  </data>
+  <data name="Menu.Rendering.PlaceID" xml:space="preserve">
+    <value>or a place ID</value>
+  </data>
+  <data name="Menu.Rendering.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Menu.Rendering.HUDLookPosition" xml:space="preserve">
+    <value>HUD look and position</value>
+  </data>
+  <data name="Menu.Rendering.WhereSitsItsBackgroundColoursSize" xml:space="preserve">
+    <value>Where it sits, its background, colours and size. The preview is exactly what you'll see in game.</value>
+  </data>
+  <data name="Menu.Rendering.ActualSize" xml:space="preserve">
+    <value>Actual size</value>
+  </data>
+  <data name="Menu.Rendering.FPSCountsFramesGameActuallyShows" xml:space="preserve">
+    <value>FPS counts the frames the game actually shows on screen, so it can't read higher than your monitor's refresh rate.</value>
+  </data>
+  <data name="Menu.Rendering.Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="Menu.Rendering.WhichCornerEdgeRobloxWindowHUD" xml:space="preserve">
+    <value>Which corner or edge of the Roblox window the HUD sits in.</value>
+  </data>
+  <data name="Menu.Rendering.DistanceFromSide" xml:space="preserve">
+    <value>Distance from the side</value>
+  </data>
+  <data name="Menu.Rendering.PixelsMiddlePositionsShiftRight" xml:space="preserve">
+    <value>In pixels (for the middle positions, a shift to the right).</value>
+  </data>
+  <data name="Menu.Rendering.DistanceFromTopBottom" xml:space="preserve">
+    <value>Distance from the top or bottom</value>
+  </data>
+  <data name="Menu.Rendering.Pixels" xml:space="preserve">
+    <value>In pixels.</value>
+  </data>
+  <data name="Menu.Rendering.BackgroundOpacity" xml:space="preserve">
+    <value>Background opacity</value>
+  </data>
+  <data name="Menu.Rendering.N0NoBackgroundAtAllJust" xml:space="preserve">
+    <value>0% is no background at all - just the text.</value>
+  </data>
+  <data name="Menu.Rendering.TextSizeWholeHUD" xml:space="preserve">
+    <value>Text size of the whole HUD.</value>
+  </data>
+  <data name="Menu.Rendering.RoundedCorners" xml:space="preserve">
+    <value>Rounded corners</value>
+  </data>
+  <data name="Menu.Rendering.HowRoundBackgroundSCornersAre" xml:space="preserve">
+    <value>How round the background's corners are.</value>
+  </data>
+  <data name="Menu.Rendering.Layout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="Menu.Rendering.ListOneStatPerLineEverything" xml:space="preserve">
+    <value>A list, one stat per line, or everything on one line.</value>
+  </data>
+  <data name="Menu.Rendering.List" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="Menu.Rendering.OneLine" xml:space="preserve">
+    <value>One line</value>
+  </data>
+  <data name="Menu.Rendering.ShowLabels" xml:space="preserve">
+    <value>Show labels</value>
+  </data>
+  <data name="Menu.Rendering.FPSPINGSoFrontEachNumber" xml:space="preserve">
+    <value>FPS, PING and so on in front of each number.</value>
+  </data>
+  <data name="Menu.Rendering.TextShadow" xml:space="preserve">
+    <value>Text shadow</value>
+  </data>
+  <data name="Menu.Rendering.KeepsTextReadableOverBrightScenes" xml:space="preserve">
+    <value>Keeps the text readable over bright scenes - most useful with no background.</value>
+  </data>
+  <data name="Menu.Rendering.BackgroundLabelsNumbersAsRRGGBB" xml:space="preserve">
+    <value>Background, labels and numbers, as #RRGGBB.</value>
+  </data>
+  <data name="Menu.Rendering.Background" xml:space="preserve">
+    <value>Background</value>
+  </data>
+  <data name="Menu.Rendering.Labels" xml:space="preserve">
+    <value>Labels</value>
+  </data>
+  <data name="Menu.Rendering.Numbers" xml:space="preserve">
+    <value>Numbers</value>
+  </data>
+  <data name="Menu.Rendering.ResetHUDLook" xml:space="preserve">
+    <value>Reset the HUD look</value>
+  </data>
 </root>

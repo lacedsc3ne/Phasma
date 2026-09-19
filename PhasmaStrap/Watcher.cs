@@ -209,11 +209,10 @@ namespace PhasmaStrap
                     }
                 };
 
-                if (App.Settings.Prop.ForceInGameResolution)
-                {
-                    ActivityWatcher.OnGameJoin += (_, _) => ForcedResolution.OnGameJoin();
-                    ActivityWatcher.OnGameLeave += (_, _) => ForcedResolution.OnGameLeave();
-                }
+                // always wired: the setting and the per-game resolutions are read at each join, so
+                // turning it on (and Save) works without restarting Roblox
+                ActivityWatcher.OnGameJoin += (sender, _) => ForcedResolution.OnGameJoin((sender as ActivityWatcher)?.Data.PlaceId ?? 0);
+                ActivityWatcher.OnGameLeave += (_, _) => ForcedResolution.OnGameLeave();
 
                 // also wire up the optimizer if any per-game preset is assigned, even when the
                 // global toggles are all off - a place-specific preset should still fire (see

@@ -27,6 +27,33 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // opens the Custom RPC template editor (list/detail editor for per-game Discord presence
         // templates) - moved out of the inline tab into its own window to match Voidstrap's "Custom
         // RPC" card + View button layout, without losing the multi-template editing this already had.
+        // also on the Shortcuts page (Studio companion) - the same setting
+        public bool StudioRichPresenceEnabled
+        {
+            get => App.Settings.Prop.StudioRichPresenceEnabled;
+            set
+            {
+                App.Settings.Prop.StudioRichPresenceEnabled = value;
+
+                if (value)
+                {
+                    App.StudioRichPresence ??= new PhasmaStrap.StudioRichPresence();
+                }
+                else
+                {
+                    App.StudioRichPresence?.Dispose();
+                    App.StudioRichPresence = null;
+                }
+            }
+        }
+
+        // also on the Game chat page - the same setting
+        public bool RpcAutoTranslate
+        {
+            get => App.Settings.Prop.RpcAutoTranslate;
+            set => App.Settings.Prop.RpcAutoTranslate = value;
+        }
+
         public ICommand OpenCustomRPCCommand => new RelayCommand(() => new RPCTemplatesWindow(this).Show());
 
         // opens the standalone Roblox account switcher (Integrations > Roblox tab) - see

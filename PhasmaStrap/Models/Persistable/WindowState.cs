@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap.Models.Persistable
+namespace PhasmaStrap.Models.Persistable
 {
     public class WindowState
     {
@@ -9,5 +9,7 @@
         public double Left { get; set; }
 
         public double Top { get; set; }
+
+        public bool Maximized { get; set; }
     }
 }

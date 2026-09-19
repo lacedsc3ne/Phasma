@@ -100,30 +100,10 @@
                     </controls:OptionControl>
 
                     <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_ShowAsPlayingPhasmaStrap}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_NamesActivityPhasmaStrapShowsFromMoment}"
-                        IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding DiscordShowAsPhasmaStrap, Mode=TwoWay}" />
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
                         Header="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Title}"
                         Description="{x:Static resources:Strings.Menu_Integrations_AllowActivityJoining_Description}"
                         IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
                         <ui:ToggleSwitch IsChecked="{Binding DiscordActivityJoinEnabled, Mode=TwoWay}" />
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_UseDiscordSOwnJoinButton}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_FriendsGetDiscordSJoinButton}"
-                        IsEnabled="{Binding DiscordActivityJoinEnabled, Mode=OneWay}">
-                        <ui:ToggleSwitch IsChecked="{Binding DiscordNativeJoin, Mode=TwoWay}" />
-                    </controls:OptionControl>
-
-                    <controls:OptionControl
-                        Header="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
-                        Description="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}">
-                        <ui:Button Content="{x:Static resources:Strings.Menu_Integrations_View}" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />
                     </controls:OptionControl>
 
                     <ui:Card Margin="0,8,0,0" Padding="12">
@@ -163,11 +143,49 @@
                         </StackPanel>
                     </ui:Card>
 
-                    <ui:CardExpander Margin="0,8,0,0">
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Settings24">
                         <ui:CardExpander.Header>
-                            <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Integrations_RPCAdvanced}" />
+                            <StackPanel>
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Integrations_RPCAdvanced}" />
+                                <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Integrations_JoinButtonTypeCustomTextPer}" />
+                            </StackPanel>
                         </ui:CardExpander.Header>
-                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Text="{x:Static resources:Strings.Menu_Integrations_CardAboveAlwaysShowsSampleSettings}" />
+                        <StackPanel>
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_ShowAsPlayingPhasmaStrap}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_NamesActivityPhasmaStrapShowsFromMoment}"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding DiscordShowAsPhasmaStrap, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_UseDiscordSOwnJoinButton}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_FriendsGetDiscordSJoinButton}"
+                                IsEnabled="{Binding DiscordActivityJoinEnabled, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding DiscordNativeJoin, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Title}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_RPCTemplates_Description}">
+                                <ui:Button Content="{x:Static resources:Strings.Menu_Integrations_View}" Command="{Binding OpenCustomRPCCommand, Mode=OneTime}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_ShowRobloxStudioProfile}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_WhileYouBuildRobloxStudioDiscord}">
+                                <ui:ToggleSwitch IsChecked="{Binding StudioRichPresenceEnabled, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <controls:OptionControl
+                                Header="{x:Static resources:Strings.Menu_Integrations_TranslateGameSStatusText}"
+                                Description="{x:Static resources:Strings.Menu_Integrations_GameNamesStatusLinesOtherLanguages}"
+                                IsEnabled="{Binding InnerContent.IsChecked, ElementName=DiscordActivityOption, Mode=OneWay}">
+                                <ui:ToggleSwitch IsChecked="{Binding RpcAutoTranslate, Mode=TwoWay}" />
+                            </controls:OptionControl>
+
+                            <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" Text="{x:Static resources:Strings.Menu_Integrations_CardAboveAlwaysShowsSampleSettings}" />
+                        </StackPanel>
                     </ui:CardExpander>
                 </StackPanel>
             </TabItem>

@@ -17000,5 +17000,347 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.Settings", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join button type, custom text per game, Studio and translation..
+        /// </summary>
+        public static string Menu_Integrations_JoinButtonTypeCustomTextPer {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.JoinButtonTypeCustomTextPer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Roblox Studio on your profile.
+        /// </summary>
+        public static string Menu_Integrations_ShowRobloxStudioProfile {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.ShowRobloxStudioProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to While you build in Roblox Studio, Discord shows what you're working on (needs the Studio companion plugin - Shortcuts pa.
+        /// </summary>
+        public static string Menu_Integrations_WhileYouBuildRobloxStudioDiscord {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.WhileYouBuildRobloxStudioDiscord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate the game's status text.
+        /// </summary>
+        public static string Menu_Integrations_TranslateGameSStatusText {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.TranslateGameSStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game names and status lines in other languages are shown in English on your profile..
+        /// </summary>
+        public static string Menu_Integrations_GameNamesStatusLinesOtherLanguages {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.GameNamesStatusLinesOtherLanguages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Per game.
+        /// </summary>
+        public static string Menu_Rendering_PerGame {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.PerGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Give a game its own resolution: pick the monitor and resolution above, choose the game, press Add. It's used in that gam.
+        /// </summary>
+        public static string Menu_Rendering_GiveGameItsOwnResolutionPick {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.GiveGameItsOwnResolutionPick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recently played games.
+        /// </summary>
+        public static string Menu_Rendering_RecentlyPlayedGames {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.RecentlyPlayedGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to or a place ID.
+        /// </summary>
+        public static string Menu_Rendering_PlaceID {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.PlaceID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Menu_Rendering_Add {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HUD look and position.
+        /// </summary>
+        public static string Menu_Rendering_HUDLookPosition {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.HUDLookPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where it sits, its background, colours and size. The preview is exactly what you'll see in game..
+        /// </summary>
+        public static string Menu_Rendering_WhereSitsItsBackgroundColoursSize {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.WhereSitsItsBackgroundColoursSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Actual size.
+        /// </summary>
+        public static string Menu_Rendering_ActualSize {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ActualSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FPS counts the frames the game actually shows on screen, so it can't read higher than your monitor's refresh rate..
+        /// </summary>
+        public static string Menu_Rendering_FPSCountsFramesGameActuallyShows {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.FPSCountsFramesGameActuallyShows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Position.
+        /// </summary>
+        public static string Menu_Rendering_Position {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Position", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Which corner or edge of the Roblox window the HUD sits in..
+        /// </summary>
+        public static string Menu_Rendering_WhichCornerEdgeRobloxWindowHUD {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.WhichCornerEdgeRobloxWindowHUD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distance from the side.
+        /// </summary>
+        public static string Menu_Rendering_DistanceFromSide {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.DistanceFromSide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In pixels (for the middle positions, a shift to the right)..
+        /// </summary>
+        public static string Menu_Rendering_PixelsMiddlePositionsShiftRight {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.PixelsMiddlePositionsShiftRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distance from the top or bottom.
+        /// </summary>
+        public static string Menu_Rendering_DistanceFromTopBottom {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.DistanceFromTopBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In pixels..
+        /// </summary>
+        public static string Menu_Rendering_Pixels {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Pixels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background opacity.
+        /// </summary>
+        public static string Menu_Rendering_BackgroundOpacity {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.BackgroundOpacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0% is no background at all - just the text..
+        /// </summary>
+        public static string Menu_Rendering_N0NoBackgroundAtAllJust {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.N0NoBackgroundAtAllJust", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text size of the whole HUD..
+        /// </summary>
+        public static string Menu_Rendering_TextSizeWholeHUD {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.TextSizeWholeHUD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rounded corners.
+        /// </summary>
+        public static string Menu_Rendering_RoundedCorners {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.RoundedCorners", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How round the background's corners are..
+        /// </summary>
+        public static string Menu_Rendering_HowRoundBackgroundSCornersAre {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.HowRoundBackgroundSCornersAre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout.
+        /// </summary>
+        public static string Menu_Rendering_Layout {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Layout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A list, one stat per line, or everything on one line..
+        /// </summary>
+        public static string Menu_Rendering_ListOneStatPerLineEverything {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ListOneStatPerLineEverything", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List.
+        /// </summary>
+        public static string Menu_Rendering_List {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.List", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One line.
+        /// </summary>
+        public static string Menu_Rendering_OneLine {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.OneLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show labels.
+        /// </summary>
+        public static string Menu_Rendering_ShowLabels {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ShowLabels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FPS, PING and so on in front of each number..
+        /// </summary>
+        public static string Menu_Rendering_FPSPINGSoFrontEachNumber {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.FPSPINGSoFrontEachNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text shadow.
+        /// </summary>
+        public static string Menu_Rendering_TextShadow {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.TextShadow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keeps the text readable over bright scenes - most useful with no background..
+        /// </summary>
+        public static string Menu_Rendering_KeepsTextReadableOverBrightScenes {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.KeepsTextReadableOverBrightScenes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background, labels and numbers, as #RRGGBB..
+        /// </summary>
+        public static string Menu_Rendering_BackgroundLabelsNumbersAsRRGGBB {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.BackgroundLabelsNumbersAsRRGGBB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background.
+        /// </summary>
+        public static string Menu_Rendering_Background {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Background", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Labels.
+        /// </summary>
+        public static string Menu_Rendering_Labels {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Labels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Numbers.
+        /// </summary>
+        public static string Menu_Rendering_Numbers {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.Numbers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset the HUD look.
+        /// </summary>
+        public static string Menu_Rendering_ResetHUDLook {
+            get {
+                return ResourceManager.GetString("Menu.Rendering.ResetHUDLook", resourceCulture);
+            }
+        }
     }
 }
