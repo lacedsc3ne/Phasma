@@ -49,6 +49,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public Visibility OwnerVisibility => Server.Owned ? Visibility.Visible : Visibility.Collapsed;
 
         public bool CanJoin => Server.Active && Server.PlaceId > 0;
+
+        // a real end date (not a free server's "never"), for sorting and the "ending soon" filter
+        public DateTime? EndsAt => Server.Expires is DateTime e && e < DateTime.UtcNow.AddYears(20) ? e : null;
+    }
+
+    // one choice in the owner / game filter lists
+    public sealed record PrivateServerFilterOption(string Label, long Id)
+    {
+        public override string ToString() => Label;
     }
 
     /// <summary>
@@ -70,8 +79,176 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private bool _loaded;
         public Visibility ListsVisibility => _loaded ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility NoOwnedVisibility => _loaded && Owned.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility NoSharedVisibility => _loaded && Shared.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NoOwnedVisibility => _loaded && !_all.Any(r => r.Server.Owned) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NoSharedVisibility => _loaded && !_all.Any(r => !r.Server.Owned) ? Visibility.Visible : Visibility.Collapsed;
+
+        // ---- filters. They only change what's shown; the list itself comes from Load.
+
+        private List<PrivateServerRow> _all = new();
+        private HashSet<long> _friendIds = new();
+
+        public const long AnyOwner = 0;
+        public const long FriendsOnly = -1;
+
+        public ObservableCollection<PrivateServerFilterOption> OwnerOptions { get; } = new();
+        public ObservableCollection<PrivateServerFilterOption> GameOptions { get; } = new();
+
+        private string _search = "";
+        public string Search { get => _search; set { if (_search == value) return; _search = value; OnPropertyChanged(nameof(Search)); ApplyFilters(); } }
+
+        private PrivateServerFilterOption? _owner;
+        public PrivateServerFilterOption? Owner { get => _owner; set { if (Equals(_owner, value) || value is null) return; _owner = value; OnPropertyChanged(nameof(Owner)); ApplyFilters(); } }
+
+        private PrivateServerFilterOption? _game;
+        public PrivateServerFilterOption? Game { get => _game; set { if (Equals(_game, value) || value is null) return; _game = value; OnPropertyChanged(nameof(Game)); ApplyFilters(); } }
+
+        // 0 yours and shared, 1 only yours, 2 only shared
+        private int _showIndex;
+        public int ShowIndex { get => _showIndex; set { if (_showIndex == value) return; _showIndex = value; OnPropertyChanged(nameof(ShowIndex)); ApplyFilters(); } }
+
+        // 0 any, 1 can join now, 2 inactive, 3 ending within 30 days
+        private int _statusIndex;
+        public int StatusIndex { get => _statusIndex; set { if (_statusIndex == value) return; _statusIndex = value; OnPropertyChanged(nameof(StatusIndex)); ApplyFilters(); } }
+
+        // 0 game A-Z, 1 owner A-Z, 2 ending soonest
+        private int _sortIndex;
+        public int SortIndex { get => _sortIndex; set { if (_sortIndex == value) return; _sortIndex = value; OnPropertyChanged(nameof(SortIndex)); ApplyFilters(); } }
+
+        private string _filterSummary = "";
+        public string FilterSummary { get => _filterSummary; private set { _filterSummary = value; OnPropertyChanged(nameof(FilterSummary)); } }
+
+        public Visibility YoursVisibility => ShowIndex != 2 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility SharedVisibility => ShowIndex != 1 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NoMatchesVisibility => _loaded && _all.Count > 0 && Owned.Count + Shared.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        public ICommand ClearFiltersCommand => new RelayCommand(() =>
+        {
+            _search = "";
+            _owner = OwnerOptions.FirstOrDefault();
+            _game = GameOptions.FirstOrDefault();
+            _showIndex = _statusIndex = _sortIndex = 0;
+            OnPropertyChanged(nameof(Search));
+            OnPropertyChanged(nameof(Owner));
+            OnPropertyChanged(nameof(Game));
+            OnPropertyChanged(nameof(ShowIndex));
+            OnPropertyChanged(nameof(StatusIndex));
+            OnPropertyChanged(nameof(SortIndex));
+            ApplyFilters();
+        });
+
+        private bool Matches(PrivateServerRow row)
+        {
+            PrivateServerInfo s = row.Server;
+
+            string search = _search.Trim();
+            if (search.Length > 0
+                && !s.GameName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                && !s.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+                && !s.OwnerName.Contains(search, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            long owner = _owner?.Id ?? AnyOwner;
+            if (owner == FriendsOnly && (s.Owned || !_friendIds.Contains(s.OwnerId)))
+                return false;
+            if (owner > 0 && (s.Owned || s.OwnerId != owner))
+                return false;
+
+            if (_game is { Id: > 0 } game && s.UniverseId != game.Id)
+                return false;
+
+            return _statusIndex switch
+            {
+                1 => row.CanJoin,
+                2 => !s.Active,
+                3 => s.Active && row.EndsAt is DateTime ends && ends < DateTime.UtcNow.AddDays(30),
+                _ => true,
+            };
+        }
+
+        private void ApplyFilters()
+        {
+            IEnumerable<PrivateServerRow> rows = _all.Where(Matches);
+
+            rows = _sortIndex switch
+            {
+                1 => rows.OrderBy(r => r.Server.Owned ? "" : r.Server.OwnerName, StringComparer.OrdinalIgnoreCase).ThenBy(r => r.Title, StringComparer.OrdinalIgnoreCase),
+                2 => rows.OrderBy(r => r.EndsAt ?? DateTime.MaxValue).ThenBy(r => r.Title, StringComparer.OrdinalIgnoreCase),
+                _ => rows.OrderByDescending(r => r.Server.Active).ThenBy(r => r.Title, StringComparer.OrdinalIgnoreCase),
+            };
+
+            Owned.Clear();
+            Shared.Clear();
+            foreach (PrivateServerRow row in rows)
+            {
+                if (row.Server.Owned && _showIndex != 2)
+                    Owned.Add(row);
+                else if (!row.Server.Owned && _showIndex != 1)
+                    Shared.Add(row);
+            }
+
+            int shown = Owned.Count + Shared.Count;
+            FilterSummary = shown == _all.Count ? $"Showing all {_all.Count}." : $"Showing {shown} of {_all.Count}.";
+
+            OnPropertyChanged(nameof(YoursVisibility));
+            OnPropertyChanged(nameof(SharedVisibility));
+            OnPropertyChanged(nameof(NoMatchesVisibility));
+        }
+
+        // owners who share servers with you: friends first, then whoever shares the most
+        private void BuildFilterOptions()
+        {
+            long ownerId = _owner?.Id ?? AnyOwner;
+            long gameId = _game?.Id ?? 0;
+
+            OwnerOptions.Clear();
+            OwnerOptions.Add(new PrivateServerFilterOption("Anyone", AnyOwner));
+
+            var owners = _all.Where(r => !r.Server.Owned && r.Server.OwnerId > 0)
+                .GroupBy(r => r.Server.OwnerId)
+                .Select(g => (Id: g.Key, Name: g.First().Server.OwnerName, Count: g.Count(), Friend: _friendIds.Contains(g.Key)))
+                .OrderByDescending(o => o.Friend).ThenByDescending(o => o.Count).ThenBy(o => o.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            int friendCount = owners.Count(o => o.Friend);
+            if (friendCount > 0)
+                OwnerOptions.Add(new PrivateServerFilterOption($"Friends only ({owners.Where(o => o.Friend).Sum(o => o.Count)})", FriendsOnly));
+
+            foreach (var o in owners)
+                OwnerOptions.Add(new PrivateServerFilterOption($"{(o.Name.Length > 0 ? o.Name : o.Id.ToString())}{(o.Friend ? "  · friend" : "")}  ({o.Count})", o.Id));
+
+            GameOptions.Clear();
+            GameOptions.Add(new PrivateServerFilterOption("All games", 0));
+            foreach (var g in _all.Where(r => r.Server.UniverseId > 0).GroupBy(r => r.Server.UniverseId)
+                         .Select(g => (Id: g.Key, Name: g.First().Title, Count: g.Count()))
+                         .OrderBy(g => g.Name, StringComparer.OrdinalIgnoreCase))
+                GameOptions.Add(new PrivateServerFilterOption($"{g.Name}  ({g.Count})", g.Id));
+
+            // keep what was picked, if it's still there
+            _owner = OwnerOptions.FirstOrDefault(o => o.Id == ownerId) ?? OwnerOptions[0];
+            _game = GameOptions.FirstOrDefault(o => o.Id == gameId) ?? GameOptions[0];
+            OnPropertyChanged(nameof(Owner));
+            OnPropertyChanged(nameof(Game));
+        }
+
+        // which owners are your friends - only used to sort and label the owner list
+        private async Task LoadFriendsAsync()
+        {
+            try
+            {
+                RobloxCookie.RobloxAccount? me = await RobloxCookie.GetAccountAsync();
+                if (me is null)
+                    return;
+
+                List<FriendInfo> friends = await FriendsService.GetFriendsAsync(me.UserId);
+                _friendIds = friends.Select(f => f.UserId).ToHashSet();
+                BuildFilterOptions();
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("PrivateServersViewModel", $"Friends list not loaded: {ex.Message}");
+            }
+        }
 
         public ICommand LoadCommand => new AsyncRelayCommand(LoadAsync);
 
@@ -84,15 +261,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 List<PrivateServerInfo> servers = await PrivateServers.ListAsync();
 
-                Owned.Clear();
-                Shared.Clear();
-
                 var rows = servers.Select(s => new PrivateServerRow { Server = s }).ToList();
-                foreach (PrivateServerRow row in rows.OrderByDescending(r => r.Server.Active).ThenBy(r => r.Server.GameName, StringComparer.OrdinalIgnoreCase))
-                    (row.Server.Owned ? Owned : Shared).Add(row);
-
+                _all = rows;
                 _loaded = true;
-                Status = servers.Count == 0 ? "This account has no private servers." : $"{Owned.Count} of your own, {Shared.Count} shared with you.";
+                BuildFilterOptions();
+                ApplyFilters();
+
+                Status = servers.Count == 0 ? "This account has no private servers." : $"{rows.Count(r => r.Server.Owned)} of your own, {rows.Count(r => !r.Server.Owned)} shared with you.";
+                _ = LoadFriendsAsync();
 
                 // icons after the list shows - they're only decoration
                 var games = await PhasmaStrap.Utility.GameLookup.WithIconsAsync(servers.Where(s => s.UniverseId > 0).Select(s => new PhasmaStrap.Utility.GameInfo(s.UniverseId, s.PlaceId, s.GameName)).DistinctBy(g => g.UniverseId).ToList());

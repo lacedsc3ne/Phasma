@@ -5869,4 +5869,49 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Rendering.CopyWindowName" xml:space="preserve">
     <value>Copy window name</value>
   </data>
+  <data name="Menu.PrivateServers.SearchGamesServerNamesUsernames" xml:space="preserve">
+    <value>Search games, server names or usernames</value>
+  </data>
+  <data name="Menu.PrivateServers.WhoseServersShowFriendsAreListed" xml:space="preserve">
+    <value>Whose servers to show - your friends are listed first</value>
+  </data>
+  <data name="Menu.PrivateServers.OnlyServersGame" xml:space="preserve">
+    <value>Only servers for this game</value>
+  </data>
+  <data name="Menu.PrivateServers.YoursShared" xml:space="preserve">
+    <value>Yours and shared</value>
+  </data>
+  <data name="Menu.PrivateServers.OnlyYours" xml:space="preserve">
+    <value>Only yours</value>
+  </data>
+  <data name="Menu.PrivateServers.OnlySharedYou" xml:space="preserve">
+    <value>Only shared with you</value>
+  </data>
+  <data name="Menu.PrivateServers.AnyStatus" xml:space="preserve">
+    <value>Any status</value>
+  </data>
+  <data name="Menu.PrivateServers.CanJoinNow" xml:space="preserve">
+    <value>Can join now</value>
+  </data>
+  <data name="Menu.PrivateServers.Inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="Menu.PrivateServers.EndingWithin30Days" xml:space="preserve">
+    <value>Ending within 30 days</value>
+  </data>
+  <data name="Menu.PrivateServers.SortByGame" xml:space="preserve">
+    <value>Sort by game</value>
+  </data>
+  <data name="Menu.PrivateServers.SortByOwner" xml:space="preserve">
+    <value>Sort by owner</value>
+  </data>
+  <data name="Menu.PrivateServers.EndingSoonestFirst" xml:space="preserve">
+    <value>Ending soonest first</value>
+  </data>
+  <data name="Menu.PrivateServers.ClearFilters" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="Menu.PrivateServers.NoServersMatchTheseFilters" xml:space="preserve">
+    <value>No servers match these filters.</value>
+  </data>
 </root>

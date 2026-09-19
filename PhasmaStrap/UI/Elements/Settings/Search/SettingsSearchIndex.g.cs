@@ -590,6 +590,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Channel_RobloxChannel, "", typeof(PhasmaStrapPage), Strings.Menu_PhasmaStrap_PhasmaStrap, "", "", "", null, ""),
             // ---- PrivateServersPage.xaml (PrivateServersPage) ----
             new(SettingsSearchEntryKind.Action, Strings.Menu_PrivateServers_LoadMyPrivateServers, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
+            new(SettingsSearchEntryKind.Action, Strings.Menu_PrivateServers_ClearFilters, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
             new(SettingsSearchEntryKind.Section, Strings.Menu_PrivateServers_Yours, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
             new(SettingsSearchEntryKind.Section, Strings.Menu_PrivateServers_SharedYou, "", typeof(ServerBrowserPage), Strings.Menu_ServerBrowser_Title, "", "", "", typeof(PrivateServersPage), Strings.Menu_PrivateServers_PrivateServers),
             // ---- ReleasesPage.xaml (ReleasesPage) ----

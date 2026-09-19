@@ -11,6 +11,7 @@ namespace PhasmaStrap.Integrations
         public string Name { get; init; } = "";
         public string GameName { get; init; } = "";
         public string OwnerName { get; init; } = "";
+        public long OwnerId { get; init; }
         public bool Owned { get; init; }
         public bool Active { get; init; }
         public DateTime? Expires { get; init; }
@@ -140,6 +141,7 @@ namespace PhasmaStrap.Integrations
                                 Name = Text(item, "name"),
                                 GameName = Text(item, "universeName", "gameName"),
                                 OwnerName = Text(item, "ownerName"),
+                                OwnerId = Long(item, "ownerId"),
                                 Owned = owned,
                                 Active = !item.TryGetProperty("active", out _) || Bool(item, "active"),
                                 Expires = expires,
