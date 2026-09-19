@@ -192,11 +192,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        // NOTE for every number box on this page: Wpf.Ui's NumberBox writes its own Value back
+        // when it loads, so these setters run on every page open with the value the getter just
+        // returned. They must do nothing when the value hasn't changed - this one used to turn
+        // "0" (shown while mesh quality is off) into all four LOD flags at 0, i.e. lowest detail.
         public int MeshQuality
         {
             get => int.TryParse(App.FastFlags.GetPreset("Geometry.MeshLOD.L0"), out var result) ? result : 0;
             set
             {
+                if (value == MeshQuality)
+                    return;
+
                 int baseValue = Math.Clamp(value, 0, LODLevels.Length - 1);
 
                 for (int i = 0; i < LODLevels.Length; i++)
@@ -287,6 +294,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Rendering.Nograss1"), out var result) ? result : 100;
             set
             {
+                if (value == MinGrassDistance)
+                    return;
+
                 App.FastFlags.SetPreset("Rendering.Nograss1", value.ToString());
                 OnPropertyChanged(nameof(MinGrassDistance));
             }
@@ -297,6 +307,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Rendering.Nograss2"), out var result) ? result : 290;
             set
             {
+                if (value == MaxGrassDistance)
+                    return;
+
                 App.FastFlags.SetPreset("Rendering.Nograss2", value.ToString());
                 OnPropertyChanged(nameof(MaxGrassDistance));
             }
@@ -619,6 +632,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Rendering.Shaders"), out var result) ? result : 0;
             set
             {
+                if (value == ShadersLimit)
+                    return;
+
                 App.FastFlags.SetPreset("Rendering.Shaders", value == 0 ? null : value.ToString());
 
                 if (value < -64000000)
@@ -669,6 +685,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Rendering.FrameRateBufferPercentage"), out var result) ? result : 0;
             set
             {
+                if (value == FPSBufferPercentage)
+                    return;
+
                 int clamped = Math.Clamp(value, 0, 100);
                 App.FastFlags.SetPreset("Rendering.FrameRateBufferPercentage", clamped >= 1 ? clamped.ToString() : null);
             }
@@ -679,6 +698,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Rendering.Framerate"), out var result) ? result : 0;
             set
             {
+                if (value == FramerateLimit)
+                    return;
+
                 App.FastFlags.SetPreset("Rendering.Framerate", value == 0 ? null : value.ToString());
 
                 if (value > 240)
@@ -714,13 +736,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int? FontSize
         {
             get => int.TryParse(App.FastFlags.GetPreset("UI.FontSize"), out var result) ? result : 1;
-            set => App.FastFlags.SetPreset("UI.FontSize", value == 1 ? null : value);
+            set
+            {
+                if (value == FontSize)
+                    return;
+
+                App.FastFlags.SetPreset("UI.FontSize", value == 1 ? null : value);
+            }
         }
 
         public int HideGUI
         {
             get => int.TryParse(App.FastFlags.GetPreset("UI.Hide"), out var result) ? result : 0;
-            set => App.FastFlags.SetPreset("UI.Hide", value > 0 ? value.ToString() : null);
+            set
+            {
+                if (value == HideGUI)
+                    return;
+
+                App.FastFlags.SetPreset("UI.Hide", value > 0 ? value.ToString() : null);
+            }
         }
 
         #endregion
@@ -827,6 +861,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => int.TryParse(App.FastFlags.GetPreset("Network.Mtusize"), out var result) ? result : 0;
             set
             {
+                if (value == MtuSize)
+                    return;
+
                 int clamped = Math.Clamp(value, 0, 1500);
                 App.FastFlags.SetPreset("Network.Mtusize", clamped >= 576 ? clamped.ToString() : null);
             }
@@ -835,7 +872,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int BufferArrayLength
         {
             get => int.TryParse(App.FastFlags.GetPreset("Recommended.Buffer"), out var result) ? result : 0;
-            set => App.FastFlags.SetPreset("Recommended.Buffer", value == 0 ? null : value.ToString());
+            set
+            {
+                if (value == BufferArrayLength)
+                    return;
+
+                App.FastFlags.SetPreset("Recommended.Buffer", value == 0 ? null : value.ToString());
+            }
         }
 
         #endregion
