@@ -40,6 +40,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
@@ -69,7 +70,10 @@
                     <TextBlock Grid.Row="1" x:Name="MessageText" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12.5" LineHeight="17"
                                TextWrapping="Wrap" Margin="0,8,0,0" MaxHeight="170" TextTrimming="CharacterEllipsis" />
 
-                    <Border Grid.Row="2" Margin="0,10,0,0" CornerRadius="2" Height="3" Background="{DynamicResource ControlFillColorDefaultBrush}" ClipToBounds="True">
+                    <ui:Button Grid.Row="2" x:Name="ActionButton" Margin="0,10,0,0" Padding="12,5" HorizontalAlignment="Left" Appearance="Secondary" Icon="Edit16"
+                               Visibility="Collapsed" Click="ActionButton_Click" />
+
+                    <Border Grid.Row="3" Margin="0,10,0,0" CornerRadius="2" Height="3" Background="{DynamicResource ControlFillColorDefaultBrush}" ClipToBounds="True">
                         <Grid ClipToBounds="True">
                             <Rectangle x:Name="ProgressBar" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="3" RadiusX="1.5" RadiusY="1.5" RenderTransformOrigin="0,0.5"
                                        Fill="{DynamicResource SystemAccentColorPrimaryBrush}">

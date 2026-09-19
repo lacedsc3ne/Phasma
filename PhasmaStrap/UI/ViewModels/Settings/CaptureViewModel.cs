@@ -440,6 +440,66 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<ReplayClipItem> Replays { get; } = new();
 
+        // the page shows only the newest few; everything else is in the Captures window
+        private const int RecentCount = 3;
+        public ObservableCollection<ScreenshotItem> RecentScreenshots { get; } = new();
+        public ObservableCollection<ReplayClipItem> RecentReplays { get; } = new();
+
+        public System.Windows.Visibility RecentHintVisibility => Screenshots.Count > RecentCount ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+        public string AllScreenshotsText => $"All screenshots ({Screenshots.Count})";
+        public string AllClipsText => $"All clips ({Replays.Count})";
+
+        private static void SyncRecent<T>(ObservableCollection<T> all, ObservableCollection<T> recent)
+        {
+            var newest = all.Take(RecentCount).ToList();
+            if (newest.SequenceEqual(recent))
+                return;
+            recent.Clear();
+            foreach (T item in newest)
+                recent.Add(item);
+        }
+
+        public ICommand OpenScreenshotLibraryCommand => new RelayCommand(() => OpenLibrary(PhasmaStrap.UI.ViewModels.Dialogs.CaptureLibraryViewModel.ScreenshotsTab));
+        public ICommand OpenClipLibraryCommand => new RelayCommand(() => OpenLibrary(PhasmaStrap.UI.ViewModels.Dialogs.CaptureLibraryViewModel.ClipsTab));
+
+        private static void OpenLibrary(int tab) =>
+            PhasmaStrap.UI.Elements.Dialogs.CaptureLibraryWindow.Open(tab, System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault());
+
+        public ICommand RenameScreenshotCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) Rename(item.Path, image: true); });
+        public ICommand RenameReplayCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) Rename(item.Path, image: false); });
+
+        private void Rename(string path, bool image)
+        {
+            var owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault();
+            string current = Path.GetFileNameWithoutExtension(path);
+
+            while (true)
+            {
+                var dialog = new PhasmaStrap.UI.Elements.Dialogs.TextInputDialog("Rename", $"New name for {Path.GetFileName(path)}:", current) { Owner = owner };
+                dialog.ShowDialog();
+                if (!dialog.Confirmed)
+                    return;
+
+                string? renamed = CaptureLibrary.Rename(path, dialog.Value, out string? error);
+                if (renamed is not null)
+                {
+                    Report(image, $"Renamed to {Path.GetFileName(renamed)}.");
+                    if (image) RefreshGallery(); else RefreshReplays();
+                    return;
+                }
+
+                Frontend.ShowMessageBox(error ?? "That name can't be used.", System.Windows.MessageBoxImage.Warning);
+                current = dialog.Value;
+            }
+        }
+
+        public bool ScreenshotPickArea
+        {
+            get => App.Settings.Prop.ScreenshotPickArea;
+            set { App.Settings.Prop.ScreenshotPickArea = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(ScreenshotPickArea)); }
+        }
+
         public bool HasReplays => Replays.Count > 0;
 
         public ICommand RefreshReplaysCommand => new RelayCommand(RefreshReplays);
@@ -472,15 +532,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (item is null)
                 return;
 
-            try
-            {
-                if (File.Exists(item.Path))
-                    File.Delete(item.Path);
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine("CaptureViewModel", $"Failed to delete '{item.Path}': {ex.Message}");
-            }
+            if (!CaptureLibrary.Recycle(item.Path, out string? error))
+                ReplayStatus = $"Couldn't delete {item.FileName}: {error}";
 
             RefreshReplays();
         });
@@ -519,7 +572,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     Replays.Add(item);
             }
 
+            SyncRecent(Replays, RecentReplays);
             OnPropertyChanged(nameof(HasReplays));
+            OnPropertyChanged(nameof(AllClipsText));
             OnPropertyChanged(nameof(StorageUsageText));
         }
 
@@ -560,15 +615,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (item is null)
                 return;
 
-            try
-            {
-                if (File.Exists(item.Path))
-                    File.Delete(item.Path);
-            }
-            catch (Exception ex)
-            {
-                App.Logger.WriteLine("CaptureViewModel", $"Failed to delete '{item.Path}': {ex.Message}");
-            }
+            if (!CaptureLibrary.Recycle(item.Path, out string? error))
+                Status = $"Couldn't delete {item.FileName}: {error}";
 
             RefreshGallery();
         });
@@ -685,7 +733,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     Screenshots.Add(item);
             }
 
+            SyncRecent(Screenshots, RecentScreenshots);
             OnPropertyChanged(nameof(HasScreenshots));
+            OnPropertyChanged(nameof(AllScreenshotsText));
+            OnPropertyChanged(nameof(RecentHintVisibility));
             OnPropertyChanged(nameof(StorageUsageText));
         }
     }

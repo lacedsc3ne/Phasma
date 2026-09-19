@@ -1,0 +1,186 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.CaptureLibraryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        Title="Captures"
+        Width="1120"
+        Height="780"
+        MinWidth="640"
+        MinHeight="480"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <base:WpfUiWindow.Resources>
+        <DataTemplate x:Key="CardTemplate">
+            <Border x:Name="Card" Width="250" Margin="0,0,12,12" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}"
+                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                <Border.ContextMenu>
+                    <ContextMenu DataContext="{Binding PlacementTarget, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="Open" Command="{Binding Tag.OpenCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Open24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Edit" Command="{Binding Tag.EditCommand}" CommandParameter="{Binding DataContext}" Visibility="{Binding DataContext.EditVisibility}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Edit24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Rename" Command="{Binding Tag.RenameCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Rename24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Copy" Command="{Binding Tag.CopyCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Copy24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Copy file path" Command="{Binding Tag.CopyPathCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Link24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Show in folder" Command="{Binding Tag.RevealCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Delete (to the Recycle Bin)" Command="{Binding Tag.DeleteCommand}" CommandParameter="{Binding DataContext}">
+                            <MenuItem.Icon><ui:SymbolIcon Symbol="Delete24" /></MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <StackPanel>
+                    <Border Height="141" CornerRadius="8,8,0,0" ClipToBounds="True" Background="{DynamicResource ControlFillColorSecondaryBrush}" Cursor="Hand" ToolTip="Open">
+                        <Border.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding Tag.OpenCommand, ElementName=Card}" CommandParameter="{Binding}" />
+                        </Border.InputBindings>
+                        <Grid>
+                            <ui:SymbolIcon Symbol="{Binding Symbol}" FontSize="28" Opacity="0.35" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding PlaceholderVisibility}" />
+                            <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="6" Padding="4,2" CornerRadius="4" Background="#B0000000" Visibility="{Binding BadgeVisibility}">
+                                <ui:SymbolIcon Symbol="{Binding Symbol}" FontSize="13" Foreground="White" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <Grid Margin="10,8,6,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding FileName}" />
+                            <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Opacity="0.85" Text="{Binding GameText}" Visibility="{Binding GameVisibility}" TextTrimming="CharacterEllipsis" ToolTip="{Binding GameText}" />
+                            <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Subtitle}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:Button Padding="5" Appearance="Transparent" Icon="Edit16" ToolTip="Edit" Visibility="{Binding EditVisibility}"
+                                       Command="{Binding Tag.EditCommand, ElementName=Card}" CommandParameter="{Binding}" />
+                            <ui:Button Padding="5" Appearance="Transparent" Icon="Copy16" ToolTip="Copy, ready to paste into a chat"
+                                       Command="{Binding Tag.CopyCommand, ElementName=Card}" CommandParameter="{Binding}" />
+                            <ui:Button Padding="5" Appearance="Transparent" Icon="MoreHorizontal16" ToolTip="Rename, show in folder, delete..." Click="More_Click" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </base:WpfUiWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="Captures" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <TabControl Grid.Row="1" Margin="12,0,12,0" SelectedIndex="{Binding Tab, Mode=TwoWay}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Image24" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding ScreenshotsHeader}" />
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="VideoClip24" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding ClipsHeader}" />
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
+
+        <!-- filters -->
+        <Grid Grid.Row="2" Margin="12,10,12,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="180" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="Search names and games" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <WrapPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                <ComboBox Width="170" Margin="0,0,8,0" Padding="10,5,10,5" ToolTip="Which game it was taken in" ItemsSource="{Binding GameOptions}" SelectedItem="{Binding Game, Mode=TwoWay}" />
+                <ComboBox Width="140" Margin="0,0,8,0" Padding="10,5,10,5" SelectedIndex="{Binding DateIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="Any time" />
+                    <ComboBoxItem Content="Today" />
+                    <ComboBoxItem Content="Last 7 days" />
+                    <ComboBoxItem Content="Last 30 days" />
+                </ComboBox>
+                <ComboBox Width="120" Margin="0,0,8,0" Padding="10,5,10,5" Visibility="{Binding TypeVisibility}" SelectedIndex="{Binding TypeIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="All clips" />
+                    <ComboBoxItem Content="Videos" />
+                    <ComboBoxItem Content="GIFs" />
+                </ComboBox>
+                <ComboBox Width="140" Margin="0,0,8,0" Padding="10,5,10,5" SelectedIndex="{Binding SortIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="Newest first" />
+                    <ComboBoxItem Content="Oldest first" />
+                    <ComboBoxItem Content="Name" />
+                    <ComboBoxItem Content="Largest first" />
+                </ComboBox>
+                <ui:Button Padding="8,6" Appearance="Secondary" Icon="Dismiss16" ToolTip="Clear filters" Command="{Binding ClearFiltersCommand, Mode=OneTime}" />
+            </WrapPanel>
+        </Grid>
+
+        <!-- the cards, virtualised by row -->
+        <Grid Grid.Row="3" Margin="12,0,0,0">
+            <ItemsControl x:Name="CardRows" ItemsSource="{Binding Rows}" SizeChanged="CardRows_SizeChanged"
+                          VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource CardTemplate}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding EmptyVisibility}" IsHitTestVisible="False">
+                <ui:SymbolIcon Symbol="ImageMultiple24" FontSize="40" Opacity="0.25" HorizontalAlignment="Center" />
+                <TextBlock Margin="0,10,0,0" FontSize="14" Opacity="0.6" HorizontalAlignment="Center" Text="{Binding EmptyText}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="4" Margin="12,8,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Status}" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding Summary}" />
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>

@@ -293,6 +293,9 @@ namespace PhasmaStrap.Models.Persistable
         // endpoint ID of the recording device (ReplayAudio.ListMicrophones); "" = Windows' default
         public string InstantReplayMicrophoneDevice { get; set; } = "";
 
+        // the screenshot hotkey freezes the game and lets you drag over the part to save
+        public bool ScreenshotPickArea { get; set; } = false;
+
         // put a fresh capture on the clipboard so it can be pasted straight into a chat
         // (screenshots behave like Print Screen; clips are opt-in because they replace whatever
         // was copied a few seconds after the hotkey, which is easy to be surprised by)

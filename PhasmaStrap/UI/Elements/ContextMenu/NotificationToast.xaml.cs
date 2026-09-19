@@ -39,14 +39,14 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Closed += Window_Closed;
         }
 
-        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5, Action? onClick = null)
+        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null)
         {
             if (_closed)
                 return;
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds, onClick)));
+                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds, onClick, actionText, action)));
                 return;
             }
 
@@ -59,7 +59,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 Message = message,
                 Category = category,
                 Duration = durationSeconds,
-                OnClick = onClick
+                OnClick = onClick,
+                ActionText = actionText,
+                Action = action,
             });
 
             if (!_isProcessing)
@@ -89,6 +91,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     ApplyCategoryStyle(item.Category);
 
                     _currentClick = item.OnClick;
+                    _currentAction = item.Action;
+                    ActionButton.Content = item.ActionText ?? "";
+                    ActionButton.Visibility = item.Action is not null && !string.IsNullOrEmpty(item.ActionText) ? Visibility.Visible : Visibility.Collapsed;
                     NotificationBorder.Cursor = item.OnClick is null ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand;
                     if (item.OnClick is not null)
                         SourceText.Text += "  \u00b7  Click to open";
@@ -223,6 +228,27 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             _currentItemCts?.Cancel();
         }
 
+        private Action? _currentAction;
+
+        private void ActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            Action? action = _currentAction;
+            if (action is null)
+                return;
+
+            // dismiss first, so the toast isn't left over whatever the action opens
+            _currentItemCts?.Cancel();
+
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("NotificationToast::Action", $"Action failed: {ex.Message}");
+            }
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             // cancel just the current item's hold delay, not the whole toast lifetime - lets the
@@ -284,6 +310,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             public NotificationCategory Category { get; set; }
             public double Duration { get; set; } = 5;
             public Action? OnClick { get; set; }
+            public string? ActionText { get; set; }
+            public Action? Action { get; set; }
         }
     }
 }
