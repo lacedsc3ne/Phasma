@@ -135,6 +135,8 @@ namespace PhasmaStrap.Utility
 
         public static void Apply(string level)
         {
+            App.SendStat("lowEndMode", level);
+
             if (Active.Length > 0)
                 Undo();
 

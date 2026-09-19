@@ -99,6 +99,8 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public string ToShareCode()
         {
+            App.SendStat("shareCode", "crosshairCreated");
+
             CrosshairStyle style = Clamped();
 
             var bytes = new List<byte>
@@ -151,7 +153,10 @@ namespace PhasmaStrap.Integrations.Overlays
                     : DecodeJson(code[CodePrefix.Length..]);
 
                 if (style is not null)
+                {
+                    App.SendStat("shareCode", "crosshairImported");
                     return style;
+                }
             }
 
             return null;

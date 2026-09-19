@@ -2,6 +2,10 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.9
+- **Get help on Discord**: the support links now point to the PhasmaStrap Discord server instead of GitHub issues.
+- PhasmaStrap counts how often features are used (a clip saved, a preset shared or imported, low-end mode turned on) so the project knows what people actually use. Counts only, never what was in them, and all of it stops when you turn off "Enable sending of analytics".
+
 ## 2.17.8
 - **Statistics and crash reports now go to PhasmaStrap's own server** instead of the upstream Bloxstrap project's. They are still anonymous, still off when you turn off "Enable sending of analytics", and the privacy page at phasmastrap.com/privacy says exactly what is sent.
 

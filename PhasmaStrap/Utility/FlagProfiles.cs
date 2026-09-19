@@ -187,6 +187,8 @@ namespace PhasmaStrap.Utility
 
         public static string ToShareCode(FlagProfile profile)
         {
+            App.SendStat("shareCode", "flagProfileCreated");
+
             // a value spanning lines can't go in the line format - use the old one for that profile
             if (profile.Flags.Values.Any(v => v.IndexOfAny(new[] { '\r', '\n' }) >= 0))
             {
@@ -294,7 +296,10 @@ namespace PhasmaStrap.Utility
                     : DecodeJson(code[CodePrefix.Length..]);
 
                 if (profile is not null)
+                {
+                    App.SendStat("shareCode", "flagProfileImported");
                     return Tidy(profile);
+                }
             }
 
             return null;

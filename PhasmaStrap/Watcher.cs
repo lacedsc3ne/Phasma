@@ -307,6 +307,8 @@ namespace PhasmaStrap
 
         public void TakeScreenshot()
         {
+            App.SendStat("capture", "screenshot");
+
             if (!App.Settings.Prop.ScreenshotPickArea)
             {
                 ScreenshotTaken(ScreenshotCapture.Capture());
@@ -398,6 +400,8 @@ namespace PhasmaStrap
 
         public void SaveInstantReplay()
         {
+            App.SendStat("capture", "instantReplay");
+
             const string LOG_IDENT = "Watcher::SaveInstantReplay";
 
             if (!App.Settings.Prop.InstantReplayEnabled)

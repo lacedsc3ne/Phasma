@@ -27,7 +27,8 @@ namespace PhasmaStrap
         public const string ServerBase = "https://api.phasmastrap.com";
         public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/Phasma";
         public const string ProjectHelpLink = "https://github.com/lacedsc3ne/Phasma/wiki";
-        public const string ProjectSupportLink = "https://github.com/lacedsc3ne/Phasma/issues/new";
+        public const string ProjectDiscordLink = "https://discord.gg/x4M4cZS4p7";
+        public const string ProjectSupportLink = ProjectDiscordLink;
 
         public const string RobloxPlayerAppName = "RobloxPlayerBeta";
         public const string RobloxStudioAppName = "RobloxStudioBeta";
