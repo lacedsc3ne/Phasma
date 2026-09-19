@@ -1,0 +1,272 @@
+﻿<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.CrosshairEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        xmlns:vm="clr-namespace:PhasmaStrap.UI.ViewModels.Dialogs"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:CrosshairEditorViewModel, IsDesignTimeCreatable=False}"
+        Title="Crosshair editor"
+        Width="1120"
+        Height="780"
+        MinWidth="960"
+        MinHeight="640"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <base:WpfUiWindow.Resources>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Width" Value="110" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+        <Style x:Key="Value" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Width" Value="36" />
+            <Setter Property="TextAlignment" Value="Right" />
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,16,0,6" />
+        </Style>
+
+        <DataTemplate x:Key="ChoiceTemplate">
+            <!-- a real button, so the keyboard and screen readers can pick a design too -->
+            <Button Margin="0,0,6,6" Cursor="Hand" ToolTip="{Binding Name}" AutomationProperties.Name="{Binding Name}"
+                    Command="{Binding DataContext.UseChoiceCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Tile" Width="84" CornerRadius="6" Padding="4" BorderThickness="1"
+                                Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Tile" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+                <Grid>
+                    <StackPanel>
+                        <Border Height="52" CornerRadius="4" Background="#FF24262C">
+                            <Image Source="{Binding Thumbnail}" Width="64" Height="64" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                        </Border>
+                        <TextBlock Margin="0,4,0,0" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Name}" />
+                    </StackPanel>
+                    <ui:Button HorizontalAlignment="Right" VerticalAlignment="Top" Padding="2" Margin="0,-2,-2,0" Appearance="Transparent" Icon="Dismiss12" ToolTip="Delete this design"
+                               Visibility="{Binding DeleteVisibility}"
+                               Command="{Binding DataContext.DeleteDesignCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                </Grid>
+            </Button>
+        </DataTemplate>
+    </base:WpfUiWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="Crosshair editor" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <Grid Grid.Row="1" Margin="12,4,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="420" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ============================================================ preview -->
+            <Grid Grid.Column="0" Margin="0,0,12,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" CornerRadius="8" ClipToBounds="True" Background="{Binding Backdrop.Brush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Grid>
+                        <Image Source="{Binding Preview}" Width="{Binding PreviewPixels}" Height="{Binding PreviewPixels}" Stretch="Fill"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,80,0,0" Foreground="#AAFFFFFF" Visibility="{Binding EmptyVisibility}"
+                                   Text="Nothing to see - switch on the arms, the dot or the ring." />
+                    </Grid>
+                </Border>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Background" />
+                    <ComboBox Width="190" ItemsSource="{Binding Backdrops}" SelectedItem="{Binding Backdrop, Mode=TwoWay}" />
+                    <TextBlock VerticalAlignment="Center" Margin="16,0,8,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Zoom" />
+                    <ComboBox Width="80" ItemsSource="{Binding ZoomOptions}" SelectedItem="{Binding Zoom, Mode=TwoWay}" ItemStringFormat="{}{0}x" />
+                    <TextBlock VerticalAlignment="Center" Margin="12,0,0,0" FontSize="11" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="1x is the size it has in the game" />
+                </StackPanel>
+            </Grid>
+
+            <!-- ============================================================ controls -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Start from" />
+                    <ItemsControl ItemsSource="{Binding BuiltIn}" ItemTemplate="{StaticResource ChoiceTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <TextBlock Style="{StaticResource Section}" Text="My designs" />
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Visibility="{Binding MineEmptyVisibility}" Text="None saved yet - name a design below and save it." />
+                    <ItemsControl ItemsSource="{Binding Mine}" ItemTemplate="{StaticResource ChoiceTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <!-- arms -->
+                    <CheckBox Margin="0,16,0,4" IsChecked="{Binding Arms, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Arms" /></CheckBox>
+                    <StackPanel IsEnabled="{Binding Arms}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Length" />
+                            <Slider Width="230" Minimum="1" Maximum="60" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding ArmLength, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding ArmLength}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Thickness" />
+                            <Slider Width="230" Minimum="1" Maximum="16" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding ArmThickness, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding ArmThickness}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Gap" />
+                            <Slider Width="230" Minimum="-10" Maximum="40" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Gap, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding Gap}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Rotation" />
+                            <Slider Width="230" Minimum="0" Maximum="89" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Rotation, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding Rotation, StringFormat={}{0}°}" />
+                        </StackPanel>
+                        <CheckBox Margin="110,2,0,0" Content="T-shape (no top arm)" IsChecked="{Binding TStyle, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- dot -->
+                    <CheckBox Margin="0,16,0,4" IsChecked="{Binding Dot, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Centre dot" /></CheckBox>
+                    <StackPanel IsEnabled="{Binding Dot}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Size" />
+                            <Slider Width="230" Minimum="1" Maximum="16" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding DotSize, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding DotSize}" />
+                        </StackPanel>
+                        <CheckBox Margin="110,2,0,0" Content="Round" IsChecked="{Binding DotRound, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- ring -->
+                    <CheckBox Margin="0,16,0,4" IsChecked="{Binding Ring, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Ring" /></CheckBox>
+                    <StackPanel IsEnabled="{Binding Ring}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Radius" />
+                            <Slider Width="230" Minimum="2" Maximum="60" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding RingRadius, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding RingRadius}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Thickness" />
+                            <Slider Width="230" Minimum="1" Maximum="12" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding RingThickness, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding RingThickness}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- colour -->
+                    <TextBlock Style="{StaticResource Section}" Text="Colour" />
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <Border Width="26" Height="26" CornerRadius="4" Margin="0,0,8,0" Background="{Binding ColorBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" />
+                        <ui:TextBox Width="110" Text="{Binding ColorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClearButtonEnabled="False" />
+                        <ItemsControl Margin="8,0,0,0" ItemsSource="{Binding Swatches}" VerticalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="20" Height="20" Margin="0,0,4,0" CornerRadius="10" Cursor="Hand" Background="{Binding}" BorderBrush="#66FFFFFF" BorderThickness="1" ToolTip="{Binding}">
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.PickColorCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                        </Border.InputBindings>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+                        <TextBlock Style="{StaticResource Label}" Text="Opacity" />
+                        <Slider Width="230" Minimum="0.05" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding Opacity, Mode=TwoWay}" />
+                        <TextBlock Style="{StaticResource Value}" Text="{Binding Opacity, StringFormat={}{0:P0}}" Width="44" />
+                    </StackPanel>
+
+                    <!-- outline -->
+                    <CheckBox Margin="0,16,0,4" IsChecked="{Binding Outline, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Outline" /></CheckBox>
+                    <StackPanel IsEnabled="{Binding Outline}">
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Style="{StaticResource Label}" Text="Thickness" />
+                            <Slider Width="230" Minimum="1" Maximum="4" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding OutlineThickness, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource Value}" Text="{Binding OutlineThickness}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
+                            <Border Width="26" Height="26" CornerRadius="4" Margin="0,0,8,0" Background="{Binding OutlineColorBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" />
+                            <ui:TextBox Width="110" Text="{Binding OutlineColorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClearButtonEnabled="False" />
+                            <ItemsControl Margin="8,0,0,0" ItemsSource="{Binding Swatches}" VerticalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="20" Height="20" Margin="0,0,4,0" CornerRadius="10" Cursor="Hand" Background="{Binding}" BorderBrush="#66FFFFFF" BorderThickness="1" ToolTip="{Binding}">
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.PickOutlineColorCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </Border.InputBindings>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- save + share -->
+                    <TextBlock Style="{StaticResource Section}" Text="Save and share" />
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBox Width="240" PlaceholderText="Name of this design" Text="{Binding DesignName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:Button Margin="8,0,0,0" Content="Save to my designs" Icon="Save24" Command="{Binding SaveDesignCommand}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <ui:Button Content="Copy code" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyCodeCommand}" ToolTip="A short text anyone with PhasmaStrap can paste into their editor" />
+                        <ui:TextBox Width="200" Margin="8,0,0,0" PlaceholderText="Paste a PHX1- code" Text="{Binding ImportCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:Button Margin="8,0,0,0" Content="Load" Icon="ArrowDownload24" Appearance="Secondary" Command="{Binding ImportCodeCommand}" />
+                    </StackPanel>
+                    <TextBlock Margin="0,6,0,12" FontSize="11" FontFamily="Consolas" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding ShareCode}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="12,10,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Status}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Content="Apply" Icon="Checkmark24" Appearance="Primary" Command="{Binding ApplyCommand}" />
+                <ui:Button Margin="8,0,0,0" Content="Close" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>

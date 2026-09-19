@@ -171,6 +171,11 @@ namespace PhasmaStrap.Models.Persistable
         public string CrosshairColorHex { get; set; } = "#00FF00";
         public string CrosshairOutlineColorHex { get; set; } = "#000000";
 
+        // the crosshair editor's designs (Integrations.Overlays.CrosshairStyle). When the active one
+        // is null the older single-shape settings above are converted on the fly (CrosshairStyles).
+        public Integrations.Overlays.CrosshairStyle? CrosshairActive { get; set; } = null;
+        public List<Integrations.Overlays.CrosshairStyle> CrosshairLibrary { get; set; } = new();
+
         // extra HUD rows on top of FPS - each is an opt-in addition, off by default so the HUD
         // looks exactly as it always has unless the user turns these on individually
         public bool OverlayHudShowFrameTime { get; set; } = false;
