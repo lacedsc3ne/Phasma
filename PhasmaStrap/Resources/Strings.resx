@@ -5800,4 +5800,22 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Accounts.RecentWarnings" xml:space="preserve">
     <value>Recent warnings</value>
   </data>
+  <data name="Menu.Rendering.LowEndMode" xml:space="preserve">
+    <value>Low-end mode</value>
+  </data>
+  <data name="Menu.Rendering.OneClickMakeRobloxRunWeak" xml:space="preserve">
+    <value>One click to make Roblox run on a weak PC: lower graphics, a tuned Roblox process, and PhasmaStrap's own heavy extras off. Turn off puts back exactly what you had before.</value>
+  </data>
+  <data name="Menu.Rendering.Strong" xml:space="preserve">
+    <value>Strong</value>
+  </data>
+  <data name="Menu.Rendering.TurnOff" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="Menu.Rendering.ShowLight" xml:space="preserve">
+    <value>Show Light</value>
+  </data>
+  <data name="Menu.Rendering.ShowStrong" xml:space="preserve">
+    <value>Show Strong</value>
+  </data>
 </root>
