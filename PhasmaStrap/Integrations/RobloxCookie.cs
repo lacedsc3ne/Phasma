@@ -123,6 +123,9 @@ namespace PhasmaStrap.Integrations
                 if (string.IsNullOrEmpty(newCookie) || string.IsNullOrEmpty(templateDatPath) || !File.Exists(templateDatPath))
                     return false;
 
+                // the account guard ignores PhasmaStrap's own opens of the sign-in file
+                Utility.AccountGuard.MarkOwnAccess();
+
                 using JsonDocument doc = JsonDocument.Parse(File.ReadAllText(templateDatPath));
                 if (!doc.RootElement.TryGetProperty("CookiesData", out var value))
                     return false;
@@ -177,6 +180,9 @@ namespace PhasmaStrap.Integrations
             {
                 if (!File.Exists(datPath))
                     return null;
+
+                // the account guard ignores PhasmaStrap's own opens of the sign-in file
+                Utility.AccountGuard.MarkOwnAccess();
 
                 using JsonDocument doc = JsonDocument.Parse(File.ReadAllText(datPath));
                 if (!doc.RootElement.TryGetProperty("CookiesData", out var value))

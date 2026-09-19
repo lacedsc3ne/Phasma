@@ -98,6 +98,12 @@ namespace PhasmaStrap.Models.Persistable
         public bool RobloxKeepPreviousVersion { get; set; } = false;
         // after an update, check which of your flags the new version no longer has
         public bool RobloxCheckFlagsAfterUpdate { get; set; } = false;
+
+        // Account guard (Accounts page, Utility/AccountGuard): warn about hosts/certificate/proxy
+        // tampering; with AccountGuardBackground also watch Roblox's sign-in file from a small
+        // background process started at Windows sign-in
+        public bool AccountGuardEnabled { get; set; } = false;
+        public bool AccountGuardBackground { get; set; } = false;
         public bool ShowServerDetails { get; set; } = false;
         public ObservableCollection<CustomIntegration> CustomIntegrations { get; set; } = new();
 

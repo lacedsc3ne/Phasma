@@ -57,6 +57,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.FastFlags.Save();
             App.FlagProfiles.Save();
 
+            // the account guard's start-up entry and background process follow its settings
+            PhasmaStrap.Utility.AccountGuard.ApplyStartup();
+            PhasmaStrap.Utility.AccountGuard.StartBackgroundIfWanted();
+
             foreach (var pair in App.PendingSettingTasks)
             {
                 var task = pair.Value;

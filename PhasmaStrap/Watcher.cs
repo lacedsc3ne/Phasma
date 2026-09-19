@@ -158,6 +158,9 @@ namespace PhasmaStrap
                 {
                     try { Utility.RobloxVersions.ShowPendingFlagNotice(); }
                     catch (Exception ex) { App.Logger.WriteLine("Watcher", $"Flag notice failed: {ex.Message}"); }
+
+                    // account guard: hosts / certificates / proxy, once per Roblox session
+                    Utility.AccountGuard.ScanAndNotify();
                 });
 
                 // a game joined from inside the Roblox app never went through a launch that could

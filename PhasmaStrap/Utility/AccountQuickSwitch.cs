@@ -100,6 +100,8 @@ namespace PhasmaStrap.Utility
 
         private static async Task CopyWithRetryAsync(string source, string destination)
         {
+            AccountGuard.MarkOwnAccess();
+
             for (int attempt = 0; ; attempt++)
             {
                 try
@@ -124,6 +126,7 @@ namespace PhasmaStrap.Utility
         private static async Task ReplaceAsync(string source, string liveCookiePath)
         {
             string temp = liveCookiePath + ".tmp";
+            AccountGuard.MarkOwnAccess();
 
             try
             {

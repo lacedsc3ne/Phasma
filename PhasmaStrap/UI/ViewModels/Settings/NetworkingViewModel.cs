@@ -44,6 +44,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 string cookiePath = RobloxCookie.LiveCookiesDatPath;
                 if (File.Exists(cookiePath))
                 {
+                    PhasmaStrap.Utility.AccountGuard.MarkOwnAccess();
                     File.Delete(cookiePath);
                     signedOut = true;
                 }

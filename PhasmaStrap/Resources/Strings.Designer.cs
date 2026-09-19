@@ -16478,5 +16478,95 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.RobloxVersions.CompareOtherVersionPC", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account guard.
+        /// </summary>
+        public static string Menu_Accounts_AccountGuard {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.AccountGuard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warns you about what login stealers do: reading Roblox's sign-in file, sending roblox.com somewhere else, or planting a .
+        /// </summary>
+        public static string Menu_Accounts_WarnsYouAboutWhatLoginStealers {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.WarnsYouAboutWhatLoginStealers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Turn on the account guard.
+        /// </summary>
+        public static string Menu_Accounts_TurnAccountGuard {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.TurnAccountGuard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checks your hosts file, trusted certificates, Roblox's certificate list and the Windows proxy each time you play, and te.
+        /// </summary>
+        public static string Menu_Accounts_ChecksHostsFileTrustedCertificatesRoblox {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.ChecksHostsFileTrustedCertificatesRoblox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Watch the sign-in file in the background.
+        /// </summary>
+        public static string Menu_Accounts_WatchSignFileBackground {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.WatchSignFileBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runs a small PhasmaStrap process from when you sign in to Windows. It notices another program opening Roblox's sign-in f.
+        /// </summary>
+        public static string Menu_Accounts_RunsSmallPhasmaStrapProcessFromWhen {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.RunsSmallPhasmaStrapProcessFromWhen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check now.
+        /// </summary>
+        public static string Menu_Accounts_CheckNow {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.CheckNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is fine.
+        /// </summary>
+        public static string Menu_Accounts_Fine {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.Fine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You know about this - don't mention it again.
+        /// </summary>
+        public static string Menu_Accounts_YouKnowAboutDonTMention {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.YouKnowAboutDonTMention", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recent warnings.
+        /// </summary>
+        public static string Menu_Accounts_RecentWarnings {
+            get {
+                return ResourceManager.GetString("Menu.Accounts.RecentWarnings", resourceCulture);
+            }
+        }
     }
 }
