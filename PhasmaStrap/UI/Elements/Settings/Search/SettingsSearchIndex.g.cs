@@ -129,9 +129,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Tab, Strings.Menu_Behaviour_RobloxVersion, "", typeof(BehaviourPage), Strings.Menu_Behaviour_Title, "", "", "", null, ""),
             // ---- CapturePage.xaml (CapturePage) ----
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_TakeScreenshotNow, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
-            new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_CopyNewScreenshotsClipboard, Strings.Menu_Capture_ScreenshotTakenHotkeyAlsoCopiedSo, typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_PickAreaWhenIPressScreenshot, Strings.Menu_Capture_GameFreezesScreenYouDragOver, typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenHotkeys, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_NoScreenshotsYet, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_InstantReplay, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
@@ -145,7 +145,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_RecordMyMicrophoneToo, Strings.Menu_Capture_MixesMicrophoneIntoClipExactlyAs, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_Microphone, Strings.Menu_Capture_WhichMicrophoneRecordWindowsDefaultOne, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_CopyNewClipsClipboard, Strings.Menu_Capture_WhenReplayFinishesSavingClipCopied, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
-            new(SettingsSearchEntryKind.Action, Strings.Dialog_ChannelLists_Refresh, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Capture_OpenFolder, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_InstantReplay, "", null, ""),
             new(SettingsSearchEntryKind.Section, Strings.Menu_Capture_Storage, "", typeof(CapturePage), Strings.Menu_Capture_Capture, "", "", "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Capture_SizeLimit, Strings.Menu_Capture_HowMuchRoomScreenshotsClipsGIFs, typeof(CapturePage), Strings.Menu_Capture_Capture, "", Strings.Menu_Capture_Storage, "", null, ""),

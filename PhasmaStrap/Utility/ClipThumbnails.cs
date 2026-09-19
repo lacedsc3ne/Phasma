@@ -65,7 +65,8 @@ namespace PhasmaStrap.Utility
             if (!File.Exists(path))
                 return null;
 
-            if (path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+            // pictures (screenshots, GIFs' first frame) decode straight to thumbnail size
+            if (!path.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase))
             {
                 var gif = new BitmapImage();
                 gif.BeginInit();

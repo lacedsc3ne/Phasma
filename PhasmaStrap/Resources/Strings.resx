@@ -5923,4 +5923,19 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Capture.WhichMicrophoneRecordWindowsDefaultOne" xml:space="preserve">
     <value>Which microphone to record. Windows default is the one set as Default Device in Windows' sound settings. A few microphones don't let apps skip their own processing - for those, turn off Audio enhancements for the microphone in Windows' sound settings. Noise cancelling built into the microphone itself can only be turned off in its own app.</value>
   </data>
+  <data name="Menu.Capture.EveryScreenshotSearchFiltersRename" xml:space="preserve">
+    <value>Every screenshot, with search, filters and rename</value>
+  </data>
+  <data name="Menu.Capture.PickAreaWhenIPressScreenshot" xml:space="preserve">
+    <value>Pick an area when I press the screenshot hotkey</value>
+  </data>
+  <data name="Menu.Capture.GameFreezesScreenYouDragOver" xml:space="preserve">
+    <value>The game freezes on screen and you drag over the part you want. Enter or a double-click takes the whole window, Esc cancels.</value>
+  </data>
+  <data name="Menu.Capture.LatestScreenshotsOpenAllScreenshotsSearch" xml:space="preserve">
+    <value>Your latest screenshots. Open All screenshots to search, filter and rename them.</value>
+  </data>
+  <data name="Menu.Capture.EveryClipSearchFiltersRename" xml:space="preserve">
+    <value>Every clip, with search, filters and rename</value>
+  </data>
 </root>

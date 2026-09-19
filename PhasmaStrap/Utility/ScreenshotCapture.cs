@@ -30,6 +30,37 @@ namespace PhasmaStrap.Utility
 
         public static string? Capture()
         {
+            using Bitmap? bitmap = Grab(out _);
+            return bitmap is null ? null : Save(bitmap);
+        }
+
+        // saves a picture into the screenshots folder
+        public static string? Save(Bitmap bitmap)
+        {
+            try
+            {
+                Directory.CreateDirectory(ScreenshotsDir);
+
+                string path = Path.Combine(ScreenshotsDir, $"Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+                for (int n = 2; File.Exists(path); n++)
+                    path = Path.Combine(ScreenshotsDir, $"Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}_{n}.png");
+
+                bitmap.Save(path, ImageFormat.Png);
+
+                App.Logger.WriteLine(LOG_IDENT, $"Saved to {path}");
+                return path;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Save failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        // the Roblox window's picture as it is now, and where the window is on screen (pixels)
+        public static Bitmap? Grab(out Rectangle screenRect)
+        {
+            screenRect = Rectangle.Empty;
             HWND hwnd = FindRobloxWindow();
             if (hwnd.IsNull)
             {
@@ -52,9 +83,12 @@ namespace PhasmaStrap.Utility
             if (width <= 0 || height <= 0)
                 return null;
 
+            screenRect = new Rectangle(rect.left, rect.top, width, height);
+
+            Bitmap? bitmap = null;
             try
             {
-                using var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+                bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
                 bool ok;
 
                 using (Graphics graphics = Graphics.FromImage(bitmap))
@@ -78,20 +112,16 @@ namespace PhasmaStrap.Utility
                 if (!ok)
                 {
                     App.Logger.WriteLine(LOG_IDENT, "PrintWindow failed");
+                    bitmap.Dispose();
                     return null;
                 }
 
-                Directory.CreateDirectory(ScreenshotsDir);
-
-                string path = Path.Combine(ScreenshotsDir, $"Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
-                bitmap.Save(path, ImageFormat.Png);
-
-                App.Logger.WriteLine(LOG_IDENT, $"Saved to {path}");
-                return path;
+                return bitmap;
             }
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Capture failed: {ex.Message}");
+                bitmap?.Dispose();
                 return null;
             }
         }

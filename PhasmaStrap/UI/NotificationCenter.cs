@@ -85,7 +85,8 @@ namespace PhasmaStrap.UI
         /// switch and (for <see cref="NotificationCategory.GameJoin"/>/<see cref="NotificationCategory.GameLeave"/>)
         /// the relevant per-event-type setting are both enabled.
         /// </summary>
-        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5, Action? onClick = null)
+        // actionText/action: an optional button on the toast (e.g. "Edit" on a saved screenshot)
+        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null)
         {
             if (!App.Settings.Prop.NotificationsEnabled)
                 return;
@@ -111,7 +112,7 @@ namespace PhasmaStrap.UI
             // Do Not Disturb suppresses only the on-screen popup - history above is recorded
             // either way, so nothing's lost, it just doesn't interrupt the session
             if (!App.Settings.Prop.DoNotDisturbEnabled)
-                ShowToast(title, message, category, durationSeconds, onClick);
+                ShowToast(title, message, category, durationSeconds, onClick, actionText, action);
         }
 
         /// <summary>A click action that reveals a saved file in Explorer (for screenshot/replay toasts).</summary>
@@ -138,7 +139,7 @@ namespace PhasmaStrap.UI
             HistoryChanged?.Invoke(null, EventArgs.Empty);
         }
 
-        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds, Action? onClick)
+        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds, Action? onClick, string? actionText, Action? action)
         {
             var app = System.Windows.Application.Current;
 
@@ -152,7 +153,7 @@ namespace PhasmaStrap.UI
                     if (s_toast is null || !s_toast.IsUsable)
                         s_toast = new NotificationToast();
 
-                    s_toast.ShowNotification(title, message, category, durationSeconds, onClick);
+                    s_toast.ShowNotification(title, message, category, durationSeconds, onClick, actionText, action);
                 }
                 catch (Exception ex)
                 {

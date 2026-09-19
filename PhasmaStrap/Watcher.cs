@@ -304,10 +304,50 @@ namespace PhasmaStrap
                 HeadsetAudio.Stop();
         }
 
+        private bool _pickingArea;
+
         public void TakeScreenshot()
         {
-            string? path = ScreenshotCapture.Capture();
+            if (!App.Settings.Prop.ScreenshotPickArea)
+            {
+                ScreenshotTaken(ScreenshotCapture.Capture());
+                return;
+            }
 
+            // "pick an area": freeze the game's picture and let the user drag over what they want
+            if (_pickingArea)
+                return;
+
+            System.Drawing.Bitmap? shot = ScreenshotCapture.Grab(out System.Drawing.Rectangle where);
+            if (shot is null)
+            {
+                ScreenshotTaken(null);
+                return;
+            }
+
+            _pickingArea = true;
+            try
+            {
+                UI.Elements.Dialogs.ScreenshotAreaWindow.Pick(shot, where, picked =>
+                {
+                    _pickingArea = false;
+                    if (picked is null)
+                        return; // cancelled - nothing to say
+
+                    using (picked)
+                        ScreenshotTaken(ScreenshotCapture.Save(picked));
+                });
+            }
+            catch (Exception ex)
+            {
+                _pickingArea = false;
+                App.Logger.WriteException("Watcher::TakeScreenshot", ex);
+                shot.Dispose();
+            }
+        }
+
+        private void ScreenshotTaken(string? path)
+        {
             bool copied = path is not null && App.Settings.Prop.CaptureCopyScreenshotToClipboard && CopyCapture(path, image: true);
 
             if (path is not null)
@@ -317,7 +357,9 @@ namespace PhasmaStrap
                 path is null ? "Screenshot failed" : copied ? "Screenshot saved and copied" : "Screenshot saved",
                 path is not null ? Path.GetFileName(path) : "Could not find the Roblox window.",
                 NotificationCategory.General,
-                onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
+                onClick: path is not null ? NotificationCenter.RevealFile(path) : null,
+                actionText: path is not null ? "Edit" : null,
+                action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null);
         }
 
         // runs after a capture has been saved - the only moment old captures are ever cleaned up
@@ -425,7 +467,9 @@ namespace PhasmaStrap
                         path is null ? "Replay failed" : copied ? "Replay saved and copied" : "Replay saved",
                         path is not null ? Path.GetFileName(path) : (error ?? "Nothing was buffered yet - check the log for details."),
                         NotificationCategory.General, 6,
-                        onClick: path is not null ? NotificationCenter.RevealFile(path) : null);
+                        onClick: path is not null ? NotificationCenter.RevealFile(path) : null,
+                        actionText: path is not null ? "Edit" : null,
+                        action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null);
                 });
             });
         }

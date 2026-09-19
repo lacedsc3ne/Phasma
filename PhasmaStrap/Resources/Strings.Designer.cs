@@ -16937,5 +16937,50 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Capture.WhichMicrophoneRecordWindowsDefaultOne", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Every screenshot, with search, filters and rename.
+        /// </summary>
+        public static string Menu_Capture_EveryScreenshotSearchFiltersRename {
+            get {
+                return ResourceManager.GetString("Menu.Capture.EveryScreenshotSearchFiltersRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick an area when I press the screenshot hotkey.
+        /// </summary>
+        public static string Menu_Capture_PickAreaWhenIPressScreenshot {
+            get {
+                return ResourceManager.GetString("Menu.Capture.PickAreaWhenIPressScreenshot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The game freezes on screen and you drag over the part you want. Enter or a double-click takes the whole window, Esc canc.
+        /// </summary>
+        public static string Menu_Capture_GameFreezesScreenYouDragOver {
+            get {
+                return ResourceManager.GetString("Menu.Capture.GameFreezesScreenYouDragOver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your latest screenshots. Open All screenshots to search, filter and rename them..
+        /// </summary>
+        public static string Menu_Capture_LatestScreenshotsOpenAllScreenshotsSearch {
+            get {
+                return ResourceManager.GetString("Menu.Capture.LatestScreenshotsOpenAllScreenshotsSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Every clip, with search, filters and rename.
+        /// </summary>
+        public static string Menu_Capture_EveryClipSearchFiltersRename {
+            get {
+                return ResourceManager.GetString("Menu.Capture.EveryClipSearchFiltersRename", resourceCulture);
+            }
+        }
     }
 }

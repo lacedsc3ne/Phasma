@@ -22,7 +22,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <ui:Button Content="{x:Static resources:Strings.Menu_Capture_TakeScreenshotNow}" Icon="Camera24" Command="{Binding TakeScreenshotCommand, Mode=OneTime}" />
-                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
+                <ui:Button Margin="8,0,0,0" Content="{Binding AllScreenshotsText}" Icon="ImageMultiple24" Appearance="Primary" ToolTip="{x:Static resources:Strings.Menu_Capture_EveryScreenshotSearchFiltersRename}" Command="{Binding OpenScreenshotLibraryCommand, Mode=OneTime}" />
                 <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenFolderCommand, Mode=OneTime}" />
             </StackPanel>
         </Grid>
@@ -31,6 +31,10 @@
 
         <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_CopyNewScreenshotsClipboard}" Description="{x:Static resources:Strings.Menu_Capture_ScreenshotTakenHotkeyAlsoCopiedSo}">
             <ui:ToggleSwitch IsChecked="{Binding CopyScreenshotToClipboard, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_PickAreaWhenIPressScreenshot}" Description="{x:Static resources:Strings.Menu_Capture_GameFreezesScreenYouDragOver}">
+            <ui:ToggleSwitch IsChecked="{Binding ScreenshotPickArea, Mode=TwoWay}" />
         </controls:OptionControl>
 
         <Border Margin="0,12,0,0" Padding="12,10" CornerRadius="8" BorderThickness="1" Visibility="{Binding HotkeyHintVisibility, Mode=OneWay}"
@@ -62,7 +66,9 @@
             <TextBlock Text="{x:Static resources:Strings.Menu_Capture_NoScreenshotsYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="16" Opacity="0.5" Margin="0,12,0,0" HorizontalAlignment="Center" />
         </StackPanel>
 
-        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding Screenshots, Mode=OneWay}">
+        <TextBlock Margin="0,14,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding RecentHintVisibility}"
+                   Text="{x:Static resources:Strings.Menu_Capture_LatestScreenshotsOpenAllScreenshotsSearch}" />
+        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding RecentScreenshots, Mode=OneWay}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="3" />
@@ -85,6 +91,9 @@
                                 </MenuItem>
                                 <MenuItem Header="{x:Static resources:Strings.Common_Edit}" Command="{Binding Tag.EditScreenshotCommand}" CommandParameter="{Binding DataContext}">
                                     <MenuItem.Icon><ui:SymbolIcon Symbol="Edit24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Common_Rename}" Command="{Binding Tag.RenameScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Rename24" /></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{x:Static resources:Strings.Menu_Capture_ShowFolder}" Command="{Binding Tag.RevealScreenshotCommand}" CommandParameter="{Binding DataContext}">
                                     <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
@@ -186,7 +195,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Capture_SavedReplays}" VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <ui:Button Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshReplaysCommand, Mode=OneTime}" />
+                <ui:Button Content="{Binding AllClipsText}" Icon="VideoClip24" Appearance="Primary" ToolTip="{x:Static resources:Strings.Menu_Capture_EveryClipSearchFiltersRename}" Command="{Binding OpenClipLibraryCommand, Mode=OneTime}" />
                 <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Capture_OpenFolder}" Icon="Folder24" Appearance="Secondary" Command="{Binding OpenReplaysFolderCommand, Mode=OneTime}" />
             </StackPanel>
         </Grid>
@@ -208,7 +217,7 @@
             <TextBlock Text="{x:Static resources:Strings.Menu_Capture_NoReplaysSavedYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
         </StackPanel>
 
-        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Replays, Mode=OneWay}">
+        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding RecentReplays, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ui:Card Margin="0,0,0,6" Padding="12,10" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
@@ -226,6 +235,9 @@
                                 </MenuItem>
                                 <MenuItem Header="{x:Static resources:Strings.Common_Edit}" Command="{Binding Tag.EditReplayCommand}" CommandParameter="{Binding DataContext}">
                                     <MenuItem.Icon><ui:SymbolIcon Symbol="Edit24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="{x:Static resources:Strings.Common_Rename}" Command="{Binding Tag.RenameReplayCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Rename24" /></MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="{x:Static resources:Strings.Menu_Capture_ShowFolder}" Command="{Binding Tag.RevealReplayCommand}" CommandParameter="{Binding DataContext}">
                                     <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
