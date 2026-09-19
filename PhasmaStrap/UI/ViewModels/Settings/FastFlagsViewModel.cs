@@ -1196,96 +1196,96 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         // something niche/situational the user didn't expect
         public string[] EnginePresetNames { get; } = { "Default", "Balanced", "Performance", "Quality" };
 
-        // one-shot apply actions (buttons), not a persisted selection - the individual toggles
-        // below are the source of truth and may not match any named preset once hand-tweaked.
-        // This used to be a ComboBox whose getter always returned "" so it looked permanently
-        // blank, and whose setter tore down and rebuilt the page's DataContext from inside the
-        // ComboBox's own binding update - reloading is now deferred to the dispatcher so the
-        // preset is fully applied before the page re-reads the flags.
+        // The toggles a preset decides, and which of them each preset turns on (every other one
+        // in the list is turned off). One table, so applying a preset and recognising which preset
+        // the page currently matches can never disagree.
+        private static readonly string[] EnginePresetToggles =
+        {
+            nameof(DisableTelemetry), nameof(DisableWebview2Telemetry), nameof(DisableVoiceChatTelemetry), nameof(BlockTencent),
+            nameof(LessLagSpikes), nameof(FasterLoading), nameof(BetterPacketSending), nameof(CacheSizeImprovement),
+            nameof(OptimizeCFrameUpdates), nameof(Preload), nameof(DisablePostFX), nameof(DisablePlayerShadows),
+            nameof(WorserParticles), nameof(LowPolyMeshes), nameof(LightCulling), nameof(DisableSky), nameof(MoreLighting),
+            nameof(NoGuiBlur), nameof(TextureRemover), nameof(DisableTerrainTextures), nameof(OldChromeUI), nameof(Prerender),
+        };
+
+        private static readonly string[] BalancedOn =
+        {
+            nameof(DisableTelemetry), nameof(DisableWebview2Telemetry), nameof(DisableVoiceChatTelemetry), nameof(LessLagSpikes),
+            nameof(FasterLoading), nameof(BetterPacketSending), nameof(CacheSizeImprovement), nameof(OptimizeCFrameUpdates), nameof(Preload),
+        };
+
+        private static readonly Dictionary<string, HashSet<string>> EnginePresetsOn = new()
+        {
+            ["Default"] = new(),
+            // brighter/clearer rendering, no toggles that reduce visual quality
+            ["Quality"] = new() { nameof(MoreLighting) },
+            ["Balanced"] = new(BalancedOn),
+            ["Performance"] = new(BalancedOn.Concat(new[] { nameof(DisablePostFX), nameof(DisablePlayerShadows), nameof(WorserParticles), nameof(LowPolyMeshes), nameof(LightCulling), nameof(DisableSky) })),
+        };
+
+        private static readonly Dictionary<string, System.Reflection.PropertyInfo> EnginePresetProperties =
+            EnginePresetToggles.ToDictionary(n => n, n => typeof(FastFlagsViewModel).GetProperty(n)!);
+
         public ICommand ApplyEnginePresetCommand => new RelayCommand<string>(ApplyEnginePreset);
 
+        private bool _applyingPreset;
+
+        // Sets the toggles right away, so the page shows the preset's settings at once; like every
+        // other change here, it is only written to disk when the window's Save button is pressed.
         private void ApplyEnginePreset(string? name)
         {
-            switch (name)
+            if (name is null || !EnginePresetsOn.TryGetValue(name, out HashSet<string>? on))
+                on = EnginePresetsOn["Default"];
+
+            _applyingPreset = true;
+            try
             {
-                case "Quality":
-                    ApplyQualityPreset();
-                    break;
-                case "Balanced":
-                    ApplyBalancedPreset();
-                    break;
-                case "Performance":
-                    ApplyPerformancePreset();
-                    break;
-                default:
-                    ApplyDefaultPreset();
-                    break;
+                foreach (string toggle in EnginePresetToggles)
+                {
+                    bool wanted = on.Contains(toggle);
+                    if ((bool)EnginePresetProperties[toggle].GetValue(this)! != wanted)
+                        EnginePresetProperties[toggle].SetValue(this, wanted);
+                }
+            }
+            finally
+            {
+                _applyingPreset = false;
             }
 
-            // like every other change here, kept when the window's Save button is pressed
-            System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() => RequestPageReloadEvent?.Invoke(this, EventArgs.Empty)));
+            // every control on the page re-reads its value (no page rebuild, so the scroll position
+            // and open sections stay where they are)
+            OnPropertyChanged(string.Empty);
         }
 
-        private void ApplyDefaultPreset()
+        // the preset the page's toggles currently match exactly, or "" once they've been changed by hand
+        public string ActiveEnginePreset
         {
-            DisableTelemetry = false;
-            DisableWebview2Telemetry = false;
-            DisableVoiceChatTelemetry = false;
-            BlockTencent = false;
-            LessLagSpikes = false;
-            FasterLoading = false;
-            BetterPacketSending = false;
-            CacheSizeImprovement = false;
-            OptimizeCFrameUpdates = false;
-            Preload = false;
-            DisablePostFX = false;
-            DisablePlayerShadows = false;
-            WorserParticles = false;
-            LowPolyMeshes = false;
-            LightCulling = false;
-            DisableSky = false;
-            MoreLighting = false;
-            NoGuiBlur = false;
-            TextureRemover = false;
-            DisableTerrainTextures = false;
-            OldChromeUI = false;
-            Prerender = false;
+            get
+            {
+                foreach (var (name, on) in EnginePresetsOn)
+                {
+                    if (EnginePresetToggles.All(t => (bool)EnginePresetProperties[t].GetValue(this)! == on.Contains(t)))
+                        return name;
+                }
+
+                return "";
+            }
         }
 
-        // brighter/clearer rendering, no toggles that reduce visual quality
-        private void ApplyQualityPreset()
+        private void OnFlagsChanged(object? sender, EventArgs e)
         {
-            ApplyDefaultPreset();
-
-            MoreLighting = true;
+            if (!_applyingPreset)
+                OnPropertyChanged(nameof(ActiveEnginePreset));
         }
 
-        private void ApplyBalancedPreset()
+        public FastFlagsViewModel()
         {
-            ApplyDefaultPreset();
-
-            DisableTelemetry = true;
-            DisableWebview2Telemetry = true;
-            DisableVoiceChatTelemetry = true;
-            LessLagSpikes = true;
-            FasterLoading = true;
-            BetterPacketSending = true;
-            CacheSizeImprovement = true;
-            OptimizeCFrameUpdates = true;
-            Preload = true;
+            // any toggle flipped by hand moves the preset highlight
+            App.FastFlags.ValuesChanged += OnFlagsChanged;
         }
 
-        private void ApplyPerformancePreset()
-        {
-            ApplyBalancedPreset();
-
-            DisablePostFX = true;
-            DisablePlayerShadows = true;
-            WorserParticles = true;
-            LowPolyMeshes = true;
-            LightCulling = true;
-            DisableSky = true;
-        }
+        // called when the page replaces this view model
+        public void Detach() => App.FastFlags.ValuesChanged -= OnFlagsChanged;
 
         #endregion
 

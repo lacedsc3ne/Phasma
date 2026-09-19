@@ -16,6 +16,9 @@ namespace PhasmaStrap
 
         public bool Changed => !OriginalProp.SequenceEqual(Prop);
 
+        // raised after a flag was set, changed or removed (pages that show a summary follow it)
+        public event EventHandler? ValuesChanged;
+
         public static IReadOnlyDictionary<string, string> PresetFlags = new Dictionary<string, string>
         {
             { "Rendering.ManualFullscreen", "FFlagHandleAltEnterFullscreenManually" },
@@ -453,10 +456,13 @@ namespace PhasmaStrap
 
             if (value is null)
             {
-                if (Prop.ContainsKey(key))
-                    App.Logger.WriteLine(LOG_IDENT, $"Deletion of '{key}' is pending");
+                if (!Prop.ContainsKey(key))
+                    return;
+
+                App.Logger.WriteLine(LOG_IDENT, $"Deletion of '{key}' is pending");
 
                 Prop.Remove(key);
+                ValuesChanged?.Invoke(this, EventArgs.Empty);
             }
             else
             {
@@ -473,6 +479,7 @@ namespace PhasmaStrap
                 }
 
                 Prop[key] = value.ToString()!;
+                ValuesChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
