@@ -10,7 +10,11 @@ namespace PhasmaStrap.Integrations.Overlays
     /// </summary>
     public static class OverlaySettings
     {
-        public static bool GameEffectsEnabled =>
+        public static bool GameEffectsEnabled => OverlayWindowNeeded || App.Settings.Prop.StreamSafeEnabled;
+
+        // something is drawn on the overlay window itself (stream-safe mode only needs its own
+        // stream view window, so on its own it leaves the overlay hidden)
+        public static bool OverlayWindowNeeded =>
             HudEnabled ||
             CrosshairEnabled ||
             App.Settings.Prop.RiShadeEnabled ||

@@ -188,6 +188,15 @@ namespace PhasmaStrap
 
                     try
                     {
+                        OverlayHub.Refresh();
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine("Watcher::SettingsReloaded", $"Overlay refresh failed: {ex.Message}");
+                    }
+
+                    try
+                    {
                         bool wanted = App.Settings.Prop.InstantReplayEnabled && ActivityWatcher.InGame;
                         if (wanted && !_instantReplay.IsRunning)
                             _instantReplay.Start();

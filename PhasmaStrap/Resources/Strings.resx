@@ -5818,4 +5818,55 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Rendering.ShowStrong" xml:space="preserve">
     <value>Show Strong</value>
   </data>
+  <data name="Menu.Rendering.StreamSafeMode" xml:space="preserve">
+    <value>Stream-safe mode</value>
+  </data>
+  <data name="Menu.Rendering.HideChatNamesStream" xml:space="preserve">
+    <value>Hide chat and names on stream</value>
+  </data>
+  <data name="Menu.Rendering.GivesOBSItsOwnCopyGame" xml:space="preserve">
+    <value>Gives OBS its own copy of the game with the areas you mark pixelated. Your own screen stays the same.</value>
+  </data>
+  <data name="Menu.Rendering.HiddenAreas" xml:space="preserve">
+    <value>Hidden areas</value>
+  </data>
+  <data name="Menu.Rendering.EditAreas" xml:space="preserve">
+    <value>Edit areas</value>
+  </data>
+  <data name="Menu.Rendering.HowHiddenAreasLook" xml:space="preserve">
+    <value>How hidden areas look</value>
+  </data>
+  <data name="Menu.Rendering.PixelatedKeepsColoursButMakesText" xml:space="preserve">
+    <value>Pixelated keeps the colours but makes text unreadable. Black covers the area completely.</value>
+  </data>
+  <data name="Menu.Rendering.Pixelated" xml:space="preserve">
+    <value>Pixelated</value>
+  </data>
+  <data name="Menu.Rendering.Black" xml:space="preserve">
+    <value>Black</value>
+  </data>
+  <data name="Menu.Rendering.ShowCrosshairStream" xml:space="preserve">
+    <value>Show the crosshair on stream</value>
+  </data>
+  <data name="Menu.Rendering.DrawsCrosshairIntoStreamPictureAs" xml:space="preserve">
+    <value>Draws your crosshair into the stream picture as well, when the crosshair is on.</value>
+  </data>
+  <data name="Menu.Rendering.SettingUpOBS" xml:space="preserve">
+    <value>Setting up OBS</value>
+  </data>
+  <data name="Menu.Rendering.N1JoinGameSwitchedSaved" xml:space="preserve">
+    <value>1. Join a game with this switched on and saved.</value>
+  </data>
+  <data name="Menu.Rendering.N2OBSAddWindowCaptureSource" xml:space="preserve">
+    <value>2. In OBS, add a Window Capture source and pick the window called PhasmaStrap Stream View.</value>
+  </data>
+  <data name="Menu.Rendering.N3SetItsCaptureMethodWindows" xml:space="preserve">
+    <value>3. Set its capture method to Windows 10 (1903 and up), then remove or hide your old Roblox or screen capture.</value>
+  </data>
+  <data name="Menu.Rendering.StreamViewSitsBehindOtherWindows" xml:space="preserve">
+    <value>The stream view sits behind your other windows and only updates while Roblox is in front. When you tab out, the stream shows the last game picture instead of your desktop.</value>
+  </data>
+  <data name="Menu.Rendering.CopyWindowName" xml:space="preserve">
+    <value>Copy window name</value>
+  </data>
 </root>

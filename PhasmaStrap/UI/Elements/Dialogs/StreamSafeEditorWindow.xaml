@@ -1,0 +1,131 @@
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.StreamSafeEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:base="clr-namespace:PhasmaStrap.UI.Elements.Base"
+        Title="Stream-safe areas"
+        Width="1180"
+        Height="760"
+        MinWidth="900"
+        MinHeight="560"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+    <base:WpfUiWindow.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,16,0,6" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+    </base:WpfUiWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Padding="8" Title="Stream-safe areas" Icon="pack://application:,,,/PhasmaStrap.ico" />
+
+        <Grid Grid.Row="1" Margin="12,4,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ============================================================ the picture -->
+            <Border x:Name="StageHost" Grid.Column="0" Margin="0,0,12,0" CornerRadius="8" ClipToBounds="True" Background="#FF15171B"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" SizeChanged="StageHost_SizeChanged">
+                <Canvas x:Name="Stage" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF24262C" ClipToBounds="True" Cursor="Cross"
+                        MouseLeftButtonDown="Stage_MouseLeftButtonDown" MouseMove="Stage_MouseMove" MouseLeftButtonUp="Stage_MouseLeftButtonUp" LostMouseCapture="Stage_LostMouseCapture">
+                    <Image x:Name="Picture" Stretch="Fill" IsHitTestVisible="False" />
+                    <TextBlock x:Name="PicturePlaceholder" IsHitTestVisible="False" Foreground="#88FFFFFF" FontSize="13" TextAlignment="Center" TextWrapping="Wrap" Width="420"
+                               Text="Open Roblox (or pick a screenshot on the right) to see your game behind the boxes. The boxes already work without it." />
+                </Canvas>
+            </Border>
+
+            <!-- ============================================================ the list -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Hidden areas" />
+                    <TextBlock Style="{StaticResource Hint}" Text="Drag on the picture to mark a new area. Drag a box to move it, or drag its edges to resize it." />
+
+                    <ListBox x:Name="AreaList" Margin="0,10,0,0" MaxHeight="300" SelectionChanged="AreaList_SelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <EventSetter Event="GotKeyboardFocus" Handler="AreaItem_GotKeyboardFocus" />
+                                <Setter Property="Margin" Value="0,0,0,4" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="Row" Padding="6" CornerRadius="6" BorderThickness="1" BorderBrush="Transparent" Background="Transparent">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Row" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                                    <Setter TargetName="Row" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox Grid.Column="0" ClearButtonEnabled="False" PlaceholderText="Name" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11" FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding SizeText}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock x:Name="EmptyText" Margin="0,8,0,0" Style="{StaticResource Hint}" Text="Nothing is hidden yet." />
+
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:Button x:Name="AddButton" Margin="0,0,8,8" Content="Add area" Icon="Add24" Click="Add_Click" />
+                        <ui:Button x:Name="DeleteButton" Margin="0,0,8,8" Content="Delete" Icon="Delete24" Appearance="Secondary" Click="Delete_Click" />
+                        <ui:Button Margin="0,0,8,8" Content="Reset to defaults" Icon="ArrowReset24" Appearance="Secondary" Click="Reset_Click"
+                                   ToolTip="Roblox's chat (top left) and player list (top right)" />
+                    </WrapPanel>
+
+                    <TextBlock Style="{StaticResource Section}" Text="Picture" />
+                    <TextBlock x:Name="PictureStatus" Style="{StaticResource Hint}" Text="Looking for Roblox..." />
+                    <WrapPanel Margin="0,10,0,0">
+                        <ui:Button Margin="0,0,8,8" Content="Grab from Roblox" Icon="Camera24" Appearance="Secondary" Click="Grab_Click" />
+                        <ui:Button Margin="0,0,8,8" Content="Use a screenshot..." Icon="Image24" Appearance="Secondary" Click="Browse_Click" />
+                    </WrapPanel>
+                    <TextBlock Margin="0,4,0,12" Style="{StaticResource Hint}" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                               Text="The picture is only a guide. Areas are kept as a share of the Roblox window, so they stay in place at any window size." />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="12,10,12,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StatusText" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Content="Apply" Icon="Checkmark24" Appearance="Primary" Click="Apply_Click" />
+                <ui:Button Margin="8,0,0,0" Content="Close" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</base:WpfUiWindow>
