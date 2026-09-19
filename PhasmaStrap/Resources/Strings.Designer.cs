@@ -15461,5 +15461,338 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Diagnostics.Finish", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lets the game's asset downloads - textures, meshes, sounds, animations - pass through PhasmaStrap, so they can be kept o.
+        /// </summary>
+        public static string Menu_AssetEngine_LetsGameSAssetDownloadsTextures {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.LetsGameSAssetDownloadsTextures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Route asset downloads through PhasmaStrap.
+        /// </summary>
+        public static string Menu_AssetEngine_RouteAssetDownloadsThroughPhasmaStrap {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.RouteAssetDownloadsThroughPhasmaStrap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The switch everything below (except swap packs) depends on. Off by default: it puts PhasmaStrap in the game's loading pa.
+        /// </summary>
+        public static string Menu_AssetEngine_SwitchEverythingBelowExceptSwapPacks {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.SwitchEverythingBelowExceptSwapPacks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset cache.
+        /// </summary>
+        public static string Menu_AssetEngine_AssetCache {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.AssetCache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keeps downloaded assets on disk across sessions and across games - the same hat or sound is stored once however many gam.
+        /// </summary>
+        public static string Menu_AssetEngine_KeepsDownloadedAssetsDiskAcrossSessions {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.KeepsDownloadedAssetsDiskAcrossSessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep assets on disk.
+        /// </summary>
+        public static string Menu_AssetEngine_KeepAssetsDisk {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.KeepAssetsDisk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty the cache.
+        /// </summary>
+        public static string Menu_AssetEngine_EmptyCache {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.EmptyCache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Games PhasmaStrap knows the assets of.
+        /// </summary>
+        public static string Menu_AssetEngine_GamesPhasmaStrapKnowsAssets {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.GamesPhasmaStrapKnowsAssets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefetch downloads what a game is known to use and is not on disk (any more), before you join it. It asks Roblox for the.
+        /// </summary>
+        public static string Menu_AssetEngine_PrefetchDownloadsWhatGameKnownUse {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.PrefetchDownloadsWhatGameKnownUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None yet - a game appears here after you have played it with routing switched on..
+        /// </summary>
+        public static string Menu_AssetEngine_NoneYetGameAppearsHereAfter {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.NoneYetGameAppearsHereAfter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefetch.
+        /// </summary>
+        public static string Menu_AssetEngine_Prefetch {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.Prefetch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Texture shrinker.
+        /// </summary>
+        public static string Menu_AssetEngine_TextureShrinker {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.TextureShrinker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scales large images down on their way to the game, instead of removing them like the AssetWarp switches do: the game sti.
+        /// </summary>
+        public static string Menu_AssetEngine_ScalesLargeImagesDownTheirWay {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ScalesLargeImagesDownTheirWay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shrink large images.
+        /// </summary>
+        public static string Menu_AssetEngine_ShrinkLargeImages {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ShrinkLargeImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Largest side.
+        /// </summary>
+        public static string Menu_AssetEngine_LargestSide {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.LargestSide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Images bigger than this are scaled down to it. Each size is cached separately, so changing it needs no clean-up..
+        /// </summary>
+        public static string Menu_AssetEngine_ImagesBiggerThanAreScaledDown {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ImagesBiggerThanAreScaledDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset swap packs.
+        /// </summary>
+        public static string Menu_AssetEngine_AssetSwapPacks {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.AssetSwapPacks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace any sound, texture, skybox face or mesh by its asset ID: whenever a game downloads that asset, it gets your file.
+        /// </summary>
+        public static string Menu_AssetEngine_ReplaceAnySoundTextureSkyboxFace {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ReplaceAnySoundTextureSkyboxFace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use swap packs.
+        /// </summary>
+        public static string Menu_AssetEngine_UseSwapPacks {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.UseSwapPacks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Works with the proxy alone - routing everything is not needed for this..
+        /// </summary>
+        public static string Menu_AssetEngine_WorksProxyAloneRoutingEverythingNot {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.WorksProxyAloneRoutingEverythingNot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name of a new pack.
+        /// </summary>
+        public static string Menu_AssetEngine_NameNewPack {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.NameNewPack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create.
+        /// </summary>
+        public static string Menu_AssetEngine_Create {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import a pack....
+        /// </summary>
+        public static string Menu_AssetEngine_ImportPack {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ImportPack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No packs yet..
+        /// </summary>
+        public static string Menu_AssetEngine_NoPacksYet {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.NoPacksYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only in these games (place IDs, empty = every game):.
+        /// </summary>
+        public static string Menu_AssetEngine_OnlyTheseGamesPlaceIDsEmpty {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.OnlyTheseGamesPlaceIDsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to every game.
+        /// </summary>
+        public static string Menu_AssetEngine_EveryGame {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.EveryGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove this replacement.
+        /// </summary>
+        public static string Menu_AssetEngine_RemoveReplacement {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.RemoveReplacement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export....
+        /// </summary>
+        public static string Menu_AssetEngine_Export {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete the pack.
+        /// </summary>
+        public static string Menu_AssetEngine_DeletePack {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.DeletePack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a replacement.
+        /// </summary>
+        public static string Menu_AssetEngine_AddReplacement {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.AddReplacement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note (optional).
+        /// </summary>
+        public static string Menu_AssetEngine_NoteOptional {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.NoteOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the file....
+        /// </summary>
+        public static string Menu_AssetEngine_ChooseFile {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.ChooseFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Traffic report.
+        /// </summary>
+        public static string Menu_AssetEngine_TrafficReport {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.TrafficReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Per game: how much was downloaded, how much the cache and the shrinker saved, what kind of assets it was and which of Ro.
+        /// </summary>
+        public static string Menu_AssetEngine_PerGameHowMuchWasDownloaded {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.PerGameHowMuchWasDownloaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep a traffic report.
+        /// </summary>
+        public static string Menu_AssetEngine_KeepTrafficReport {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.KeepTrafficReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing counted yet..
+        /// </summary>
+        public static string Menu_AssetEngine_NothingCountedYet {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.NothingCountedYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset engine.
+        /// </summary>
+        public static string Menu_FastFlagSettings_AssetEngine {
+            get {
+                return ResourceManager.GetString("Menu.FastFlagSettings.AssetEngine", resourceCulture);
+            }
+        }
     }
 }

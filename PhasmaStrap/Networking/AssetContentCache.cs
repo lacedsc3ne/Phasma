@@ -51,6 +51,8 @@ namespace PhasmaStrap.Networking
             return Path.Combine(_root, key.Length >= 2 ? key[..2] : "__", name);
         }
 
+        public bool Contains(string key, string variant = "") => File.Exists(PathOf(key, variant));
+
         public CachedAsset? TryGet(string key, string variant = "")
         {
             string path = PathOf(key, variant);

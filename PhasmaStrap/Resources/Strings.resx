@@ -5431,4 +5431,115 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Diagnostics.Finish" xml:space="preserve">
     <value>Finish</value>
   </data>
+  <data name="Menu.AssetEngine.LetsGameSAssetDownloadsTextures" xml:space="preserve">
+    <value>Lets the game's asset downloads - textures, meshes, sounds, animations - pass through PhasmaStrap, so they can be kept on disk for next time, shrunk, replaced, and counted. Nothing in Roblox's folders is changed. If anything goes wrong with an asset, the game is simply sent to Roblox's own server for it.</value>
+  </data>
+  <data name="Menu.AssetEngine.RouteAssetDownloadsThroughPhasmaStrap" xml:space="preserve">
+    <value>Route asset downloads through PhasmaStrap</value>
+  </data>
+  <data name="Menu.AssetEngine.SwitchEverythingBelowExceptSwapPacks" xml:space="preserve">
+    <value>The switch everything below (except swap packs) depends on. Off by default: it puts PhasmaStrap in the game's loading path. Takes effect from the next time Roblox starts.</value>
+  </data>
+  <data name="Menu.AssetEngine.AssetCache" xml:space="preserve">
+    <value>Asset cache</value>
+  </data>
+  <data name="Menu.AssetEngine.KeepsDownloadedAssetsDiskAcrossSessions" xml:space="preserve">
+    <value>Keeps downloaded assets on disk across sessions and across games - the same hat or sound is stored once however many games use it. Entries never go stale: changed content has a different fingerprint. The least recently used assets are removed once the limit is reached.</value>
+  </data>
+  <data name="Menu.AssetEngine.KeepAssetsDisk" xml:space="preserve">
+    <value>Keep assets on disk</value>
+  </data>
+  <data name="Menu.AssetEngine.EmptyCache" xml:space="preserve">
+    <value>Empty the cache</value>
+  </data>
+  <data name="Menu.AssetEngine.GamesPhasmaStrapKnowsAssets" xml:space="preserve">
+    <value>Games PhasmaStrap knows the assets of</value>
+  </data>
+  <data name="Menu.AssetEngine.PrefetchDownloadsWhatGameKnownUse" xml:space="preserve">
+    <value>Prefetch downloads what a game is known to use and is not on disk (any more), before you join it. It asks Roblox for the assets' current addresses with your login, which is why it only ever runs when you press it.</value>
+  </data>
+  <data name="Menu.AssetEngine.NoneYetGameAppearsHereAfter" xml:space="preserve">
+    <value>None yet - a game appears here after you have played it with routing switched on.</value>
+  </data>
+  <data name="Menu.AssetEngine.Prefetch" xml:space="preserve">
+    <value>Prefetch</value>
+  </data>
+  <data name="Menu.AssetEngine.TextureShrinker" xml:space="preserve">
+    <value>Texture shrinker</value>
+  </data>
+  <data name="Menu.AssetEngine.ScalesLargeImagesDownTheirWay" xml:space="preserve">
+    <value>Scales large images down on their way to the game, instead of removing them like the AssetWarp switches do: the game still looks like itself, but uses far less video memory and decodes faster. Only ordinary images (PNG, JPEG...) are touched; Roblox's own compressed texture formats pass through unchanged, and so does any image that would not get smaller.</value>
+  </data>
+  <data name="Menu.AssetEngine.ShrinkLargeImages" xml:space="preserve">
+    <value>Shrink large images</value>
+  </data>
+  <data name="Menu.AssetEngine.LargestSide" xml:space="preserve">
+    <value>Largest side</value>
+  </data>
+  <data name="Menu.AssetEngine.ImagesBiggerThanAreScaledDown" xml:space="preserve">
+    <value>Images bigger than this are scaled down to it. Each size is cached separately, so changing it needs no clean-up.</value>
+  </data>
+  <data name="Menu.AssetEngine.AssetSwapPacks" xml:space="preserve">
+    <value>Asset swap packs</value>
+  </data>
+  <data name="Menu.AssetEngine.ReplaceAnySoundTextureSkyboxFace" xml:space="preserve">
+    <value>Replace any sound, texture, skybox face or mesh by its asset ID: whenever a game downloads that asset, it gets your file instead. A pack can apply everywhere or only to certain games, and can be shared as a single file. Only you see the change. Replacement files have to be in a format Roblox accepts for that kind of asset (PNG / JPG, OGG / MP3, .mesh).</value>
+  </data>
+  <data name="Menu.AssetEngine.UseSwapPacks" xml:space="preserve">
+    <value>Use swap packs</value>
+  </data>
+  <data name="Menu.AssetEngine.WorksProxyAloneRoutingEverythingNot" xml:space="preserve">
+    <value>Works with the proxy alone - routing everything is not needed for this.</value>
+  </data>
+  <data name="Menu.AssetEngine.NameNewPack" xml:space="preserve">
+    <value>Name of a new pack</value>
+  </data>
+  <data name="Menu.AssetEngine.Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Menu.AssetEngine.ImportPack" xml:space="preserve">
+    <value>Import a pack...</value>
+  </data>
+  <data name="Menu.AssetEngine.NoPacksYet" xml:space="preserve">
+    <value>No packs yet.</value>
+  </data>
+  <data name="Menu.AssetEngine.OnlyTheseGamesPlaceIDsEmpty" xml:space="preserve">
+    <value>Only in these games (place IDs, empty = every game):</value>
+  </data>
+  <data name="Menu.AssetEngine.EveryGame" xml:space="preserve">
+    <value>every game</value>
+  </data>
+  <data name="Menu.AssetEngine.RemoveReplacement" xml:space="preserve">
+    <value>Remove this replacement</value>
+  </data>
+  <data name="Menu.AssetEngine.Export" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+  <data name="Menu.AssetEngine.DeletePack" xml:space="preserve">
+    <value>Delete the pack</value>
+  </data>
+  <data name="Menu.AssetEngine.AddReplacement" xml:space="preserve">
+    <value>Add a replacement</value>
+  </data>
+  <data name="Menu.AssetEngine.NoteOptional" xml:space="preserve">
+    <value>Note (optional)</value>
+  </data>
+  <data name="Menu.AssetEngine.ChooseFile" xml:space="preserve">
+    <value>Choose the file...</value>
+  </data>
+  <data name="Menu.AssetEngine.TrafficReport" xml:space="preserve">
+    <value>Traffic report</value>
+  </data>
+  <data name="Menu.AssetEngine.PerGameHowMuchWasDownloaded" xml:space="preserve">
+    <value>Per game: how much was downloaded, how much the cache and the shrinker saved, what kind of assets it was and which of Roblox's servers were slow. Covers asset downloads that pass through PhasmaStrap - not the game's live connection to its server.</value>
+  </data>
+  <data name="Menu.AssetEngine.KeepTrafficReport" xml:space="preserve">
+    <value>Keep a traffic report</value>
+  </data>
+  <data name="Menu.AssetEngine.NothingCountedYet" xml:space="preserve">
+    <value>Nothing counted yet.</value>
+  </data>
+  <data name="Menu.FastFlagSettings.AssetEngine" xml:space="preserve">
+    <value>Asset engine</value>
+  </data>
 </root>
