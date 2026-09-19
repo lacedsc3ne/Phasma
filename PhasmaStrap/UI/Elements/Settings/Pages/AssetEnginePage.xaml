@@ -165,6 +165,15 @@
         </Border>
         <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PackStatus, Mode=OneWay}" />
 
+        <!-- ============================================================ server picker -->
+        <TextBlock Text="{x:Static resources:Strings.Menu_AssetEngine_JoinTimeServerPicker}" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_AssetEngine_WhenGameJoinedWithoutNamingServer}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_AssetEngine_LetMeChooseServerWhenI}">
+            <ui:ToggleSwitch IsChecked="{Binding ServerPickerEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+        <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PickerStatus, Mode=OneWay}" />
+
         <!-- ============================================================ traffic -->
         <TextBlock Text="{x:Static resources:Strings.Menu_AssetEngine_TrafficReport}" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_AssetEngine_PerGameHowMuchWasDownloaded}" />

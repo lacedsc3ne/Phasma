@@ -22,7 +22,12 @@ namespace PhasmaStrap.Networking
         // that gate whether anything actually gets stripped. Without an entry here, Windows
         // would resolve those hostnames normally and Roblox would talk to them directly,
         // bypassing the proxy (and therefore AssetWarp) entirely regardless of its toggles.
-        public static readonly string[] InterceptedHostnames = new[]
+        //
+        // The exception is JoinPickerPolicy.Host (gamejoin.roblox.com): every join in every game
+        // would then depend on the proxy being up, so it is only listed while the server picker is
+        // actually switched on. Toggling the picker makes the block "not current", and it is
+        // rewritten through the usual elevated run.
+        public static string[] InterceptedHostnames => new[]
             {
                 PresenceSpoofPolicy.Host,
                 RobuxSpoofer.Host,
@@ -31,6 +36,7 @@ namespace PhasmaStrap.Networking
                 AssetWarpPolicy.Host,
                 AssetWarpThumbnailPolicy.Host,
             }
+            .Concat(App.Settings.Prop.JoinServerPickerEnabled ? new[] { JoinPickerPolicy.Host } : Array.Empty<string>())
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 

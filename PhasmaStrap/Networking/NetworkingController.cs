@@ -188,6 +188,12 @@ namespace PhasmaStrap.Networking
             AssetProxyServer.InterceptedHosts[GameCreatorSpoofer.Host] = (existingGames.RequestTransform, CombineResponseTransforms(existingGames.ResponseTransform, GameCreatorSpoofer.ProcessResponse), existingGames.TryServeFromCache);
 
             RegisterAssetWarpHosts();
+
+            // the join-time server picker. Registered always (it decides per request whether it is
+            // on); the hosts file only sends gamejoin here while it is switched on.
+            if (!AssetProxyServer.InterceptedHosts.ContainsKey(JoinPickerPolicy.Host))
+                AssetProxyServer.InterceptedHosts[JoinPickerPolicy.Host] = (null, null, null);
+            AssetProxyServer.AsyncHandlers[JoinPickerPolicy.Host] = JoinPickerPolicy.HandleAsync;
         }
 
         private static void RegisterAssetWarpHosts()

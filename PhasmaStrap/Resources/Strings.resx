@@ -5542,4 +5542,13 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.FastFlagSettings.AssetEngine" xml:space="preserve">
     <value>Asset engine</value>
   </data>
+  <data name="Menu.AssetEngine.JoinTimeServerPicker" xml:space="preserve">
+    <value>Join-time server picker</value>
+  </data>
+  <data name="Menu.AssetEngine.WhenGameJoinedWithoutNamingServer" xml:space="preserve">
+    <value>When a game is joined without naming a server - the Play button, also inside the Roblox app - PhasmaStrap holds the request for a moment and shows the servers it can find, with region and estimated ping. Pick one and you are put in that server; do nothing for about 20 seconds and Roblox chooses as usual. Joins that already name a server (friends, invites, the server browser), private servers and teleports inside a game are left alone. It needs you to be signed in, and it adds gamejoin.roblox.com to the hosts-file entries of the proxy (Windows asks for permission once) - only while this is on.</value>
+  </data>
+  <data name="Menu.AssetEngine.LetMeChooseServerWhenI" xml:space="preserve">
+    <value>Let me choose the server when I join a game</value>
+  </data>
 </root>

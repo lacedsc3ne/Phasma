@@ -15794,5 +15794,32 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.FastFlagSettings.AssetEngine", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join-time server picker.
+        /// </summary>
+        public static string Menu_AssetEngine_JoinTimeServerPicker {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.JoinTimeServerPicker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When a game is joined without naming a server - the Play button, also inside the Roblox app - PhasmaStrap holds the requ.
+        /// </summary>
+        public static string Menu_AssetEngine_WhenGameJoinedWithoutNamingServer {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.WhenGameJoinedWithoutNamingServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Let me choose the server when I join a game.
+        /// </summary>
+        public static string Menu_AssetEngine_LetMeChooseServerWhenI {
+            get {
+                return ResourceManager.GetString("Menu.AssetEngine.LetMeChooseServerWhenI", resourceCulture);
+            }
+        }
     }
 }

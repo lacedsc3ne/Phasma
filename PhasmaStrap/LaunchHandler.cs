@@ -203,6 +203,34 @@ namespace PhasmaStrap
                     return;
                 }
 
+                // UI-test hook: the join-time server picker with made-up servers, in the background
+                if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "ServerPicker")
+                {
+                    var fake = Task.Run(async () =>
+                    {
+                        await Task.Delay(1500);
+                        Models.MatchmakerCandidate Make(string city, string country, int km, int ping, int playing) => new()
+                        {
+                            JobId = Guid.NewGuid().ToString(), Datacenter = new Models.RobloxDatacenter { City = city, Country = country },
+                            DistanceKm = km, EstimatedPingMs = ping, Playing = playing, MaxPlayers = 30,
+                        };
+                        return new List<Models.MatchmakerCandidate>
+                        {
+                            Make("Amsterdam", "Netherlands", 170, 9, 21), Make("Frankfurt", "Germany", 320, 13, 28), Make("Frankfurt", "Germany", 320, 13, 12),
+                            Make("Paris", "France", 260, 12, 30), Make("London", "United Kingdom", 330, 14, 18), Make("Warsaw", "Poland", 1160, 31, 9),
+                            Make("Ashburn", "USA", 6200, 96, 25), Make("Chicago", "USA", 6650, 104, 30), Make("Dallas", "USA", 7900, 124, 17),
+                        };
+                    });
+
+                    var picker = new UI.Elements.Dialogs.ServerPickerWindow(1, fake, TimeSpan.FromSeconds(120));
+                    ApplyUiTestBackground(picker);
+                    picker.Topmost = false;
+                    picker.ShowDialog();
+                    App.Logger.WriteLine(LOG_IDENT, $"Picker closed, chosen: {picker.ChosenJobId ?? "(none)"}");
+                    App.Terminate();
+                    return;
+                }
+
                 // UI-test hook: the launch (bootstrapper) dialog on its own, in the background
                 if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "BootstrapperDialog")
                 {
