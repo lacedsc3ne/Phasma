@@ -59,13 +59,56 @@
             </DockPanel>
 
             <StackPanel Visibility="{Binding ListsVisibility}">
-                <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_Yours}" />
-                <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoOwnedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_YouDonTOwnAnyPrivate}" />
-                <ItemsControl ItemsSource="{Binding Owned}" ItemTemplate="{StaticResource ServerTemplate}" />
+                <!-- filters -->
+                <Border Margin="0,16,0,0" Padding="12" CornerRadius="8" BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_PrivateServers_SearchGamesServerNamesUsernames}" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <ComboBox Grid.Column="1" Margin="8,0,0,0" Padding="10,5,10,5" ToolTip="{x:Static resources:Strings.Menu_PrivateServers_WhoseServersShowFriendsAreListed}" ItemsSource="{Binding OwnerOptions}" SelectedItem="{Binding Owner, Mode=TwoWay}" />
+                            <ComboBox Grid.Column="2" Margin="8,0,0,0" Padding="10,5,10,5" ToolTip="{x:Static resources:Strings.Menu_PrivateServers_OnlyServersGame}" ItemsSource="{Binding GameOptions}" SelectedItem="{Binding Game, Mode=TwoWay}" />
+                        </Grid>
+                        <WrapPanel Margin="0,8,0,0">
+                            <ComboBox Width="190" Margin="0,0,8,0" Padding="10,5,10,5" SelectedIndex="{Binding ShowIndex, Mode=TwoWay}">
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_YoursShared}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_OnlyYours}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_OnlySharedYou}" />
+                            </ComboBox>
+                            <ComboBox Width="190" Margin="0,0,8,0" Padding="10,5,10,5" SelectedIndex="{Binding StatusIndex, Mode=TwoWay}">
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_AnyStatus}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_CanJoinNow}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_Inactive}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_EndingWithin30Days}" />
+                            </ComboBox>
+                            <ComboBox Width="190" Margin="0,0,8,0" Padding="10,5,10,5" SelectedIndex="{Binding SortIndex, Mode=TwoWay}">
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_SortByGame}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_SortByOwner}" />
+                                <ComboBoxItem Content="{x:Static resources:Strings.Menu_PrivateServers_EndingSoonestFirst}" />
+                            </ComboBox>
+                            <ui:Button Margin="0,0,12,0" Icon="Dismiss24" Content="{x:Static resources:Strings.Menu_PrivateServers_ClearFilters}" Appearance="Secondary" Command="{Binding ClearFiltersCommand, Mode=OneTime}" />
+                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding FilterSummary}" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
 
-                <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_SharedYou}" />
-                <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoSharedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_NobodyHasAddedYouTheirPrivate}" />
-                <ItemsControl ItemsSource="{Binding Shared}" ItemTemplate="{StaticResource ServerTemplate}" />
+                <TextBlock Margin="0,16,0,0" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoMatchesVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_NoServersMatchTheseFilters}" />
+
+                <StackPanel Visibility="{Binding YoursVisibility}">
+                    <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_Yours}" />
+                    <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoOwnedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_YouDonTOwnAnyPrivate}" />
+                    <ItemsControl ItemsSource="{Binding Owned}" ItemTemplate="{StaticResource ServerTemplate}" />
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding SharedVisibility}">
+                    <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_PrivateServers_SharedYou}" />
+                    <TextBlock Margin="0,0,0,8" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoSharedVisibility}" Text="{x:Static resources:Strings.Menu_PrivateServers_NobodyHasAddedYouTheirPrivate}" />
+                    <ItemsControl ItemsSource="{Binding Shared}" ItemTemplate="{StaticResource ServerTemplate}" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

@@ -16775,5 +16775,140 @@ namespace PhasmaStrap.Resources {
                 return ResourceManager.GetString("Menu.Rendering.CopyWindowName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search games, server names or usernames.
+        /// </summary>
+        public static string Menu_PrivateServers_SearchGamesServerNamesUsernames {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.SearchGamesServerNamesUsernames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whose servers to show - your friends are listed first.
+        /// </summary>
+        public static string Menu_PrivateServers_WhoseServersShowFriendsAreListed {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.WhoseServersShowFriendsAreListed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only servers for this game.
+        /// </summary>
+        public static string Menu_PrivateServers_OnlyServersGame {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.OnlyServersGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yours and shared.
+        /// </summary>
+        public static string Menu_PrivateServers_YoursShared {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.YoursShared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only yours.
+        /// </summary>
+        public static string Menu_PrivateServers_OnlyYours {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.OnlyYours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only shared with you.
+        /// </summary>
+        public static string Menu_PrivateServers_OnlySharedYou {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.OnlySharedYou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any status.
+        /// </summary>
+        public static string Menu_PrivateServers_AnyStatus {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.AnyStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can join now.
+        /// </summary>
+        public static string Menu_PrivateServers_CanJoinNow {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.CanJoinNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inactive.
+        /// </summary>
+        public static string Menu_PrivateServers_Inactive {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.Inactive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ending within 30 days.
+        /// </summary>
+        public static string Menu_PrivateServers_EndingWithin30Days {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.EndingWithin30Days", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by game.
+        /// </summary>
+        public static string Menu_PrivateServers_SortByGame {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.SortByGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by owner.
+        /// </summary>
+        public static string Menu_PrivateServers_SortByOwner {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.SortByOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ending soonest first.
+        /// </summary>
+        public static string Menu_PrivateServers_EndingSoonestFirst {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.EndingSoonestFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear filters.
+        /// </summary>
+        public static string Menu_PrivateServers_ClearFilters {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.ClearFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No servers match these filters..
+        /// </summary>
+        public static string Menu_PrivateServers_NoServersMatchTheseFilters {
+            get {
+                return ResourceManager.GetString("Menu.PrivateServers.NoServersMatchTheseFilters", resourceCulture);
+            }
+        }
     }
 }
