@@ -12,7 +12,8 @@ namespace PhasmaStrap.Networking
 
         private static int _keeperBusy;
 
-        public static bool IsActive => AssetProxyServer.IsRunning && HostsFileManager.IsBlockPresent();
+        // hosted here or in another PhasmaStrap process (the game watcher, say)
+        public static bool IsActive => ProxyHealth.IsHostedAnywhere() && HostsFileManager.IsBlockPresent();
 
         // Two trust boundaries have to be satisfied for Roblox to accept the proxy's leaf certs:
         //  1. the Windows CurrentUser store - used by PhasmaStrap's own HttpClient and any other

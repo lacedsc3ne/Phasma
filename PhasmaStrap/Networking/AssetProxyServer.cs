@@ -84,6 +84,7 @@ namespace PhasmaStrap.Networking
                     _cts = new CancellationTokenSource();
                     _ = Task.Run(() => AcceptLoopAsync(listener, _cts.Token));
                     _loggedPortBusy = false;
+                    ProxyHealth.Hosting();
                     App.Logger.WriteLine(LOG_IDENT, $"Listening on 127.0.0.1:{Port}");
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
@@ -181,6 +182,8 @@ namespace PhasmaStrap.Networking
                     App.Logger.WriteLine(LOG_IDENT, $"Refusing connection for non-allowlisted host {sniHost}");
                     return;
                 }
+
+                ProxyHealth.Accepted();
 
                 // One reader for the life of the connection: it may have read ahead into the next
                 // request. Ordinary (API) requests are answered and the connection closed, as
@@ -287,6 +290,8 @@ namespace PhasmaStrap.Networking
             if (host is not null && !InterceptedHosts.ContainsKey(host))
                 return;
 
+            ProxyHealth.Rejected(host);
+
             bool trip;
             lock (HandshakeFailures)
             {
@@ -311,13 +316,21 @@ namespace PhasmaStrap.Networking
                 {
                     int patched = AssetProxyCA.PatchRobloxTrustBundles();
                     bool ok = AssetProxyCA.IsRobloxTrustBundlePatched();
+                    bool? running = AssetProxyCA.RunningRobloxTrustsProxy();
 
-                    UI.NotificationCenter.Notify(
-                        "Roblox rejected the proxy certificate",
-                        patched > 0 || ok
-                            ? "Roblox's certificate bundle had changed (an update?) - PhasmaStrap re-added its certificate. Restart Roblox for spoofing to work again."
-                            : "PhasmaStrap could not re-add its certificate to Roblox's bundle - check the Networking page.",
-                        UI.NotificationCategory.General);
+                    // say only what is known: "re-added" only when something was actually re-added
+                    string message;
+                    if (!ok)
+                        message = "PhasmaStrap could not add its certificate to Roblox's bundle - check the Networking page.";
+                    else if (patched > 0)
+                        message = "Roblox's certificate bundle had changed (an update?) - PhasmaStrap re-added its certificate. Restart Roblox for the proxy to work again.";
+                    else if (running == false)
+                        message = "This Roblox was opened before its certificate bundle was patched. Restart Roblox for the proxy to work.";
+                    else
+                        message = "Roblox's bundle already has the certificate, but Roblox still refused it - the proxy isn't working this session. Check the log.";
+
+                    App.Logger.WriteLine(LOG_IDENT, $"Certificate re-check: bundles patched now {patched}, all patched {ok}, running Roblox read it {running?.ToString() ?? "n/a"}");
+                    UI.NotificationCenter.Notify("Roblox rejected the proxy certificate", message, UI.NotificationCategory.General);
                 }
                 catch (Exception ex)
                 {
