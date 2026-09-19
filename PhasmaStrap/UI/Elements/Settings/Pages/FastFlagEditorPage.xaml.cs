@@ -316,8 +316,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             try { clipboard = Clipboard.GetText(); } catch { }
 
             // a code already on the clipboard is filled in (even inside a copied chat message)
-            string found = FlagLayers.FindCodes(clipboard, "PHF1-").FirstOrDefault() ?? "";
-            string? code = AskName("Add a profile from a share code", "Paste the share code (it starts with PHF1-):", found);
+            string found = FlagLayers.FindProfileCode(clipboard);
+            string? code = AskName("Add a profile from a share code", "Paste the share code (it starts with PHF):", found);
             if (code is null)
                 return;
 

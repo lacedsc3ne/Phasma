@@ -84,58 +84,129 @@ namespace PhasmaStrap.Integrations.Overlays
         }
 
         // ------------------------------------------------------------------ sharing
+        //
+        // A code carries the whole design. Two formats:
+        //   PHX2-  (written now) the design packed into ~25 bytes, URL-safe base64:
+        //          [1 = format] [part switches] [arm length, thickness, gap+10, rotation,
+        //          dot size, ring radius, ring thickness, outline thickness] [opacity x10000, 2 bytes]
+        //          [colour ARGB] [outline colour ARGB] [name, UTF-8, rest of the bytes]
+        //   PHX1-  (older codes, still read) the design as deflated JSON.
 
         private const string CodePrefix = "PHX1-";
+        private const string ShortPrefix = "PHX2-";
+        private const byte ShortFormat = 1;
+        private const int ShortFixedBytes = 20;
 
-        // a short text that can be pasted in chat: the design, deflated, as URL-safe base64
         public string ToShareCode()
         {
-            byte[] json = JsonSerializer.SerializeToUtf8Bytes(Clamped());
-            using var output = new MemoryStream();
-            using (var deflate = new DeflateStream(output, CompressionLevel.SmallestSize, leaveOpen: true))
-                deflate.Write(json);
+            CrosshairStyle style = Clamped();
 
-            return CodePrefix + Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+            var bytes = new List<byte>
+            {
+                ShortFormat,
+                (byte)((style.Arms ? 1 : 0) | (style.TStyle ? 2 : 0) | (style.Dot ? 4 : 0) | (style.DotRound ? 8 : 0) | (style.Ring ? 16 : 0) | (style.Outline ? 32 : 0)),
+                (byte)style.ArmLength, (byte)style.ArmThickness, (byte)(style.Gap + 10), (byte)style.Rotation,
+                (byte)style.DotSize, (byte)style.RingRadius, (byte)style.RingThickness, (byte)style.OutlineThickness,
+            };
+
+            ushort opacity = (ushort)Math.Round(style.Opacity * 10000);
+            bytes.Add((byte)(opacity >> 8));
+            bytes.Add((byte)opacity);
+
+            AddColor(bytes, style.Color);
+            AddColor(bytes, style.OutlineColor);
+
+            // a long name would make the code long - 40 characters is plenty to recognise it by
+            string name = style.Name.Length > 40 ? style.Name[..40] : style.Name;
+            bytes.AddRange(Encoding.UTF8.GetBytes(name));
+
+            return ShortPrefix + Convert.ToBase64String(bytes.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
+
+        private static void AddColor(List<byte> bytes, string color)
+        {
+            string hex = NormaliseColor(color, "#00FF00")[1..];
+            uint value = Convert.ToUInt32(hex, 16);
+            if (hex.Length == 6)
+                value |= 0xFF000000;
+
+            bytes.Add((byte)(value >> 24));
+            bytes.Add((byte)(value >> 16));
+            bytes.Add((byte)(value >> 8));
+            bytes.Add((byte)value);
+        }
+
+        private static string ReadColor(byte[] bytes, int at) => bytes[at] == 0xFF
+            ? $"#{bytes[at + 1]:X2}{bytes[at + 2]:X2}{bytes[at + 3]:X2}"
+            : $"#{bytes[at]:X2}{bytes[at + 1]:X2}{bytes[at + 2]:X2}{bytes[at + 3]:X2}";
 
         // the code is found inside whatever was pasted (backticks, quotes, a sentence) - see
         // FlagLayers.FindCodes
         public static CrosshairStyle? FromShareCode(string? pasted)
         {
-            foreach (string code in PhasmaStrap.Utility.FlagLayers.FindCodes(pasted, CodePrefix))
+            foreach (string code in PhasmaStrap.Utility.FlagLayers.FindCodes(pasted, ShortPrefix, CodePrefix))
             {
-                if (Decode(code) is CrosshairStyle style)
+                CrosshairStyle? style = code.StartsWith(ShortPrefix, StringComparison.OrdinalIgnoreCase)
+                    ? DecodeShort(code[ShortPrefix.Length..])
+                    : DecodeJson(code[CodePrefix.Length..]);
+
+                if (style is not null)
                     return style;
             }
 
             return null;
         }
 
-        private static CrosshairStyle? Decode(string text)
+        private static CrosshairStyle? DecodeShort(string body)
         {
             try
             {
-                if (text.Length > 2000)
+                if (body.Length > 400)
                     return null;
 
-                string body = text[CodePrefix.Length..].Replace('-', '+').Replace('_', '/');
-                body += (body.Length % 4) switch { 2 => "==", 3 => "=", _ => "" };
+                string base64 = body.Replace('-', '+').Replace('_', '/');
+                base64 += (base64.Length % 4) switch { 2 => "==", 3 => "=", _ => "" };
+                byte[] b = Convert.FromBase64String(base64);
 
-                using var input = new MemoryStream(Convert.FromBase64String(body));
-                using var deflate = new DeflateStream(input, CompressionMode.Decompress);
-                using var json = new MemoryStream();
+                if (b.Length < ShortFixedBytes || b[0] != ShortFormat)
+                    return null;
 
-                // a tiny code that inflates into megabytes is not a crosshair
-                byte[] buffer = new byte[4096];
-                int read;
-                while ((read = deflate.Read(buffer, 0, buffer.Length)) > 0)
+                return new CrosshairStyle
                 {
-                    json.Write(buffer, 0, read);
-                    if (json.Length > 16384)
-                        return null;
-                }
+                    Arms = (b[1] & 1) != 0,
+                    TStyle = (b[1] & 2) != 0,
+                    Dot = (b[1] & 4) != 0,
+                    DotRound = (b[1] & 8) != 0,
+                    Ring = (b[1] & 16) != 0,
+                    Outline = (b[1] & 32) != 0,
+                    ArmLength = b[2],
+                    ArmThickness = b[3],
+                    Gap = b[4] - 10,
+                    Rotation = b[5],
+                    DotSize = b[6],
+                    RingRadius = b[7],
+                    RingThickness = b[8],
+                    OutlineThickness = b[9],
+                    Opacity = ((b[10] << 8) | b[11]) / 10000.0,
+                    Color = ReadColor(b, 12),
+                    OutlineColor = ReadColor(b, 16),
+                    Name = Encoding.UTF8.GetString(b, ShortFixedBytes, b.Length - ShortFixedBytes),
+                }.Clamped();
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
-                return JsonSerializer.Deserialize<CrosshairStyle>(json.ToArray())?.Clamped();
+        private static CrosshairStyle? DecodeJson(string body)
+        {
+            if (body.Length > 2000 || PhasmaStrap.Utility.FlagLayers.Unpack(body, 16384) is not byte[] json)
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<CrosshairStyle>(json)?.Clamped();
             }
             catch
             {
