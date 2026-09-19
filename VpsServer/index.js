@@ -9,19 +9,45 @@
 //   GET /v1/releases/latest   same JSON as api.github.com/repos/<repo>/releases/latest
 //   GET /v1/releases          same JSON as .../releases?per_page=30
 //   GET /health               status of the cache
+//   POST /v1/refresh          ask GitHub right now (after publishing a release); needs the
+//                             header "Authorization: Bearer <secret>"
 //
 // Settings (environment variables; Pterodactyl sets SERVER_PORT from the allocation):
 //   SERVER_PORT / PORT   port to listen on (default 8080)
 //   REPO                 GitHub repository (default lacedsc3ne/Phasma)
 //   GITHUB_TOKEN         optional; not needed at one refresh every 5 minutes
 //   REFRESH_MINUTES      how often to ask GitHub (default 5)
+//   REFRESH_SECRET       the secret for POST /v1/refresh - or put it in refresh-secret.txt next
+//                        to this file (easier in Pterodactyl). No secret = the endpoint is off.
 
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 const PORT = Number(process.env.SERVER_PORT || process.env.PORT || 8080);
 const REPO = process.env.REPO || "lacedsc3ne/Phasma";
 const TOKEN = process.env.GITHUB_TOKEN || "";
 const REFRESH_MS = Math.max(1, Number(process.env.REFRESH_MINUTES || 5)) * 60 * 1000;
+const SECRET = (process.env.REFRESH_SECRET || readSecretFile()).trim();
+
+// an on-demand refresh costs 2 of GitHub's 60 requests an hour - never more than one a minute
+const MANUAL_REFRESH_COOLDOWN_MS = 60 * 1000;
+let lastManualRefresh = 0;
+
+function readSecretFile() {
+    try {
+        return fs.readFileSync(path.join(__dirname, "refresh-secret.txt"), "utf8");
+    } catch {
+        return "";
+    }
+}
+
+function secretMatches(header) {
+    const given = Buffer.from((header || "").replace(/^Bearer\s+/i, "").trim());
+    const wanted = Buffer.from(SECRET);
+    return SECRET.length > 0 && given.length === wanted.length && crypto.timingSafeEqual(given, wanted);
+}
 
 const cache = { latest: null, list: null, fetchedAt: 0, lastError: null, requests: 0 };
 
@@ -70,8 +96,30 @@ function send(res, status, body, maxAgeSeconds = 60) {
     res.end(body);
 }
 
+async function manualRefresh(req, res) {
+    if (!secretMatches(req.headers.authorization))
+        return send(res, 401, JSON.stringify({ error: "wrong or missing secret" }), 0);
+
+    const wait = lastManualRefresh + MANUAL_REFRESH_COOLDOWN_MS - Date.now();
+    if (wait > 0)
+        return send(res, 429, JSON.stringify({ error: `refreshed moments ago, try again in ${Math.ceil(wait / 1000)} s` }), 0);
+
+    lastManualRefresh = Date.now();
+    await refresh();
+    log("Refreshed on request");
+
+    return send(res, cache.lastError ? 502 : 200, JSON.stringify({
+        ok: !cache.lastError,
+        latest: cache.latest ? JSON.parse(cache.latest).tag_name : null,
+        lastError: cache.lastError,
+    }), 0);
+}
+
 const server = http.createServer((req, res) => {
     const path = (req.url || "/").split("?")[0].replace(/\/+$/, "") || "/";
+
+    if (req.method === "POST" && path === "/v1/refresh")
+        return manualRefresh(req, res).catch(error => send(res, 500, JSON.stringify({ error: error.message }), 0));
 
     if (req.method !== "GET" && req.method !== "HEAD")
         return send(res, 405, JSON.stringify({ error: "method not allowed" }), 0);
@@ -102,7 +150,7 @@ const server = http.createServer((req, res) => {
 
 refresh().then(() => {
     setInterval(refresh, REFRESH_MS);
-    server.listen(PORT, "0.0.0.0", () => log(`PhasmaStrap VPS service listening on port ${PORT} (repo ${REPO}, refresh every ${REFRESH_MS / 60000} min)`));
+    server.listen(PORT, "0.0.0.0", () => log(`PhasmaStrap VPS service listening on port ${PORT} (repo ${REPO}, refresh every ${REFRESH_MS / 60000} min, instant refresh ${SECRET ? "on" : "off - no secret"})`));
 });
 
 process.on("SIGTERM", () => server.close(() => process.exit(0)));
