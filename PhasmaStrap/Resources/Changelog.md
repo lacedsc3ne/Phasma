@@ -2,6 +2,9 @@
 <!-- One "## <version>" section per release, newest first. The News page shows the section for
      the running version under "What's new", and the release on GitHub uses the same text. -->
 
+## 2.17.7
+- **Updates and the News page now come from PhasmaStrap's own server** (api.phasmastrap.com) instead of GitHub's, which only allows 60 requests an hour per IP address - with a few people on one network, update checks used to quietly fail. If the server is down, PhasmaStrap asks GitHub like before. Downloads still come from GitHub.
+
 ## 2.17.6
 - **Choose what double-clicking the tray icon does** while Roblox is running (PhasmaStrap › Startup & updates): open settings (the default), bring Roblox to the front, open the tray menu, take a screenshot, save an instant replay, show server details, copy the invite link or clean RAM.
 
