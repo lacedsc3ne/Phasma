@@ -5668,4 +5668,16 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.FastFlagGames.WhenYouClickPlayWebsiteLink" xml:space="preserve">
     <value>When you click Play on a website or a link while Roblox is open with a different profile, close that Roblox first so the new game gets its flags. You leave the game you were in.</value>
   </data>
+  <data name="Menu.FastFlagEditor.HideToggleFlags" xml:space="preserve">
+    <value>Hide toggle flags</value>
+  </data>
+  <data name="Menu.FastFlagEditor.LeaveOutFlagsSetByToggles" xml:space="preserve">
+    <value>Leave out the flags set by the toggles on the Roblox FFlags tab, to see only the ones you added yourself.</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ShowFlagsToo" xml:space="preserve">
+    <value>Show your flags too</value>
+  </data>
+  <data name="Menu.FastFlagEditor.ListOwnFlagsAsWellSo" xml:space="preserve">
+    <value>List your own flags as well, so you see everything these games start with. Turn off to see only this profile's changes.</value>
+  </data>
 </root>
