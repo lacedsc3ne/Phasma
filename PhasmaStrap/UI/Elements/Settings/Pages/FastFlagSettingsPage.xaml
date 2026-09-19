@@ -247,6 +247,20 @@
                        JournalOwnership="OwnsJournal"
                        Background="Transparent" />
             </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="BoxMultiple24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_AssetEngine}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="AssetEnginePage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
         </TabControl>
         </DockPanel>
     </Grid>

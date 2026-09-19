@@ -60,6 +60,192 @@ namespace PhasmaStrap.Networking
         public static bool SwapsEnabled => App.Settings.Prop.SwapPacksEnabled && Packs.AnyEnabled();
         private static long CacheLimitBytes => Math.Max(256, App.Settings.Prop.AssetCacheLimitMb) * 1048576L;
 
+        // ------------------------------------------------------------------ what each game uses
+
+        public sealed class ManifestEntry
+        {
+            public long AssetId { get; set; }
+            public int TypeId { get; set; }
+            public string Key { get; set; } = "";
+        }
+
+        // place -> asset ID -> entry. Written to AssetCache\manifests\<place>.json; it is what lets
+        // "prefetch this game" know which assets the game needs before the game asks for them.
+        private static readonly ConcurrentDictionary<long, ConcurrentDictionary<long, ManifestEntry>> Manifests = new();
+        private static readonly ConcurrentDictionary<long, byte> DirtyManifests = new();
+        private static System.Threading.Timer? _manifestTimer;
+
+        private static string ManifestFolder => Path.Combine(Paths.Base, "AssetCache", "manifests");
+        private const int MaxManifestEntries = 20000;
+
+        private static ConcurrentDictionary<long, ManifestEntry> ManifestOf(long placeId) => Manifests.GetOrAdd(placeId, id =>
+        {
+            var loaded = new ConcurrentDictionary<long, ManifestEntry>();
+            try
+            {
+                string file = Path.Combine(ManifestFolder, $"{id}.json");
+                if (File.Exists(file))
+                {
+                    foreach (ManifestEntry entry in JsonSerializer.Deserialize<List<ManifestEntry>>(File.ReadAllText(file)) ?? new())
+                        loaded[entry.AssetId] = entry;
+                }
+            }
+            catch
+            {
+            }
+            return loaded;
+        });
+
+        private static void Remember(AssetRouteInfo info)
+        {
+            if (info.PlaceId <= 0 || info.AssetId <= 0 || info.OriginalUrl.Length == 0)
+                return;
+
+            ConcurrentDictionary<long, ManifestEntry> manifest = ManifestOf(info.PlaceId);
+            if (manifest.Count >= MaxManifestEntries && !manifest.ContainsKey(info.AssetId))
+                return;
+
+            if (manifest.TryGetValue(info.AssetId, out ManifestEntry? known) && known.Key == info.Key)
+                return;
+
+            manifest[info.AssetId] = new ManifestEntry { AssetId = info.AssetId, TypeId = info.TypeId, Key = info.Key };
+            DirtyManifests[info.PlaceId] = 0;
+
+            _manifestTimer ??= new System.Threading.Timer(_ => FlushManifests(), null, 20_000, 20_000);
+        }
+
+        public static void FlushManifests()
+        {
+            foreach (long placeId in DirtyManifests.Keys.ToList())
+            {
+                DirtyManifests.TryRemove(placeId, out _);
+
+                try
+                {
+                    Directory.CreateDirectory(ManifestFolder);
+                    string file = Path.Combine(ManifestFolder, $"{placeId}.json");
+                    string temp = file + ".tmp";
+                    File.WriteAllText(temp, JsonSerializer.Serialize(ManifestOf(placeId).Values.ToList()));
+                    File.Move(temp, file, true);
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Could not write the manifest of place {placeId}: {ex.Message}");
+                }
+            }
+        }
+
+        // (placeId, assets known, of which on disk)
+        public static List<(long PlaceId, int Known, int Cached)> ListManifests()
+        {
+            var result = new List<(long, int, int)>();
+
+            try
+            {
+                if (!Directory.Exists(ManifestFolder))
+                    return result;
+
+                foreach (string file in Directory.GetFiles(ManifestFolder, "*.json"))
+                {
+                    if (!long.TryParse(Path.GetFileNameWithoutExtension(file), out long placeId))
+                        continue;
+
+                    List<ManifestEntry> entries = JsonSerializer.Deserialize<List<ManifestEntry>>(File.ReadAllText(file)) ?? new();
+                    result.Add((placeId, entries.Count, entries.Count(e => Cache.Contains(e.Key))));
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not list manifests: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        // Downloads whatever this game is known to use and is not on disk (any more). The asset
+        // IDs have to be resolved to fresh signed URLs first, which is done with the user's Roblox
+        // login (private assets need it) - hence only ever on request.
+        public static async Task<(int Fetched, int Failed, int AlreadyThere)> PrefetchAsync(long placeId, Action<double> progress, CancellationToken token)
+        {
+            HookLogs();
+
+            List<ManifestEntry> missing = ManifestOf(placeId).Values.Where(e => !Cache.Contains(e.Key)).ToList();
+            int already = ManifestOf(placeId).Count - missing.Count;
+            int fetched = 0, failed = 0, done = 0;
+
+            string? cookie = Integrations.RobloxCookie.Get();
+
+            foreach (ManifestEntry[] chunk in missing.Chunk(200))
+            {
+                token.ThrowIfCancellationRequested();
+
+                string body = JsonSerializer.Serialize(chunk.Select((e, i) => new { requestId = i.ToString(), assetId = e.AssetId }));
+                var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["Host"] = AssetWarpPolicy.Host,
+                    ["User-Agent"] = "Roblox/WinInet",
+                    ["Content-Type"] = "application/json",
+                    ["Accept"] = "application/json",
+                    ["Roblox-Place-Id"] = placeId.ToString(),
+                };
+                if (!string.IsNullOrEmpty(cookie))
+                    headers["Cookie"] = $".ROBLOSECURITY={cookie}";
+
+                ProxiedResponse? answer = await AssetProxyServer.ForwardToUpstreamAsync(new ProxiedRequest(AssetWarpPolicy.Host, "POST", BatchFragment, headers, Encoding.UTF8.GetBytes(body)), token);
+
+                var locations = new List<(ManifestEntry Entry, string Url)>();
+                if (answer is { StatusCode: 200 })
+                {
+                    try
+                    {
+                        using JsonDocument document = JsonDocument.Parse(answer.Body);
+                        foreach (JsonElement element in document.RootElement.EnumerateArray())
+                        {
+                            if (element.TryGetProperty("location", out JsonElement location) && element.TryGetProperty("requestId", out JsonElement requestId)
+                                && int.TryParse(requestId.GetString(), out int index) && index >= 0 && index < chunk.Length
+                                && location.GetString() is string url && AssetRoute.IsRobloxContentUrl(url))
+                                locations.Add((chunk[index], url));
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                failed += chunk.Length - locations.Count;
+                done += chunk.Length - locations.Count;
+
+                using var gate = new SemaphoreSlim(8);
+                await Task.WhenAll(locations.Select(async item =>
+                {
+                    await gate.WaitAsync(token);
+                    try
+                    {
+                        var info = new AssetRouteInfo { OriginalUrl = item.Url, Key = AssetRoute.ContentKey(item.Url), AssetId = item.Entry.AssetId, TypeId = item.Entry.TypeId, PlaceId = placeId };
+
+                        if (Cache.Contains(info.Key) || await DownloadAsync(info, token) is not null)
+                        {
+                            Interlocked.Increment(ref fetched);
+                            Remember(info); // the content may have changed since the manifest was written
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref failed);
+                        }
+                    }
+                    finally
+                    {
+                        gate.Release();
+                        progress(Interlocked.Increment(ref done) / (double)Math.Max(1, missing.Count));
+                    }
+                }));
+            }
+
+            FlushManifests();
+            App.Logger.WriteLine(LOG_IDENT, $"Prefetch of place {placeId}: {fetched} fetched, {failed} failed, {already} were already on disk");
+            return (fetched, failed, already);
+        }
+
         // ------------------------------------------------------------------ batch response
 
         public static byte[]? RewriteBatch(ProxiedRequest request, ProxiedResponse response)
@@ -113,6 +299,7 @@ namespace PhasmaStrap.Networking
                 return null;
 
             HookLogs();
+            Remember(info);
 
             var happened = new AssetTrafficStats.Event { PlaceId = info.PlaceId, TypeId = info.TypeId };
 

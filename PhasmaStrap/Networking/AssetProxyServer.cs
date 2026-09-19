@@ -511,7 +511,9 @@ namespace PhasmaStrap.Networking
             return Array.Empty<byte>();
         }
 
-        private static async Task<ProxiedResponse?> ForwardToUpstreamAsync(ProxiedRequest request, CancellationToken token)
+        // (internal: the asset prefetcher asks Roblox's real API through this too - the hosts file
+        // points the API's name at this very proxy, so an ordinary HttpClient would loop back here)
+        internal static async Task<ProxiedResponse?> ForwardToUpstreamAsync(ProxiedRequest request, CancellationToken token)
         {
             string? ip = await DohResolver.ResolveAsync(request.Host, token);
             if (ip is null)
