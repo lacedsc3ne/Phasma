@@ -20,6 +20,11 @@ namespace PhasmaStrap
 #endif
         public const string ProjectOwner = "lacedsc3ne";
         public const string ProjectRepository = "lacedsc3ne/Phasma";
+
+        // PhasmaStrap's own server (VpsServer/ in the repo): answers release questions from a copy
+        // of GitHub's, so auto-update and the News page don't run into GitHub's limit of 60
+        // requests an hour per IP address. Empty = ask GitHub directly.
+        public const string ServerBase = "";
         public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/Phasma";
         public const string ProjectHelpLink = "https://github.com/lacedsc3ne/Phasma/wiki";
         public const string ProjectSupportLink = "https://github.com/lacedsc3ne/Phasma/issues/new";
@@ -174,7 +179,7 @@ namespace PhasmaStrap
 
             try
             {
-                var releaseInfo = await Http.GetJson<GithubRelease>($"https://api.github.com/repos/{ProjectRepository}/releases/latest");
+                var releaseInfo = await GetReleaseJson<GithubRelease>("/v1/releases/latest", "/releases/latest");
 
                 if (releaseInfo is null || releaseInfo.Assets is null)
                 {
@@ -190,6 +195,30 @@ namespace PhasmaStrap
             }
 
             return null;
+        }
+
+        // from PhasmaStrap's server when there is one and it answers quickly, otherwise from GitHub
+        public static async Task<T> GetReleaseJson<T>(string serverPath, string githubPath)
+        {
+            if (ServerBase.Length > 0)
+            {
+                try
+                {
+                    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    using var response = await HttpClient.GetAsync(ServerBase + serverPath, timeout.Token);
+                    response.EnsureSuccessStatusCode();
+
+                    T? result = JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync(timeout.Token));
+                    if (result is not null)
+                        return result;
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("App::GetReleaseJson", $"PhasmaStrap's server didn't answer ({ex.Message}) - asking GitHub");
+                }
+            }
+
+            return await Http.GetJson<T>($"https://api.github.com/repos/{ProjectRepository}{githubPath}");
         }
 
         public static async void SendStat(string key, string value)

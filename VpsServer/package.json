@@ -1,0 +1,9 @@
+{
+  "name": "phasmastrap-vps",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PhasmaStrap's VPS service (update API)",
+  "main": "index.js",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node index.js" }
+}
