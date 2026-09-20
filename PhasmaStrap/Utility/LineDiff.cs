@@ -1,6 +1,3 @@
-﻿// Ported from Voidstrap's Utility/LineDiff.cs.
-// A minimal LCS-based line differ, used by BootstrapperEditorWindow to highlight which lines
-// of the theme XML differ from the last-saved (baseline) version.
 namespace PhasmaStrap.Utility
 {
     public enum DiffKind

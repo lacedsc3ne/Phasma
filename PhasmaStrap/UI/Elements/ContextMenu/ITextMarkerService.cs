@@ -1,4 +1,3 @@
-﻿// Ported from Voidstrap's UI/Elements/ContextMenu/ITextMarkerService.cs.
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
     public interface ITextMarkerService

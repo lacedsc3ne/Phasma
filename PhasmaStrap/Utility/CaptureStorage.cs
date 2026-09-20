@@ -1,17 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    // Keeps the Screenshots and Replays folders from growing without bound.
-    //
-    // Two optional rules, both off by default: a total size limit and a maximum age. When either
-    // is exceeded the OLDEST captures go first, and they go to the Recycle Bin, not into thin air -
-    // a limit set too low by accident can be undone from there. The newest capture is never
-    // touched (it is the one that was just taken), and neither is a file marked read-only, which
-    // doubles as a way to pin a capture: Properties > Read-only.
-    //
-    // It only ever runs right after a new capture is saved, never just because a setting changed
-    // or a page was opened.
-    //
-    // The planning half has no App dependencies, so it can be exercised from a console harness.
     public static class CaptureStorage
     {
         public static Action<string>? Log;
@@ -46,7 +34,6 @@ namespace PhasmaStrap.Utility
                     if (!Extensions.Contains(file.Extension, StringComparer.OrdinalIgnoreCase))
                         continue;
 
-                    // a clip the editor is in the middle of writing
                     if (file.Name.EndsWith(".editing.mp4", StringComparison.OrdinalIgnoreCase))
                         continue;
 
@@ -57,7 +44,6 @@ namespace PhasmaStrap.Utility
             return entries;
         }
 
-        // which files have to go, oldest first. limitBytes / maxAgeDays <= 0 switch that rule off.
         public static List<Entry> Plan(List<Entry> entries, long limitBytes, int maxAgeDays, DateTime now)
         {
             var doomed = new List<Entry>();
@@ -70,7 +56,6 @@ namespace PhasmaStrap.Utility
 
             List<Entry> candidates = ordered.Where(e => !ReferenceEquals(e, newest) && !e.ReadOnly).ToList();
 
-            // everything past the age limit
             if (maxAgeDays > 0)
             {
                 foreach (Entry entry in candidates.Where(e => (now - e.Modified).TotalDays > maxAgeDays).ToList())
@@ -81,7 +66,6 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            // then the oldest of what is left, until the folder fits
             if (limitBytes > 0)
             {
                 foreach (Entry entry in candidates)

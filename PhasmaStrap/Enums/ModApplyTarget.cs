@@ -1,7 +1,5 @@
 namespace PhasmaStrap.Enums
 {
-    // which Roblox executable(s) file mods (Paths.Modifications) and managed mod packages get
-    // applied to - see Bootstrapper.ApplyModifications
     public enum ModApplyTarget
     {
         [EnumSort(Order = 1)]

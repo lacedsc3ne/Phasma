@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +13,6 @@ namespace PhasmaStrap.UI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // https://stackoverflow.com/a/28672015/11852173
-    
             var enumVal = (Enum)value;
             var stringVal = enumVal.ToString();
 

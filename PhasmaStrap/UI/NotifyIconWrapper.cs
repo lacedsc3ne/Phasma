@@ -1,4 +1,4 @@
-using PhasmaStrap.Integrations;
+﻿using PhasmaStrap.Integrations;
 using PhasmaStrap.UI.Elements.About;
 using PhasmaStrap.UI.Elements.ContextMenu;
 
@@ -6,14 +6,12 @@ namespace PhasmaStrap.UI
 {
     public class NotifyIconWrapper : IDisposable
     {
-        // lol who needs properly structured mvvm and xaml when you have the absolute catastrophe that this is
-
         private bool _disposing = false;
 
         private readonly System.Windows.Forms.NotifyIcon _notifyIcon;
-        
+
         private readonly MenuContainer _menuContainer;
-        
+
         private readonly Watcher _watcher;
 
         private ActivityWatcher? _activityWatcher => _watcher.ActivityWatcher;
@@ -39,8 +37,6 @@ namespace PhasmaStrap.UI
             if (_activityWatcher is not null && App.Settings.Prop.ShowServerDetails)
                 _activityWatcher.OnGameJoin += OnGameJoin;
 
-            // in-app toast notifications (NotificationCenter) are opt-in and independent of the
-            // balloon-tip alert above, gated by their own per-event-type settings
             if (_activityWatcher is not null)
             {
                 _activityWatcher.OnGameJoin += OnGameJoinToast;
@@ -123,7 +119,7 @@ namespace PhasmaStrap.UI
         {
             if (_activityWatcher is null)
                 return;
-            
+
             string? serverLocation = await _activityWatcher.Data.QueryServerLocation();
 
             if (string.IsNullOrEmpty(serverLocation))
@@ -154,15 +150,13 @@ namespace PhasmaStrap.UI
             );
         }
 
-        // NotificationCenter's own toast, separate from the balloon-tip alert above - each is gated by
-        // its own setting (NotificationsJoinToastEnabled/NotificationsLeaveToastEnabled) so both can be
-        // off, on, or mixed independently of ShowServerDetails
         private void OnGameJoinToast(object? sender, EventArgs e)
         {
             NotificationCenter.Notify(
                 Strings.Menu_Notifications_Event_GameJoin_Title,
                 Strings.Menu_Notifications_Event_GameJoin_Message,
-                NotificationCategory.GameJoin
+                NotificationCategory.GameJoin,
+                kind: NotificationKindId.ServerJoined
             );
         }
 
@@ -171,12 +165,12 @@ namespace PhasmaStrap.UI
             NotificationCenter.Notify(
                 Strings.Menu_Notifications_Event_GameLeave_Title,
                 Strings.Menu_Notifications_Event_GameLeave_Message,
-                NotificationCategory.GameLeave
+                NotificationCategory.GameLeave,
+                kind: NotificationKindId.ServerLeft
             );
         }
         #endregion
 
-        // we may need to create our own handler for this, because this sorta sucks
         public void ShowAlert(string caption, string message, int duration, EventHandler? clickHandler)
         {
             string id = Guid.NewGuid().ToString()[..8];
@@ -203,7 +197,7 @@ namespace PhasmaStrap.UI
             Task.Run(async () =>
             {
                 await Task.Delay(duration * 1000);
-             
+
                 _notifyIcon.BalloonTipClicked -= clickHandler;
 
                 App.Logger.WriteLine(LOG_IDENT, "Duration over, erasing current click handler");

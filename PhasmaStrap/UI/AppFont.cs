@@ -7,13 +7,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI
 {
-    /// <summary>
-    /// Applies a chosen font to PhasmaStrap's own WPF UI, separate from the Roblox client font
-    /// mod (see GoogleFontsService / Paths.CustomFont). Ported from Voidstrap's AppFont; loads
-    /// the font app-locally via WPF's Fonts.GetFontFamilies(Uri) rather than installing it at
-    /// the OS level, which is sufficient since this only needs to affect PhasmaStrap's own
-    /// windows.
-    /// </summary>
     public static class AppFont
     {
         private static bool _registered;

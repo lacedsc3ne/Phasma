@@ -7,12 +7,6 @@ using PhasmaStrap.Models.Persistable;
 
 namespace PhasmaStrap.Integrations
 {
-    // Background poller that tunes the live Roblox process while a game session runs: process
-    // priority class, an optional logical-processor affinity cap, priority boost, and (when the
-    // Roblox window is unfocused) working-set trimming plus lowering PhasmaStrap's own priority so
-    // Roblox gets the CPU. Ported from Voidstrap, with the EmulationBypassService hook and
-    // multi-instance ("MultiAccount") ShouldRun trigger removed since PhasmaStrap doesn't have
-    // those subsystems.
     internal sealed class RobloxProcessOptimizer : IDisposable
     {
         private const int PollIntervalMs = 2000;
@@ -25,8 +19,6 @@ namespace PhasmaStrap.Integrations
 
         private readonly int _processId;
 
-        // per-place override resolved once at construction (see EnginePresets.Resolve) - null means
-        // "just read the live global settings every poll", matching the pre-per-game-override behavior
         private readonly EnginePresetValues? _override;
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();

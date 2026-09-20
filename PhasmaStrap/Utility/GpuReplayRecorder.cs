@@ -8,32 +8,6 @@ using D3D11 = Vortice.Direct3D11.D3D11;
 
 namespace PhasmaStrap.Utility
 {
-    // Instant Replay's GPU path.
-    //
-    // The older recorder (InstantReplayRecorder) reads every frame back to system memory, JPEG
-    // compresses it on the CPU (about half a core at 1080p60), keeps up to 1.2 GB of JPEGs, and
-    // only encodes H.264 when a clip is saved - which takes as long again as the clip.
-    //
-    // Here the frame never leaves the GPU: desktop duplication hands over a texture, it is copied
-    // (GPU to GPU) into a pooled texture, and that texture goes straight to a Media Foundation
-    // sink writer that owns the same D3D device - colour conversion and scaling run on the GPU,
-    // H.264 on the GPU's encoder block. What is kept is finished H.264, in memory, as a rolling
-    // list of short MP4 segments (a few MB each - nothing is written to disk until a clip is
-    // saved). Saving a clip is then just a remux of the newest segments (ReplayMuxer): no
-    // re-encode, done in a fraction of a second.
-    //
-    // Why segments rather than one endless stream: the sink writer cannot hand out the encoder's
-    // output, only write containers. Each segment is its own writer (so it starts on a keyframe
-    // and can be dropped when it ages out); the next one is created ahead of time on a worker so
-    // switching costs the capture thread nothing.
-    //
-    // A clip therefore runs from a segment boundary: it is the requested length or up to one
-    // segment longer, never shorter (once that much has been buffered).
-    //
-    // Only what is on screen while the game is the FOREGROUND window is recorded - desktop
-    // duplication sees the whole monitor, and other windows are nobody's business.
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public sealed class GpuReplayRecorder : IDisposable
     {
         public static Action<string>? Log;
@@ -41,7 +15,7 @@ namespace PhasmaStrap.Utility
         public sealed class Settings
         {
             public int Fps = 60;
-            public int MaxHeight;                 // 0 = native
+            public int MaxHeight;
             public int ClipSeconds = 20;
             public string ProcessName = "RobloxPlayerBeta";
             public Func<int, int, int, int> BitrateFor = (w, h, fps) => 10_000_000;
@@ -56,7 +30,6 @@ namespace PhasmaStrap.Utility
         private Thread? _thread;
         private volatile bool _running;
 
-        // ---- owned by the capture thread
         private ID3D11Device? _device;
         private ID3D11DeviceContext? _context;
         private IntPtr _deviceManager;
@@ -70,7 +43,6 @@ namespace PhasmaStrap.Utility
         private IntPtr _hwnd;
         private DateTime _hwndCheckedUtc = DateTime.MinValue;
 
-        // ---- shared
         private readonly object _sync = new();
         private readonly List<Segment> _closed = new();
         private readonly ManualResetEventSlim _cutDone = new(false);
@@ -78,32 +50,25 @@ namespace PhasmaStrap.Utility
         private int _failures;
         private bool _everWorked;
 
-        // closed segments that were dropped while a clip was still being written from them
         private readonly List<Segment> _limbo = new();
 
-        // frames the game presented, as counted by desktop duplication - for FpsFeed
         private long _presented;
         private long _presentedSince;
 
-        // stats
         private long _statFrames, _statDropped, _statRepeated;
 
-        // the newest picture of the game, kept so a tick with no new frame repeats it: clips are
-        // then exactly the chosen frame rate, even when the game draws fewer frames than that
         private ID3D11Texture2D? _last;
-        private IDXGIKeyedMutex? _lastMutex;   // _last is shared with the overlay compositor
+        private IDXGIKeyedMutex? _lastMutex;
         private int _lastWidth, _lastHeight;
         private bool _lastValid;
         private DateTime _statSinceUtc;
 
         public bool IsRunning => _running;
 
-        /// <summary>Set when the GPU path cannot work on this machine - the caller falls back to the CPU recorder.</summary>
         public bool Unavailable { get; private set; }
 
         public string UnavailableReason { get; private set; } = "";
 
-        /// <summary>Raised (once, from the capture thread) when the GPU path gives up.</summary>
         public event Action? GaveUp;
 
         public GpuReplayRecorder(Func<Settings> settings)
@@ -111,7 +76,6 @@ namespace PhasmaStrap.Utility
             _settings = settings;
         }
 
-        // 100ns ticks on the clock every timestamp here (and ReplayAudio) uses
         public static long Now() => (long)(Stopwatch.GetTimestamp() * (10_000_000.0 / Stopwatch.Frequency));
 
         private sealed class PoolItem : IDisposable
@@ -134,7 +98,7 @@ namespace PhasmaStrap.Utility
             public int SourceWidth, SourceHeight, Width, Height, Fps, Bitrate;
             public long StartTicks = -1, EndTicks;
             public int Frames;
-            public long LastSlot = -1;   // frame number (at the clip's fps) of the last frame written
+            public long LastSlot = -1;
             public Task? Finalizing;
             public bool Ok;
 
@@ -154,8 +118,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ lifecycle
-
         public void Start()
         {
             if (_running)
@@ -164,7 +126,6 @@ namespace PhasmaStrap.Utility
             _running = true;
             _statSinceUtc = DateTime.UtcNow;
 
-            // the overlay lets go of its own screen capture and reads ours (SharedGameFrame)
             SharedGameFrame.RecorderActive = true;
 
             _thread = new Thread(CaptureLoop) { IsBackground = true, Name = "GpuReplayCapture" };
@@ -186,8 +147,6 @@ namespace PhasmaStrap.Utility
             Stop();
             GC.SuppressFinalize(this);
         }
-
-        // ------------------------------------------------------------------ capture thread
 
         private void CaptureLoop()
         {
@@ -222,15 +181,11 @@ namespace PhasmaStrap.Utility
 
                         if (!active)
                         {
-                            // nothing to record right now (not in front, minimised, no window). The
-                            // segment ends here, so the pause becomes a cut in the clip rather than
-                            // a frame frozen for as long as the game was out of sight.
                             CloseCurrent();
                             Thread.Sleep(100);
                             nextMs = clock.Elapsed.TotalMilliseconds;
                             continue;
                         }
-
                     }
                     catch (Exception ex)
                     {
@@ -238,7 +193,6 @@ namespace PhasmaStrap.Utility
                         ReleaseDuplication();
                         DropCurrent();
 
-                        // a pipeline that never gets going is a machine this path does not work on
                         if (++_failures >= 6 && !_everWorked)
                         {
                             Unavailable = true;
@@ -290,7 +244,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // false = nothing recordable is in front right now
         private bool CaptureOnce(Settings settings, int fps, int frameWaitMs)
         {
             IntPtr hwnd = ResolveWindow(settings.ProcessName);
@@ -312,8 +265,6 @@ namespace PhasmaStrap.Utility
 
             if (!EnsureDuplication(origin.X + wantWidth / 2, origin.Y + wantHeight / 2))
             {
-                // the overlay may still be holding the monitor's capture for a moment - it lets
-                // go as soon as it sees the recorder running, so try again soon
                 _duplicationRetryUtc = DateTime.UtcNow.AddSeconds(1);
                 return false;
             }
@@ -329,19 +280,15 @@ namespace PhasmaStrap.Utility
                     _duplication!.AcquireNextFrame(Math.Clamp(frameWaitMs, 0, 100), out OutduplFrameInfo info, out resource);
                     acquired = true;
 
-                    // the grab rate is the recorder's; how many frames went by in between is the game's
                     CountPresented((int)info.AccumulatedFrames);
 
-                    // a mouse-only update carries no new image
                     fresh = info.LastPresentTime != 0 && resource is not null;
                 }
                 catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.WaitTimeout)
                 {
-                    // nothing new on screen this tick - the last picture is written again below
                 }
                 catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.AccessLost)
                 {
-                    // resolution / fullscreen change or the secure desktop - rebuilt on the next tick
                     ReleaseDuplication();
                     _lastValid = false;
                     return true;
@@ -366,7 +313,6 @@ namespace PhasmaStrap.Utility
                 }
                 else
                 {
-                    // a repeat is only right while the window is the size it was
                     if (!_lastValid || (wantWidth & ~1) < _lastWidth || (wantHeight & ~1) < _lastHeight)
                         return true;
                     _statRepeated++;
@@ -374,8 +320,6 @@ namespace PhasmaStrap.Utility
 
                 int width = _lastWidth, height = _lastHeight;
 
-                // "Native" is the game's own size; any other choice is exactly that height (the
-                // width follows the game's shape), scaled up or down as needed
                 int outWidth = width, outHeight = height;
                 if (settings.MaxHeight > 0)
                 {
@@ -388,8 +332,6 @@ namespace PhasmaStrap.Utility
 
                 if (_current is null || !_current.Matches(width, height, outWidth, outHeight, fps, bitrate))
                 {
-                    // first frame, or the window / a setting changed: a clip has one format, so
-                    // what was buffered in the old one is let go
                     if (_current is not null)
                     {
                         DropCurrent();
@@ -408,15 +350,12 @@ namespace PhasmaStrap.Utility
                     Prepare(width, height, outWidth, outHeight, fps, bitrate);
                 }
 
-                // every frame sits on the clip's own frame grid (1/fps apart): a constant frame rate
                 long frameTicks = 10_000_000L / fps;
-                // (a tick may wait up to half a frame for a new picture, and may fire a little early:
-                // both land on the tick's own step)
+
                 long slot = (long)Math.Floor((now - _current.StartTicks) / (double)frameTicks + 0.25);
                 if (slot <= _current.LastSlot)
-                    return true; // this grid step already has its frame
+                    return true;
 
-                // the loop ran late (a hitch): fill the steps it missed, up to a quarter second
                 long missed = Math.Min(slot - _current.LastSlot - 1, Math.Max(1, fps / 4));
                 for (long s = slot - missed; s < slot; s++)
                 {
@@ -481,8 +420,6 @@ namespace PhasmaStrap.Utility
             SharedGameFrame.Updated();
         }
 
-        // the overlay reads _last from its own device; the keyed mutex keeps us from writing
-        // while it copies (it holds it for one copy - well under a millisecond)
         private bool LockLast()
         {
             if (_lastMutex is null)
@@ -490,7 +427,6 @@ namespace PhasmaStrap.Utility
             return KeyedMutexLock.Acquire(_lastMutex, 0, 50) == KeyedMutexLock.Acquired;
         }
 
-        // hands the kept picture to the encoder as frame number `slot` of the current segment
         private bool WriteLast(long slot, long frameTicks, int width, int height)
         {
             PoolItem? item = Rent(width, height);
@@ -546,17 +482,10 @@ namespace PhasmaStrap.Utility
             _presentedSince = now;
         }
 
-        // ------------------------------------------------------------------ segments
-
         private Segment CreateSegment(int sourceWidth, int sourceHeight, int width, int height, int fps, int bitrate)
         {
             EnsureDevice();
 
-            // 1080p above ~170fps is outside every H.264 level; an encoder that enforces levels
-            // refuses it, so the stream is then declared as 60fps - frames keep their real
-            // timestamps, only the nominal rate in the header differs
-            // before that, the highest H.264 levels are asked for outright (6.2, then 5.2) - some
-            // encoders pick a level from the size and rate themselves, some need to be told
             var attempts = new List<(Guid Input, int DeclaredFps, int Level)>
             {
                 (VideoFormatGuids.Argb32, fps, 0),
@@ -604,7 +533,7 @@ namespace PhasmaStrap.Utility
                     MfInterop.SetUInt64(output, MediaTypeAttributeKeys.PixelAspectRatio, MfInterop.Pack(1, 1));
                     if (level > 0)
                     {
-                        output.Set(MediaTypeAttributeKeys.Mpeg2Profile, 100u); // High
+                        output.Set(MediaTypeAttributeKeys.Mpeg2Profile, 100u);
                         output.Set(MediaTypeAttributeKeys.Mpeg2Level, (uint)level);
                     }
 
@@ -639,7 +568,6 @@ namespace PhasmaStrap.Utility
             throw new InvalidOperationException($"no GPU encoder accepted {sourceWidth}x{sourceHeight} -> {width}x{height} @ {fps}fps ({string.Join("; ", failures)})", last);
         }
 
-        // builds the next segment's writer on a worker, so that the switch is free
         private void Prepare(int sourceWidth, int sourceHeight, int width, int height, int fps, int bitrate)
         {
             _next = Task.Run<Segment?>(() =>
@@ -676,7 +604,6 @@ namespace PhasmaStrap.Utility
             return segment;
         }
 
-        // ends the segment being written and queues it for finalisation; the capture thread never waits
         private void CloseCurrent(long endTicks = 0)
         {
             Segment? segment = _current;
@@ -716,7 +643,6 @@ namespace PhasmaStrap.Utility
             {
                 _closed.Add(segment);
 
-                // (while a clip is being written nothing is retired - next close catches up)
                 while (Volatile.Read(ref _cutsOutstanding) == 0 && _closed.Count > 1 && _closed[0].EndTicks < keepFrom)
                 {
                     expired.Add(_closed[0]);
@@ -783,10 +709,6 @@ namespace PhasmaStrap.Utility
                 Retire(segment);
         }
 
-        // ------------------------------------------------------------------ saving
-
-        // The newest `seconds` of what was recorded, as finished segments in order (each with the
-        // moment it started, on the Now() clock). The caller must Release() the result.
         internal sealed class Cut : IDisposable
         {
             public List<Segment> Segments = new();
@@ -806,7 +728,6 @@ namespace PhasmaStrap.Utility
             {
                 if (_running)
                 {
-                    // have the capture thread end the segment being written, so the clip runs right up to now
                     _cutDone.Reset();
                     _cutRequested = true;
                     _cutDone.Wait(2000);
@@ -823,7 +744,6 @@ namespace PhasmaStrap.Utility
                         total += _closed[i].EndTicks - _closed[i].StartTicks;
                     }
 
-                    // they must survive until the clip has been written, whatever ages out meanwhile
                     Interlocked.Increment(ref _cutsOutstanding);
                 }
 
@@ -834,9 +754,6 @@ namespace PhasmaStrap.Utility
 
                 picked.RemoveAll(s => !s.Ok || s.ByteStream == IntPtr.Zero);
 
-                // a clip has one format: keep the newest run of segments that share it. (Segments
-                // need not follow on from each other in time - a stretch where the game was not in
-                // front is simply not there, and ReplayMuxer joins what is.)
                 for (int i = picked.Count - 1; i > 0; i--)
                 {
                     if (!picked[i].Matches(picked[i - 1].SourceWidth, picked[i - 1].SourceHeight, picked[i - 1].Width, picked[i - 1].Height, picked[i - 1].Fps, picked[i - 1].Bitrate))
@@ -856,12 +773,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ self test
-
-        // Pushes generated frames through exactly the pipeline real frames take (same device, pool,
-        // segment writers and rotation) without looking at the screen. Used by the test harness,
-        // and cheap enough to answer "does the GPU path work on this PC" before relying on it.
-        // Runs on the calling thread; the recorder must not be started.
         internal Cut? RunSynthetic(int sourceWidth, int sourceHeight, int width, int height, int fps, int bitrate, int frames, bool realTime)
         {
             if (_running)
@@ -873,7 +784,6 @@ namespace PhasmaStrap.Utility
             {
                 EnsureDevice();
 
-                // a gradient, drawn once; per frame only the columns of the moving bar change
                 byte[] pixels = new byte[sourceWidth * sourceHeight * 4];
                 for (int y = 0; y < sourceHeight; y++)
                 {
@@ -910,7 +820,6 @@ namespace PhasmaStrap.Utility
                     if (item is null)
                         throw new InvalidOperationException("the encoder never gave a texture back");
 
-                    // a bar that sweeps across the gradient - easy to find again in a grabbed frame
                     int bar = (int)((long)n * sourceWidth / Math.Max(1, frames));
                     for (int x = Math.Max(0, Math.Min(bar, previousBar) - 12); x < Math.Min(sourceWidth, Math.Max(bar, previousBar) + 12); x++)
                     {
@@ -939,7 +848,7 @@ namespace PhasmaStrap.Utility
                 }
 
                 CloseCurrent(realTime ? Now() : start + frames * frameTicks);
-                return TakeCut(1_000_000); // everything that was made
+                return TakeCut(1_000_000);
             }
             finally
             {
@@ -956,8 +865,6 @@ namespace PhasmaStrap.Utility
             pixels[i + 3] = 255;
         }
 
-        // ------------------------------------------------------------------ device / pool
-
         private void EnsureDevice()
         {
             if (_device is not null)
@@ -965,7 +872,6 @@ namespace PhasmaStrap.Utility
 
             D3D11.D3D11CreateDevice((IDXGIAdapter)null!, DriverType.Hardware, DeviceCreationFlags.BgraSupport | DeviceCreationFlags.VideoSupport, FeatureLevels, out _device, out _context).CheckError();
 
-            // Media Foundation drives this device from its own threads
             using (ID3D11Multithread multithread = _device!.QueryInterface<ID3D11Multithread>())
                 multithread.SetMultithreadProtected(true);
 
@@ -1030,12 +936,10 @@ namespace PhasmaStrap.Utility
             _outputLeft = _outputTop = _outputRight = _outputBottom = 0;
         }
 
-        // a texture the encoder is not holding any more; null when every one is still in flight
         private PoolItem? Rent(int width, int height)
         {
             if (width != _poolWidth || height != _poolHeight)
             {
-                // textures still inside the encoder stay alive through its own references
                 foreach (PoolItem old in _pool)
                     old.Dispose();
                 _pool.Clear();
@@ -1090,7 +994,6 @@ namespace PhasmaStrap.Utility
             _next = null;
             try { next?.Result?.Dispose(); } catch { }
 
-            // a clip being written right now still needs its segments
             for (int i = 0; i < 100 && Volatile.Read(ref _cutsOutstanding) > 0; i++)
                 Thread.Sleep(100);
 
@@ -1133,8 +1036,6 @@ namespace PhasmaStrap.Utility
             _device?.Dispose();
             _device = null;
         }
-
-        // ------------------------------------------------------------------ misc
 
         private IntPtr ResolveWindow(string processName)
         {

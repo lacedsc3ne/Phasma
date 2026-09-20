@@ -7,16 +7,6 @@ using DataObject = System.Windows.DataObject;
 
 namespace PhasmaStrap.Utility
 {
-    // Puts a screenshot or clip on the clipboard so it can be pasted straight into a chat.
-    //
-    // A file is offered as a file drop (what Discord, Explorer and mail clients take as "a file
-    // was pasted"); a screenshot additionally as a bitmap, for the programs that only take
-    // pictures (Paint, image editors, some web pages).
-    //
-    // The clipboard is an STA-only API and is frequently held open for a moment by whatever
-    // clipboard manager is running, so every call goes through an STA thread and retries.
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public static class ClipboardShare
     {
         public static Action<string>? Log;
@@ -53,7 +43,7 @@ namespace PhasmaStrap.Utility
             {
                 var image = new BitmapImage();
                 image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad; // the file is not kept open
+                image.CacheOption = BitmapCacheOption.OnLoad;
                 image.UriSource = new Uri(path, UriKind.Absolute);
                 image.EndInit();
                 image.Freeze();
@@ -92,13 +82,11 @@ namespace PhasmaStrap.Utility
                 {
                     try
                     {
-                        // copy: true - the data outlives this process
                         Clipboard.SetDataObject(data, true);
                         return true;
                     }
                     catch (System.Runtime.InteropServices.COMException) when (attempt < 8)
                     {
-                        // CLIPBRD_E_CANT_OPEN: another program has it open right now
                         Thread.Sleep(60);
                     }
                 }

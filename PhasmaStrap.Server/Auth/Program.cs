@@ -10,11 +10,6 @@ using PhasmaStrap.Server.Auth.Web;
 
 namespace PhasmaStrap.Server.Auth;
 
-// Ported from Voidstrap's ServerAuthInterface console app (VoidstrapClient.ServerAuthInterface/Program.cs).
-// In Voidstrap this subsystem is a standalone process. It is NOT currently wired into
-// PhasmaStrap.Server's single Program.Main - it is ported here as a callable host
-// (call AuthHost.Run(args) from a background thread/Task) for future integration,
-// since PhasmaStrap.Server's WebServer/Program.cs already owns the process entry point.
 public class AuthHost
 {
 	private static Process? _RobloxProcess;

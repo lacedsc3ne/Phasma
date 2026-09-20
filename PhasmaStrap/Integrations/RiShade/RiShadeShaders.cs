@@ -1,9 +1,5 @@
 namespace PhasmaStrap.Integrations.RiShade
 {
-    // Ported from Voidstrap's RiShadeShaders.cs verbatim. The shader itself gracefully no-ops any
-    // branch gated on uAiDepth/uDOF/uAO/uGiStr/uFogStr/uALStr-via-depth when those inputs are left
-    // at their disabled defaults, so the full HLSL source can be reused as-is even though this port
-    // never populates an AI depth buffer (see RiShadeSettings.cs for what's intentionally unsupported).
     internal static class RiShadeShaders
     {
         public const string Source = @"

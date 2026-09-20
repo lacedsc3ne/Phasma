@@ -7,7 +7,6 @@ namespace PhasmaStrap.Models
         public string LaunchArgs { get; set; } = "";
         public bool AutoClose { get; set; } = true;
 
-        // per-game launching, ported from Voidstrap
         public bool SpecifyGame { get; set; } = false;
         public string GameID { get; set; } = "";
         public bool RunAsAdmin { get; set; } = false;

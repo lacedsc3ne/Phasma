@@ -13,14 +13,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Editor for the Capture page's Instant Replay clips: trim with draggable start/end handles
-    /// on a thumbnail timeline, crop, slow motion / fast forward, and save a single frame as a
-    /// screenshot. Preview is a plain MediaElement; the actual edit is a re-encode through
-    /// <see cref="ClipProcessor"/>, so trims are frame-exact. If the system can't play MP4 in a
-    /// MediaElement (N editions without the media pack), it falls back to decoded still frames -
-    /// no playback, but every edit still works.
-    /// </summary>
     public partial class ClipEditorWindow : WpfUiWindow
     {
         private const string LOG_IDENT = "ClipEditorWindow";
@@ -70,8 +62,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Loaded += async (_, _) => await LoadAsync();
         }
 
-        // ---------------------------------------------------------------- loading
-
         private async Task LoadAsync()
         {
             UpdateStatus("Loading clip...");
@@ -84,7 +74,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Probe failed: {ex.Message}");
                 UpdateStatus($"This clip can't be read: {ex.Message}");
-                Timeline.IsEnabled = false; // every action checks _info, so nothing else can run
+                Timeline.IsEnabled = false;
                 return;
             }
 
@@ -117,7 +107,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
 
             Player.Source = new Uri(_path, UriKind.Absolute);
-            // play + pause so the first frame renders instead of a black surface
+
             Player.Play();
             Player.Pause();
             _timer.Start();
@@ -129,7 +119,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Player.Position = _start;
             Player.SpeedRatio = _speed;
 
-            // assigning SpeedRatio can quietly resume a paused MediaElement
             if (!_playing)
                 Player.Pause();
         }
@@ -189,8 +178,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             });
         }
 
-        // ---------------------------------------------------------------- position / playback
-
         private TimeSpan Position => _stillMode || !_opened ? _stillPosition : Player.Position;
 
         private TimeSpan FrameStep => TimeSpan.FromSeconds(1.0 / Math.Max(1, _info?.Fps ?? 12));
@@ -208,7 +195,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             UpdatePlayhead();
         }
 
-        // still-frame fallback: decode the wanted frame off the UI thread, newest request wins
         private void ShowStill(TimeSpan position)
         {
             _stillCancel?.Cancel();
@@ -244,7 +230,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 return;
 
             if (_playing && Player.Position >= _end)
-                Player.Position = _start; // loop the selection
+                Player.Position = _start;
 
             if (_drag == DragTarget.None)
                 UpdatePlayhead();
@@ -302,8 +288,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
         }
 
-        // ---------------------------------------------------------------- trim
-
         private void SetStart(TimeSpan value)
         {
             _start = TimeSpan.FromTicks(Math.Clamp(value.Ticks, 0, Math.Max(0, (_end - MinSelection).Ticks)));
@@ -329,8 +313,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             LayoutTimeline();
             UpdateStatus();
         }
-
-        // ---------------------------------------------------------------- timeline
 
         private double TrackWidth => Math.Max(1, Timeline.ActualWidth - TimelinePad * 2);
 
@@ -387,7 +369,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             double x = e.GetPosition(Timeline).X;
             double startX = TimeToX(_start), endX = TimeToX(_end);
 
-            // handles hang outside the selection, so their grab zones lean outwards
             if (x >= startX - 14 && x <= startX + 4)
                 _drag = DragTarget.Start;
             else if (x >= endX - 4 && x <= endX + 14)
@@ -435,8 +416,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
         }
 
-        // ---------------------------------------------------------------- crop
-
         private void Crop_Click(object sender, RoutedEventArgs e) => SetCropMode(!_cropMode);
 
         private void SetCropMode(bool enabled)
@@ -467,7 +446,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             if (!_cropMode)
             {
-                SetPlaying(!_playing); // clicking the video toggles playback, like any player
+                SetPlaying(!_playing);
                 return;
             }
 
@@ -538,8 +517,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             CropCanvas.Children.Add(outline);
         }
 
-        // ---------------------------------------------------------------- status
-
         private static string Format(TimeSpan time) => $"{(int)time.TotalMinutes}:{time.Seconds:00}.{time.Milliseconds / 10:00}";
 
         private bool HasChanges => _start > TimeSpan.Zero || _end < _duration || _crop is not null || Math.Abs(_speed - 1.0) > 0.001;
@@ -554,7 +531,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             TimeSpan selection = _end - _start;
             string size = _crop is Rect rect ? $"{_info.Width} × {_info.Height} → {(int)Math.Round(rect.Width) & ~1} × {(int)Math.Round(rect.Height) & ~1}" : $"{_info.Width} × {_info.Height}";
-            // (a re-timed clip is saved without its sound - see ClipProcessor.Export)
+
             string speed = Math.Abs(_speed - 1.0) > 0.001 ? $"  ·  {_speed:0.##}× → {selection.TotalSeconds / _speed:0.0}s saved, without sound" : "";
 
             StatusText.Text = $"Selected {selection.TotalSeconds:0.0}s of {_duration.TotalSeconds:0.0}s  ·  {size}{speed}" + (extra is null ? "" : $"  ·  {extra}");
@@ -573,14 +550,12 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 SetPlaying(false);
         }
 
-        // ---------------------------------------------------------------- saving
-
         private ClipEditOptions BuildOptions()
         {
             var options = new ClipEditOptions
             {
                 Start = _start,
-                // leave the end open when it hasn't moved, so the final frame can't be clipped by rounding
+
                 End = _end >= _duration ? TimeSpan.MaxValue : _end,
                 Speed = _speed,
             };
@@ -634,7 +609,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             {
                 if (overwrite)
                 {
-                    // everything reading the original has to let go before it can be replaced
                     _thumbCancel?.Cancel();
                     _stillCancel?.Cancel();
                     await _thumbTask;
@@ -655,7 +629,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                     Saved = true;
                     App.Logger.WriteLine(LOG_IDENT, $"Replaced {_path}");
 
-                    // start over on the new file
                     _crop = null;
                     DrawCrop();
                     SpeedBox.SelectedIndex = 2;
@@ -687,7 +660,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private async Task ReplaceOriginalAsync(string edited)
         {
-            // MediaElement releases its file handle a moment after Close()
             for (int attempt = 0; ; attempt++)
             {
                 try
@@ -701,8 +673,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 }
             }
         }
-
-        // ---------------------------------------------------------------- GIF
 
         private static int TagOf(ComboBox box, int fallback) =>
             box.SelectedItem is ComboBoxItem { Tag: string tag } && int.TryParse(tag, out int value) ? value : fallback;
@@ -798,7 +768,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         {
             if (_busy)
             {
-                e.Cancel = true; // let the save finish rather than leave half a file behind
+                e.Cancel = true;
                 return;
             }
 
@@ -815,8 +785,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             {
             }
         }
-
-        // ---------------------------------------------------------------- keyboard
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {

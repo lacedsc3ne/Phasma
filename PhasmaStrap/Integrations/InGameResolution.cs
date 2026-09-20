@@ -2,11 +2,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.Integrations
 {
-    // Forces the chosen monitor to a specific resolution/refresh rate while a Roblox session is
-    // active, and restores whatever mode was active before the session started once it ends.
-    // Ported from Voidstrap's InGameResolutionApplier (which just wraps DisplaySystem.ApplyMode),
-    // extended here with the "remember and restore the previous mode on game leave" half - hooked
-    // from Watcher.cs the same way FakeExclusiveFullscreen/AudioDucker are.
     public static class ForcedResolution
     {
         private const string LOG_IDENT = "ForcedResolution";
@@ -16,7 +11,6 @@ namespace PhasmaStrap.Integrations
         private static string? _savedDevice;
         private static bool _applied;
 
-        // a game with its own resolution uses that; otherwise the general one, when it's on
         public static void OnGameJoin(long placeId = 0)
         {
             lock (_sync)
@@ -41,12 +35,10 @@ namespace PhasmaStrap.Integrations
                 }
                 else
                 {
-                    // switched to a game without one: put the screen back
                     RestoreLocked();
                     return;
                 }
 
-                // a server switch into a game with a different resolution
                 if (_applied)
                     RestoreLocked();
 
@@ -56,7 +48,6 @@ namespace PhasmaStrap.Integrations
 
                 if (current != null && current.Width == width && current.Height == height && current.RefreshRate == refreshRate)
                 {
-                    // already at the target mode, nothing to restore later
                     return;
                 }
 

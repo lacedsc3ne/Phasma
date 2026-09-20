@@ -9,7 +9,6 @@ namespace PhasmaStrap.Models
         public double TotalMinutes { get; set; }
         public DateTime LastPlayed { get; set; }
 
-        // the game's name, plus the place's own name when the game has several (Utility/PlaceNames)
         [JsonIgnore]
         public string DisplayName => PhasmaStrap.Utility.PlaceNames.Display(Name, PlaceId);
 

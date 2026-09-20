@@ -3,11 +3,6 @@ using System.Security.Cryptography;
 
 namespace PhasmaStrap.Integrations
 {
-    // downloads, installs, updates and runs the Rojo CLI (https://github.com/rojo-rbx/rojo),
-    // a popular third-party Studio file-sync tool for developers. Unlike the rest of the
-    // extension manifest in ExtensionManager, which only ever points at an executable the
-    // user already has, this manages the executable's entire lifecycle itself.
-    // Ported from Voidstrap.
     public static class RojoManager
     {
         private const long MaxReleaseBytes = 536_870_912L;
@@ -70,7 +65,6 @@ namespace PhasmaStrap.Integrations
             App.Logger.WriteLine(LOG_IDENT, $"Rojo installed at {RojoExe}");
         }
 
-        // returns true if an update was applied (or install skipped because already current)
         public static async Task<bool> UpdateAsync(Action<string>? progress, CancellationToken ct)
         {
             const string LOG_IDENT = "RojoManager::UpdateAsync";
@@ -197,9 +191,6 @@ namespace PhasmaStrap.Integrations
             entry.ExtractToFile(destination, true);
         }
 
-        // streams the download to disk while reporting progress, mirroring the manual
-        // buffered-copy pattern Bootstrapper.DownloadPackage uses for Roblox's own packages -
-        // and, when GitHub supplied a sha256 digest for the asset, verifies it afterwards
         private static async Task DownloadAsync(string url, string outputPath, string digest, long size, string label, Action<string>? progress, CancellationToken ct)
         {
             var response = await App.HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);

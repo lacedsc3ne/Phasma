@@ -1,14 +1,5 @@
 namespace PhasmaStrap.Networking
 {
-    /// <summary>
-    /// Marker-based editor for the Windows hosts file (%SystemRoot%\System32\drivers\etc\hosts), used
-    /// exclusively by <see cref="Integrations.ClassicHostRedirect"/>. Named/scoped separately from the
-    /// existing <see cref="HostsFileManager"/> (which manages a single fixed block of proxy-spoof
-    /// hostnames) rather than folded into it, matching the same self-contained-per-feature convention
-    /// already used by <see cref="Integrations.TelemetryBlocker"/> - each hosts-editing feature owns its
-    /// own block/marker so they can coexist safely on the same physical file without a shared class
-    /// needing to know about every consumer's hostname list up front.
-    /// </summary>
     internal static class ClassicHostsFile
     {
         private const string LOG_IDENT = "ClassicHostsFile";
@@ -17,9 +8,6 @@ namespace PhasmaStrap.Networking
 
         public static string HostsPath => Path.Combine(Paths.System, "drivers", "etc", "hosts");
 
-        /// <summary>
-        /// Returns true if any line in the hosts file contains the given marker comment.
-        /// </summary>
         public static bool IsMarkerPresent(string marker)
         {
             try
@@ -36,12 +24,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        /// <summary>
-        /// Appends "&lt;address&gt; &lt;host&gt; &lt;marker&gt;" lines for every host in <paramref name="hosts"/>,
-        /// after first removing any existing lines carrying the same marker. Refuses to write if doing so would
-        /// drop any unrelated (non-marker) line already present in the file, since the hosts file is shared with
-        /// the rest of the system and other software may have entries in it.
-        /// </summary>
         public static bool Apply(string marker, string address, IEnumerable<string> hosts)
         {
             s_mutationGate.Wait();
@@ -68,10 +50,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        /// <summary>
-        /// Removes every line carrying the given marker. Returns true if the file no longer contains the
-        /// marker afterwards (including when it never did).
-        /// </summary>
         public static bool Remove(string marker)
         {
             s_mutationGate.Wait();
@@ -109,7 +87,6 @@ namespace PhasmaStrap.Networking
             return File.ReadAllLines(path).Where(line => !line.Contains(marker, StringComparison.Ordinal)).ToList();
         }
 
-        // refuses to write if it would silently drop lines that don't belong to us (i.e. something else's hosts entries)
         private static bool WriteSafely(string marker, List<string> newLines)
         {
             string path = HostsPath;

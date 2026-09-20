@@ -1,9 +1,9 @@
-﻿namespace PhasmaStrap.RobloxInterfaces
+namespace PhasmaStrap.RobloxInterfaces
 {
     public static class Deployment
     {
         public const string DefaultChannel = "production";
-        
+
         private const string VersionStudioHash = "version-012732894899482c";
 
         public static string Channel = DefaultChannel;
@@ -11,7 +11,7 @@
         public static string BinaryType = "WindowsPlayer";
 
         public static bool IsDefaultChannel => Channel.Equals(DefaultChannel, StringComparison.OrdinalIgnoreCase);
-        
+
         public static string BaseUrl { get; private set; } = null!;
 
         public static IReadOnlyList<string> Mirrors => BaseUrls.OrderBy(entry => entry.Value).Select(entry => entry.Key).ToList();
@@ -25,8 +25,6 @@
 
         private static readonly Dictionary<string, ClientVersion> ClientVersionCache = new();
 
-        // a list of roblox deployment locations that we check for, in case one of them don't work
-        // these are all weighted based on their priority, so that we pick the most optimal one that we can. 0 = highest
         private static readonly Dictionary<string, int> BaseUrls = new()
         {
             { "https://setup.rbxcdn.com", 0 },
@@ -50,8 +48,6 @@
 
                 response.EnsureSuccessStatusCode();
 
-                // versionStudio is the version hash for the last MFC studio to be deployed.
-                // the response body should always be "version-012732894899482c".
                 string content = await response.Content.ReadAsStringAsync(token);
 
                 if (content != VersionStudioHash)
@@ -71,11 +67,6 @@
             return url;
         }
 
-        /// <summary>
-        /// This function serves double duty as the setup mirror enumerator, and as our connectivity check.
-        /// Returns null for success.
-        /// </summary>
-        /// <returns></returns>
         public static async Task<Exception?> InitializeConnectivity()
         {
             const string LOG_IDENT = "Deployment::InitializeConnectivity";
@@ -108,7 +99,6 @@
                     BaseUrl = finishedTask.Result;
             }
 
-            // stop other running connectivity tests
             tokenSource.Cancel();
 
             if (string.IsNullOrEmpty(BaseUrl))
@@ -116,7 +106,6 @@
                 if (exceptions.Any())
                     return exceptions[0];
 
-                // task cancellation exceptions don't get added to the list
                 return new TaskCanceledException("All connection attempts timed out.");
             }
 
@@ -165,7 +154,7 @@
                 {
                     clientVersion = await Http.GetJson<ClientVersion>("https://clientsettingscdn.roblox.com" + path);
                 }
-                catch (HttpRequestException httpEx) 
+                catch (HttpRequestException httpEx)
                 when (!isDefaultChannel && BadChannelCodes.Contains(httpEx.StatusCode))
                 {
                     throw new InvalidChannelException(httpEx.StatusCode);

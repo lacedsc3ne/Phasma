@@ -65,7 +65,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { Pack.Enabled = value; AssetContentService.Packs.Save(Pack); OnPropertyChanged(nameof(Enabled)); _changed(); }
         }
 
-        // "" = every game; otherwise place IDs separated by commas
         public string Places
         {
             get => string.Join(", ", Pack.Places);
@@ -87,10 +86,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Hosts { get; init; } = "";
     }
 
-    /// <summary>
-    /// Backs the "Asset engine" tab: routing asset downloads through the proxy, and what that
-    /// makes possible - the persistent cache, the texture shrinker, swap packs, the traffic report.
-    /// </summary>
     public sealed class AssetEngineViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<CachedGameRow> Games { get; } = new();
@@ -121,8 +116,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return names;
         }
 
-        // ------------------------------------------------------------------ status + master switch
-
         public string StatusText
         {
             get
@@ -141,8 +134,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.AssetRouteEnabled;
             set { App.Settings.Prop.AssetRouteEnabled = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(RouteEnabled)); OnPropertyChanged(nameof(StatusText)); }
         }
-
-        // ------------------------------------------------------------------ cache
 
         private static readonly int[] LimitValuesMb = { 1024, 2048, 4096, 8192, 16384, 32768 };
         public string[] CacheLimitOptions { get; } = { "1 GB", "2 GB", "4 GB", "8 GB", "16 GB", "32 GB" };
@@ -217,8 +208,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private string _prefetchStatus = "";
         public string PrefetchStatus { get => _prefetchStatus; private set { _prefetchStatus = value; OnPropertyChanged(nameof(PrefetchStatus)); } }
 
-        // ------------------------------------------------------------------ shrinker
-
         private static readonly int[] ShrinkValues = { 1024, 512, 256, 128 };
         public string[] ShrinkOptions { get; } = { "1024 px (barely visible)", "512 px (recommended)", "256 px (soft)", "128 px (blurry, smallest)" };
 
@@ -242,8 +231,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(SelectedShrink));
             }
         }
-
-        // ------------------------------------------------------------------ swap packs
 
         public bool SwapsEnabled
         {
@@ -396,8 +383,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(PacksEmptyVisibility));
         }
 
-        // ------------------------------------------------------------------ join-time server picker
-
         private string _pickerStatus = "";
         public string PickerStatus { get => _pickerStatus; private set { _pickerStatus = value; OnPropertyChanged(nameof(PickerStatus)); } }
 
@@ -409,7 +394,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 App.Settings.Prop.JoinServerPickerEnabled = value;
                 App.Settings.Save();
 
-                // the hosts file has to gain (or lose) gamejoin.roblox.com - one elevation prompt
                 if (App.Settings.Prop.NetworkingProxyEnabled && !HostsFileManager.IsBlockCurrent())
                 {
                     bool ok = HostsElevation.Apply(true, App.Settings.Prop.BlockRobloxTelemetry);
@@ -434,8 +418,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // ------------------------------------------------------------------ traffic
-
         public bool TrafficEnabled
         {
             get => App.Settings.Prop.TrafficReportEnabled;
@@ -449,8 +431,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             AssetContentService.Traffic.Clear();
             Refresh();
         });
-
-        // ------------------------------------------------------------------ refresh
 
         private void Refresh()
         {

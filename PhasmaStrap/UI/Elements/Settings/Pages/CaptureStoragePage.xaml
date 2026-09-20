@@ -1,0 +1,28 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.CaptureStoragePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance dmodels:CaptureViewModel, IsDesignTimeCreatable=True}"
+      Title="CaptureStoragePage"
+      Scrollable="True">
+
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Capture_Storage}" FontSize="20" FontWeight="Medium" />
+        <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Capture_KeepScreenshotClipFoldersFromGrowing}" />
+        <TextBlock Margin="0,8,0,4" FontSize="12" TextWrapping="Wrap" Text="{Binding StorageUsageText, Mode=OneWay}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_SizeLimit}" Description="{x:Static resources:Strings.Menu_Capture_HowMuchRoomScreenshotsClipsGIFs}">
+            <ComboBox Width="140" ItemsSource="{Binding StorageLimitOptions, Mode=OneTime}" SelectedItem="{Binding SelectedStorageLimit, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Capture_RemoveCapturesOlderThan}" Description="{x:Static resources:Strings.Menu_Capture_CapturesPastAgeAreCleanedUp}">
+            <ComboBox Width="140" ItemsSource="{Binding MaxAgeOptions, Mode=OneTime}" SelectedItem="{Binding SelectedMaxAge, Mode=TwoWay}" />
+        </controls:OptionControl>
+    </StackPanel>
+</ui:UiPage>

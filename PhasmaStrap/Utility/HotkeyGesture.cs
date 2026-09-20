@@ -2,12 +2,6 @@ using System.Windows.Input;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// The one place that turns a hotkey binding into text and back. Bindings are stored as
-    /// "Ctrl+Shift+F9", "Alt+R" or just "F9" - unlike WPF's KeyGesture, a key on its own is a
-    /// valid binding (RegisterHotKey is fine with no modifiers), so people can use F-keys or
-    /// the numpad without holding anything.
-    /// </summary>
     public static class HotkeyGesture
     {
         public static string Format(ModifierKeys modifiers, Key key)
@@ -50,8 +44,6 @@ namespace PhasmaStrap.Utility
             return TryParseKey(tokens[^1], out key) && key != Key.None;
         }
 
-        // Builds the stored gesture text from what the keyboard hook reports. False when the key
-        // can't be used (no WPF equivalent, or a modifier on its own).
         public static bool TryFromVirtualKey(ModifierKeys modifiers, int virtualKey, out string text)
         {
             text = "";
@@ -62,12 +54,9 @@ namespace PhasmaStrap.Utility
 
             text = Format(modifiers, key);
 
-            // must survive the round trip, or the listener could never match it
             return TryParse(text, out ModifierKeys parsedModifiers, out Key parsedKey) && parsedModifiers == modifiers && parsedKey == key;
         }
 
-        // A key that types something when pressed with at most Shift held. The listener lets these
-        // through to the game (so chat keeps working) and only fires them while Roblox is active.
         public static bool IsTypingGesture(ModifierKeys modifiers, Key key)
         {
             if ((modifiers & (ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Windows)) != 0)
@@ -86,9 +75,6 @@ namespace PhasmaStrap.Utility
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern uint MapVirtualKeyW(uint code, uint mapType);
 
-        // What to show on screen. The stored text names punctuation keys by their US-layout
-        // character; on any other layout (AZERTY, QWERTZ...) that is the wrong label, so ask Windows
-        // what the key actually prints on this keyboard.
         public static string ToDisplay(string? text)
         {
             if (!TryParse(text, out ModifierKeys modifiers, out Key key))
@@ -100,7 +86,6 @@ namespace PhasmaStrap.Utility
             if (!punctuation)
                 return text!;
 
-            // MAPVK_VK_TO_CHAR; the top bit flags a dead key (^, ¨ ...)
             uint mapped = MapVirtualKeyW((uint)KeyInterop.VirtualKeyFromKey(key), 2) & 0x7FFFFFFF;
             if (mapped < 0x21 || mapped > 0xFFFF)
                 return text!;

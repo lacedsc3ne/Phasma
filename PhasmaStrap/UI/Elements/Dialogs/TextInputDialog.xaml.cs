@@ -5,10 +5,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// A minimal "enter a name" prompt, used by the Mod Management and Custom Cursor Set
-    /// managers on ModsPage to ask for a new/renamed item's display name.
-    /// </summary>
     public partial class TextInputDialog : WpfUiWindow
     {
         public bool Confirmed { get; private set; } = false;

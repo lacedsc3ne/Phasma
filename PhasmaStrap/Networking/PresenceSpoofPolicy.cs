@@ -10,9 +10,6 @@ namespace PhasmaStrap.Networking
         Offline
     }
 
-    // rewrites the outgoing heartbeat/pulse request PhasmaStrap's Roblox client sends to
-    // Roblox's own servers, changing what session type/location Roblox's backend thinks
-    // you're connecting from. Ported from Voidstrap.
     public static class PresenceSpoofPolicy
     {
         public const string Host = "apis.roblox.com";
@@ -73,15 +70,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // Roblox's presence backend only considers a session "online" while pulses for it
-        // keep arriving - there's no ClientType/Location pair that means "offline" the way
-        // Studio/Website mean "in Studio"/"online", so rewriting the body like Online/Studio
-        // do can't express it, and would still renew the online session regardless of what
-        // values were sent. Instead, Offline mode short-circuits the request entirely (via
-        // AssetProxyServer's TryServeFromCache hook) and hands back a synthesized success
-        // response without ever forwarding the pulse upstream. With no pulse reaching the
-        // real server, the session's presence naturally ages out and Roblox reports it
-        // offline to friends/followers, while the client stays fully logged in and playing.
         public static ProxiedResponse? TryServeFromCache(ProxiedRequest request)
         {
             PresenceSpoofMode mode = App.Settings.Prop.PresenceSpoofMode;
@@ -92,9 +80,6 @@ namespace PhasmaStrap.Networking
             if (!request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            // "action reports" are the client telling the backend what it's doing (in a game,
-            // which place, etc.) - they'd expose the real activity behind any spoofed presence,
-            // so swallow them whenever a spoof mode is active, not just for Offline
             bool actionReport = request.Path.Contains(ActionReportFragment, StringComparison.OrdinalIgnoreCase);
             bool pulse = request.Path.Contains(PulseFragment, StringComparison.OrdinalIgnoreCase);
 

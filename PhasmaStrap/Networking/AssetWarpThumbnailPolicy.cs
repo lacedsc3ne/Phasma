@@ -2,12 +2,6 @@ using System.Text.Json.Nodes;
 
 namespace PhasmaStrap.Networking
 {
-    // companion to AssetWarpPolicy: blanks out thumbnail images (menu/lobby artwork - game
-    // icons, avatar headshots shown outside of an actual game) when any of the image-ish
-    // AssetWarp categories are enabled, so the app shell stops fetching decorative artwork
-    // through the proxy too. This only ever touches the JSON thumbnail-lookup response body
-    // for this one endpoint; it never blocks or rewrites anything in-game. Ported from
-    // Voidstrap.Integrations.AssetProxy.AppShellStripper.
     public static class AssetWarpThumbnailPolicy
     {
         private const string LOG_IDENT = "AssetWarpThumbnailPolicy";

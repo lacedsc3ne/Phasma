@@ -6,16 +6,6 @@ using PhasmaStrap.Server.Common;
 
 namespace PhasmaStrap.Server.WebServer.Services;
 
-/// <summary>
-/// Tracks which gamepasses the local player owns, backed by a small JSON file under
-/// <see cref="PathHelper.GamePasses"/>.
-///
-/// NOTE: There is currently no in-app purchase/grant flow anywhere in this project - this
-/// service only ever checks ownership. The owned-set therefore starts empty and stays empty
-/// until something populates <see cref="PathHelper.GamePasses"/> directly (e.g. by hand-editing
-/// the JSON file, which is just a JSON array of gamepass IDs, such as "[123456789]"), or until a
-/// future purchase/grant mechanism is added that calls <see cref="Grant(long)"/>.
-/// </summary>
 internal class GamePassService
 {
 	private const int MaxGamePasses = 4096;

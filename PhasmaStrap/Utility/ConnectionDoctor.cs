@@ -8,7 +8,7 @@ namespace PhasmaStrap.Utility
     public sealed class RouteHop
     {
         public int Ttl;
-        public string Address = "";     // "" = no answer at this distance
+        public string Address = "";
         public int Milliseconds = -1;
         public bool IsDestination;
     }
@@ -17,7 +17,7 @@ namespace PhasmaStrap.Utility
     {
         public string Label = "";
         public string Address = "";
-        public List<int> Samples = new();   // round trip in ms, -1 = lost
+        public List<int> Samples = new();
 
         public int Sent => Samples.Count;
         public int Lost => Samples.Count(s => s < 0);
@@ -25,7 +25,6 @@ namespace PhasmaStrap.Utility
         public double Average => Samples.Any(s => s >= 0) ? Samples.Where(s => s >= 0).Average() : 0;
         public int Worst => Samples.Any(s => s >= 0) ? Samples.Max() : 0;
 
-        // mean difference between consecutive replies - what "jitter" means for a game
         public double Jitter
         {
             get
@@ -41,7 +40,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // replies that took more than twice the usual time (and at least 30 ms more) - the rubber-band moments
         public int Spikes
         {
             get
@@ -64,25 +62,13 @@ namespace PhasmaStrap.Utility
         public string Verdict = "";
         public List<string> Findings = new();
 
-        // the server itself ignores pings, so a machine beside it in the same datacenter was measured
         public bool MeasuredNeighbour;
     }
 
-    // The Diagnostics page's connection test: where between this PC and the game server does the
-    // trouble start? A route trace finds the stations on the way; then the router, the first
-    // station at the internet provider and the game server are pinged side by side for a while, so
-    // loss and jitter can be compared at the same moments.
-    //
-    // One rule keeps the verdict honest: stations along the way are allowed to answer pings badly
-    // (routers deliberately treat them as low priority), so a station is only blamed when the game
-    // server is suffering too.
-    //
-    // Plain ICMP through the Ping class - no admin rights, nothing installed. No App dependencies.
     public static class ConnectionDoctor
     {
         public static Action<string>? Log;
 
-        // the address of the server Roblox connected to last, from its newest logs
         public static string? FindLastServer(string robloxLogsDirectory)
         {
             try
@@ -111,10 +97,6 @@ namespace PhasmaStrap.Utility
             return null;
         }
 
-        // Roblox game servers do not answer pings. Machines next to them in the same datacenter
-        // rack do (x.y.z.3, .4, .8, .9 in every Roblox /24 looked at, with round trips that match
-        // the geography), and the way there is the same - so that is what gets measured.
-        // Returns the server itself when it does answer, null when nothing nearby does.
         public static async Task<string?> FindPingableAsync(string server, CancellationToken token = default)
         {
             if (!IPAddress.TryParse(server, out IPAddress? ip) || ip.AddressFamily != AddressFamily.InterNetwork)
@@ -161,7 +143,6 @@ namespace PhasmaStrap.Utility
         {
             var report = new ConnectionReport { Server = server };
 
-            // ---- how is this PC connected
             string gateway = "";
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -180,7 +161,6 @@ namespace PhasmaStrap.Utility
                 break;
             }
 
-            // ---- the route
             status("Tracing the route to the game server...");
             byte[] payload = new byte[32];
 
@@ -204,7 +184,6 @@ namespace PhasmaStrap.Utility
                                 hop.Address = reply.Address.ToString();
                                 hop.IsDestination = reply.Status == IPStatus.Success;
 
-                                // a TTL-expired reply carries no timing of its own
                                 hop.Milliseconds = reply.Status == IPStatus.Success ? (int)reply.RoundtripTime : -1;
                             }
                         }
@@ -218,13 +197,11 @@ namespace PhasmaStrap.Utility
                     if (hop.IsDestination)
                         break;
 
-                    // the last stretch of many routes stays silent - no point in knocking 20 more times
                     if (ttl >= 12 && report.Route.TakeLast(6).All(h => h.Address.Length == 0))
                         break;
                 }
             }
 
-            // ---- who to watch: the router, the first station outside the home that answers, the server
             var targets = new List<PingTarget>();
 
             if (gateway.Length > 0)
@@ -258,7 +235,6 @@ namespace PhasmaStrap.Utility
             targets.Add(new PingTarget { Label = "The game server", Address = measured ?? server });
             report.Targets = targets;
 
-            // ---- side by side, five times a second
             status($"Measuring for {seconds} seconds...");
             var clock = Stopwatch.StartNew();
             var pingers = targets.Select(_ => new Ping()).ToList();

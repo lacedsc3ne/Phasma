@@ -8,9 +8,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Interaction logic for ModsPage.xaml
-    /// </summary>
     public partial class ModsPage
     {
         private const string ManagedModDragFormat = "PhasmaStrap.ManagedModItem";
@@ -96,7 +93,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 if (e.Data.GetData(ManagedModDragFormat) is not ManagedModItem source)
                     return;
 
-                // top half of the card = insert before, bottom half = insert after
                 double relativeY = e.GetPosition(border).Y;
                 bool insertAfter = relativeY > border.ActualHeight / 2;
 
@@ -121,8 +117,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private async void ManagedModsList_Drop(object sender, DragEventArgs e)
         {
-            // dropped on empty space rather than an existing card - create a new managed mod
-            // from whatever was dropped
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                 return;
 

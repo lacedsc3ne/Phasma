@@ -65,7 +65,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  drifting red mist behind the glass, matches the bootstrapper splash's style  -->
         <Canvas Grid.RowSpan="2" ClipToBounds="True" IsHitTestVisible="False">
             <Ellipse x:Name="Mist1" Width="480" Height="480" Canvas.Left="-160" Canvas.Top="-200" Opacity="0.12" Effect="{StaticResource MistBlurLarge}" Fill="{DynamicResource BackgroundGlowPrimaryBrush}">
                 <Ellipse.RenderTransform>
@@ -104,7 +103,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                
+
                 <Grid Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,32">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -120,6 +119,7 @@
 
                 <StackPanel Grid.Row="1" HorizontalAlignment="Center">
                     <ui:Hyperlink Icon="QuestionCircle48" Content="{x:Static resources:Strings.About_Title}" Command="{Binding LaunchAboutCommand, Mode=OneTime}" HorizontalAlignment="Center" />
+                    <ui:Hyperlink Icon="Heart24" Content="Support on Ko-fi" NavigateUri="https://ko-fi.com/lacedscene" HorizontalAlignment="Center" />
                 </StackPanel>
             </Grid>
 

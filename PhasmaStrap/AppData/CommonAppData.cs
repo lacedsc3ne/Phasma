@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +8,6 @@ namespace PhasmaStrap.AppData
 {
     public abstract class CommonAppData
     {
-        // in case a new package is added, you can find the corresponding directory
-        // by opening the stock bootstrapper in a hex editor
         private IReadOnlyDictionary<string, string> _commonMap { get; } = new Dictionary<string, string>()
         {
             { "Libraries.zip",                 @"" },
@@ -17,7 +15,6 @@ namespace PhasmaStrap.AppData
             { "shaders.zip",                   @"shaders\" },
             { "ssl.zip",                       @"ssl\" },
 
-            // the runtime installer is only extracted if it needs installing
             { "WebView2.zip",                  @"" },
             { "WebView2RuntimeInstaller.zip",  @"WebView2RuntimeInstaller\" },
 
@@ -54,7 +51,6 @@ namespace PhasmaStrap.AppData
         public List<string> ModManifest => DistributionState.ModManifest;
 
         public virtual IReadOnlyDictionary<string, string> PackageDirectoryMap { get; set; }
-
 
         public CommonAppData()
         {

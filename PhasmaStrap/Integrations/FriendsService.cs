@@ -34,19 +34,10 @@ namespace PhasmaStrap.Integrations
         public bool Joinable => Type == FriendPresenceType.InGame && RootPlaceId != 0 && !string.IsNullOrEmpty(GameId);
     }
 
-    // Talks to friends.roblox.com / presence.roblox.com / thumbnails.roblox.com to back the Friends
-    // page's online-status leaderboard, join-a-friend, and (via FriendActivityMonitor) activity
-    // toasts. A real "hours played" leaderboard isn't possible here - Roblox's API only ever
-    // exposes your OWN playtime (PlayTimeStore is local-only for exactly this reason), never
-    // another user's - so this only ever ranks by online status / current game, which presence.
-    // roblox.com genuinely supports.
     public static class FriendsService
     {
         private const string LOG_IDENT = "FriendsService";
 
-        // dedicated client (cookies disabled, manual Cookie header per request) - same reasoning as
-        // RobloxCookie.AuthClient: never let this mix with whatever App.HttpClient's own cookie jar
-        // might be tracking for a different account
         private static readonly HttpClient _client = new(new HttpClientHandler { UseCookies = false })
         {
             Timeout = TimeSpan.FromSeconds(12)
@@ -81,8 +72,6 @@ namespace PhasmaStrap.Integrations
                         result.Add(new FriendInfo { UserId = id, Username = name, DisplayName = displayName });
                 }
 
-                // friends.roblox.com stopped including names in this response - it's ids only now,
-                // so look the names up separately (users.roblox.com takes up to 100 ids per call)
                 List<long> nameless = result.Where(f => string.IsNullOrEmpty(f.Username)).Select(f => f.UserId).ToList();
                 if (nameless.Count > 0)
                 {
@@ -244,7 +233,6 @@ namespace PhasmaStrap.Integrations
             return map;
         }
 
-        /// <summary>The roblox:// deep link that launches into a joinable friend's current server.</summary>
         public static string GetJoinDeeplink(FriendPresence presence) =>
             $"roblox://experiences/start?placeId={presence.RootPlaceId}&gameInstanceId={presence.GameId}";
 

@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace PhasmaStrap.Models
 {
-    // A single row shown in FFlagSearchDialog's bulk-validation result grid.
-    // Ported from Voidstrap's UI/Elements/Dialogs/FlagValidationResult.cs.
     public class FlagValidationResult : INotifyPropertyChanged
     {
         private string _name = "";

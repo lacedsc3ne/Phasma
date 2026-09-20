@@ -7,10 +7,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
-// Ported from Voidstrap (UI/SmoothProgress.cs): eases ProgressBar.Value transitions instead of
-// snapping instantly, and (if the active template has a "GlowRect" part) drives an indeterminate
-// marquee glow. Installed as a class handler, so it applies to every ProgressBar without any XAML
-// changes - if a template has no "GlowRect" part the marquee half of this simply no-ops.
 namespace PhasmaStrap.UI;
 
 internal static class SmoothProgress
@@ -197,7 +193,7 @@ internal static class SmoothProgress
             Duration = TimeSpan.FromSeconds(Math.Clamp(distance / MarqueePixelsPerSecond, 0.9, 4.0)),
             RepeatBehavior = RepeatBehavior.Forever
         };
-        // uncapped, a running animation ticks at the monitor's refresh rate (240 on a 240 Hz screen)
+
         Timeline.SetDesiredFrameRate(animation, 60);
         animation.Freeze();
         transform.BeginAnimation(TranslateTransform.XProperty, animation);

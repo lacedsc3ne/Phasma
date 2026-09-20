@@ -2,9 +2,6 @@ using System.Text.Json.Nodes;
 
 namespace PhasmaStrap.Networking
 {
-    // rewrites the balance shown on your own screen only - the real Robux balance held
-    // by Roblox's servers is completely unaffected, since this only rewrites the response
-    // your own client receives, never anything sent to Roblox. Ported from Voidstrap.
     public static class RobuxSpoofer
     {
         private const string LOG_IDENT = "RobuxSpoofer";

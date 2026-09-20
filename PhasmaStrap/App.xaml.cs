@@ -8,9 +8,6 @@ using Microsoft.Win32;
 
 namespace PhasmaStrap
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
 #if QA_BUILD
@@ -21,19 +18,16 @@ namespace PhasmaStrap
         public const string ProjectOwner = "lacedsc3ne";
         public const string ProjectRepository = "lacedsc3ne/Phasma";
 
-        // PhasmaStrap's own server (VpsServer/ in the repo): answers release questions from a copy
-        // of GitHub's, so auto-update and the News page don't run into GitHub's limit of 60
-        // requests an hour per IP address. Empty = ask GitHub directly.
         public const string ServerBase = "https://api.phasmastrap.com";
         public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/Phasma";
         public const string ProjectHelpLink = "https://github.com/lacedsc3ne/Phasma/wiki";
         public const string ProjectDiscordLink = "https://discord.gg/x4M4cZS4p7";
+        public const string ProjectDonateLink = "https://ko-fi.com/lacedscene";
         public const string ProjectSupportLink = ProjectDiscordLink;
 
         public const string RobloxPlayerAppName = "RobloxPlayerBeta";
         public const string RobloxStudioAppName = "RobloxStudioBeta";
 
-        // simple shorthand for extremely frequently used and long string - this goes under HKCU
         public const string UninstallKey = $@"Software\Microsoft\Windows\CurrentVersion\Uninstall\{ProjectName}";
 
         public static LaunchSettings LaunchSettings { get; private set; } = null!;
@@ -70,7 +64,6 @@ namespace PhasmaStrap
 
         public static readonly FastFlagManager FastFlags = new();
 
-        // FastFlag profiles and which games use them (see Utility/FlagProfiles.cs)
         public static readonly Utility.FlagProfileManager FlagProfiles = new();
 
         public static readonly HttpClient HttpClient = new(
@@ -89,17 +82,27 @@ namespace PhasmaStrap
                     return _webUrl;
 
                 string url = ConstructPhasmaStrapWebUrl();
-                if (Settings.Loaded) // only cache if settings are done loading
+                if (Settings.Loaded)
                     _webUrl = url;
                 return url;
             }
         }
-        
+
         public static void Terminate(ErrorCode exitCode = ErrorCode.ERROR_SUCCESS)
         {
             int exitCodeNum = (int)exitCode;
 
             Logger.WriteLine("App::Terminate", $"Terminating with exit code {exitCodeNum} ({exitCode})");
+
+            var failsafe = new Thread(() =>
+            {
+                Thread.Sleep(5000);
+                Logger.WriteLine("App::Terminate", "Exit is taking too long, ending the process");
+                try { Process.GetCurrentProcess().Kill(); } catch (Exception) { }
+            })
+            { IsBackground = true };
+
+            failsafe.Start();
 
             Environment.Exit(exitCodeNum);
         }
@@ -145,7 +148,7 @@ namespace PhasmaStrap
             if (Bootstrapper?.Dialog != null)
             {
                 if (Bootstrapper.Dialog.TaskbarProgressValue == 0)
-                    Bootstrapper.Dialog.TaskbarProgressValue = 1; // make sure it's visible
+                    Bootstrapper.Dialog.TaskbarProgressValue = 1;
 
                 Bootstrapper.Dialog.TaskbarProgressState = TaskbarItemProgressState.Error;
             }
@@ -157,16 +160,11 @@ namespace PhasmaStrap
 
         public static string ConstructPhasmaStrapWebUrl()
         {
-            // PhasmaStrap's own server, not the upstream Bloxstrap project's: install/upgrade
-            // counts and crash logs are this fork's business (and are off when you turn
-            // "Enable sending of analytics" off). The web environment setting upstream uses to
-            // pick a staging host has no meaning here - there is one server.
             return "api.phasmastrap.com";
         }
 
         public static bool CanSendLogs()
         {
-            // non developer mode always uses production
             if (!Settings.Prop.DeveloperMode || Settings.Prop.WebEnvironment == WebEnvironment.Production)
                 return IsProductionBuild;
 
@@ -197,7 +195,6 @@ namespace PhasmaStrap
             return null;
         }
 
-        // from PhasmaStrap's server when there is one and it answers quickly, otherwise from GitHub
         public static async Task<T> GetReleaseJson<T>(string serverPath, string githubPath)
         {
             if (ServerBase.Length > 0)
@@ -228,7 +225,9 @@ namespace PhasmaStrap
 
             try
             {
-                await HttpClient.GetAsync($"https://{WebUrl}/metrics/post?key={key}&value={value}");
+                using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{WebUrl}/metrics/post?key={key}&value={value}");
+                Utility.PhasmaAccount.Authorize(request);
+                using var response = await HttpClient.SendAsync(request);
             }
             catch (Exception ex)
             {
@@ -243,10 +242,12 @@ namespace PhasmaStrap
 
             try
             {
-                await HttpClient.PostAsync(
-                    $"https://{WebUrl}/metrics/post-exception", 
-                    new StringContent(Logger.AsDocument)
-                );
+                using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{WebUrl}/metrics/post-exception")
+                {
+                    Content = new StringContent(Logger.AsDocument)
+                };
+                Utility.PhasmaAccount.Authorize(request);
+                using var response = await HttpClient.SendAsync(request);
             }
             catch (Exception ex)
             {
@@ -259,7 +260,7 @@ namespace PhasmaStrap
             const string LOG_IDENT = "App::AssertWindowsOSVersion";
 
             int major = Environment.OSVersion.Version.Major;
-            if (major < 10) // Windows 10 and newer only
+            if (major < 10)
             {
                 Logger.WriteLine(LOG_IDENT, $"Detected unsupported Windows version ({Environment.OSVersion.Version}).");
 
@@ -308,8 +309,6 @@ namespace PhasmaStrap
             Logger.WriteLine(LOG_IDENT, $"Temp path is {Paths.Temp}");
             Logger.WriteLine(LOG_IDENT, $"WindowsStartMenu path is {Paths.WindowsStartMenu}");
 
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
             HttpClient.Timeout = TimeSpan.FromSeconds(30);
@@ -317,9 +316,6 @@ namespace PhasmaStrap
 
             LaunchSettings = new LaunchSettings(e.Args);
 
-            // internal helper mode: relaunched (elevated) by Integrations.ClassicHostRedirect to apply/remove
-            // the classic client hosts file redirect. Do the one thing and exit immediately - none of the
-            // normal startup below (installation checks, settings load, main window, etc) should run.
             if (LaunchSettings.ClassicRedirectFlag.Active)
             {
                 bool enable = string.Equals(LaunchSettings.ClassicRedirectFlag.Data, "on", StringComparison.OrdinalIgnoreCase);
@@ -328,19 +324,14 @@ namespace PhasmaStrap
                 return;
             }
 
-            // guaranteed cleanup of the classic client hosts redirect and server process, even if we crash or
-            // are killed - see Integrations.ClassicServerManager.Stop() and Integrations.ClassicHostRedirect
             AppDomain.CurrentDomain.ProcessExit += (_, _) => Integrations.ClassicServerManager.Stop();
 
-            // if a previous session left the redirect behind (crash/kill), clear it now if it's safe to do so
             _ = Task.Run(() =>
             {
                 try { Integrations.ClassicHostRedirect.CleanStaleRedirect(); }
                 catch (Exception ex) { Logger.WriteLine("App::OnStartup", $"Stale classic redirect cleanup failed: {ex.Message}"); }
             });
 
-            // these only ever run as a short-lived elevated relaunch triggered by
-            // Networking.HostsFileManager, never as part of the normal app flow
             if (LaunchSettings.ApplyHostsFlag.Active)
             {
                 Shutdown(Networking.HostsElevation.ApplyElevated(LaunchSettings.ApplyHostsFlag.Data) ? 0 : 1);
@@ -371,19 +362,16 @@ namespace PhasmaStrap
                 return;
             }
 
-            // internal helper mode: relaunched (elevated) by Utility.SystemMemoryCleaner to purge the
-            // system standby list - the "RAM cleaner" button's deep-clean step
             if (LaunchSettings.PurgeStandbyFlag.Active)
             {
                 Shutdown(Utility.SystemMemoryCleaner.PurgeStandbyListNow() ? 0 : 1);
                 return;
             }
 
-            // installation check begins here
             using var uninstallKey = Registry.CurrentUser.OpenSubKey(UninstallKey);
             string? installLocation = null;
             bool fixInstallLocation = false;
-            
+
             if (uninstallKey?.GetValue("InstallLocation") is string value)
             {
                 if (Directory.Exists(value))
@@ -392,7 +380,6 @@ namespace PhasmaStrap
                 }
                 else
                 {
-                    // check if user profile folder has been renamed
                     var match = Regex.Match(value, @"^[a-zA-Z]:\\Users\\([^\\]+)", RegexOptions.IgnoreCase);
 
                     if (match.Success)
@@ -408,12 +395,10 @@ namespace PhasmaStrap
                 }
             }
 
-            // silently change install location if we detect a portable run
             if (installLocation is null && Directory.GetParent(Paths.Process)?.FullName is string processDir)
             {
                 var files = Directory.GetFiles(processDir).Select(x => Path.GetFileName(x)).ToArray();
 
-                // check if settings.json and state.json are the only files in the folder
                 if (files.Length <= 3 && files.Contains("Settings.json") && files.Contains("State.json"))
                 {
                     installLocation = processDir;
@@ -436,7 +421,6 @@ namespace PhasmaStrap
                 }
                 else
                 {
-                    // force reinstall
                     installLocation = null;
                 }
             }
@@ -445,7 +429,7 @@ namespace PhasmaStrap
             {
                 Logger.Initialize(true);
                 Logger.WriteLine(LOG_IDENT, "Not installed, launching the installer");
-                AssertWindowsOSVersion(); // prevent new installs from unsupported operating systems
+                AssertWindowsOSVersion();
                 LaunchHandler.LaunchInstaller();
             }
             else
@@ -454,7 +438,6 @@ namespace PhasmaStrap
 
                 Logger.WriteLine(LOG_IDENT, "Entering main logic");
 
-                // ensure executable is in the install directory
                 if (Paths.Process != Paths.Application && !File.Exists(Paths.Application))
                 {
                     Logger.WriteLine(LOG_IDENT, "Copying to install directory");
@@ -474,12 +457,9 @@ namespace PhasmaStrap
                 FastFlags.Load();
                 FlagProfiles.Load(false);
 
-                // presets from before profiles existed become profiles, once
                 if (Settings.Prop.FastFlagPlacePresets.Count > 0)
                     FlagProfiles.MigrateFromPlacePresets();
 
-                // UI polish (ported from Voidstrap): smooth ProgressBar value transitions,
-                // installed as a WPF class handler so it applies to every ProgressBar
                 if (Settings.Prop.SmoothProgressBarsEnabled)
                     UI.SmoothProgress.Install();
 
@@ -494,16 +474,6 @@ namespace PhasmaStrap
 
                 try
                 {
-                    // Bootstrapper.cs already re-claims the roblox/roblox-player URL protocol handlers on
-                    // every actual game launch ("just in case the stock bootstrapper changes it back"), but
-                    // that only fires while an actual Play click is being processed. If another Bloxstrap-
-                    // family fork gets installed in between real launches, it can silently steal that
-                    // registry entry, and PhasmaStrap would never get a chance to win it back - the next
-                    // browser Play click would launch the OTHER strap instead, not this process. Doing the
-                    // same claim here, on every PhasmaStrap start (settings, tray, background updater,
-                    // launch-at-startup - not just an actual Play launch), closes that window: whichever
-                    // strap ran most recently for ANY reason ends up owning the association, not just
-                    // whichever one happened to handle the last real launch.
                     WindowsRegistry.RegisterPlayer();
                 }
                 catch (Exception ex)
@@ -513,10 +483,6 @@ namespace PhasmaStrap
 
                 try
                 {
-                    // GPU preference and Game DVR are persistent per-user registry associations, not
-                    // something tied to a running Roblox process - reapply them on every start so a
-                    // manual registry change (or a Windows update resetting Game Bar) doesn't quietly
-                    // undo what the toggle says should be in effect.
                     Integrations.SystemPerformanceBoost.ApplyGpuPreference();
                     Integrations.SystemPerformanceBoost.ApplyGameDvr();
                 }
@@ -577,9 +543,6 @@ namespace PhasmaStrap
                     Logger.WriteLine(LOG_IDENT, $"Friend activity monitor startup failed: {ex.Message}");
                 }
 
-                // both read the hosts file / open the cert store / may need an elevated helper -
-                // none of which anything later in startup depends on, so keep them off the path
-                // that gates the first window appearing
                 _ = Task.Run(() =>
                 {
                     try
@@ -590,9 +553,6 @@ namespace PhasmaStrap
                     {
                         Logger.WriteLine(LOG_IDENT, $"Networking proxy reconciliation failed: {ex.Message}");
                     }
-
-                    // (the telemetry block is reconciled together with the proxy block inside
-                    // NetworkingController.ReconcileOnStartup -> HostsElevation, one prompt at most)
                 });
 
                 if (!Locale.SupportedLocales.ContainsKey(Settings.Prop.Locale))
@@ -609,14 +569,11 @@ namespace PhasmaStrap
                 if (!LaunchSettings.BypassUpdateCheck)
                     Installer.HandleUpgrade();
 
-                // non-settings processes (watcher/bootstrapper) follow Settings.json edits made in
-                // the settings window while they run - no-op in the settings window itself
                 Utility.SettingsHotReload.Start();
 
                 LaunchHandler.ProcessLaunchArgs();
             }
 
-            // you must *explicitly* call terminate when everything is done, it won't be called implicitly
             Logger.WriteLine(LOG_IDENT, "Startup finished");
         }
     }

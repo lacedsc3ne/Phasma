@@ -2,12 +2,6 @@ using System.Net.NetworkInformation;
 
 namespace PhasmaStrap.Utility
 {
-    // Backs the overlay HUD's "Show ping" row. Pings the current server's real machine address -
-    // captured by ActivityWatcher from Roblox's own join log line (GameJoiningEntryPattern /
-    // GameJoiningUDMUXPattern), the same address ServerInformationViewModel's "server location"
-    // lookup already relies on being real. Runs its own slow background loop (ICMP round-trips
-    // aren't something to do on the render thread) rather than sampling inline from
-    // OverlayCompositor.UpdateHudIfDue like SystemStatsSampler does.
     internal static class ServerPingMonitor
     {
         private const string LOG_IDENT = "ServerPingMonitor";
@@ -18,7 +12,6 @@ namespace PhasmaStrap.Utility
         private static Task? _loopTask;
         private static volatile int _latestMs = -1;
 
-        /// <summary>Last measured round-trip in milliseconds, or -1 if there's no reading yet.</summary>
         public static int LatestMs => _latestMs;
 
         public static void Start(string? address)
@@ -44,8 +37,6 @@ namespace PhasmaStrap.Utility
 
         private static async Task LoopAsync(string address, CancellationToken token)
         {
-            // Roblox game servers ignore pings; a machine beside it in the same datacenter answers
-            // and sits at the end of the same route (see ConnectionDoctor.FindPingableAsync)
             try
             {
                 string? pingable = await ConnectionDoctor.FindPingableAsync(address, token).ConfigureAwait(false);

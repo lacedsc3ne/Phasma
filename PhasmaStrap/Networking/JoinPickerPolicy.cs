@@ -5,35 +5,16 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Networking
 {
-    // Join-time server picker.
-    //
-    // When the game asks Roblox "put me in a server of place X" (POST gamejoin.roblox.com
-    // /v1/join-game), the proxy holds that request, shows the servers the matchmaker can find
-    // with their region and estimated ping, and - if the player picks one - turns the request
-    // into "put me in THIS server" (/v1/join-game-instance with its gameId) before it goes on to
-    // Roblox. Roblox still does the joining; nothing about the answer is made up. It works for
-    // joins started inside the Roblox app too, which PhasmaStrap's launch-time matchmaker never
-    // sees.
-    //
-    // Left alone on purpose: joins that already name a server (friends, invites, server browser),
-    // private and reserved servers, and teleports between places of a running game. If the player
-    // does nothing, closes the window, or anything fails, the request goes through untouched and
-    // Roblox chooses as it always did.
-    //
-    // gamejoin.roblox.com is only redirected to the proxy while this is switched on
-    // (HostsFileManager.InterceptedHostnames), so nobody else's joins depend on it.
     public static class JoinPickerPolicy
     {
         private const string LOG_IDENT = "JoinPickerPolicy";
 
         public const string Host = "gamejoin.roblox.com";
 
-        // the game must get its answer before it gives up on the request
         private static readonly TimeSpan MaxHold = TimeSpan.FromSeconds(25);
 
         public static bool IsEnabled => App.Settings.Prop.NetworkingProxyEnabled && App.Settings.Prop.JoinServerPickerEnabled;
 
-        // the game repeats a join request it got no answer to: all of them wait for the one decision
         private static readonly object Sync = new();
         private static long _decidingPlace;
         private static Task<string?>? _deciding;
@@ -61,7 +42,7 @@ namespace PhasmaStrap.Networking
 
                 string? jobId = await DecideAsync(placeId, token);
                 if (string.IsNullOrEmpty(jobId))
-                    return null; // untouched: Roblox picks
+                    return null;
 
                 body["gameId"] = jobId;
 
@@ -78,7 +59,6 @@ namespace PhasmaStrap.Networking
                 ProxiedResponse? response = await AssetProxyServer.ForwardToUpstreamAsync(rewritten, token);
                 if (response is null || response.StatusCode >= 400)
                 {
-                    // the chosen server filled up or went away in the meantime: let Roblox choose after all
                     App.Logger.WriteLine(LOG_IDENT, $"Roblox refused the chosen server ({response?.StatusCode.ToString() ?? "no answer"}) - handing the join back");
                     return null;
                 }
@@ -99,7 +79,6 @@ namespace PhasmaStrap.Networking
                 if (_deciding is not null && _decidingPlace == placeId && !_deciding.IsCompleted)
                     return _deciding;
 
-                // a retry that arrives just after the decision was made gets the same answer
                 if (_last.PlaceId == placeId && (DateTime.UtcNow - _last.AtUtc).TotalSeconds < 20)
                     return Task.FromResult(_last.JobId);
 

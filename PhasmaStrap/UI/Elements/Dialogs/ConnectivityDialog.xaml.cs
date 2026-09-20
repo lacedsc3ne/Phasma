@@ -1,4 +1,4 @@
-﻿using System.Media;
+using System.Media;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -8,12 +8,6 @@ using Windows.Win32.Foundation;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // hmm... do i use MVVM for this?
-    // this is entirely static, so i think im fine without it, and this way is just so much more efficient
-
-    /// <summary>
-    /// Interaction logic for ExceptionDialog.xaml
-    /// </summary>
     public partial class ConnectivityDialog
     {
         public ConnectivityDialog(string title, string description, MessageBoxImage image, Exception exception)
@@ -74,7 +68,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         {
             if (!inner)
                 ErrorRichTextBox.Selection.Text = $"{exception.GetType()}: {exception.Message}";
-            
+
             if (exception.InnerException is null)
                 return;
 

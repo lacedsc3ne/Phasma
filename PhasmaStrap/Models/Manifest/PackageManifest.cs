@@ -1,9 +1,3 @@
-﻿/*
- * Roblox Studio Mod Manager (ProjectSrc/Utility/PackageManifest.cs)
- * MIT License
- * Copyright (c) 2015-present MaximumADHD
-*/
-
 namespace PhasmaStrap.Models.Manifest
 {
     public class PackageManifest : List<Package>
@@ -30,7 +24,6 @@ namespace PhasmaStrap.Models.Manifest
                     string.IsNullOrEmpty(rawSize))
                     break;
 
-                // ignore launcher
                 if (fileName == "RobloxPlayerLauncher.exe")
                     break;
 

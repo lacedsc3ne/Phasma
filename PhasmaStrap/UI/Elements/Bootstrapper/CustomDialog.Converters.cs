@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Xml;
@@ -8,7 +8,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
     public partial class CustomDialog
     {
-        // https://stackoverflow.com/a/2961702
         private static T? ConvertValue<T>(string input) where T : struct
         {
             try
@@ -60,20 +59,14 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
         private static GridLengthConverter GridLengthConverter { get; } = new GridLengthConverter();
         private static object? GetGridLengthFromXElement(XElement xmlElement, string attributeName) => GetTypeFromXElement(GridLengthConverter, xmlElement, attributeName);
 
-
         private static BrushConverter BrushConverter { get; } = new BrushConverter();
 
-        /// <summary>
-        /// Return type of string = Name of DynamicResource
-        /// Return type of brush = ... The Brush!!!
-        /// </summary>
         private static object? GetBrushFromXElement(XElement element, string attributeName)
         {
             string? value = element.Attribute(attributeName)?.Value?.ToString();
             if (value == null)
                 return null;
 
-            // dynamic resource name
             if (value.StartsWith('{') && value.EndsWith('}'))
                 return value[1..^1];
 

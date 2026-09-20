@@ -3,13 +3,6 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace PhasmaStrap.Utility
 {
-    // A COM IStream over managed memory, for Media Foundation to write an MP4 segment into
-    // (through MFCreateMFByteStreamOnStream) and read it back from later. The stock
-    // CreateStreamOnHGlobal stream is refused by the MPEG-4 sink at BeginWriting.
-    //
-    // Storage is a list of fixed blocks rather than one array: a segment grows to a few MB in
-    // small writes, and doubling-and-copying a contiguous buffer would put every segment on the
-    // large object heap several times over.
     internal sealed class MemoryComStream : IStream
     {
         private const int BlockSize = 256 * 1024;
@@ -81,9 +74,9 @@ namespace PhasmaStrap.Utility
             {
                 long target = dwOrigin switch
                 {
-                    0 => dlibMove,              // STREAM_SEEK_SET
-                    1 => _position + dlibMove,  // STREAM_SEEK_CUR
-                    2 => _length + dlibMove,    // STREAM_SEEK_END
+                    0 => dlibMove,
+                    1 => _position + dlibMove,
+                    2 => _length + dlibMove,
                     _ => throw new ArgumentException("origin"),
                 };
 
@@ -112,9 +105,9 @@ namespace PhasmaStrap.Utility
             {
                 pstatstg = new System.Runtime.InteropServices.ComTypes.STATSTG
                 {
-                    type = 2, // STGTY_STREAM
+                    type = 2,
                     cbSize = _length,
-                    grfMode = 2, // STGM_READWRITE
+                    grfMode = 2,
                 };
             }
         }
@@ -125,7 +118,7 @@ namespace PhasmaStrap.Utility
 
         public void CopyTo(IStream pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten) => throw new NotSupportedException();
 
-        public void LockRegion(long libOffset, long cb, int dwLockType) => throw new COMException("not supported", unchecked((int)0x80030001)); // STG_E_INVALIDFUNCTION
+        public void LockRegion(long libOffset, long cb, int dwLockType) => throw new COMException("not supported", unchecked((int)0x80030001));
 
         public void UnlockRegion(long libOffset, long cb, int dwLockType) => throw new COMException("not supported", unchecked((int)0x80030001));
 

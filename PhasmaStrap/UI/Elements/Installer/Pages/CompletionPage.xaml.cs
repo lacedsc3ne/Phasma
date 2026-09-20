@@ -1,11 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 using PhasmaStrap.UI.ViewModels.Installer;
 
 namespace PhasmaStrap.UI.Elements.Installer.Pages
 {
-    /// <summary>
-    /// Interaction logic for CompletionPage.xaml
-    /// </summary>
     public partial class CompletionPage
     {
         private readonly CompletionViewModel _viewModel = new();

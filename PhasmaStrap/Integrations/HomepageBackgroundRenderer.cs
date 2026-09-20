@@ -6,17 +6,6 @@ using PhasmaStrap.Enums;
 
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// Shared rendering logic for the "Homepage Background" setting (Overlays tab, ModsPage):
-    /// turns Mode/Color/Gradient/Angle into a WPF <see cref="Brush"/>. This used to live only in
-    /// <c>HomepageBackgroundPreviewWindow</c>; it was pulled out here so it has exactly one
-    /// implementation, ready to be reused wherever this setting is actually drawn.
-    ///
-    /// As of this writing that's still only the preview window opened by the settings page's
-    /// own "Preview" button - see the doc comments on <c>HomepageBackgroundPreviewWindow</c> and
-    /// on <c>Integrations.Overlays.OverlayCompositor</c> for why this doesn't yet composite live
-    /// behind the running Roblox client.
-    /// </summary>
     internal static class HomepageBackgroundRenderer
     {
         public static Color ParseColorOrDefault(string? hex, Color fallback)
@@ -33,12 +22,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        /// <summary>
-        /// Builds the brush for the given mode/colors/angle. <see cref="HomepageBackgroundMode.None"/>
-        /// still returns a usable brush (the solid color) rather than null, matching the previous
-        /// behavior in the preview window - callers that care about "is this actually on" should
-        /// check the mode/enabled flag themselves before calling this.
-        /// </summary>
         public static Brush BuildBrush(HomepageBackgroundMode mode, Color solidColor, Color gradientColor, double gradientAngleDegrees)
         {
             if (mode == HomepageBackgroundMode.Gradient)
@@ -60,11 +43,6 @@ namespace PhasmaStrap.Integrations
             return new SolidColorBrush(solidColor);
         }
 
-        /// <summary>
-        /// Convenience overload that reads Mode/Color/Gradient/Angle straight out of
-        /// <see cref="App.Settings"/>, so a future live-compositing consumer (or any other caller)
-        /// doesn't have to re-parse the persisted hex strings itself.
-        /// </summary>
         public static Brush BuildBrushFromSettings()
         {
             var s = App.Settings.Prop;

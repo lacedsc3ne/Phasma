@@ -15,14 +15,6 @@ namespace PhasmaStrap.Integrations.AntiAliasing
         public Vector4 SrcRect;
     }
 
-    /// <summary>
-    /// Anti-Aliasing's shader pass(es) as a stage that plugs into
-    /// <see cref="Overlays.OverlayCompositor"/>'s single shared D3D11 device/context, rather than
-    /// owning its own device/window/swapchain/capture. This is the render-pipeline half of the
-    /// original standalone AntiAliasingOverlay.cs (CreatePipeline/CreateSizedResources/
-    /// RenderMethodInto/DrawPass) with the window/device/composition/capture/message-loop half
-    /// removed, since the compositor already owns all of that.
-    /// </summary>
     internal sealed class AntiAliasingStage : IDisposable
     {
         private const string LOG_IDENT = "AntiAliasing";
@@ -195,11 +187,6 @@ namespace PhasmaStrap.Integrations.AntiAliasing
             _context.Draw(3, 0);
         }
 
-        /// <summary>
-        /// Renders the selected AA technique from <paramref name="input"/> into
-        /// <paramref name="output"/>, at the compositor's current display size. Call
-        /// <see cref="EnsureSize"/> first if the size may have changed since the last frame.
-        /// </summary>
         public void Render(int method, ID3D11ShaderResourceView input, ID3D11RenderTargetView output)
         {
             _context.VSSetShader(_vs);

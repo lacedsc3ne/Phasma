@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,7 +9,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    // One row of the flag list
     public sealed class FlagRow : INotifyPropertyChanged
     {
         private string _name = "";
@@ -21,36 +20,23 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         public string Value { get => _value; set { _value = value; Changed(nameof(Value)); } }
         public string Note { get => _note; set { _note = value; Changed(nameof(Note)); } }
 
-        // "", "Problem", "Added", "Changed", "Off" - colours the note
         public string Tone { get => _tone; set { _tone = value; Changed(nameof(Tone)); } }
 
-        // a flag the profile turns off (it has no value of its own)
         public bool IsTurnedOff { get; set; }
 
-        // profile view: one of your own flags the profile doesn't touch, shown so the whole set the
-        // game gets can be seen and edited (a new value becomes a change for these games only)
         public bool IsInherited { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void Changed(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-    // Tells the editor which profile to show next time it loads (the Per-game flags tab's
-    // "Edit profile" button)
     public static class FlagEditorRequest
     {
         public static string? ProfileToOpen { get; set; }
     }
 
-    /// <summary>
-    /// The FastFlag editor. Edits either "your flags" (App.FastFlags, every game) or one FastFlag
-    /// profile (App.FlagProfiles, only the games it is given to). Every change waits for the
-    /// settings window's Save button, like the rest of the settings.
-    /// </summary>
     public partial class FastFlagEditorPage
     {
-        // a datagrid is a code-behind thing, so this page is too
-
         private sealed class ScopeItem
         {
             public string? ProfileId { get; init; }
@@ -59,23 +45,19 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private readonly ObservableCollection<FlagRow> _rows = new();
 
-        // everything is listed by default - these only narrow the list down
         private bool _hideQuickFlags = false;
         private bool _showYoursInProfile = true;
         private string _searchFilter = "";
         private bool _refreshingScopes;
 
-        // null = your flags
         private string? _profileId;
 
         private FlagProfile? Profile => App.FlagProfiles.Find(_profileId);
 
         private bool EditingProfile => Profile is not null;
 
-        // flags set by the Quick settings toggles; hidden from "your flags" unless asked for
         private static readonly HashSet<string> QuickFlagNames = new(FastFlagManager.PresetFlags.Values, StringComparer.Ordinal);
 
-        // space the flag list always gets, even when everything above it is tall
         private const double MinimumListHeight = 320;
 
         public FastFlagEditorPage()
@@ -84,14 +66,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DataGrid.ItemsSource = _rows;
         }
 
-        // ------------------------------------------------------------------ layout
-
         private void PageScroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateLayoutHeight();
 
         private void RootLayout_LayoutUpdated(object? sender, EventArgs e) => UpdateLayoutHeight();
 
-        // Fill the visible area when there is room (the list takes the rest); when the sections
-        // above are taller than that, grow past it so the page scrolls instead of clipping.
         private void UpdateLayoutHeight()
         {
             if (PageScroller is null || RootLayout is null || RootLayout.RowDefinitions.Count == 0)
@@ -107,12 +85,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             if (wanted <= 0 || double.IsNaN(wanted) || double.IsInfinity(wanted))
                 return;
 
-            // LayoutUpdated fires constantly; only touch Height when it really changes, or this loops
             if (double.IsNaN(RootLayout.Height) || Math.Abs(RootLayout.Height - wanted) > 0.5)
                 RootLayout.Height = wanted;
         }
-
-        // ------------------------------------------------------------------ page lifetime
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -134,7 +109,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void Page_Unloaded(object sender, RoutedEventArgs e) => App.FlagProfiles.Edited -= OnProfilesEdited;
 
-        // the Per-game flags tab changed something (a new profile, a rule) - keep up
         private void OnProfilesEdited(object? sender, EventArgs e)
         {
             if (!EditingProfile)
@@ -150,8 +124,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             App.FlagProfiles.NotifyEdited();
             App.FlagProfiles.Edited += OnProfilesEdited;
         }
-
-        // ------------------------------------------------------------------ scope (what is being edited)
 
         private void RefreshScopes()
         {
@@ -216,8 +188,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void GoToGames_Click(object sender, RoutedEventArgs e) => FastFlagSettingsPage.SelectTab(this, "FastFlagGamesPage");
 
-        // ------------------------------------------------------------------ profile actions
-
         private Window? Owner => Window.GetWindow(this);
 
         private string? AskName(string title, string prompt, string initial)
@@ -236,7 +206,26 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             var profile = new FlagProfile { Name = FlagLayers.UniqueName(App.FlagProfiles.Prop, name) };
             App.FlagProfiles.Prop.Profiles.Add(profile);
             MarkProfilesEdited();
+            OfferToClearGlobalFlags(profile.Name);
             return profile;
+        }
+
+        private void OfferToClearGlobalFlags(string profileName)
+        {
+            int count = App.FastFlags.Prop.Count;
+            if (count == 0)
+                return;
+
+            var answer = Frontend.ShowMessageBox(
+                $"You have {count} flag{(count == 1 ? "" : "s")} set globally, outside any profile. Those stay switched on in every game, on top of whatever \"{profileName}\" sets.\n\nClear them, so your profiles alone decide which flags are set?",
+                MessageBoxImage.Question,
+                MessageBoxButton.YesNo);
+
+            if (answer != MessageBoxResult.Yes)
+                return;
+
+            App.FastFlags.Prop.Clear();
+            MarkProfilesEdited();
         }
 
         private void SwitchTo(string? profileId)
@@ -263,6 +252,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             menu.Items.Add(MenuItem("Duplicate", profile is not null, () => DuplicateProfile(profile!)));
             menu.Items.Add(MenuItem("Copy share code", profile is not null, () => CopyShareCode(profile!)));
             menu.Items.Add(MenuItem("Add a profile from a share code", true, PasteShareCode));
+            menu.Items.Add(MenuItem("Publish to the gallery", profile is not null, () => PublishToGallery(profile!)));
+            menu.Items.Add(MenuItem("Add a profile from the gallery", true, AddFromGallery));
             menu.Items.Add(new Separator());
             menu.Items.Add(MenuItem("Delete this profile", profile is not null, () => DeleteProfile(profile!)));
 
@@ -298,7 +289,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             SwitchTo(copy.Id);
         }
 
-        private void CopyShareCode(FlagProfile profile)
+        private async void CopyShareCode(FlagProfile profile)
         {
             if (profile.ChangeCount == 0)
             {
@@ -306,8 +297,63 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 return;
             }
 
-            ClipboardShare.CopyText(FlagLayers.ToShareCode(profile));
-            Frontend.ShowMessageBox($"The share code for \"{profile.Name}\" is on your clipboard. Anyone can add it with Profile options > Add a profile from a share code.\n\nIt holds the flags only - not which games use it.", MessageBoxImage.Information);
+            string code = FlagLayers.ToShareCode(profile);
+            string? link = await PhasmaStrap.Utility.PhasmaAccount.ShortLinkAsync("flagProfile", profile.Name, code);
+
+            ClipboardShare.CopyText(link ?? code);
+
+            Frontend.ShowMessageBox(
+                link is null
+                    ? $"The share code for \"{profile.Name}\" is on your clipboard. Anyone can add it with Profile options > Add a profile from a share code.\n\nThe short link needs the PhasmaStrap server, which could not be reached just now, so this is the long code instead.\n\nIt holds the flags only - not which games use it."
+                    : $"{link} is on your clipboard.\n\nSend it to anyone. They add it with Profile options > Add a profile from a share code, or open the link.\n\nIt holds the flags only - not which games use it.",
+                MessageBoxImage.Information);
+        }
+
+        private async void PublishToGallery(FlagProfile profile)
+        {
+            if (profile.ChangeCount == 0)
+            {
+                Frontend.ShowMessageBox("This profile is empty, so there is nothing to publish yet.", MessageBoxImage.Information);
+                return;
+            }
+
+            if (!PhasmaStrap.Utility.PhasmaAccount.SignedIn)
+            {
+                Frontend.ShowMessageBox("Sign in on the Accounts page first, so the gallery can show who made it.", MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = Frontend.ShowMessageBox(
+                $"Publishing \"{profile.Name}\" puts its flags, its name and the name on your account in the public gallery, where anyone can read and add them.\n\nYou can remove it again at any time. Carry on?",
+                MessageBoxImage.Question,
+                MessageBoxButton.YesNo);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            string? summary = AskName("Publish to the gallery", "One line about what it does (optional):", "");
+
+            var (problem, url) = await PhasmaStrap.Utility.PhasmaAccount.PublishToGalleryAsync("flagProfile", profile.Name, summary ?? "", FlagLayers.ToShareCode(profile));
+
+            if (problem is null && url is not null)
+                ClipboardShare.CopyText(url);
+
+            Frontend.ShowMessageBox(
+                problem is null
+                    ? $"\"{profile.Name}\" is in the gallery at phasmastrap.com/gallery.\n\nIts link, {url}, is on your clipboard."
+                    : $"It was not published: {problem}",
+                problem is null ? MessageBoxImage.Information : MessageBoxImage.Warning);
+        }
+
+        private void AddFromGallery()
+        {
+            var dialog = new GalleryPickerDialog("Gallery", "FastFlag profiles people have published. Double-click one to add it.", "flagProfile") { Owner = Owner };
+            dialog.ShowDialog();
+
+            if (!dialog.Confirmed)
+                return;
+
+            AddProfileFromCode(dialog.Code);
         }
 
         private void PasteShareCode()
@@ -315,12 +361,42 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             string clipboard = "";
             try { clipboard = Clipboard.GetText(); } catch { }
 
-            // a code already on the clipboard is filled in (even inside a copied chat message)
             string found = FlagLayers.FindProfileCode(clipboard);
-            string? code = AskName("Add a profile from a share code", "Paste the share code (it starts with PHF):", found);
+            string? code = AskName("Add a profile", "Paste a share code or a phasmastrap.com/g/ link:", found.Length > 0 ? found : GalleryLinkIn(clipboard));
             if (code is null)
                 return;
 
+            AddPastedCode(code);
+        }
+
+        private static string GalleryLinkIn(string text)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(text ?? "", @"https?://[^\s]*phasmastrap\.com/g/[a-z0-9]{4,24}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            return match.Success ? match.Value : "";
+        }
+
+        private async void AddPastedCode(string code)
+        {
+            string? galleryId = PhasmaStrap.Utility.PhasmaAccount.GalleryIdIn(code);
+
+            if (galleryId is not null)
+            {
+                string? fetched = await PhasmaStrap.Utility.PhasmaAccount.GalleryTakeAsync(galleryId);
+
+                if (fetched is null)
+                {
+                    Frontend.ShowMessageBox("That link does not point at anything in the gallery any more.", MessageBoxImage.Warning);
+                    return;
+                }
+
+                code = fetched;
+            }
+
+            AddProfileFromCode(code);
+        }
+
+        private void AddProfileFromCode(string code)
+        {
             FlagProfile? profile = FlagLayers.FromShareCode(code);
             if (profile is null)
             {
@@ -359,8 +435,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             MarkProfilesEdited();
             SwitchTo(null);
         }
-
-        // ------------------------------------------------------------------ the list
 
         private void ReloadList()
         {
@@ -416,7 +490,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                     });
                 }
 
-                // the rest of what these games get: your own flags the profile leaves alone
                 if (_showYoursInProfile)
                 {
                     foreach (var (name, raw) in App.FastFlags.Prop)
@@ -510,8 +583,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DataGrid.ScrollIntoView(row);
         }
 
-        // ------------------------------------------------------------------ changing flags
-
         private bool ScopeHas(string name)
         {
             FlagProfile? profile = Profile;
@@ -562,7 +633,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 ImportJSON(dialog.JsonTextBox.Text);
         }
 
-        // the search database's add: no message boxes (it reports back in its own status line)
         private string? AddFromDatabase(string name, string value)
         {
             if (ScopeHas(name))
@@ -621,7 +691,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             json = json.Trim();
 
-            // autocorrect where possible
             if (!json.StartsWith('{'))
                 json = '{' + json;
 
@@ -696,12 +765,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void DataGrid_BeginningEdit(object? sender, DataGridBeginningEditEventArgs e)
         {
-            // a turned-off flag has no value; typing one turns it into a changed value instead
             if (e.Row.DataContext is FlagRow { IsTurnedOff: true } row && e.Column.DisplayIndex == 1)
                 row.Value = App.FastFlags.GetValue(row.Name) ?? "";
 
-            // one of your flags seen from a profile: its value can be changed for these games, but
-            // renaming it here would make no sense - that is done under "Your flags"
             if (e.Row.DataContext is FlagRow { IsInherited: true } && e.Column.DisplayIndex == 0)
                 e.Cancel = true;
         }
@@ -755,7 +821,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
             else if (e.Column.DisplayIndex == 1)
             {
-                // your own flag, left as it was - nothing to change for these games
                 if (row.IsInherited && text == row.Value)
                     return;
 
@@ -773,7 +838,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 row.IsInherited = false;
             }
 
-            // notes depend on the new name/value - refresh once the edit has been committed
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 ReloadList();
@@ -799,7 +863,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             foreach (FlagRow row in DataGrid.SelectedItems.OfType<FlagRow>().ToList())
             {
-                // one of your flags, seen from a profile: deleting it here means "not for these games"
                 if (profile is not null && row.IsInherited)
                 {
                     if (!profile.Remove.Contains(row.Name))
@@ -874,8 +937,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             ReloadList();
         }
 
-        // ------------------------------------------------------------------ right-click menu
-
         private void DataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             List<FlagRow> rows = DataGrid.SelectedItems.OfType<FlagRow>().ToList();
@@ -941,7 +1002,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             return parent;
         }
 
-        // copies (or moves) rows from the current scope into a profile, or into your flags (null)
         private void CopyRows(List<FlagRow> rows, FlagProfile? target, bool move)
         {
             FlagProfile? source = Profile;
@@ -1000,8 +1060,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         }
 
         private void ShowStatus(string message) => Frontend.ShowMessageBox(message, MessageBoxImage.Information);
-
-        // ------------------------------------------------------------------ export
 
         private static readonly Regex _groupPrefixRegex = new("^[A-Z]+[a-z]*", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -1072,8 +1130,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             sb.AppendLine("}");
             return sb.ToString();
         }
-
-        // ------------------------------------------------------------------ search
 
         private readonly System.Windows.Threading.DispatcherTimer _searchDebounce = new() { Interval = TimeSpan.FromMilliseconds(120) };
         private bool _searchDebounceHooked;

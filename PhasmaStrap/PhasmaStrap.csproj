@@ -7,13 +7,13 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>PhasmaStrap.ico</ApplicationIcon>
-    <Version>2.17.9</Version>
-    <FileVersion>2.17.9</FileVersion>
+    <Version>2.18.0</Version>
+    <FileVersion>2.18.0</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
-    
+
   <ItemGroup>
     <Resource Include="PhasmaStrap.ico" />
     <Resource Include="Resources\PhasmaStrapLogo.png" />
@@ -71,7 +71,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
-      <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
@@ -81,22 +81,12 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
 
-    <!-- Overlays: D3D11/DXGI/DirectComposition compositor. Voidstrap pins these at 3.8.3,
-         but that version's lib/ folder only ships net8.0/net9.0/net10.0 targets - restoring
-         it against net6.0-windows resolves an EMPTY compile-time asset set (no reference
-         assembly), so it silently fails to compile the moment any Vortice type is actually
-         used, even though restore itself reports success. Verified against nuget.org's
-         nuspecs that 2.1.0 is the newest release still multi-targeting net5.0/net6.0/
-         netstandard2.0, and confirmed with a real scratch build (a project that actually
-         references Vortice.Direct3D11 types, not just restores the package) that 2.1.0
-         compiles cleanly on net6.0-windows. -->
     <PackageReference Include="Vortice.Direct3D11" Version="2.1.0" />
     <PackageReference Include="Vortice.DXGI" Version="2.1.0" />
     <PackageReference Include="Vortice.DirectComposition" Version="2.1.0" />
     <PackageReference Include="Vortice.D3DCompiler" Version="2.1.0" />
     <PackageReference Include="Vortice.Mathematics" Version="1.4.25" />
-    <!-- Pinned to 2.1.0 for the same reason as the other Vortice.* packages above - newer
-         releases silently fail to compile on this net6.0-windows target. -->
+
     <PackageReference Include="Vortice.MediaFoundation" Version="2.1.0" />
   </ItemGroup>
 
@@ -116,13 +106,12 @@
   <ItemGroup>
     <AdditionalFiles Include="NativeMethods.txt" />
 
-    <!-- Provide the path to the winmds used as input into the analyzer. -->
     <CompilerVisibleProperty Include="CsWin32InputMetadataPaths" />
     <CompilerVisibleProperty Include="CsWin32InputDocPaths" />
   </ItemGroup>
 
   <Target Name="AssembleCsWin32InputPaths" BeforeTargets="GenerateMSBuildEditorConfigFileCore">
-    <!-- Roslyn only allows source generators to see msbuild properties, to lift msbuild items into semicolon-delimited properties. -->
+
     <PropertyGroup>
       <CsWin32InputMetadataPaths>@(ProjectionMetadataWinmd->'%(FullPath)','|')</CsWin32InputMetadataPaths>
       <CsWin32InputDocPaths>@(ProjectionDocs->'%(FullPath)','|')</CsWin32InputDocPaths>
@@ -150,8 +139,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <!-- opt-in audit: fails the build if a setting is written by the UI but read by nothing
-       (dotnet build -p:RunSettingsAudit=true). See tools/check_dead_settings.py. -->
   <Target Name="CheckDeadSettings" AfterTargets="Build" Condition="'$(RunSettingsAudit)' == 'true'">
     <Exec Command="python &quot;$(MSBuildThisFileDirectory)..	ools\check_dead_settings.py&quot;" />
   </Target>

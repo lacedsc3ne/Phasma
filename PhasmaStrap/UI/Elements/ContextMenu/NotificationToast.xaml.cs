@@ -1,31 +1,17 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// The actual toast popup window shown by <see cref="NotificationCenter"/>. A borderless,
-    /// click-through-free, always-on-top window that slides/fades in from the top-right corner of the
-    /// work area, holds for a duration (shown via a draining progress bar), then slides back out.
-    /// Notifications shown while one is already animating are queued and shown one after another.
-    /// </summary>
-    /// <remarks>
-    /// Ported from Voidstrap's UINotify.xaml(.cs) (Voidstrap.UI.Elements.Overlay.NotificationWindow),
-    /// trimmed down to a title+message layout since PhasmaStrap has no equivalent to Voidstrap's
-    /// avatar/flag image support, and simplified to always position against the primary work area
-    /// rather than anchoring to the Roblox window (PhasmaStrap has no equivalent overlay-anchor
-    /// utility to reuse for that, and the app-wide corner is a reasonable default for a general
-    /// notification surface, not just server-join toasts).
-    /// </remarks>
     public partial class NotificationToast : Window
     {
         private const int MaxQueuedNotifications = 20;
-        private const int EdgeMargin = 10;
 
         private readonly Queue<NotificationQueueItem> _queue = new();
         private readonly CancellationTokenSource _lifetimeCts = new();
-        private double _slideDistance = 420;
+        private double _slideFromX = 440;
+        private double _slideFromY;
 
         private bool _isProcessing;
         private bool _closed;
@@ -39,14 +25,14 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Closed += Window_Closed;
         }
 
-        public void ShowNotification(string title, string message, NotificationCategory category, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null)
+        public void ShowNotification(string title, string message, NotificationKindId kind, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null)
         {
             if (_closed)
                 return;
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, category, durationSeconds, onClick, actionText, action)));
+                Dispatcher.BeginInvoke(new Action(() => ShowNotification(title, message, kind, durationSeconds, onClick, actionText, action)));
                 return;
             }
 
@@ -57,14 +43,16 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             {
                 Title = title,
                 Message = message,
-                Category = category,
+                Kind = kind,
                 Duration = durationSeconds,
                 OnClick = onClick,
                 ActionText = actionText,
                 Action = action,
             });
 
-            if (!_isProcessing)
+            if (_isProcessing)
+                UpdateStackChrome();
+            else
                 _ = ProcessQueueAsync();
         }
 
@@ -79,45 +67,51 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     NotificationQueueItem item = _queue.Dequeue();
                     double duration = double.IsFinite(item.Duration) ? Math.Clamp(item.Duration, 0.5, 60) : 5;
 
-                    // a queued item of the same category as one still animating almost always means
-                    // the user is rapidly re-pressing a toggle hotkey and wants to see the LATEST
-                    // state now, not wait out the previous toast's full hold time first
-                    if (_queue.Count > 0 && _queue.Peek().Category == item.Category)
+                    if (_queue.Count > 0 && _queue.Peek().Kind == item.Kind)
                         continue;
 
                     TitleText.Text = item.Title;
                     MessageText.Text = item.Message;
                     MessageText.Visibility = string.IsNullOrWhiteSpace(item.Message) ? Visibility.Collapsed : Visibility.Visible;
-                    ApplyCategoryStyle(item.Category);
+                    ApplyKindStyle(item.Kind);
 
                     _currentClick = item.OnClick;
                     _currentAction = item.Action;
                     ActionButton.Content = item.ActionText ?? "";
                     ActionButton.Visibility = item.Action is not null && !string.IsNullOrEmpty(item.ActionText) ? Visibility.Visible : Visibility.Collapsed;
-                    NotificationBorder.Cursor = item.OnClick is null ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand;
-                    if (item.OnClick is not null)
-                        SourceText.Text += "  \u00b7  Click to open";
+                    CardBorder.Cursor = item.OnClick is null ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand;
+                    HintText.Visibility = item.OnClick is null ? Visibility.Collapsed : Visibility.Visible;
+                    UpdateStackChrome();
 
                     ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
                     ProgressScale.ScaleX = 0;
                     RootTranslate.BeginAnimation(TranslateTransform.XProperty, null);
-                    RootTranslate.X = _slideDistance;
+                    RootTranslate.BeginAnimation(TranslateTransform.YProperty, null);
                     NotificationBorder.BeginAnimation(OpacityProperty, null);
                     NotificationBorder.Opacity = 0;
 
                     if (!IsVisible)
                         Show();
 
-                    // SizeToContent="Height": let the new text measure before we place the window
+                    ApplyAppearance();
                     InvalidateMeasure();
                     UpdateLayout();
                     UpdatePosition();
 
-                    var slideIn = new DoubleAnimation(_slideDistance, 0, TimeSpan.FromMilliseconds(420))
+                    RootTranslate.X = _slideFromX;
+                    RootTranslate.Y = _slideFromY;
+
+                    var slideIn = new DoubleAnimation(_slideFromX, 0, TimeSpan.FromMilliseconds(420))
                     {
                         EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                     };
                     RootTranslate.BeginAnimation(TranslateTransform.XProperty, slideIn);
+
+                    var riseIn = new DoubleAnimation(_slideFromY, 0, TimeSpan.FromMilliseconds(420))
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    RootTranslate.BeginAnimation(TranslateTransform.YProperty, riseIn);
 
                     var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(260))
                     {
@@ -141,17 +135,21 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                         }
                         catch (OperationCanceledException) when (!_lifetimeCts.IsCancellationRequested)
                         {
-                            // dismissed early via the close button - fall through to the slide-out
-                            // below instead of the outer catch tearing down the whole queue
                         }
                     }
                     _currentItemCts = null;
 
-                    var slideOut = new DoubleAnimation(0, _slideDistance, TimeSpan.FromMilliseconds(320))
+                    var slideOut = new DoubleAnimation(0, _slideFromX, TimeSpan.FromMilliseconds(320))
                     {
                         EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
                     };
                     RootTranslate.BeginAnimation(TranslateTransform.XProperty, slideOut);
+
+                    var riseOut = new DoubleAnimation(0, _slideFromY, TimeSpan.FromMilliseconds(320))
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    RootTranslate.BeginAnimation(TranslateTransform.YProperty, riseOut);
 
                     var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(320))
                     {
@@ -186,25 +184,17 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             }
         }
 
-        private void ApplyCategoryStyle(NotificationCategory category)
+        private void ApplyKindStyle(NotificationKindId kind)
         {
-            (Wpf.Ui.Common.SymbolRegular symbol, string accentKey, string source) = category switch
-            {
-                NotificationCategory.GameJoin => (Wpf.Ui.Common.SymbolRegular.PlayCircle24, "SystemFillColorSuccessBrush", "Game session"),
-                NotificationCategory.GameLeave => (Wpf.Ui.Common.SymbolRegular.DoorArrowRight20, "SystemFillColorCautionBrush", "Game session"),
-                _ => (Wpf.Ui.Common.SymbolRegular.Info24, "SystemAccentColorPrimaryBrush", "PhasmaStrap"),
-            };
+            NotificationStyle style = NotificationStyles.For(kind);
 
-            CategoryIcon.Symbol = symbol;
-            SourceText.Text = source;
+            var brush = new SolidColorBrush(style.Accent);
+            brush.Freeze();
 
-            if (Application.Current.TryFindResource(accentKey) is SolidColorBrush brush)
-            {
-                AccentBar.Background = brush;
-                ProgressBar.Fill = brush;
-                CategoryIcon.Foreground = brush;
-                IconBackground.Color = brush.Color;
-            }
+            CategoryIcon.Symbol = style.Symbol;
+            CategoryIcon.Foreground = brush;
+            ProgressBar.Fill = brush;
+            IconBackground.Color = style.Accent;
         }
 
         private Action? _currentClick;
@@ -224,7 +214,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 App.Logger.WriteLine("NotificationToast::Click", $"Click action failed: {ex.Message}");
             }
 
-            // the toast did its job - dismiss it
             _currentItemCts?.Cancel();
         }
 
@@ -236,7 +225,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             if (action is null)
                 return;
 
-            // dismiss first, so the toast isn't left over whatever the action opens
             _currentItemCts?.Cancel();
 
             try
@@ -251,19 +239,42 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            // cancel just the current item's hold delay, not the whole toast lifetime - lets the
-            // queue continue normally to whatever's next
             _currentItemCts?.Cancel();
+        }
+
+        private void ClearAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            _queue.Clear();
+            UpdateStackChrome();
+            _currentItemCts?.Cancel();
+        }
+
+        private void UpdateStackChrome()
+        {
+            int waiting = _queue.Count;
+
+            StackCountText.Text = waiting + 1 + " NOTIFICATIONS";
+            StackHeader.Visibility = waiting > 0 ? Visibility.Visible : Visibility.Collapsed;
+            PeekNear.Visibility = waiting > 0 ? Visibility.Visible : Visibility.Collapsed;
+            PeekFar.Visibility = waiting > 1 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private const int SideMargin = 14;
+
+        private void ApplyAppearance()
+        {
+            double card = Math.Clamp(App.Settings.Prop.NotificationWidth, 300, 700);
+
+            Width = card + (SideMargin * 2);
+            PeekNear.Width = Math.Max(40, card - 10);
+            PeekFar.Width = Math.Max(30, card - 24);
         }
 
         private void UpdatePosition()
         {
-            _slideDistance = ActualWidth > 0 ? ActualWidth : Width;
+            double width = ActualWidth > 0 ? ActualWidth : Width;
+            double height = ActualHeight > 0 ? ActualHeight : 0;
 
-            // SystemParameters.WorkArea is cached by WPF and goes stale when a fullscreen game
-            // switches the display resolution - the toast then lands off the right edge of the
-            // (now smaller) screen. Ask Windows for the live work area of the monitor the game
-            // (or the cursor) is on, and convert device pixels to WPF units for this window's DPI.
             Rect workArea = SystemParameters.WorkArea;
             try
             {
@@ -287,9 +298,32 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             {
             }
 
-            Left = workArea.Right - _slideDistance - EdgeMargin;
-            Top = workArea.Top + EdgeMargin;
+            string position = App.Settings.Prop.NotificationPosition ?? "TopRight";
+            bool bottom = position.StartsWith("Bottom", StringComparison.OrdinalIgnoreCase);
+            bool left = position.EndsWith("Left", StringComparison.OrdinalIgnoreCase);
+            bool middle = position.EndsWith("Middle", StringComparison.OrdinalIgnoreCase);
+
+            double offsetX = Math.Clamp(App.Settings.Prop.NotificationOffsetX, 0, 2000);
+            double offsetY = Math.Clamp(App.Settings.Prop.NotificationOffsetY, 0, 2000);
+
+            Left = middle
+                ? workArea.Left + ((workArea.Width - width) / 2) + offsetX
+                : left
+                    ? workArea.Left + offsetX
+                    : workArea.Right - width - offsetX;
+
+            Top = bottom ? workArea.Bottom - height - offsetY : workArea.Top + offsetY;
+
+            Left = Math.Clamp(Left, workArea.Left, Math.Max(workArea.Left, workArea.Right - width));
+            Top = Math.Clamp(Top, workArea.Top, Math.Max(workArea.Top, workArea.Bottom - height));
+
+            _slideFromX = middle ? 0 : left ? -width : width;
+            _slideFromY = middle ? (bottom ? height : -height) : 0;
         }
+
+        public static readonly string[] Positions = { "TopRight", "TopMiddle", "TopLeft", "BottomRight", "BottomMiddle", "BottomLeft" };
+
+        public static readonly string[] PositionLabels = { "Top right", "Top middle", "Top left", "Bottom right", "Bottom middle", "Bottom left" };
 
         private void Window_Closed(object? sender, EventArgs e)
         {
@@ -307,7 +341,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         {
             public string Title { get; set; } = "";
             public string Message { get; set; } = "";
-            public NotificationCategory Category { get; set; }
+            public NotificationKindId Kind { get; set; }
             public double Duration { get; set; } = 5;
             public Action? OnClick { get; set; }
             public string? ActionText { get; set; }

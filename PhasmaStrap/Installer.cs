@@ -5,14 +5,8 @@ namespace PhasmaStrap
 {
     internal class Installer
     {
-        /// <summary>
-        /// Should the release notes open when updating to this version?
-        /// </summary>
         private const bool OpenReleaseNotes = true;
-        /// <summary>
-        /// Which version's release notes to open
-        /// Leave blank to use the current version
-        /// </summary>
+
         private const string ForcedReleaseNotesVersion = "2.11.2";
 
         private static string DesktopShortcut => Path.Combine(Paths.Desktop, $"{App.ProjectName}.lnk");
@@ -39,7 +33,6 @@ namespace PhasmaStrap
 
             App.Logger.WriteLine(LOG_IDENT, "Beginning installation");
 
-            // should've been created earlier from the write test anyway
             Directory.CreateDirectory(InstallLocation);
 
             Paths.Initialize(InstallLocation);
@@ -48,8 +41,6 @@ namespace PhasmaStrap
             {
                 Filesystem.AssertReadOnly(Paths.Application);
 
-                // if a previous install left behind a OneDrive/cloud-synced placeholder at this
-                // path, force it to hydrate first so the overwrite below doesn't fail
                 CloudFiles.Hydrate(Paths.Application);
 
                 try
@@ -87,9 +78,6 @@ namespace PhasmaStrap
                 uninstallKey.SetValueSafe("URLUpdateInfo", App.ProjectDownloadLink);
             }
 
-            // only register player, for the scenario where the user installs bloxstrap, closes it,
-            // and then launches from the website expecting it to work
-            // studio can be implicitly registered when it's first launched manually or if its configuration files are present
             WindowsRegistry.RegisterPlayer();
 
             if (App.IsStudioInstalled)
@@ -101,7 +89,6 @@ namespace PhasmaStrap
             if (CreateStartMenuShortcuts)
                 Shortcut.Create(Paths.Application, "", StartMenuShortcut);
 
-            // existing configuration persisting from an earlier install
             App.Settings.Load(false);
             App.State.Load(false);
             App.FastFlags.Load(false);
@@ -118,11 +105,9 @@ namespace PhasmaStrap
 
         private bool ValidateLocation()
         {
-            // prevent from installing to the root of a drive
             if (InstallLocation.Length <= 3)
                 return false;
 
-            // unc path, just to be safe
             if (InstallLocation.StartsWith("\\\\"))
                 return false;
 
@@ -130,15 +115,12 @@ namespace PhasmaStrap
                 || InstallLocation.Contains("\\Temp\\", StringComparison.InvariantCultureIgnoreCase))
                 return false;
 
-            // prevent from installing to a onedrive folder
             if (InstallLocation.Contains("OneDrive", StringComparison.InvariantCultureIgnoreCase))
                 return false;
 
-            // prevent from installing to an essential user profile folder (e.g. Documents, Downloads, Contacts idk)
             if (String.Compare(Directory.GetParent(InstallLocation)?.FullName, Paths.UserProfile, StringComparison.InvariantCultureIgnoreCase) == 0)
                 return false;
 
-            // prevent from installing into the program files folder
             if (InstallLocation.Contains("Program Files"))
                 return false;
 
@@ -157,7 +139,7 @@ namespace PhasmaStrap
             }
             else
             {
-                if (!IsImplicitInstall 
+                if (!IsImplicitInstall
                     && !InstallLocation.EndsWith(App.ProjectName, StringComparison.InvariantCultureIgnoreCase)
                     && Directory.Exists(InstallLocation)
                     && Directory.EnumerateFileSystemEntries(InstallLocation).Any())
@@ -179,7 +161,6 @@ namespace PhasmaStrap
 
                 try
                 {
-                    // check if we can write to the directory (a bit hacky but eh)
                     string testFile = Path.Combine(InstallLocation, $"{App.ProjectName}WriteTest.txt");
 
                     Directory.CreateDirectory(InstallLocation);
@@ -204,14 +185,13 @@ namespace PhasmaStrap
             const string LOG_IDENT = "Installer::DoUninstall";
 
             var processes = new List<Process>();
-            
+
             if (!String.IsNullOrEmpty(App.PlayerState.Prop.VersionGuid))
                 processes.AddRange(Process.GetProcessesByName(App.RobloxPlayerAppName));
 
             if (App.IsStudioInstalled)
                 processes.AddRange(Process.GetProcessesByName(App.RobloxStudioAppName));
 
-            // prompt to shutdown roblox if its currently running
             if (processes.Any())
             {
                 var result = Frontend.ShowMessageBox(
@@ -245,7 +225,6 @@ namespace PhasmaStrap
             bool playerStillInstalled = true;
             bool studioStillInstalled = true;
 
-            // check if stock bootstrapper is still installed
             using var playerKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\roblox-player");
             var playerFolder = playerKey?.GetValue("InstallLocation");
 
@@ -343,8 +322,6 @@ namespace PhasmaStrap
 
             if (Directory.Exists(Paths.Base))
             {
-                // this is definitely one of the workaround hacks of all time
-
                 string deleteCommand;
 
                 if (deleteFolder)
@@ -366,9 +343,6 @@ namespace PhasmaStrap
 
         private const string ReplacedSuffix = ".old";
 
-        // Puts this exe in place of the installed one. The installed exe is usually still running
-        // (the tray icon, a game's watcher), which blocks overwriting it - but Windows does allow
-        // renaming a running exe, so it's moved aside and deleted on a later start.
         private static bool ReplaceApplication(string LOG_IDENT)
         {
             for (int i = 1; i <= 6; i++)
@@ -418,7 +392,6 @@ namespace PhasmaStrap
             }
         }
 
-        // exes moved aside by ReplaceApplication, once nothing runs them any more
         private static void DeleteReplacedExecutables()
         {
             try
@@ -430,7 +403,7 @@ namespace PhasmaStrap
                 foreach (string file in Directory.EnumerateFiles(folder, Path.GetFileName(Paths.Application) + ".*" + ReplacedSuffix))
                 {
                     try { File.Delete(file); }
-                    catch (Exception) { /* still running - next time */ }
+                    catch (Exception) {  }
                 }
             }
             catch (Exception)
@@ -445,6 +418,24 @@ namespace PhasmaStrap
                 MessageBoxImage.Warning);
         }
 
+        private static bool IsLooseBuild(string executable)
+        {
+            try
+            {
+                string? folder = Path.GetDirectoryName(executable);
+                if (string.IsNullOrEmpty(folder))
+                    return false;
+
+                string sibling = Path.Combine(folder, Path.GetFileNameWithoutExtension(executable) + ".dll");
+                return File.Exists(sibling) && File.Exists(Path.Combine(folder, "PhasmaStrap.runtimeconfig.json"));
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("Installer::IsLooseBuild", ex);
+                return false;
+            }
+        }
+
         public static void HandleUpgrade()
         {
             const string LOG_IDENT = "Installer::HandleUpgrade";
@@ -454,7 +445,21 @@ namespace PhasmaStrap
             if (!File.Exists(Paths.Application) || Paths.Process == Paths.Application)
                 return;
 
-            // 2.0.0 downloads updates to <BaseFolder>/Updates so lol
+            if (IsLooseBuild(Paths.Process) && !IsLooseBuild(Paths.Application))
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Refusing to replace the installed copy with a loose build from {Paths.Process}");
+
+                Frontend.ShowMessageBox(
+                    "This is a development build running from its build folder, so it was not copied over your installed PhasmaStrap.\n\n"
+                    + "A loose build needs the files next to it to run, and the installed copy is a single file. Replacing one with the other leaves PhasmaStrap unable to start.\n\n"
+                    + "Publish a single-file build if you want to update your install.",
+                    MessageBoxImage.Warning,
+                    MessageBoxButton.OK
+                );
+
+                return;
+            }
+
             bool isAutoUpgrade = App.LaunchSettings.UpgradeFlag.Active
                 || Paths.Process.StartsWith(Path.Combine(Paths.Base, "Updates"))
                 || Paths.Process.StartsWith(Path.Combine(Paths.LocalAppData, "Temp"))
@@ -478,7 +483,6 @@ namespace PhasmaStrap
                     return;
             }
 
-            // silently upgrade version if the command line flag is set or if we're launching from an auto update
             if (!isAutoUpgrade)
             {
                 var result = Frontend.ShowMessageBox(
@@ -495,13 +499,8 @@ namespace PhasmaStrap
 
             Filesystem.AssertReadOnly(Paths.Application);
 
-            // in case the install folder was later swept up by OneDrive/Known Folder Move and the
-            // executable became a cloud-only placeholder, hydrate it before we try to overwrite it
             CloudFiles.Hydrate(Paths.Application);
 
-            // the process that downloaded this update holds the lock until it exits; that can take
-            // longer than a few seconds (its window closing), and giving up here used to leave the
-            // old version installed without a word
             using (var ipl = new InterProcessLock("AutoUpdater", TimeSpan.FromSeconds(30)))
             {
                 if (!ipl.IsAcquired)
@@ -527,8 +526,6 @@ namespace PhasmaStrap
                 uninstallKey.SetValueSafe("URLInfoAbout", App.ProjectSupportLink);
                 uninstallKey.SetValueSafe("URLUpdateInfo", App.ProjectDownloadLink);
             }
-
-            // update migrations
 
             if (existingVer is not null)
             {
@@ -684,7 +681,7 @@ namespace PhasmaStrap
 
             if (isAutoUpgrade)
             {
-#pragma warning disable CS0162 // Unreachable code detected
+#pragma warning disable CS0162
                 if (OpenReleaseNotes)
                 {
                     string releaseNoteVersion;
@@ -692,7 +689,6 @@ namespace PhasmaStrap
                     {
                         if (!string.IsNullOrEmpty(existingVer))
                         {
-                            // dont show release notes if existingVer is greater than or equal to ForcedReleaseNotesVersion
                             VersionComparison compareResult = Utilities.CompareVersions(existingVer, ForcedReleaseNotesVersion);
                             if (compareResult == VersionComparison.Equal || compareResult == VersionComparison.GreaterThan)
                                 return;
@@ -707,7 +703,7 @@ namespace PhasmaStrap
 
                     Utilities.ShellExecute($"https://github.com/{App.ProjectRepository}/wiki/Release-notes-for-PhasmaStrap-v{releaseNoteVersion}");
                 }
-#pragma warning restore CS0162 // Unreachable code detected
+#pragma warning restore CS0162
             }
             else
             {

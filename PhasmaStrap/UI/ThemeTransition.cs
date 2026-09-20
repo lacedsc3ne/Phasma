@@ -7,8 +7,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-// Ported from Voidstrap (UI/ThemeTransition.cs): cross-fades the old visual state of a window
-// over the new one while a theme switch is applied underneath, instead of an instant hard cut.
 namespace PhasmaStrap.UI;
 
 internal static class ThemeTransition

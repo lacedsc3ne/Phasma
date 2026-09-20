@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -10,9 +10,6 @@ using PhasmaStrap.UI.ViewModels.Bootstrapper;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
-    /// <summary>
-    /// Interaction logic for ByfronDialog.xaml
-    /// </summary>
     public partial class ByfronDialog : IBootstrapperDialog
     {
         private readonly ByfronDialogViewModel _viewModel;
@@ -95,7 +92,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
                 _viewModel.OnPropertyChanged(nameof(_viewModel.CancelEnabled));
                 _viewModel.OnPropertyChanged(nameof(_viewModel.CancelButtonVisibility));
-                
+
                 _viewModel.OnPropertyChanged(nameof(_viewModel.VersionTextVisibility));
                 _viewModel.OnPropertyChanged(nameof(_viewModel.VersionText));
             }
@@ -112,7 +109,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
             if (App.Settings.Prop.Theme.GetFinal() == Theme.Light)
             {
-                // Matching the roblox website light theme as close as possible.
                 _viewModel.DialogBorder = new Thickness(1);
                 _viewModel.Background = new SolidColorBrush(Color.FromRgb(242, 244, 245));
                 _viewModel.Foreground = new SolidColorBrush(Color.FromRgb(57, 59, 61));
@@ -130,7 +126,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
         }
 
         #region IBootstrapperDialog Methods
-        // Referencing FluentDialog
+
         public void ShowBootstrapper() => this.ShowDialog();
 
         public void CloseBootstrapper()

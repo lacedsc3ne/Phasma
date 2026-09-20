@@ -11,8 +11,6 @@ using PhasmaStrap.Integrations.Overlays;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Marks the parts of the game picture that stream-safe mode hides. The boxes sit on a still of
-    // the Roblox window (or a screenshot the user picks), and are kept as fractions of the window.
     public partial class StreamSafeEditorWindow
     {
         public sealed class AreaItem : INotifyPropertyChanged
@@ -56,7 +54,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         private AreaItem? _selected;
         private BitmapSource? _picture;
 
-        // the drag in progress
         private AreaItem? _dragItem;
         private Edges _dragEdges;
         private bool _dragCreating;
@@ -80,8 +77,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Closing += OnClosing;
             PreviewKeyDown += OnPreviewKeyDown;
         }
-
-        // ------------------------------------------------------------------ areas
 
         private AreaItem AddArea(string name, double x, double y, double w, double h)
         {
@@ -166,7 +161,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             StatusText.Text = _areas.Count >= StreamSafe.MaxRegions ? $"{StreamSafe.MaxRegions} areas is the most there can be." : "";
         }
 
-        // how a hidden area looks: a coarse checker for "Pixelate", nearly solid black for "Black"
         private static Brush FillBrush()
         {
             if (App.Settings.Prop.StreamSafeStyle == StreamSafe.StyleBlack)
@@ -187,8 +181,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             brush.Freeze();
             return brush;
         }
-
-        // ------------------------------------------------------------------ layout
 
         private double AspectRatio => _picture is not null && _picture.PixelHeight > 0 ? (double)_picture.PixelWidth / _picture.PixelHeight : 16.0 / 9.0;
 
@@ -231,8 +223,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             item.Changed(nameof(AreaItem.SizeText));
         }
 
-        // ------------------------------------------------------------------ dragging
-
         private static Edges HitEdges(FrameworkElement box, Point p)
         {
             Edges edges = Edges.None;
@@ -241,7 +231,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             if (p.Y < EdgeGrab) edges |= Edges.Top;
             if (p.Y > box.ActualHeight - EdgeGrab) edges |= Edges.Bottom;
 
-            // a box too small to tell its edges apart resizes from the bottom right
             if (edges.HasFlag(Edges.Left | Edges.Right)) edges &= ~Edges.Left;
             if (edges.HasFlag(Edges.Top | Edges.Bottom)) edges &= ~Edges.Top;
             return edges;
@@ -279,7 +268,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             if (e.Handled || _areas.Count >= StreamSafe.MaxRegions)
                 return;
 
-            // a new area, drawn from where the drag starts
             Point p = StagePoint(e);
             AreaItem item = AddArea($"Area {_areas.Count + 1}", p.X, p.Y, 0, 0);
             Select(item);
@@ -350,13 +338,10 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             if (Stage.IsMouseCaptured)
                 Stage.ReleaseMouseCapture();
 
-            // a click without a drag doesn't make an area
             if (_dragCreating && (item.W < MinSize || item.H < MinSize))
                 RemoveArea(item);
             _dragCreating = false;
         }
-
-        // ------------------------------------------------------------------ list and buttons
 
         private void AreaList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -364,7 +349,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 Select(AreaList.SelectedItem as AreaItem);
         }
 
-        // typing in an area's name selects that area
         private void AreaItem_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             if (sender is ListBoxItem container)
@@ -385,7 +369,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             if (_areas.Count >= StreamSafe.MaxRegions)
                 return;
 
-            // cascade new areas so they don't land exactly on top of each other
             double offset = 0.03 * (_areas.Count % 8);
             Select(AddArea($"Area {_areas.Count + 1}", 0.35 + offset, 0.35 + offset, 0.25, 0.2));
         }
@@ -434,8 +417,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 Apply();
         }
 
-        // ------------------------------------------------------------------ the picture
-
         private void Grab_Click(object sender, RoutedEventArgs e) => GrabFromRoblox();
 
         private void Browse_Click(object sender, RoutedEventArgs e)
@@ -480,8 +461,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             LayoutStage();
         }
 
-        // Copies the Roblox window's current picture. It runs on its own thread and is given up
-        // after a couple of seconds, so a busy or frozen Roblox can't hang this window.
         private void GrabFromRoblox()
         {
             PictureStatus.Text = "Looking for Roblox...";
@@ -552,7 +531,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 IntPtr hdc = graphics.GetHdc();
                 try
                 {
-                    // PW_CLIENTONLY | PW_RENDERFULLCONTENT - the second is what makes DirectX windows copy
                     if (!PrintWindow(hwnd, hdc, 0x1 | 0x2))
                         return null;
                 }
@@ -565,7 +543,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             var data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             try
             {
-                // some setups hand back an all-black picture instead of failing
                 bool anything = false;
                 for (int i = 1; i < 64 && !anything; i++)
                 {

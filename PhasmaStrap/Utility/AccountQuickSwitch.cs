@@ -1,17 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    // The headless half of account switching, for the tray menu's "Switch account".
-    //
-    // The Accounts page (AccountSwitcherViewModel) owns the library: <AccountBackups>\accounts.json
-    // plus one saved RobloxCookies.dat per account. Switching is "put that account's .dat where
-    // Roblox reads its login from", which only works while Roblox is closed. From the tray Roblox
-    // is by definition running, so the tray starts a separate PhasmaStrap process
-    // (-switchaccount <userId>) that outlives the Watcher: it closes Roblox, swaps the login and
-    // starts Roblox again. Nothing here ever runs without the user picking an account and
-    // confirming.
-    //
-    // The file format is the view model's - same property names, every field kept on rewrite.
-    // Folder and cookie path are parameters, so it can be exercised from a console harness.
     public static class AccountQuickSwitch
     {
         public static Action<string>? Log;
@@ -41,7 +29,6 @@ namespace PhasmaStrap.Utility
             return System.Text.Json.JsonSerializer.Deserialize<List<Account>>(File.ReadAllText(path)) ?? new List<Account>();
         }
 
-        // accounts that can actually be switched to, most recently used first
         public static List<Account> List(string folder)
         {
             try
@@ -58,8 +45,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Roblox has to be closed. Throws with a readable message when it cannot be done; the
-        // login that was active is kept as _previous_session.dat and put back if the swap fails.
         public static async Task SwitchAsync(string folder, string liveCookiePath, long userId)
         {
             List<Account> all = ReadAll(folder);

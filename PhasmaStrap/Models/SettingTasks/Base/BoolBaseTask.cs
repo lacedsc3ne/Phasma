@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,7 +30,7 @@ namespace PhasmaStrap.Models.SettingTasks.Base
             set
             {
                 _newState = value;
-                
+
                 if (Changed)
                     App.PendingSettingTasks[Name] = this;
                 else

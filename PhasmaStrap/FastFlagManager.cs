@@ -16,7 +16,6 @@ namespace PhasmaStrap
 
         public bool Changed => !OriginalProp.SequenceEqual(Prop);
 
-        // raised after a flag was set, changed or removed (pages that show a summary follow it)
         public event EventHandler? ValuesChanged;
 
         public static IReadOnlyDictionary<string, string> PresetFlags = new Dictionary<string, string>
@@ -28,7 +27,6 @@ namespace PhasmaStrap
             { "Rendering.TextureQuality.OverrideEnabled", "DFFlagTextureQualityOverrideEnabled" },
             { "Rendering.TextureQuality.Level", "DFIntTextureQualityOverride" },
 
-            // Telemetry / privacy
             { "Telemetry.TelemetryV2Url", "DFStringTelemetryV2Url" },
             { "Telemetry.Protocol", "FFlagEnableTelemetryProtocol" },
             { "Telemetry.GraphicsQualityUsage", "DFFlagGraphicsQualityUsageTelemetry" },
@@ -91,15 +89,12 @@ namespace PhasmaStrap
             { "Debug.Chunks", "FFlagDebugLightGridShowChunks" },
             { "Debug.FlagState", "FStringDebugShowFlagState" },
 
-            // Voice / chat
             { "UI.Chatbubble", "FFlagEnableBubbleChatFromChatService" },
             { "Menu.ChatTranslation", "FFlagChatTranslationSettingEnabled3" },
 
-            // Rendering
             { "Rendering.GpuCulling", "FFlagFastGPULightCulling3" },
             { "Rendering.CpuCulling", "FFlagDebugForceFSMCPULightCulling" },
             { "UI.RainbowText", "FFlagDebugDisplayUnthemedInstances" },
-            { "Rendering.FRMQualityOverride", "DFIntDebugFRMQualityLevelOverride" },
             { "Geometry.MeshLOD.Static", "DFIntCSGLevelOfDetailSwitchingDistanceStatic" },
             { "Geometry.MeshLOD.L0", "DFIntCSGLevelOfDetailSwitchingDistance" },
             { "Geometry.MeshLOD.L12", "DFIntCSGLevelOfDetailSwitchingDistanceL12" },
@@ -112,10 +107,6 @@ namespace PhasmaStrap
             { "Rendering.WorserParticles2", "FFlagFixOutdatedTimeScaleParticles" },
             { "Rendering.WorserParticles3", "FFlagFixParticleAttachmentCulling" },
             { "Rendering.WorserParticles4", "FFlagFixParticleEmissionBias2" },
-            { "Rendering.LowPolyMeshes1", "DFIntCSGLevelOfDetailSwitchingDistance" },
-            { "Rendering.LowPolyMeshes2", "DFIntCSGLevelOfDetailSwitchingDistanceL12" },
-            { "Rendering.LowPolyMeshes3", "DFIntCSGLevelOfDetailSwitchingDistanceL23" },
-            { "Rendering.LowPolyMeshes4", "DFIntCSGLevelOfDetailSwitchingDistanceL34" },
             { "Rendering.Mode.DisableD3D11", "FFlagDebugGraphicsDisableDirect3D11" },
             { "Rendering.Mode.D3D11", "FFlagDebugGraphicsPreferD3D11" },
             { "Rendering.Mode.Vulkan", "FFlagDebugGraphicsPreferVulkan" },
@@ -168,7 +159,6 @@ namespace PhasmaStrap
             { "UI.OldChromeUI9", "FFlagUpdateHealthBar" },
             { "UI.OldChromeUI10", "FFlagUseNewPinIcon" },
             { "Rendering.Shaders", "DFIntRenderClampRoughnessMax" },
-            { "Rendering.Shaders2", "DFIntDebugFRMQualityLevelOverride" },
             { "System.TargetRefreshRate1", "DFIntGraphicsOptimizationModeFRMFrameRateTarget" },
             { "System.TargetRefreshRate2", "DFIntGraphicsOptimizationModeMaxFrameTimeTargetMs" },
             { "System.TargetRefreshRate3", "DFIntGraphicsOptimizationModeMinFrameTimeTargetMs" },
@@ -184,7 +174,6 @@ namespace PhasmaStrap
             { "UI.FontSize", "FIntFontSizePadding" },
             { "UI.Hide", "DFIntCanHideGuiGroupId" },
 
-            // Networking
             { "Network.DefaultBps", "DFIntBandwidthManagerApplicationDefaultBps" },
             { "Network.MaxWorkCatchupMs", "DFIntBandwidthManagerDataSenderMaxWorkCatchupMs" },
             { "Network.RCore1", "DFIntSignalRCoreServerTimeoutMs" },
@@ -223,7 +212,6 @@ namespace PhasmaStrap
             { "Network.SerializeRead", "FFlagLargeReplicatorSerializeRead3" },
             { "Network.SerializeWrite", "FFlagLargeReplicatorSerializeWrite3" },
 
-            // UI / misc
             { "UI.SensetivityNumbers", "FFlagFixSensitivityTextPrecision" },
             { "UI.NoGuiBlur", "FIntRobloxGuiBlurIntensity" },
             { "UI.TextSize1", "FFlagEnablePreferredTextSizeScale" },
@@ -448,8 +436,6 @@ namespace PhasmaStrap
             { TextureQuality.Level3, "3" },
         };
 
-        // all fflags are stored as strings
-        // to delete a flag, set the value as null
         public void SetValue(string key, object? value)
         {
             const string LOG_IDENT = "FastFlagManager::SetValue";
@@ -483,20 +469,14 @@ namespace PhasmaStrap
             }
         }
 
-        // this returns null if the fflag doesn't exist
         public string? GetValue(string key)
         {
-            // check if we have an updated change for it pushed first
             if (Prop.TryGetValue(key, out object? value) && value is not null)
                 return value.ToString();
 
             return null;
         }
 
-        // matches the preset key itself, or a dot-delimited child of it (e.g. prefix "Rendering.Mode"
-        // matches "Rendering.Mode" and "Rendering.Mode.Vulkan", but NOT an unrelated sibling key like
-        // "Rendering.Shaders2" when prefix is "Rendering.Shaders" - plain StartsWith would wrongly
-        // treat "Shaders2" as a child of "Shaders" since there's no separator between them)
         private static bool MatchesPresetPrefix(string key, string prefix) => key == prefix || key.StartsWith(prefix + ".");
 
         public void SetPreset(string prefix, object? value)
@@ -544,14 +524,11 @@ namespace PhasmaStrap
 
         public override void Save()
         {
-            // convert all flag values to strings before saving
-
             foreach (var pair in Prop)
                 Prop[pair.Key] = pair.Value.ToString()!;
 
             base.Save();
 
-            // clone the dictionary
             OriginalProp = new(Prop);
         }
 
@@ -562,8 +539,6 @@ namespace PhasmaStrap
             if (GetPreset("Rendering.ManualFullscreen") != "False")
                 SetPreset("Rendering.ManualFullscreen", "False");
 
-            // clone the dictionary - after the forced flag above, so a fresh load doesn't count as
-            // an unsaved change
             OriginalProp = new(Prop);
 
             return result;

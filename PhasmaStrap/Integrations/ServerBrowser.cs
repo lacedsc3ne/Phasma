@@ -2,11 +2,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
-    // lists a game's public servers via Roblox's own unauthenticated server-list endpoint -
-    // deliberately does not touch the user's Roblox login session or probe/join servers to
-    // measure real ping, unlike Voidstrap's version, which piggybacks on the same session
-    // cookie its separate account-manager feature uses. Scoped down for that reason: this
-    // only ever reads what Roblox's public API already hands out for free.
     public static class ServerBrowser
     {
         private const string LOG_IDENT = "ServerBrowser";

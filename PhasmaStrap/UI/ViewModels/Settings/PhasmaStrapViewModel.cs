@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using ICSharpCode.SharpZipLib.Zip;
@@ -57,7 +57,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set
             {
                 App.Settings.Prop.TrayDoubleClickAction = value;
-                // saved right away so the tray icon of a game that's already running follows it
+
                 App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(TrayDoubleClickAction));
             }
@@ -75,9 +75,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public bool ShouldExportLogs { get; set; } = true;
 
-        // for bug reports: OS/.NET/GPU/PhasmaStrap version, not personal data - reuses
-        // GpuInventory.Summary (already computed for the Overlays/RiShade/NVIDIA pages) rather
-        // than querying WMI a second time here
         public bool ShouldExportSystemInfo { get; set; } = true;
 
         public ICommand ExportDataCommand => new RelayCommand(ExportData);
@@ -86,10 +83,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'");
 
-            var dialog = new SaveFileDialog 
-            { 
+            var dialog = new SaveFileDialog
+            {
                 FileName = $"PhasmaStrap-export-{timestamp}.zip",
-                Filter = $"{Strings.FileTypes_ZipArchive}|*.zip" 
+                Filter = $"{Strings.FileTypes_ZipArchive}|*.zip"
             };
 
             if (dialog.ShowDialog() != true)
@@ -143,11 +140,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             Process.Start("explorer.exe", $"/select,\"{dialog.FileName}\"");
         }
-
-        // Restores whatever "Config/" entries an export made with ExportData above contains -
-        // matched back to their real target file by name, not by hardcoding the 3 filenames
-        // twice, so this can never drift out of sync with what export actually writes.
-        // ------------------------------------------------------------ settings history
 
         public sealed class BackupItem
         {
@@ -237,8 +229,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 PhasmaStrap.Utility.SettingsBackups.Restore(Paths.SettingsBackups, item.Location, item.Backup);
 
-                // the window's Restart saves everything first, so the restored values have to be
-                // what is in memory by then
                 if (item.Location == App.Settings.FileLocation)
                     App.Settings.Load(false);
                 else if (item.Location == App.FlagProfiles.FileLocation)
@@ -323,10 +313,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 return;
             }
 
-            // Load() reassigns each manager's Prop backing field, so every already-open settings
-            // page picks up the new values on its next read - no restart needed for the values
-            // themselves (some derived UI state, like which page is currently displayed, may
-            // still look stale until you navigate away and back).
             App.Settings.Load(alertFailure: false);
             App.State.Load(alertFailure: false);
             App.FastFlags.Load(alertFailure: false);

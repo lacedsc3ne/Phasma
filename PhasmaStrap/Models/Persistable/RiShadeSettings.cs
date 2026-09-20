@@ -1,18 +1,7 @@
 namespace PhasmaStrap.Models.Persistable
 {
-    /// <summary>
-    /// Configuration for the RiShade post-processing shader stack (ported from Voidstrap).
-    /// <para/>
-    /// This is a trimmed-down port: only screen-space effects that don't require an AI-estimated
-    /// depth buffer are supported. Voidstrap's depth-buffer-driven effects (depth of field, screen
-    /// space reflections, ambient occlusion, global illumination, fog, eye adaptation and the debug
-    /// depth/normal views) all depend on <c>RiShadeDepth.cs</c>, which downloads and runs an ONNX
-    /// depth estimation model through DirectML at runtime. That dependency was intentionally not
-    /// ported, so those fields don't exist here and their shader inputs are always fed disabled.
-    /// </summary>
     public class RiShadeSettings
     {
-        // color grade
         public bool GradeEnabled { get; set; } = false;
         public float Brightness { get; set; } = 0.0f;
         public float Gamma { get; set; } = 1.0f;
@@ -23,26 +12,22 @@ namespace PhasmaStrap.Models.Persistable
         public int ColorTemp { get; set; } = 1;
         public float[] ColorTempCustom { get; set; } = new[] { 1f, 1f, 1f };
 
-        // tonemap
         public bool TonemapEnabled { get; set; } = false;
         public int TonemapMode { get; set; } = 0;
         public float TonemapExposure { get; set; } = 1.0f;
         public float TonemapWhitepoint { get; set; } = 4.0f;
 
-        // vignette
         public bool VignetteEnabled { get; set; } = false;
         public float VignetteStrength { get; set; } = 0.5f;
         public float VignetteFeather { get; set; } = 1.2f;
         public float VignetteCenterX { get; set; } = 0.0f;
         public float VignetteCenterY { get; set; } = 0.0f;
 
-        // sharpen
         public bool SharpenEnabled { get; set; } = false;
         public float SharpenStrength { get; set; } = 0.8f;
         public float SharpenRadius { get; set; } = 1.0f;
         public float SharpenClamp { get; set; } = 0.08f;
 
-        // bloom
         public bool BloomEnabled { get; set; } = false;
         public float BloomStrength { get; set; } = 0.2f;
         public int BloomPasses { get; set; } = 3;
@@ -50,18 +35,15 @@ namespace PhasmaStrap.Models.Persistable
         public float BloomRadius { get; set; } = 1.5f;
         public float[] BloomTint { get; set; } = new[] { 1f, 1f, 1f };
 
-        // chromatic aberration
         public bool ChromaEnabled { get; set; } = false;
         public float ChromaStrength { get; set; } = 0.003f;
         public bool ChromaRadial { get; set; } = true;
 
-        // film grain
         public bool GrainEnabled { get; set; } = false;
         public float GrainStrength { get; set; } = 0.04f;
         public float GrainSize { get; set; } = 1.0f;
         public bool GrainColored { get; set; } = false;
 
-        // local contrast / debanding / soft "ambient" bloom-glow (all screen-space, no depth needed)
         public float ClarityStrength { get; set; } = 0.0f;
         public bool DebandEnabled { get; set; } = false;
         public float DebandStrength { get; set; } = 0.5f;
@@ -185,7 +167,7 @@ namespace PhasmaStrap.Models.Persistable
                     s.TonemapMode = 3;
                     break;
                 default:
-                    // "Vanilla (off)" - reset happens by the caller replacing with new RiShadeSettings()
+
                     break;
             }
         }

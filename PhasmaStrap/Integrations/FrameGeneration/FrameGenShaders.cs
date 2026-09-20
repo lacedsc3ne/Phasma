@@ -176,7 +176,6 @@ float4 PSFlowCoarse(VSOut inp) : SV_Target
     if (R > 40) R = 40;
     float bias = 0.18 / (float)R;
 
-    // Pass 1: coarse sweep with step=4
     int step1 = 4;
     [loop] for (int y1 = -R; y1 <= R; y1 += step1)
     {
@@ -188,7 +187,6 @@ float4 PSFlowCoarse(VSOut inp) : SV_Target
         }
     }
 
-    // Pass 2: refine around best with step=2, radius 4
     int bx2 = (int)(bestD.x / px.x + 0.5);
     int by2 = (int)(bestD.y / px.y + 0.5);
     [loop] for (int y2 = -4; y2 <= 4; y2 += 2)
@@ -203,7 +201,6 @@ float4 PSFlowCoarse(VSOut inp) : SV_Target
         }
     }
 
-    // Pass 3: final refine with step=1, radius 2
     int bx3 = (int)(bestD.x / px.x + 0.5);
     int by3 = (int)(bestD.y / px.y + 0.5);
     [loop] for (int y3 = -2; y3 <= 2; y3++)

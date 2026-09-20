@@ -34,7 +34,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     return "Inactive";
                 if (Server.Expires is not DateTime expires)
                     return Server.Owned ? "Free" : "";
-                // free servers come back with an end date a century away
+
                 if (expires > DateTime.UtcNow.AddYears(20))
                     return "Doesn't expire";
 
@@ -50,20 +50,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public bool CanJoin => Server.Active && Server.PlaceId > 0;
 
-        // a real end date (not a free server's "never"), for sorting and the "ending soon" filter
         public DateTime? EndsAt => Server.Expires is DateTime e && e < DateTime.UtcNow.AddYears(20) ? e : null;
     }
 
-    // one choice in the owner / game filter lists
     public sealed record PrivateServerFilterOption(string Label, long Id)
     {
         public override string ToString() => Label;
     }
 
-    /// <summary>
-    /// Servers page > Private servers: the ones you own and the ones shared with you, with join,
-    /// invite link and new link. Nothing is fetched until you ask for it.
-    /// </summary>
     public sealed class PrivateServersViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<PrivateServerRow> Owned { get; } = new();
@@ -81,8 +75,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public Visibility ListsVisibility => _loaded ? Visibility.Visible : Visibility.Collapsed;
         public Visibility NoOwnedVisibility => _loaded && !_all.Any(r => r.Server.Owned) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility NoSharedVisibility => _loaded && !_all.Any(r => !r.Server.Owned) ? Visibility.Visible : Visibility.Collapsed;
-
-        // ---- filters. They only change what's shown; the list itself comes from Load.
 
         private List<PrivateServerRow> _all = new();
         private HashSet<long> _friendIds = new();
@@ -102,15 +94,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private PrivateServerFilterOption? _game;
         public PrivateServerFilterOption? Game { get => _game; set { if (Equals(_game, value) || value is null) return; _game = value; OnPropertyChanged(nameof(Game)); ApplyFilters(); } }
 
-        // 0 yours and shared, 1 only yours, 2 only shared
         private int _showIndex;
         public int ShowIndex { get => _showIndex; set { if (_showIndex == value) return; _showIndex = value; OnPropertyChanged(nameof(ShowIndex)); ApplyFilters(); } }
 
-        // 0 any, 1 can join now, 2 inactive, 3 ending within 30 days
         private int _statusIndex;
         public int StatusIndex { get => _statusIndex; set { if (_statusIndex == value) return; _statusIndex = value; OnPropertyChanged(nameof(StatusIndex)); ApplyFilters(); } }
 
-        // 0 game A-Z, 1 owner A-Z, 2 ending soonest
         private int _sortIndex;
         public int SortIndex { get => _sortIndex; set { if (_sortIndex == value) return; _sortIndex = value; OnPropertyChanged(nameof(SortIndex)); ApplyFilters(); } }
 
@@ -194,7 +183,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(NoMatchesVisibility));
         }
 
-        // owners who share servers with you: friends first, then whoever shares the most
         private void BuildFilterOptions()
         {
             long ownerId = _owner?.Id ?? AnyOwner;
@@ -223,14 +211,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                          .OrderBy(g => g.Name, StringComparer.OrdinalIgnoreCase))
                 GameOptions.Add(new PrivateServerFilterOption($"{g.Name}  ({g.Count})", g.Id));
 
-            // keep what was picked, if it's still there
             _owner = OwnerOptions.FirstOrDefault(o => o.Id == ownerId) ?? OwnerOptions[0];
             _game = GameOptions.FirstOrDefault(o => o.Id == gameId) ?? GameOptions[0];
             OnPropertyChanged(nameof(Owner));
             OnPropertyChanged(nameof(Game));
         }
 
-        // which owners are your friends - only used to sort and label the owner list
         private async Task LoadFriendsAsync()
         {
             try
@@ -270,7 +256,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 Status = servers.Count == 0 ? "This account has no private servers." : $"{rows.Count(r => r.Server.Owned)} of your own, {rows.Count(r => !r.Server.Owned)} shared with you.";
                 _ = LoadFriendsAsync();
 
-                // icons after the list shows - they're only decoration
                 var games = await PhasmaStrap.Utility.GameLookup.WithIconsAsync(servers.Where(s => s.UniverseId > 0).Select(s => new PhasmaStrap.Utility.GameInfo(s.UniverseId, s.PlaceId, s.GameName)).DistinctBy(g => g.UniverseId).ToList());
                 foreach (PrivateServerRow row in rows)
                     row.IconUrl = games.FirstOrDefault(g => g.UniverseId == row.Server.UniverseId)?.IconUrl is { Length: > 0 } icon ? icon : null;

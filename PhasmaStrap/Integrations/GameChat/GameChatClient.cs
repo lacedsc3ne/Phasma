@@ -29,12 +29,6 @@ namespace PhasmaStrap.Integrations.GameChat
         Failed
     }
 
-    /// <summary>
-    /// Talks to an optional, user-configured chat relay server (Settings > Game Chat > Server URL).
-    /// PhasmaStrap does not operate a hosted chat backend of its own (unlike Voidstrap's original
-    /// GameChatClient, which always relayed through Voidstrap's own website API) - without a server
-    /// configured this class simply reports "not connected" and never makes network calls.
-    /// </summary>
     public class GameChatClient : IDisposable
     {
         private const string Tag = "GameChatClient";

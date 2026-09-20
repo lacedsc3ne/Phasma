@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -28,26 +28,12 @@ namespace PhasmaStrap.Utility
         public Dictionary<string, string> BundleHashes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public string Proxy { get; set; } = "";
 
-        // findings you said are fine, and ones already notified about
         public List<string> Accepted { get; set; } = new();
         public List<string> Alerted { get; set; } = new();
 
         public List<GuardAlert> History { get; set; } = new();
     }
 
-    // Account guard: warns about things cookie stealers and traffic interceptors do. It can only
-    // warn - it can't stop a program that's already running on your PC.
-    //
-    // Checks (Scan):
-    //   - the hosts file sending a Roblox address somewhere else (PhasmaStrap's own block excepted)
-    //   - a trusted root certificate added to your Windows account since the guard started, and any
-    //     certificate from a known traffic-interception tool
-    //   - Roblox's own certificate list (ssl\cacert.pem) changed by something other than PhasmaStrap
-    //   - the Windows proxy setting changed
-    // And, with background watching on (-guard, started at sign-in): another program opening
-    // Roblox's sign-in file (RobloxCookies.dat) while Roblox isn't running. Windows doesn't tell a
-    // normal program who opened a file, but an oplock held on it is broken by any other open, so
-    // the open itself is noticed; programs started in the minutes before are listed as suspects.
     public static class AccountGuard
     {
         private const string LOG_IDENT = "AccountGuard";
@@ -57,14 +43,11 @@ namespace PhasmaStrap.Utility
 
         private static string StatePath => Path.Combine(Paths.Base, "AccountGuard.json");
 
-        // PhasmaStrap's own reads and writes of the sign-in file leave this stamp just before
         private static string StampPath => Path.Combine(Paths.Base, "Cache", "own-sign-in-access");
 
         private static readonly string[] RobloxDomains = { "roblox.com", "rbxcdn.com", "robloxlabs.com", "rbx.com", "roblox.qq.com", "rbxtrk.com" };
 
         private static readonly string[] InterceptorNames = { "fiddler", "charles proxy", "mitmproxy", "portswigger", "burp", "http toolkit", "httptoolkit", "proxyman", "do_not_trust", "telerik" };
-
-        // ------------------------------------------------------------------ state
 
         public static GuardState Load()
         {
@@ -126,8 +109,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ the checks
-
         private static string Hash(string text) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..16];
 
         private static IEnumerable<GuardFinding> CheckHosts()
@@ -153,7 +134,6 @@ namespace PhasmaStrap.Utility
                 if (inOwnBlock || line.Length == 0 || line.StartsWith('#'))
                     continue;
 
-                // PhasmaStrap's telemetry block marks each of its lines instead of wrapping them
                 int comment = line.IndexOf('#');
                 if (comment >= 0 && line[comment..].Contains("PHASMASTRAP", StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -162,8 +142,6 @@ namespace PhasmaStrap.Utility
                 if (parts.Length < 2)
                     continue;
 
-                // pointing an address at nothing blocks it (ad and telemetry blockers do that) -
-                // only sending it to a real address can intercept a login
                 if (parts[0] is "0.0.0.0" or "::" or "0:0:0:0:0:0:0:0")
                     continue;
 
@@ -204,7 +182,6 @@ namespace PhasmaStrap.Utility
         {
             List<X509Certificate2> mine = RootCertificates(StoreLocation.CurrentUser);
 
-            // known interception tools, wherever they're trusted
             foreach (X509Certificate2 cert in mine.Concat(RootCertificates(StoreLocation.LocalMachine)))
             {
                 string name = cert.Subject.ToLowerInvariant();
@@ -222,7 +199,6 @@ namespace PhasmaStrap.Utility
             if (!state.Baselined)
                 yield break;
 
-            // anything added to your account's trusted roots since the guard started watching
             foreach (X509Certificate2 cert in mine)
             {
                 if (IsOwnCertificate(cert) || state.RootThumbprints.Contains(cert.Thumbprint))
@@ -250,7 +226,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // the bundle without PhasmaStrap's own block, so the proxy being turned on or off isn't a change
         private static string? BundleHash(string bundle)
         {
             try
@@ -319,7 +294,6 @@ namespace PhasmaStrap.Utility
             };
         }
 
-        // everything wrong right now (baselines are taken on the first scan)
         public static List<GuardFinding> Scan()
         {
             GuardState state = Load();
@@ -330,7 +304,6 @@ namespace PhasmaStrap.Utility
             findings.AddRange(CheckTrustBundles(state));
             findings.AddRange(CheckProxy(state));
 
-            // anything seen for the first time becomes the "normal" to compare against
             bool changed = false;
 
             if (!state.Baselined)
@@ -350,7 +323,6 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            // bundles of deleted versions are forgotten
             foreach (string gone in state.BundleHashes.Keys.Where(b => !File.Exists(b)).ToList())
             {
                 state.BundleHashes.Remove(gone);
@@ -363,7 +335,6 @@ namespace PhasmaStrap.Utility
             return findings.Where(f => !state.Accepted.Contains(f.Id)).ToList();
         }
 
-        // "this is fine": never mention it again, and make it the new normal
         public static void Accept(GuardFinding finding)
         {
             GuardState state = Load();
@@ -390,10 +361,9 @@ namespace PhasmaStrap.Utility
             state.History.Add(new GuardAlert { Utc = DateTime.UtcNow, Title = title, Detail = detail });
             App.Logger.WriteLine(LOG_IDENT, $"Alert: {title} - {detail}");
 
-            UI.NotificationCenter.Notify(title, detail, UI.NotificationCategory.General, durationSeconds: 20);
+            UI.NotificationCenter.Notify(title, detail, UI.NotificationCategory.General, durationSeconds: 20, kind: UI.NotificationKindId.AccountGuard);
         }
 
-        // scan, and notify about anything not mentioned before
         public static void ScanAndNotify()
         {
             if (!App.Settings.Prop.AccountGuardEnabled)
@@ -418,11 +388,8 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ background watching
-
         public static bool BackgroundWanted => App.Settings.Prop.AccountGuardEnabled && App.Settings.Prop.AccountGuardBackground;
 
-        // starts (or stops starting) the background guard when you sign in to Windows
         public static void ApplyStartup()
         {
             try
@@ -440,7 +407,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // turned on in the settings window: start watching now rather than at the next sign-in
         public static void StartBackgroundIfWanted()
         {
             if (!BackgroundWanted)
@@ -465,7 +431,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // programs started shortly before an open - most likely whatever opened the file
         private static List<string> RecentlyStarted(TimeSpan window)
         {
             var result = new List<string>();
@@ -490,7 +455,6 @@ namespace PhasmaStrap.Utility
                 }
                 catch
                 {
-                    // other users' / protected processes can't be inspected
                 }
                 finally
                 {
@@ -503,7 +467,6 @@ namespace PhasmaStrap.Utility
 
         private static void OnSignInFileOpened()
         {
-            // Roblox itself, or PhasmaStrap (friends, private servers, account switching)
             if (RobloxRunning() || OwnAccessWithin(TimeSpan.FromSeconds(5)))
                 return;
 
@@ -520,10 +483,6 @@ namespace PhasmaStrap.Utility
             Save(state);
         }
 
-        // -guard: the background process. Holds an oplock on the sign-in file while Roblox isn't
-        // running, scans every few minutes, and ends itself when the setting is turned off.
-        // held for the life of the -guard process (a mutex can only be released by the thread
-        // that took it, so it's simply let go when the process ends)
         private static Mutex? _guardMutex;
 
         public static void RunBackground()
@@ -551,7 +510,6 @@ namespace PhasmaStrap.Utility
                 {
                     try
                     {
-                        // Settings follow the file (SettingsHotReload): turning the guard off ends this process
                         if (!BackgroundWanted)
                             break;
 
@@ -583,7 +541,6 @@ namespace PhasmaStrap.Utility
             {
                 try
                 {
-                    // Roblox reads and writes the file all the time while it runs - nothing to learn then
                     if (!File.Exists(path) || RobloxRunning())
                     {
                         stop.WaitHandle.WaitOne(TimeSpan.FromSeconds(3));
@@ -598,7 +555,7 @@ namespace PhasmaStrap.Utility
                             break;
 
                         case Oplock.Result.NotGranted:
-                            // something has it open right now; try again shortly
+
                             stop.WaitHandle.WaitOne(TimeSpan.FromSeconds(2));
                             break;
                     }
@@ -611,15 +568,13 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // A read-write-handle oplock: Windows breaks it as soon as another handle opens the file,
-        // and the other open waits (a fraction of a millisecond) until this handle lets go.
         private static class Oplock
         {
             public enum Result { Opened, NotGranted, Stopped }
 
             public static Result WaitForOtherOpen(string path, CancellationToken stop, Func<bool> giveUp)
             {
-                using SafeFileHandle handle = CreateFile(path, 0x80 /* FILE_READ_ATTRIBUTES */, 7 /* share all */, IntPtr.Zero, 3 /* OPEN_EXISTING */, 0x40000000 /* OVERLAPPED */, IntPtr.Zero);
+                using SafeFileHandle handle = CreateFile(path, 0x80 , 7 , IntPtr.Zero, 3 , 0x40000000 , IntPtr.Zero);
                 if (handle.IsInvalid)
                     return Result.NotGranted;
 
@@ -627,8 +582,8 @@ namespace PhasmaStrap.Utility
                 {
                     StructureVersion = 1,
                     StructureLength = (ushort)Marshal.SizeOf<REQUEST_OPLOCK_INPUT_BUFFER>(),
-                    RequestedOplockLevel = 1 | 2 | 4, // read | handle | write caching
-                    Flags = 1,                        // request
+                    RequestedOplockLevel = 1 | 2 | 4,
+                    Flags = 1,
                 };
 
                 using var done = new ManualResetEvent(false);
@@ -644,8 +599,8 @@ namespace PhasmaStrap.Utility
                     Marshal.StructureToPtr(new REQUEST_OPLOCK_OUTPUT_BUFFER(), outPtr, false);
                     Marshal.StructureToPtr(overlapped, ovPtr, false);
 
-                    bool ok = DeviceIoControl(handle, 0x00090240 /* FSCTL_REQUEST_OPLOCK */, inPtr, (uint)Marshal.SizeOf<REQUEST_OPLOCK_INPUT_BUFFER>(), outPtr, (uint)Marshal.SizeOf<REQUEST_OPLOCK_OUTPUT_BUFFER>(), out _, ovPtr);
-                    if (ok || Marshal.GetLastWin32Error() != 997 /* ERROR_IO_PENDING */)
+                    bool ok = DeviceIoControl(handle, 0x00090240 , inPtr, (uint)Marshal.SizeOf<REQUEST_OPLOCK_INPUT_BUFFER>(), outPtr, (uint)Marshal.SizeOf<REQUEST_OPLOCK_OUTPUT_BUFFER>(), out _, ovPtr);
+                    if (ok || Marshal.GetLastWin32Error() != 997 )
                         return Result.NotGranted;
 
                     while (true)
@@ -663,7 +618,6 @@ namespace PhasmaStrap.Utility
                 }
                 finally
                 {
-                    // closing the handle is the acknowledgement: the other open goes ahead
                     handle.Dispose();
                     Marshal.FreeHGlobal(inPtr);
                     Marshal.FreeHGlobal(outPtr);

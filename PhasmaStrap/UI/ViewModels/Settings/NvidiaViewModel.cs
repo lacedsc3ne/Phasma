@@ -5,19 +5,6 @@ using PhasmaStrap.Integrations.Nvidia;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    // Backs NvidiaPage. Talks directly to the NVIDIA driver (via NvApi/NvidiaProfileInspector)
-    // to read and write a dedicated "PhasmaStrap" driver profile scoped to
-    // RobloxPlayerBeta.exe/RobloxStudioBeta.exe - this is completely separate from Roblox's
-    // own FastFlags or in-game settings, and only takes effect on NVIDIA GPUs.
-    //
-    // The setting IDs below are the community-known NVIDIA driver profile setting IDs (as
-    // used by NVIDIA Profile Inspector) for each feature - ported over from the curated list
-    // Voidstrap's NvidiaFastFlagsViewModel exposed, which is the actually-useful subset of
-    // what NvidiaProfileInspector.cs can read/write. Voidstrap's multi-type NIP import/export
-    // and "copy from another app" dialogs were intentionally not ported (PhasmaStrap has no
-    // .nip round-trip - see NvidiaProfileManager.cs), but the ability to add a setting beyond
-    // this curated list *was* ported as CustomSettings below, adapted to read/write straight
-    // from the live driver profile instead of a persisted .nip file.
     public class NvidiaViewModel : NotifyPropertyChangedViewModel
     {
         private const uint IdLowLatencyMode = 390467;
@@ -48,11 +35,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             IdAnisotropicFilteringMode, IdTransparencySupersampling, IdBenchmarkOverlay,
         };
 
-        // Single source of truth for the Benchmark Overlay combo box: both the display list
-        // (BenchMarkOverlayModes) and the value lookups (BenchmarkOverlayFromValue/ToValue)
-        // read from this same array, so a translated label can never desync between what's
-        // shown and what's compared against (see the ComboBox desync bug this project has hit
-        // before, e.g. with SILK/latency mode strings).
         private static readonly (string Label, uint Value)[] BenchmarkOverlayOptions =
         {
             (Strings.Menu_Nvidia_BenchmarkOverlay_Disabled, 0u),
@@ -90,8 +72,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             if (IsAvailable)
             {
-                // reading the driver profile is a slow NVAPI round-trip; do it once, in the
-                // background, so clicking the NVIDIA tab doesn't freeze the window
                 StatusMessage = "Reading the NVIDIA driver profile...";
                 _ = LoadFromDriverAsync();
             }
@@ -111,11 +91,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        /// <summary>
-        /// Called from NvidiaPage's Unloaded handler so this viewmodel doesn't keep
-        /// <see cref="NvidiaFlagHistory"/> subscribed for the lifetime of the process after the
-        /// page itself has been navigated away from (mirrors NotificationsViewModel.Detach).
-        /// </summary>
         public void Detach()
         {
             NvidiaFlagHistory.Changed -= OnFlagHistoryChanged;
@@ -144,24 +119,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<string> BenchmarkOverlayModes { get; } = new ObservableCollection<string>(BenchmarkOverlayOptions.Select(option => option.Label));
 
-        // Driver profile settings the user has added beyond the curated list above (see
-        // AddNvidiaCustomSettingDialog / NvidiaPage's "Custom settings" section) - ported from
-        // Voidstrap's arbitrary setting editor (AddNvidiaFFlagWindow/NvidiaFFlagEditorPage), but
-        // adapted to PhasmaStrap's live-driver-read architecture instead of a persisted .nip
-        // file: NvidiaProfileInspector.ReadProfile() already returns every setting sitting in
-        // the driver's "PhasmaStrap" profile (curated and custom alike), so a custom entry the
-        // user applies is automatically picked back up here on the next load with no separate
-        // storage needed.
         public ObservableCollection<NvidiaSetting> CustomSettings { get; } = new ObservableCollection<NvidiaSetting>();
 
-        // Recent actions taken from the grid view (add/remove/delete/reset/apply), refreshed
-        // from the shared NvidiaFlagHistory log - see that class' remarks for why this is
-        // session-only rather than persisted to disk.
         public ObservableCollection<NvidiaHistoryEntry> FlagHistory { get; } = new ObservableCollection<NvidiaHistoryEntry>();
 
-        // Toggles NvidiaPage between the collapsed-card view (curated toggles + custom settings
-        // list) and the raw grid "Advanced Editor" view - both live in the same page/DataContext,
-        // this just flips which section is visible (see the DataTriggers in NvidiaPage.xaml).
         public bool NvidiaEditorViewMode
         {
             get => _nvidiaEditorViewMode;
@@ -267,8 +228,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ApplyProfile(NvidiaProfileInspector.ReadProfile());
         }
 
-        // one profile read feeds both the curated toggles and the custom-settings list (this used
-        // to read the whole profile twice)
         private void ApplyProfile(List<NvidiaSetting> profile)
         {
             HashSet<uint> tracked = new HashSet<uint>(AllTrackedIds);
@@ -293,7 +252,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             TextureLodBias = live.TryGetValue(IdTextureLodBias, out uint bias) ? unchecked((int)bias) : 0;
             BenchmarkOverlayMode = BenchmarkOverlayFromValue(live.TryGetValue(IdBenchmarkOverlay, out uint overlay) ? overlay : 0u);
 
-            // whatever else is in the driver's "PhasmaStrap" profile that isn't curated above
             CustomSettings.Clear();
             foreach (NvidiaSetting setting in profile)
             {
@@ -332,20 +290,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             NvidiaFlagHistory.Log("Added " + trimmedName + " (0x" + id.ToString("X8", CultureInfo.InvariantCulture) + ")");
         }
 
-        // Removes a custom setting from the list and, if the driver is reachable, immediately
-        // resets it in the "PhasmaStrap" driver profile too - PhasmaStrap has no persisted .nip
-        // file for these (see CustomSettings' doc comment) so simply dropping it from the
-        // in-memory list would otherwise leave the old value sitting in the live driver profile
-        // until something else happened to overwrite that setting ID.
         public void RemoveCustomSetting(NvidiaSetting setting)
         {
             RemoveCustomSettingCore(setting);
             NvidiaFlagHistory.Log("Removed " + setting.Name + " (0x" + setting.Id.ToString("X8", CultureInfo.InvariantCulture) + ")");
         }
 
-        // Bulk version used by the grid view's "Delete Selected" and "Delete all" buttons - same
-        // per-setting removal/driver-reset as RemoveCustomSetting, just logged as one history
-        // entry instead of one per row.
         public void RemoveCustomSettings(IEnumerable<NvidiaSetting> settings)
         {
             List<NvidiaSetting> list = settings is List<NvidiaSetting> already ? already : new List<NvidiaSetting>(settings);
@@ -360,7 +310,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 : "Deleted " + list.Count + " custom setting(s)");
         }
 
-        // "Delete all" in the grid view - clears every custom setting currently shown.
         public void ClearCustomSettings()
         {
             RemoveCustomSettings(new List<NvidiaSetting>(CustomSettings));
@@ -385,15 +334,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // "Reset NIP" in the grid view. Resets *every* setting actually sitting in the live
-        // "PhasmaStrap" driver profile right now (read straight from the driver via ReadProfile,
-        // not guessed) back to its driver default - this includes both the curated
-        // toggles/sliders on the card view and every custom setting, since both are ultimately
-        // stored in the same profile. Reloads all page state from the driver afterwards so the
-        // card view and the grid both reflect the reset immediately.
-        //
-        // Runs on a background thread; the caller (NvidiaPage) is responsible for marshalling
-        // any UI feedback back to the dispatcher thread, same as ApplyToDriver.
         public NvidiaApplyResult ResetProfile()
         {
             if (!IsAvailable)
@@ -446,18 +386,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 settings[IdTransparencySupersampling] = 8u;
             }
 
-            // Custom (non-curated) settings the user added via AddNvidiaCustomSettingDialog are
-            // folded into the exact same dictionary that both ApplyToDriver and
-            // BuildSettingsSnapshot read from, rather than being applied/exported through a
-            // separate path - this is the one place that ever needs to know about them.
             foreach (NvidiaSetting custom in CustomSettings)
                 settings[custom.Id] = custom.Value;
 
             return settings;
         }
 
-        // Runs on a background thread; the caller (NvidiaPage) is responsible for
-        // marshalling any UI feedback back to the dispatcher thread.
         public NvidiaApplyResult ApplyToDriver()
         {
             Dictionary<uint, uint> settings = BuildSettingsDictionary();
@@ -469,10 +403,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return result;
         }
 
-        // Friendly names for the tracked setting IDs, used only when exporting/copying the
-        // currently-configured values as a standalone .nip document (NvidiaProfileManager) -
-        // the driver itself is never asked for these, ReadEnum/ReadInt/ReadBool above only
-        // ever deal in raw IDs and values.
         private static readonly Dictionary<uint, string> SettingNames = new Dictionary<uint, string>
         {
             [IdLowLatencyMode] = "Low Latency Mode",
@@ -495,10 +425,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             [IdBenchmarkOverlay] = "Benchmark Overlay",
         };
 
-        // Snapshot of the currently-configured (not necessarily yet-applied) settings, for
-        // exporting to a .nip file or copying to the clipboard via NvidiaPage. Includes custom
-        // settings (using the name the user gave them) since BuildSettingsDictionary folds
-        // those into the same dictionary this reads from.
         public List<NvidiaSetting> BuildSettingsSnapshot()
         {
             Dictionary<uint, uint> settings = BuildSettingsDictionary();
@@ -588,10 +514,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return 0;
         }
 
-        // Benchmark Overlay isn't an ordinal enum like the modes above - the driver setting is a
-        // bitmask (Disabled=0, individual graph/indicator bits, Enabled=511 for "everything") -
-        // so both directions look the value up in BenchmarkOverlayOptions instead of using
-        // ObservableCollection index math.
         private static string BenchmarkOverlayFromValue(uint value)
         {
             foreach ((string Label, uint Value) option in BenchmarkOverlayOptions)

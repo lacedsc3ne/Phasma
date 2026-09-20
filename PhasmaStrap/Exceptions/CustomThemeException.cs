@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Extensions;
+using PhasmaStrap.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +9,6 @@ namespace PhasmaStrap.Exceptions
 {
     internal class CustomThemeException : Exception
     {
-        /// <summary>
-        /// The exception message in English (for logging)
-        /// </summary>
         public string EnglishMessage { get; } = null!;
 
         public CustomThemeException(string translationString)

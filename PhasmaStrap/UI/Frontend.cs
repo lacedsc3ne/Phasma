@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using PhasmaStrap.UI.Elements.Bootstrapper;
 using PhasmaStrap.UI.Elements.Dialogs;
@@ -72,7 +72,7 @@ namespace PhasmaStrap.UI
                 App.Logger.WriteException(LOG_IDENT, ex);
 
                 if (!App.LaunchSettings.QuietFlag.Active)
-                    ShowMessageBox(string.Format(Strings.CustomTheme_Errors_SetupFailed, ex.Message, "PhasmaStrap"), MessageBoxImage.Error); // NOTE: PhasmaStrap is the theme name
+                    ShowMessageBox(string.Format(Strings.CustomTheme_Errors_SetupFailed, ex.Message, "PhasmaStrap"), MessageBoxImage.Error);
 
                 return GetBootstrapperDialog(BootstrapperStyle.FluentDialog);
             }

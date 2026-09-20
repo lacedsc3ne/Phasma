@@ -1,0 +1,37 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.RenderingSystemPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      Title="RenderingSystemPage"
+      Scrollable="True">
+
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Rendering_System}" />
+        <TextBlock Margin="0,2,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="{x:Static resources:Strings.Menu_Rendering_BootstrapperLevelTweaksDonTTouch}" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_CPUCoreLimit}" Description="{x:Static resources:Strings.Menu_Rendering_RestrictsHowManyLogicalProcessorsPhasmaStrap}">
+            <StackPanel Orientation="Horizontal">
+                <Slider Width="200" Minimum="0" Maximum="{Binding MaxCpuCores, Mode=OneTime}" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CpuCoreLimit, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{Binding CpuCoreLimitDisplay, Mode=OneWay}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_FakeExclusiveFullscreen}" Description="{x:Static resources:Strings.Menu_Rendering_StripsRobloxWindowSBorderResizes}">
+            <ui:ToggleSwitch IsChecked="{Binding FakeExclusiveFullscreen, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_DuckRobloxAudioWhenUnfocused}" Description="{x:Static resources:Strings.Menu_Rendering_AutomaticallyLowersRobloxSVolumeWhile}">
+            <ui:ToggleSwitch IsChecked="{Binding DuckRobloxAudioOnUnfocus, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_HeadsetLoudness}" Description="{x:Static resources:Strings.Menu_Rendering_BoostsQuietSoundsFootstepsDistantCues}">
+            <ui:ToggleSwitch IsChecked="{Binding HeadsetAudioEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+    </StackPanel>
+</ui:UiPage>

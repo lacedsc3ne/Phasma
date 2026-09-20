@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
-// Ported from Voidstrap (UI/Elements/Settings/SmoothSnowLayer.cs): decorative animated snow
-// overlay, drawn as simple particles via OnRender/CompositionTarget.Rendering rather than any
-// external animation library. Purely cosmetic - toggle-gated (SetActive) and off by default,
-// same as in Voidstrap.
 namespace PhasmaStrap.UI
 {
     internal sealed class SmoothSnowLayer : FrameworkElement, IDisposable

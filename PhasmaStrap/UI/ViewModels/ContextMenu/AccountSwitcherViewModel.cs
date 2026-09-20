@@ -10,12 +10,6 @@ using PhasmaStrap.UI.Elements.ContextMenu;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
-    /// <summary>
-    /// One account saved in the switcher's library. <see cref="DatFile"/> names the backup file
-    /// (under <see cref="Paths.AccountBackups"/>) holding a full copy of that account's
-    /// RobloxCookies.dat, exactly as Roblox's own client wrote it (see RobloxCookie.cs's security
-    /// note for why copying it verbatim is already secure).
-    /// </summary>
     public sealed class SwitcherAccount : INotifyPropertyChanged
     {
         private string _note = "";
@@ -73,31 +67,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
         private void Raise(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-    /// <summary>
-    /// Backs the Roblox account switcher (Integrations &gt; Roblox &gt; Account Switcher &gt; View).
-    ///
-    /// How this actually works end to end:
-    ///  - Roblox's own client keeps the logged-in session in one file, RobloxCookies.dat, whose
-    ///    cookie payload is DPAPI-protected under the current Windows account
-    ///    (see RobloxCookie.LiveCookiesDatPath / RobloxCookie.cs's header comment).
-    ///  - "Add this account" verifies you're actually signed in (calls the authenticated
-    ///    users.roblox.com API through RobloxCookie.GetAccountAsync) then copies that live dat file
-    ///    byte-for-byte into Paths.AccountBackups as this account's saved login - no re-encryption
-    ///    needed, since the copy is already DPAPI-protected exactly like the original.
-    ///  - "Switch" does the reverse: copies a saved backup back over the live dat file (after backing
-    ///    up whatever was live, in case anything goes wrong). Both directions require Roblox to be
-    ///    fully closed, since it holds the file open while running.
-    ///  - There is deliberately no hook anywhere in Bootstrapper.cs/LaunchHandler.cs: once a switch
-    ///    completes, the live dat file already holds the selected account's cookie, so the very next
-    ///    time you press Play (through the normal launch path), Roblox reads that file itself and
-    ///    signs in as whichever account is currently live. The shared file on disk *is* the
-    ///    integration point.
-    ///  - "Import by cookie" is the one path that doesn't start from a real Roblox login on this PC -
-    ///    you paste a .ROBLOSECURITY value you already own (e.g. from another machine). It's verified
-    ///    the same way (authenticated API call) and then spliced into a synthesized dat file using an
-    ///    existing dat as a template (RobloxCookie.SynthesizeDatWithCookie), since building the dat's
-    ///    container format from scratch isn't something we can safely reproduce.
-    /// </summary>
     public sealed class AccountSwitcherViewModel : NotifyPropertyChangedViewModel, IDisposable
     {
         private sealed class StoredAccount
@@ -386,13 +355,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             ? _liveCookiePath
             : Accounts.Select(a => Path.Combine(_folder, a.DatFile)).FirstOrDefault(File.Exists) ?? "";
 
-        /// <summary>
-        /// Verifies one pasted cookie and, if valid, saves it as a library account. Shared by both
-        /// the single "Import by cookie" flow and bulk import - trims surrounding whitespace/quotes
-        /// too, since a cookie value copied out of a JSON export or some browser extensions often
-        /// comes wrapped in quote characters that would otherwise make an otherwise-valid cookie
-        /// look "invalid".
-        /// </summary>
         private async Task<(bool Success, string? Username, string? Error)> ImportOneCookieAsync(string rawCookie, string template)
         {
             string cookie = rawCookie.Trim().Trim('"', '\'', ' ');
@@ -479,10 +441,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
                 OnPropertyChanged(nameof(AddCurrentEnabled));
             }
         }
-
-        // --- bulk import: one cookie per line, each verified/saved the same way as the single
-        // import above. Meant for moving a whole library of accounts over at once rather than
-        // one-at-a-time. ---
 
         private string _bulkCookieText = "";
 
@@ -635,7 +593,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
                     }
                     catch
                     {
-                        // best-effort rollback only
                     }
                 }
 
@@ -867,13 +824,11 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
                         }
                         catch
                         {
-                            // ignore - process may have exited between enumeration and check
                         }
                     }
                 }
                 catch
                 {
-                    // ignore - best-effort check
                 }
                 finally
                 {
@@ -938,16 +893,10 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
             catch
             {
-                // best-effort cleanup only
             }
 
             throw new IOException("Could not write the Roblox cookie file. Make sure Roblox is fully closed.");
         }
-
-        // --- login with a real embedded browser (BrowserLoginWindow, WebView2) instead of pasting
-        // a raw cookie value - the cookie is read straight out of that window's own isolated
-        // browser session after a successful login, then saved through the same
-        // verify-and-synthesize-a-dat path as the manual cookie import above. ---
 
         public ICommand LoginWithBrowserCommand => new AsyncRelayCommand(LoginWithBrowserAsync);
 
@@ -1019,7 +968,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
             catch
             {
-                // best-effort cleanup only
             }
 
             GC.SuppressFinalize(this);

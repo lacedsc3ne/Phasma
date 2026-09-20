@@ -10,9 +10,6 @@ using PhasmaStrap.Integrations.GameChat;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
-    // Shows a live-updating view of messages sent through PhasmaStrap's own GameChat overlay (see
-    // Integrations/GameChat/GameChatLog.cs), which is where every message the overlay renders is
-    // also mirrored. This viewer is purely a passive read-along of that shared log.
     internal sealed class ChatLogsViewModel : NotifyPropertyChangedViewModel, IDisposable
     {
         private const int MaxLogRows = 2000;
@@ -74,8 +71,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
         }
 
-        // batches queued entries onto the UI thread rather than adding them one at a time, so a
-        // burst of chat activity doesn't hammer the ObservableCollection with individual updates
         private void DrainIncoming()
         {
             Interlocked.Exchange(ref _drainScheduled, 0);
@@ -137,8 +132,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
             }
         }
 
-        // guards against CSV formula injection (Excel/Sheets treat a leading =, +, -, or @ as the
-        // start of a formula when a cell is opened) by prefixing such values with a literal quote
         private static string Csv(string value)
         {
             if (value.Length > 0 && "=+-@".Contains(value[0]))

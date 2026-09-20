@@ -1,12 +1,10 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Windows.Forms;
 
 using PhasmaStrap.UI.Elements.Bootstrapper.Base;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
-    // basically just the modern dialog
-
     public partial class ProgressDialog : WinFormsDialogBase
     {
         protected override string _message

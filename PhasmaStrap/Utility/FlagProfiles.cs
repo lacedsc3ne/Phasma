@@ -1,18 +1,12 @@
 namespace PhasmaStrap.Utility
 {
-    // A named set of FastFlag changes that only applies to the games it is given to. It sits on
-    // top of "your flags" (the global list): it can add flags, give one of your flags a different
-    // value, or turn one of your flags off for those games.
     public sealed class FlagProfile
     {
-        // stable, so renaming a profile never breaks the games that use it
         public string Id { get; set; } = NewId();
         public string Name { get; set; } = "";
 
-        // flags added or changed by this profile (values are stored as strings, like the global list)
         public Dictionary<string, string> Flags { get; set; } = new();
 
-        // your flags that this profile turns off
         public List<string> Remove { get; set; } = new();
 
         public static string NewId() => Guid.NewGuid().ToString("N")[..12];
@@ -29,8 +23,6 @@ namespace PhasmaStrap.Utility
         public int ChangeCount => Flags.Count + Remove.Count;
     }
 
-    // Which profile a game launches with. PlaceId 0 = the whole game (every place in the
-    // universe); PlaceId > 0 = only that one place, which wins over a whole-game rule.
     public sealed class FlagGameRule
     {
         public long UniverseId { get; set; }
@@ -52,11 +44,8 @@ namespace PhasmaStrap.Utility
         public List<FlagGameRule> Rules { get; set; } = new();
     }
 
-    // Pure functions over profiles - no App dependencies, so they can be exercised from a harness.
     public static class FlagLayers
     {
-        // the rule a launch or join of this place uses: a rule for that exact place first, then
-        // one for the whole game it belongs to
         public static FlagGameRule? RuleFor(FlagProfileData data, long placeId, long universeId)
         {
             if (placeId > 0)
@@ -78,12 +67,9 @@ namespace PhasmaStrap.Utility
             return rule is null ? null : data.Profiles.FirstOrDefault(p => p.Id == rule.ProfileId);
         }
 
-        // true when a whole-game rule exists that the place can only be matched to once its
-        // universe is known
         public static bool NeedsUniverse(FlagProfileData data, long placeId) =>
             !data.Rules.Any(r => r.PlaceId == placeId && placeId > 0) && data.Rules.Any(r => r.IsWholeGame);
 
-        // what Roblox is given: your flags, minus the ones the profile turns off, plus its own
         public static Dictionary<string, string> Compose(IEnumerable<KeyValuePair<string, object>> global, FlagProfile? profile)
         {
             var result = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -110,7 +96,6 @@ namespace PhasmaStrap.Utility
 
         public sealed record EffectiveFlag(string Name, string Value, Source Source, string? YourValue);
 
-        // every flag a game ends up with, and where each comes from - for the preview
         public static List<EffectiveFlag> Explain(IEnumerable<KeyValuePair<string, object>> global, FlagProfile? profile)
         {
             var mine = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -143,8 +128,6 @@ namespace PhasmaStrap.Utility
             return result.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        // identifies a profile's CONTENT, so "Roblox is running with profile X" is still known to
-        // be out of date after X was edited
         public static string Signature(FlagProfile? profile)
         {
             if (profile is null || profile.ChangeCount == 0)
@@ -171,15 +154,6 @@ namespace PhasmaStrap.Utility
             return name;
         }
 
-        // ------------------------------------------------------------------ share codes
-        //
-        // A code carries the whole profile - no server involved. Two formats:
-        //   PHF2-  (written now) the name on the first line, then one line per change:
-        //          "#37=0" / "FIntSomeFlag=5" to set, "-#12" / "-FIntSomeFlag" to turn off.
-        //          "#37" is FlagCodeNames.Names[37], so the flags behind the Roblox FFlags toggles
-        //          cost a few characters instead of their full names. Deflated, then URL-safe base64.
-        //   PHF1-  (older codes, still read) the profile as deflated JSON.
-
         private const string CodePrefix = "PHF1-";
         private const string ShortPrefix = "PHF2-";
 
@@ -189,7 +163,6 @@ namespace PhasmaStrap.Utility
         {
             App.SendStat("shareCode", "flagProfileCreated");
 
-            // a value spanning lines can't go in the line format - use the old one for that profile
             if (profile.Flags.Values.Any(v => v.IndexOfAny(new[] { '\r', '\n' }) >= 0))
             {
                 var payload = new FlagProfile { Id = "", Name = profile.Name, Flags = profile.Flags, Remove = profile.Remove };
@@ -221,7 +194,6 @@ namespace PhasmaStrap.Utility
                 : null;
         }
 
-        // deflate + URL-safe base64 (no padding)
         public static string Pack(byte[] data)
         {
             using var output = new MemoryStream();
@@ -231,7 +203,6 @@ namespace PhasmaStrap.Utility
             return Convert.ToBase64String(output.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         }
 
-        // the reverse; null for anything that isn't a sound code (or inflates past maxBytes)
         public static byte[]? Unpack(string body, int maxBytes)
         {
             try
@@ -243,7 +214,6 @@ namespace PhasmaStrap.Utility
                 using var deflate = new System.IO.Compression.DeflateStream(input, System.IO.Compression.CompressionMode.Decompress);
                 using var output = new MemoryStream();
 
-                // a short code that inflates into megabytes is not a profile
                 byte[] buffer = new byte[8192];
                 int read;
                 while ((read = deflate.Read(buffer, 0, buffer.Length)) > 0)
@@ -261,8 +231,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Codes get pasted the way people share them: in Discord backticks or a code block, in
-        // quotes, in the middle of a sentence, or broken over lines. Find the code in the text first.
         public static IEnumerable<string> FindCodes(string? pasted, params string[] prefixes)
         {
             string text = pasted ?? "";
@@ -275,7 +243,6 @@ namespace PhasmaStrap.Utility
                 foreach (Match match in pattern.Matches(text))
                     yield return match.Value;
 
-                // a code wrapped over several lines
                 if (joined != text)
                 {
                     foreach (Match match in pattern.Matches(joined))
@@ -284,7 +251,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // the first profile code found in some pasted text, or "" (for pre-filling a paste box)
         public static string FindProfileCode(string? pasted) => FindCodes(pasted, Prefixes).FirstOrDefault() ?? "";
 
         public static FlagProfile? FromShareCode(string? pasted)
@@ -320,7 +286,6 @@ namespace PhasmaStrap.Utility
 
                 if (line[0] == '-')
                 {
-                    // a name/index that doesn't resolve means a damaged (or newer) code - refuse it
                     if (Unref(line[1..]) is not string removed)
                         return null;
 
@@ -363,8 +328,6 @@ namespace PhasmaStrap.Utility
         }
     }
 
-    // Checks one FastFlag name/value pair. Returns null when it is fine, otherwise what is wrong,
-    // in words a player understands.
     public static class FlagValidation
     {
         private static readonly string[] Prefixes = { "FFlag", "DFFlag", "SFFlag", "FInt", "DFInt", "FString", "DFString", "FLog", "DFLog" };
@@ -415,8 +378,6 @@ namespace PhasmaStrap.Utility
         }
     }
 
-    // The profiles and game rules, kept in <base>\FastFlagProfiles.json. Like the global flags,
-    // changes wait for the settings window's Save button.
     public sealed class FlagProfileManager : JsonManager<FlagProfileData>
     {
         public override string ClassName => nameof(FlagProfileManager);
@@ -429,7 +390,6 @@ namespace PhasmaStrap.Utility
 
         private string _saved = "";
 
-        // raised whenever a page changes the profiles or rules, so the other page can refresh
         public event EventHandler? Edited;
 
         public void NotifyEdited() => Edited?.Invoke(this, EventArgs.Empty);
@@ -480,7 +440,6 @@ namespace PhasmaStrap.Utility
                     profile.Id = FlagProfile.NewId();
             }
 
-            // a rule pointing at a deleted profile does nothing - drop it
             data.Rules.RemoveAll(r => !data.Profiles.Any(p => p.Id == r.ProfileId));
         }
 
@@ -488,7 +447,6 @@ namespace PhasmaStrap.Utility
 
         public IEnumerable<FlagGameRule> RulesUsing(string profileId) => Prop.Rules.Where(r => r.ProfileId == profileId);
 
-        // a fresh read of the file, for processes that do not own the settings window (the Watcher)
         public static FlagProfileData ReadFromDisk()
         {
             try
@@ -505,9 +463,6 @@ namespace PhasmaStrap.Utility
             return new FlagProfileData();
         }
 
-        // One-time move from the old system: presets were FastFlagSnapshots files assigned to
-        // place IDs in Settings.FastFlagPlacePresets. Every assigned preset becomes a profile and
-        // every assignment a single-place rule, so nothing launches differently afterwards.
         public void MigrateFromPlacePresets()
         {
             const string LOG_IDENT = "FlagProfileManager::Migrate";
@@ -548,7 +503,6 @@ namespace PhasmaStrap.Utility
 
                 Save();
 
-                // the snapshots now live on as profiles - keep them out of the snapshot list
                 foreach (string name in created.Keys)
                     FastFlagSnapshotManager.Delete(name);
 

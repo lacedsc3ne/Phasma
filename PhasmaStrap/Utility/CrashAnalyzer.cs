@@ -12,7 +12,7 @@ namespace PhasmaStrap.Utility
         public double SessionMinutes { get; set; }
 
         public string Cause { get; set; } = "";
-        public string Confidence { get; set; } = "";       // "Strong", "Likely", "Unclear", "" (not a crash)
+        public string Confidence { get; set; } = "";
         public List<string> Suggestions { get; set; } = new();
         public List<string> Evidence { get; set; } = new();
 
@@ -22,17 +22,6 @@ namespace PhasmaStrap.Utility
         public List<string> ForeignModules { get; set; } = new();
     }
 
-    // "Why did Roblox just close?" - answered from what is actually left behind:
-    //   - the Roblox log: does it end with the normal shutdown lines, or just stop? what were the
-    //     last errors?
-    //   - Windows' event logs around that moment: application fault (which module, which
-    //     exception), display driver resets, low-memory warnings, hardware errors, power loss;
-    //   - a minidump, when one exists: the faulting module and what third-party DLLs were loaded
-    //     inside Roblox (overlays, injectors). Roblox normally uploads and deletes its dumps, so
-    //     this is a bonus, not the basis.
-    // Every conclusion names its evidence, and "unclear" is an allowed answer.
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public static class CrashAnalyzer
     {
         public static Action<string>? Log;
@@ -43,8 +32,6 @@ namespace PhasmaStrap.Utility
             public int ActiveMods;
             public List<string> DumpDirectories = new();
         }
-
-        // ------------------------------------------------------------------ log
 
         private static readonly Regex LineTime = new(@"^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z),", RegexOptions.Compiled);
 
@@ -73,13 +60,10 @@ namespace PhasmaStrap.Utility
 
         private static string Shorten(string line)
         {
-            // drop "timestamp,seconds,thread,level " in front of the message
             int bracket = line.IndexOf('[');
             string text = bracket > 0 && bracket < 70 ? line[bracket..] : line;
             return text.Length > 220 ? text[..220] + "..." : text;
         }
-
-        // ------------------------------------------------------------------ analysis
 
         public static CrashReport Analyze(string logFile, Context context)
         {
@@ -106,13 +90,11 @@ namespace PhasmaStrap.Utility
             if (first is not null && last is not null)
                 report.SessionMinutes = (last.Value - first.Value).TotalMinutes;
 
-            // the normal shutdown sequence ends with these
             report.CleanExit = tail.TakeLast(40).Any(l => l.Contains("handler was destroyed", StringComparison.OrdinalIgnoreCase));
 
             var signs = new Dictionary<string, string>();
             foreach (string line in tail.TakeLast(1500))
             {
-                // telemetry being blocked fills the log with harmless DNS errors
                 if (line.Contains("HttpTraceError") || line.Contains("Denied local configuration"))
                     continue;
 
@@ -297,8 +279,6 @@ namespace PhasmaStrap.Utility
             _ => $"exception {code.Replace("0X", "0x")}",
         };
 
-        // ------------------------------------------------------------------ Windows event logs
-
         private sealed class WindowsEvent
         {
             public string Log = "", Kind = "", Summary = "", Module = "", Code = "";
@@ -376,8 +356,6 @@ namespace PhasmaStrap.Utility
             return result.OrderBy(e => e.TimeLocal).ToList();
         }
 
-        // ------------------------------------------------------------------ minidump
-
         public sealed class DumpInfo
         {
             public string File = "";
@@ -414,7 +392,6 @@ namespace PhasmaStrap.Utility
             return null;
         }
 
-        // MINIDUMP_HEADER / directory / exception stream (6) / module list (4) - nothing else is needed
         public static DumpInfo? ParseDump(string path)
         {
             try
@@ -422,7 +399,7 @@ namespace PhasmaStrap.Utility
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
                 using var reader = new BinaryReader(stream);
 
-                if (reader.ReadUInt32() != 0x504D444D) // "MDMP"
+                if (reader.ReadUInt32() != 0x504D444D)
                     return null;
 
                 reader.ReadUInt32();
@@ -441,10 +418,10 @@ namespace PhasmaStrap.Utility
 
                     if (type == 6 && size >= 8 + 32)
                     {
-                        stream.Position = rva + 8; // ThreadId + alignment
+                        stream.Position = rva + 8;
                         info.ExceptionCode = reader.ReadUInt32();
-                        reader.ReadUInt32();        // flags
-                        reader.ReadUInt64();        // nested record
+                        reader.ReadUInt32();
+                        reader.ReadUInt64();
                         info.ExceptionAddress = reader.ReadUInt64();
                     }
                     else if (type == 4)
@@ -457,8 +434,8 @@ namespace PhasmaStrap.Utility
                             stream.Position = rva + 4 + m * 108;
                             ulong baseOfImage = reader.ReadUInt64();
                             uint sizeOfImage = reader.ReadUInt32();
-                            reader.ReadUInt32();    // checksum
-                            reader.ReadUInt32();    // timestamp
+                            reader.ReadUInt32();
+                            reader.ReadUInt32();
                             uint nameRva = reader.ReadUInt32();
 
                             stream.Position = nameRva;

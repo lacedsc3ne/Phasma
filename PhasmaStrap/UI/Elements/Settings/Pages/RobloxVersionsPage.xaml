@@ -22,7 +22,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- ============================================================ which version -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_RobloxVersions_WhichVersionUse}" />
 
             <Border Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
@@ -46,7 +45,6 @@
                 <ui:ToggleSwitch IsChecked="{Binding KeepPrevious, Mode=TwoWay}" />
             </controls:OptionControl>
 
-            <!-- ============================================================ on this PC -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_RobloxVersions_VersionsPC}" />
             <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NothingKeptVisibility}"
                        Text="{x:Static resources:Strings.Menu_RobloxVersions_OnlyVersionUseHereKeepPrevious}" />
@@ -71,7 +69,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- ============================================================ flags -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_RobloxVersions_FlagsUpdates}" />
 
             <controls:OptionControl Header="{x:Static resources:Strings.Menu_RobloxVersions_TellMeWhenUpdateRemovesFlags}"

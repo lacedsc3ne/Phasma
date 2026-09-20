@@ -1,25 +1,6 @@
-#!/usr/bin/env python3
-"""
-Generates PhasmaStrap/UI/Elements/Settings/Search/SettingsSearchIndex.g.cs by scanning every
-settings page's XAML for the things a user can search for:
-
-  * controls:OptionControl   (Header / Description)            -> Option
-  * ui:CardExpander          (header text + optional subtitle) -> Group
-  * TabItem                  (header text)                     -> Tab
-  * section-title TextBlocks (FontSize 16-18 / Medium+)        -> Section
-  * standalone ui:ToggleSwitch / CheckBox with Content         -> Option
-  * standalone ui:Button with literal Content                  -> Action
-
-Pages embedded inside another page's tab via <Frame Source="XPage.xaml"> are attributed to the
-host page + that tab, so navigating to a result lands on the page the user can actually click in
-the sidebar. Header/description text that comes from {x:Static resources:Strings.X} is emitted as
-a reference to that same resource, so the index follows the active translation automatically.
-
-Re-run after changing any page XAML:
-    python tools/gen_settings_search_index.py
-"""
 from __future__ import annotations
 
+import io
 import os
 import re
 import sys
@@ -37,10 +18,8 @@ SKIP_LOCAL_NAMES = {
     "ItemsPanelTemplate", "ControlTemplate", "HeaderTemplate", "ItemContainerStyle",
 }
 
-
 def local(tag: str) -> str:
     return tag.split("}", 1)[1] if "}" in tag else tag
-
 
 def attr(el: ET.Element, name: str) -> str | None:
     for key, value in el.attrib.items():
@@ -48,9 +27,7 @@ def attr(el: ET.Element, name: str) -> str | None:
             return value
     return None
 
-
 def to_expr(value: str | None) -> str | None:
-    """XAML attribute -> C# expression (Strings.X reference or string literal), or None if dynamic."""
     if value is None:
         return None
     value = value.strip()
@@ -60,18 +37,15 @@ def to_expr(value: str | None) -> str | None:
     if m:
         return f"Strings.{m.group(1)}"
     if value.startswith("{"):
-        return None  # Binding / DynamicResource / other markup - can't be indexed statically
+        return None
     return cs_literal(value)
-
 
 def cs_literal(text: str) -> str:
     text = text.replace("\\", "\\\\").replace('"', '\\"').replace("\r", "").replace("\n", " ")
     text = re.sub(r"\s+", " ", text).strip()
     return f'"{text}"'
 
-
 def first_textblock_text(el: ET.Element) -> tuple[str | None, str | None]:
-    """Header content element -> (title expr, subtitle expr) from its first/second TextBlocks."""
     texts: list[str] = []
     for node in el.iter():
         if local(node.tag) == "TextBlock":
@@ -81,7 +55,6 @@ def first_textblock_text(el: ET.Element) -> tuple[str | None, str | None]:
     title = texts[0] if texts else None
     subtitle = texts[1] if len(texts) > 1 else None
     return title, subtitle
-
 
 @dataclass
 class Entry:
@@ -95,26 +68,19 @@ class Entry:
     def key(self):
         return (self.kind, self.header, self.tab, self.section, self.group)
 
-
 @dataclass
 class PageInfo:
     cls: str
     file: str
     entries: list[Entry] = field(default_factory=list)
     title_seen: bool = False
-    # nested page class -> tab expr of the host tab that embeds it
     nested: dict[str, str | None] = field(default_factory=dict)
 
-
-# generic verbs that appear on dozens of buttons ("Edit", "Browse", "Refresh"...) - indexing them
-# would bury real settings under identical-looking rows, and the option/group they belong to is
-# already indexed on its own
 GENERIC_ACTIONS = {
     "folder", "refresh", "import", "browse", "apply", "cancel", "close", "save", "reset", "preview", "remove",
     "add", "delete", "edit", "rename", "new", "open", "ok", "copy", "clear", "export", "load", "select", "pick",
     "choose", "test", "restart", "help", "back", "next", "done", "retry", "stop", "start", "run", "launch",
 }
-
 
 def is_meaningful_action(expr: str) -> bool:
     if expr.startswith("Strings.Common_"):
@@ -126,14 +92,12 @@ def is_meaningful_action(expr: str) -> bool:
         return False
     return text not in GENERIC_ACTIONS
 
-
 def font_size(el: ET.Element) -> float | None:
     v = attr(el, "FontSize")
     try:
         return float(v) if v else None
     except ValueError:
         return None
-
 
 def is_section_title(el: ET.Element) -> bool:
     size = font_size(el)
@@ -146,11 +110,8 @@ def is_section_title(el: ET.Element) -> bool:
         return True
     return False
 
-
 def walk(el: ET.Element, page: PageInfo, tab: str | None, section: str | None, group: str | None,
          in_option: bool, depth: int = 0) -> str | None:
-    """Walks children; returns the section title in effect after this element (sections persist
-    across siblings until the next one)."""
     for child in list(el):
         name = local(child.tag)
 
@@ -166,7 +127,6 @@ def walk(el: ET.Element, page: PageInfo, tab: str | None, section: str | None, g
                 header_expr, _ = first_textblock_text(header_el)
             if header_expr:
                 page.entries.append(Entry("Tab", header_expr, None, None, None, None))
-            # frames embedding another page
             for frame in child.iter():
                 if local(frame.tag) == "Frame":
                     src = attr(frame, "Source")
@@ -201,7 +161,6 @@ def walk(el: ET.Element, page: PageInfo, tab: str | None, section: str | None, g
             text_expr = to_expr(attr(child, "Text"))
             size = font_size(child)
             if text_expr and size is not None and size >= 20 and not page.title_seen and tab is None:
-                # the page's own title (first big TextBlock) - not an entry, not a section
                 page.title_seen = True
                 continue
             if text_expr and (is_section_title(child) or (size is not None and size >= 20)):
@@ -223,7 +182,6 @@ def walk(el: ET.Element, page: PageInfo, tab: str | None, section: str | None, g
 
     return section
 
-
 def parse_page(path: str) -> PageInfo | None:
     tree = ET.parse(path)
     root = tree.getroot()
@@ -234,9 +192,7 @@ def parse_page(path: str) -> PageInfo | None:
     walk(root, page, None, None, None, False)
     return page
 
-
 def parse_nav() -> dict[str, str]:
-    """page class -> nav label expr, from MainWindow.xaml's NavigationItems."""
     tree = ET.parse(MAIN_WINDOW)
     labels: dict[str, str] = {}
     for el in tree.getroot().iter():
@@ -251,29 +207,74 @@ def parse_nav() -> dict[str, str]:
             labels[m.group(1)] = content
     return labels
 
-
 def main() -> int:
     nav = parse_nav()
     pages: dict[str, PageInfo] = {}
+    file_cls: dict[str, str] = {}
     for file in sorted(os.listdir(PAGES_DIR)):
         if not file.endswith(".xaml"):
             continue
         info = parse_page(os.path.join(PAGES_DIR, file))
         if info:
             pages[info.cls] = info
+            file_cls[os.path.splitext(file)[0]] = info.cls
 
-    # nested page -> (host class, tab expr)
     host_of: dict[str, tuple[str, str | None]] = {}
     for cls, info in pages.items():
         for nested_cls, tab in info.nested.items():
             host_of[nested_cls] = (cls, tab)
 
+    for file in sorted(os.listdir(PAGES_DIR)):
+        if not file.endswith(".xaml"):
+            continue
+        owner = file_cls.get(os.path.splitext(file)[0])
+        if owner is None:
+            continue
+        text = io.open(os.path.join(PAGES_DIR, file), encoding="utf-8").read()
+        for found in re.finditer(r"<Frame[^>]*?Source=\"([^\"]+\.xaml)\"", text):
+            nested_cls = file_cls.get(os.path.splitext(os.path.basename(found.group(1)))[0])
+            if nested_cls is not None and nested_cls != owner and nested_cls not in host_of:
+                host_of[nested_cls] = (owner, None)
+
+    code_hosted = {
+        "HistoryPage": "HomePage",
+        "PrivateServersPage": "HomePage",
+        "ServerBrowserPage": "HomePage",
+        "FastFlagGamesPage": "HomePage",
+        "DiagnosticsPage": "DeveloperToolsPage",
+    }
+    for orphan, owner in code_hosted.items():
+        if orphan in pages and owner in pages and orphan not in host_of:
+            host_of[orphan] = (owner, None)
+
+    section_host: dict[str, str] = {}
+    for file in sorted(os.listdir(PAGES_DIR)):
+        if not file.endswith(".xaml"):
+            continue
+        text = io.open(os.path.join(PAGES_DIR, file), encoding="utf-8").read()
+        if "SectionItem" not in text:
+            continue
+        owner = os.path.splitext(file)[0]
+        for found in re.finditer(r"<controls:SectionItem[^>]*PageType=\"\{x:Type pages:([A-Za-z0-9_]+)\}\"", text):
+            section_host[found.group(1)] = owner
+
+    def nav_label_for(cls: str) -> str | None:
+        seen: set[str] = set()
+        current = cls
+        while current and current not in seen:
+            seen.add(current)
+            if current in nav:
+                return nav[current]
+            if current in section_host:
+                current = section_host[current]
+                continue
+            if current in host_of:
+                current = host_of[current][0]
+                continue
+            return None
+        return None
+
     lines: list[str] = []
-    lines.append("// <auto-generated>")
-    lines.append("//     Generated by tools/gen_settings_search_index.py from the settings pages' XAML.")
-    lines.append("//     Do not edit by hand - re-run the script after changing any page.")
-    lines.append("// </auto-generated>")
-    lines.append("")
     lines.append("using PhasmaStrap.Resources;")
     lines.append("using PhasmaStrap.UI.Elements.Settings.Pages;")
     lines.append("")
@@ -290,9 +291,14 @@ def main() -> int:
         info = pages[cls]
         if cls in host_of:
             host_cls, host_tab = host_of[cls]
-            nav_label = nav.get(host_cls)
+            nav_label = nav_label_for(host_cls)
             page_type = host_cls
             nested_type = f"typeof({cls})"
+        elif cls in section_host:
+            host_tab = None
+            nav_label = nav_label_for(cls)
+            page_type = cls
+            nested_type = "null"
         else:
             host_tab = None
             nav_label = nav.get(cls)
@@ -303,10 +309,7 @@ def main() -> int:
             continue
 
         seen = set()
-        lines.append(f"            // ---- {info.file} ({cls}) ----")
         for e in info.entries:
-            # an embedded page keeps its own tab; the host page's tab (the one holding the
-            # frame) travels separately so the navigator can open both in order
             key = (e.kind, e.header, host_tab, e.tab, e.section, e.group)
             if key in seen:
                 continue
@@ -334,7 +337,6 @@ def main() -> int:
         print(f"{cls:28} {per_page[cls]:4}")
     print(f"total entries: {total} -> {os.path.relpath(OUTPUT, ROOT)}")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,0 +1,18 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.LookAndFeelPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:pages="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      mc:Ignorable="d"
+      Title="LookAndFeelPage"
+      Scrollable="False">
+    <controls:SectionHost x:Name="Host" Margin="0,4,0,0">
+        <controls:SectionItem Label="Appearance" PageType="{x:Type pages:AppearancePage}" />
+        <controls:SectionItem Label="Notifications" PageType="{x:Type pages:NotificationsPage}" />
+        <controls:SectionItem Label="Hotkeys" PageType="{x:Type pages:HotkeysPage}" />
+        <controls:SectionItem Label="Desktop shortcuts" PageType="{x:Type pages:ShortcutsPage}" />
+    </controls:SectionHost>
+</ui:UiPage>

@@ -17,17 +17,45 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_PhasmaStrap}" FontSize="20" FontWeight="Medium" />
         <TextBlock Margin="0,0,0,8" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Description}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-        <TabControl Margin="0,12,0,0">
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="Settings24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel Margin="0,0,0,0">
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <StackPanel x:Name="PhasmaAccountSection" Margin="0,8,0,0">
+            <TextBlock Text="PhasmaStrap account" FontSize="20" FontWeight="Medium" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Sign in to link a Roblox account and keep a copy of your settings." />
+
+            <ui:CardControl Margin="0,8,0,0" Icon="Person24">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="{Binding AccountHeader}" />
+                        <TextBlock FontSize="12" Text="{Binding AccountDetail}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button MinWidth="100" Margin="0,0,8,0" Icon="Link24" Content="Link Roblox" Command="{Binding LinkRobloxCommand}" />
+                    <ui:Button MinWidth="100" Icon="Open24" Content="{Binding AccountActionText}" Command="{Binding AccountActionCommand}" IsEnabled="{Binding AccountActionEnabled}" />
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,8,0,0" Icon="CloudArrowUp24" Visibility="{Binding BackupVisibility}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="Settings backup" />
+                        <TextBlock FontSize="12" Text="{Binding BackupDetail}" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button MinWidth="90" Margin="0,0,8,0" Icon="CloudArrowUp24" Content="Back up" Command="{Binding BackUpCommand}" IsEnabled="{Binding BackupEnabled}" />
+                    <ui:Button MinWidth="90" Icon="CloudArrowDown24" Content="Restore" Command="{Binding RestoreCommand}" IsEnabled="{Binding BackupEnabled}" />
+                </StackPanel>
+            </ui:CardControl>
+
+            <controls:OptionControl Margin="0,8,0,0" Visibility="{Binding BackupVisibility}"
+                                    Header="Back up on its own"
+                                    Description="Once a day, when you close this window, your settings go up without you asking.">
+                <ui:ToggleSwitch IsChecked="{Binding AutoBackupEnabled, Mode=TwoWay}" />
+            </controls:OptionControl>
+        </StackPanel>
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Header}" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_General_Description}" />
 
         <controls:OptionControl
@@ -60,7 +88,7 @@
             </ComboBox>
         </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Privacy_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Privacy_Header}" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Privacy_Description}" />
 
         <controls:OptionControl
@@ -69,7 +97,6 @@
             <ui:ToggleSwitch IsChecked="{Binding AnalyticsEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <!-- This does not need i18n as this is locked behind "Developer Mode" -->
         <controls:OptionControl
             Visibility="{Binding Path=WebEnvironmentVisibility}"
             Header="{x:Static resources:Strings.Menu_PhasmaStrap_WebEnvironment}"
@@ -77,7 +104,7 @@
             <ComboBox Width="200" Padding="10,5,10,5" ItemsSource="{Binding WebEnvironments, Mode=OneWay}" SelectedValue="{Binding WebEnvironment, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Header}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TextBlock Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Header}" FontSize="20" FontWeight="Medium" Margin="0,24,0,0" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_PhasmaStrap_Section_Diagnostics_Description}" />
 
         <ui:CardExpander Margin="0,8,0,0" Icon="CopySelect20" IsExpanded="True">
@@ -178,21 +205,5 @@
                 </ItemsControl>
             </StackPanel>
         </ui:CardExpander>
-                </StackPanel>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="ArrowRepeatAll24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_Channel_RobloxChannel}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <Frame Margin="0,10,0,0"
-                       Source="ChannelPage.xaml"
-                       NavigationUIVisibility="Hidden"
-                       JournalOwnership="OwnsJournal"
-                       Background="Transparent" />
-            </TabItem>
-        </TabControl>
     </StackPanel>
 </ui:UiPage>

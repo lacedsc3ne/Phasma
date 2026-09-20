@@ -3,19 +3,6 @@ using System.Threading;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>
-    /// Owns the background thread that supervises OverlayCompositor sessions: starts one
-    /// once Roblox's game window shows up and overlays are enabled, restarts it if it
-    /// exits unexpectedly, and stops it on game leave / shutdown. Wired into
-    /// PhasmaStrap.Watcher via ActivityWatcher.OnGameJoin/OnGameLeave, matching the
-    /// Start()/Stop() integration pattern used elsewhere in PhasmaStrap.Integrations.
-    ///
-    /// Simplified from Voidstrap's OverlayHub: the standalone WPF crosshair-window
-    /// fallback (used there so the crosshair could still show while the GPU compositor
-    /// wasn't running) and the RiShade-panel hotkey plumbing were dropped since neither
-    /// exists in this port - the crosshair here is only ever drawn by the compositor
-    /// itself, and there is no RiShade panel.
-    /// </summary>
     public static class OverlayHub
     {
         private const string LOG_IDENT = "Overlays";
@@ -30,10 +17,6 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public static bool InGame => _inGame;
 
-        // the place currently joined, if any - lets OverlaySettings resolve per-game overlay
-        // profile overrides (Settings.OverlayPlaceProfiles) without OverlayCompositor needing its
-        // own reference to ActivityWatcher, which lives in a different subsystem entirely. long
-        // isn't a valid `volatile` type in C#, so this uses Interlocked instead.
         public static long CurrentPlaceId => Interlocked.Read(ref _currentPlaceId);
 
         internal static void SetCompositorLive(bool live) => _compositorLive = live;
@@ -132,12 +115,6 @@ namespace PhasmaStrap.Integrations.Overlays
             Mutex? mutex = null;
             bool held = false;
 
-            // RobloxWindowTracker only starts discovering the Roblox window once something holds a
-            // lease on it (Acquire -> Ensure). Nothing did that before this point unless the
-            // window customizer happened to be on, so the loop below sat on "Waiting for the Roblox
-            // window" forever with Current.Hwnd never leaving zero - the compositor (which takes its
-            // own lease) is only ever created AFTER that check passes. Hold a lease for the whole
-            // supervise session so discovery is actually running by the time we look.
             IDisposable trackerLease = RobloxWindowTracker.Acquire();
 
             try

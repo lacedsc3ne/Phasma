@@ -59,7 +59,7 @@
             </DockPanel>
 
             <StackPanel Visibility="{Binding ListsVisibility}">
-                <!-- filters -->
+
                 <Border Margin="0,16,0,0" Padding="12" CornerRadius="8" BorderThickness="1"
                         BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
                     <StackPanel>

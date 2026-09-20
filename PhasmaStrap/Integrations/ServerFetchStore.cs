@@ -3,11 +3,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
-    // persists what the matchmaker learns about servers it has probed (IP -> datacenter,
-    // ping samples), so future searches can weight a real observed ping alongside the
-    // geographic estimate. Simplified from Voidstrap's version: drops its remote
-    // community-preset fetching (GitHub-hosted shared datacenter data), keeping only local
-    // learning from your own probes.
     public static class ServerFetchStore
     {
         private const string LOG_IDENT = "ServerFetchStore";

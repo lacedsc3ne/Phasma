@@ -21,8 +21,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public EventHandler? RequestCloseWindowEvent;
 
-        // read by MainWindow.xaml.cs's Closed handler to decide what to do once the window has
-        // actually finished closing - set just before RequestCloseWindowEvent fires
         public bool LaunchAfterClose { get; private set; }
 
         public bool RestartAfterClose { get; private set; }
@@ -57,7 +55,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.FastFlags.Save();
             App.FlagProfiles.Save();
 
-            // the account guard's start-up entry and background process follow its settings
             PhasmaStrap.Utility.AccountGuard.ApplyStartup();
             PhasmaStrap.Utility.AccountGuard.StartBackgroundIfWanted();
 

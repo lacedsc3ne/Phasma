@@ -3657,7 +3657,7 @@ Example:
     <value>Enabled, but the local proxy isn't confirmed running - check the log</value>
   </data>
   <data name="Menu.FastFlagSettings.Description" xml:space="preserve">
-    <value>Configure Roblox engine FastFlags, NVIDIA driver tuning, and the Asset Warp asset-blocking proxy from one place.</value>
+    <value>Roblox engine FastFlags, the raw flag editor, per-game flag sets, and the Asset Warp asset-blocking proxy, all from one place.</value>
   </data>
   <data name="Menu.FastFlagSettings.Tab.AssetWarp" xml:space="preserve">
     <value>Asset Warp</value>
@@ -4193,7 +4193,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Capture</value>
   </data>
   <data name="Menu.Capture.ScreenshotsRobloxWindowSavedLocallyBind" xml:space="preserve">
-    <value>Screenshots of the Roblox window, saved locally. Bind the Take Screenshot hotkey on the Hotkeys page to capture during a game session - the button below only works while Roblox happens to be running right now, useful mainly for testing.</value>
+    <value>Screenshots of the Roblox window, saved locally. Set the screenshot hotkey below to capture during a game session. The button only works while Roblox is running right now, so it is mainly useful for testing.</value>
   </data>
   <data name="Menu.Capture.TakeScreenshotNow" xml:space="preserve">
     <value>Take screenshot now</value>
@@ -4211,7 +4211,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Instant Replay</value>
   </data>
   <data name="Menu.Capture.ContinuouslyBuffersLastSeveralSecondsGameplay" xml:space="preserve">
-    <value>Continuously buffers the last several seconds of gameplay while enabled. Press the Save Instant Replay hotkey (set one on the Hotkeys page) after something happens to save that buffer as a real MP4 clip - there's no separate start/stop for recording, it's always running once enabled.</value>
+    <value>Continuously buffers the last several seconds of gameplay while enabled. Press the replay hotkey below after something happens to save that buffer as a real MP4 clip. There is no separate start or stop: it is always running once enabled.</value>
   </data>
   <data name="Menu.Capture.EnableInstantReplay" xml:space="preserve">
     <value>Enable Instant Replay</value>
@@ -4682,7 +4682,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>Custom Cursor Set (quick folder)</value>
   </data>
   <data name="Menu.Mods.ApplyOwnCursorImagesFromLocal" xml:space="preserve">
-    <value>Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png or MouseLockedCursor.png.</value>
+    <value>Apply your own cursor images from a local folder instead of a bundled preset. The folder should directly contain any of ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as PNG, JPG, BMP, GIF, TIFF or ICO. Anything that is not already a PNG is converted to one, since that is what Roblox reads. JPG has no transparency, so a JPG cursor shows as a solid block.</value>
   </data>
   <data name="Menu.Mods.Remove" xml:space="preserve">
     <value>Remove</value>

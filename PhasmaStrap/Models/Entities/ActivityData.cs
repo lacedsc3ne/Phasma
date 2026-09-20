@@ -1,4 +1,4 @@
-﻿using System.Web;
+using System.Web;
 using System.Windows;
 using System.Windows.Input;
 using PhasmaStrap.AppData;
@@ -11,10 +11,6 @@ namespace PhasmaStrap.Models.Entities
     {
         private long _universeId = 0;
 
-        /// <summary>
-        /// If the current activity stems from an in-universe teleport, then this will be
-        /// set to the activity that corresponds to the initial game join
-        /// </summary>
         public ActivityData? RootActivity;
 
         public long UniverseId
@@ -31,11 +27,8 @@ namespace PhasmaStrap.Models.Entities
 
         public string JobId { get; set; } = string.Empty;
 
-        /// <summary>
-        /// This will be empty unless the server joined is a private server
-        /// </summary>
         public string AccessCode { get; set; } = string.Empty;
-        
+
         public long UserId { get; set; } = 0;
 
         public string MachineAddress { get; set; } = string.Empty;
@@ -50,11 +43,6 @@ namespace PhasmaStrap.Models.Entities
 
         public DateTime? TimeLeft { get; set; }
 
-        // everything below here is optional strictly for bloxstraprpc, discord rich presence, or game history
-
-        /// <summary>
-        /// This is intended only for other people to use, i.e. context menu invite link, rich presence joining
-        /// </summary>
         public string RPCLaunchData { get; set; } = string.Empty;
 
         public UniverseDetails? UniverseDetails { get; set; }
@@ -64,9 +52,9 @@ namespace PhasmaStrap.Models.Entities
             get
             {
                 string desc = string.Format(
-                    "{0} • {1} {2} {3}", 
+                    "{0} • {1} {2} {3}",
                     UniverseDetails?.Data.Creator.Name,
-                    TimeJoined.ToString("t"), 
+                    TimeJoined.ToString("t"),
                     Locale.CurrentCulture.Name.StartsWith("ja") ? '~' : '-',
                     TimeLeft?.ToString("t")
                 );
@@ -134,13 +122,6 @@ namespace PhasmaStrap.Models.Entities
 
                 GlobalCache.ServerLocation[MachineAddress] = location;
                 serverQuerySemaphore.Release();
-
-                /*Frontend.ShowConnectivityDialog(
-                    string.Format(Strings.Dialog_Connectivity_UnableToConnect, "ipinfo.io"),
-                    Strings.ActivityWatcher_LocationQueryFailed,
-                    MessageBoxImage.Warning,
-                    ex
-                );*/
             }
 
             return location;

@@ -65,19 +65,19 @@ public static class AvatarAssetTypeEx
 	{
 		return type switch
 		{
-			AvatarAssetType.TShirt => AvatarSlot.TShirt, 
-			AvatarAssetType.Shirt => AvatarSlot.Shirt, 
-			AvatarAssetType.Pants => AvatarSlot.Pants, 
-			AvatarAssetType.Hat => AvatarSlot.Hat1, 
-			AvatarAssetType.Face => AvatarSlot.Face, 
-			AvatarAssetType.Head => AvatarSlot.Head, 
-			AvatarAssetType.Torso => AvatarSlot.Torso, 
-			AvatarAssetType.LeftArm => AvatarSlot.LeftArm, 
-			AvatarAssetType.RightArm => AvatarSlot.RightArm, 
-			AvatarAssetType.LeftLeg => AvatarSlot.LeftLeg, 
-			AvatarAssetType.RightLeg => AvatarSlot.RightLeg, 
-			AvatarAssetType.Gear => AvatarSlot.Gear, 
-			_ => throw new Exception("Unknown avatar asset type"), 
+			AvatarAssetType.TShirt => AvatarSlot.TShirt,
+			AvatarAssetType.Shirt => AvatarSlot.Shirt,
+			AvatarAssetType.Pants => AvatarSlot.Pants,
+			AvatarAssetType.Hat => AvatarSlot.Hat1,
+			AvatarAssetType.Face => AvatarSlot.Face,
+			AvatarAssetType.Head => AvatarSlot.Head,
+			AvatarAssetType.Torso => AvatarSlot.Torso,
+			AvatarAssetType.LeftArm => AvatarSlot.LeftArm,
+			AvatarAssetType.RightArm => AvatarSlot.RightArm,
+			AvatarAssetType.LeftLeg => AvatarSlot.LeftLeg,
+			AvatarAssetType.RightLeg => AvatarSlot.RightLeg,
+			AvatarAssetType.Gear => AvatarSlot.Gear,
+			_ => throw new Exception("Unknown avatar asset type"),
 		};
 	}
 }

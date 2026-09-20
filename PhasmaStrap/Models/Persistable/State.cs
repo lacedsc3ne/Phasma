@@ -8,7 +8,14 @@ namespace PhasmaStrap.Models.Persistable
 
         public WindowState SettingsWindow { get; set; } = new();
 
-        // settings-search results opened most recently (see MainWindow's search) - newest first
         public List<string> RecentSettingsSearches { get; set; } = new();
+
+        public string AccountId { get; set; } = "";
+
+        public string AccountName { get; set; } = "";
+
+        public string AccountAvatar { get; set; } = "";
+
+        public string LastAutoBackup { get; set; } = "";
     }
 }

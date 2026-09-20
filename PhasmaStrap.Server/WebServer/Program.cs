@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -16,9 +16,6 @@ namespace PhasmaStrap.Server.WebServer;
 
 public class Program
 {
-	// Fixed base port for the ported auth negotiation service (Auth/AuthHost.Run). Chosen to sit well away from
-	// the WebServer's own default port (80) and the ephemeral port range, so it never collides with either.
-	// AuthHost derives ProxyPort/WebServerPort = this value and RobloxPort = this value + 1.
 	private const ushort AuthBasePort = 40010;
 
 	private static void FixUrl(RewriteContext context)
@@ -98,9 +95,6 @@ public class Program
 		Environment.Exit(123);
 	}
 
-	// AuthHost.Run blocks (Task.WaitAny) and its Config.Load calls Environment.Exit(2) on invalid args, which
-	// would kill this whole process - so the args passed here must always be well-formed, and any exception
-	// escaping Run must be caught here rather than crash the WebServer half of the process.
 	private static void StartAuthHost(int clientProcessId)
 	{
 		string[] authArgs = new string[]

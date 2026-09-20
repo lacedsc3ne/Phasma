@@ -5,9 +5,9 @@ namespace PhasmaStrap.Utility
     public enum RobloxLinkKind
     {
         Unknown,
-        Place,          // a place, optionally with a private-server link code
-        ShareLink,      // roblox.com/share?code=...&type=Server (or ro.blox.com short link, once resolved)
-        DeepLink,       // a raw roblox:// / roblox-player: URI, passed through untouched
+        Place,
+        ShareLink,
+        DeepLink,
     }
 
     public sealed class RobloxLaunchTarget
@@ -21,7 +21,6 @@ namespace PhasmaStrap.Utility
 
         public bool IsPrivateServer => !string.IsNullOrEmpty(LinkCode) || string.Equals(ShareType, "Server", StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>The roblox:// deep link the bootstrapper hands to the Roblox client.</summary>
         public string ToDeepLink()
         {
             switch (Kind)
@@ -52,12 +51,6 @@ namespace PhasmaStrap.Utility
         }
     }
 
-    /// <summary>
-    /// Understands everything people paste into the "Launch by link" box on Home: a bare place
-    /// ID, roblox.com/games/… URLs (with or without ?privateServerLinkCode=), roblox.com/share
-    /// private-server invites, ro.blox.com short links (resolved by following the redirect), and
-    /// raw roblox:// deep links.
-    /// </summary>
     public static class RobloxLinkParser
     {
         private const string LOG_IDENT = "RobloxLinkParser";
@@ -94,21 +87,18 @@ namespace PhasmaStrap.Utility
 
             var query = HttpUtility.ParseQueryString(uri.Query);
 
-            // roblox.com/share?code=abc&type=Server
             if (uri.AbsolutePath.StartsWith("/share", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(query["code"]))
             {
                 target = new RobloxLaunchTarget { Kind = RobloxLinkKind.ShareLink, ShareCode = query["code"], ShareType = query["type"] ?? "Server" };
                 return true;
             }
 
-            // roblox.com/games/start?placeId=123 (the website's own launch URL)
             if (long.TryParse(query["placeId"], out long queryPlace) && queryPlace > 0)
             {
                 target = new RobloxLaunchTarget { Kind = RobloxLinkKind.Place, PlaceId = queryPlace, LinkCode = query["linkCode"] ?? query["privateServerLinkCode"] };
                 return true;
             }
 
-            // roblox.com/games/123/Name?privateServerLinkCode=xyz  (also /games/123)
             string[] segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < segments.Length - 1; i++)
             {
@@ -122,10 +112,6 @@ namespace PhasmaStrap.Utility
             return false;
         }
 
-        /// <summary>
-        /// Like <see cref="TryParse"/>, but also follows ro.blox.com / other redirecting short links
-        /// to whatever roblox.com URL they point at.
-        /// </summary>
         public static async Task<RobloxLaunchTarget?> ResolveAsync(string? input, CancellationToken ct = default)
         {
             if (TryParse(input, out RobloxLaunchTarget direct))

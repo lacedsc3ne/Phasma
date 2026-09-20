@@ -9,7 +9,6 @@ using MapFlags = Vortice.Direct3D11.MapFlags;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>How the stats HUD looks and where it sits (Rendering > Overlays > HUD look).</summary>
     internal sealed class HudStyle
     {
         public const string TopLeft = "TopLeft", TopCenter = "TopCenter", TopRight = "TopRight";
@@ -19,7 +18,7 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public string Position = TopLeft;
         public int OffsetX = 18, OffsetY = 18;
-        public int BackgroundOpacity = 75;          // percent; 0 = no background at all
+        public int BackgroundOpacity = 75;
         public Color Background = Color.FromArgb(12, 13, 16);
         public Color Label = Color.FromArgb(226, 229, 233);
         public Color Value = Color.FromArgb(150, 226, 150);
@@ -69,7 +68,6 @@ namespace PhasmaStrap.Integrations.Overlays
             return fallback;
         }
 
-        // where the HUD's top-left corner goes inside an area of the given size
         public (int X, int Y) Place(int areaWidth, int areaHeight, int hudWidth, int hudHeight)
         {
             int x = Position switch
@@ -84,11 +82,6 @@ namespace PhasmaStrap.Integrations.Overlays
         }
     }
 
-    /// <summary>
-    /// The stats readout (FPS and friends), drawn with GDI+ into a bitmap and blitted as a GPU
-    /// texture by OverlayCompositor. The same RenderBitmap draws the settings page's preview, so
-    /// the preview is exactly what appears in game.
-    /// </summary>
     internal sealed class OverlayHud
     {
         public int TexWidth { get; private set; } = 1;
@@ -170,8 +163,6 @@ namespace PhasmaStrap.Integrations.Overlays
             }
         }
 
-        // the HUD as a picture (straight alpha). Monospaced and padded to fixed columns, so its
-        // size doesn't change every second as the numbers do.
         public static Bitmap RenderBitmap(string[] labels, string[] values, HudStyle style)
         {
             int rows = Math.Max(0, Math.Min(labels.Length, values.Length));
@@ -194,7 +185,6 @@ namespace PhasmaStrap.Integrations.Overlays
 
             float padX = 9f * scale, padY = 6f * scale, rowGap = 4f * scale, itemGap = 2f * charWidth;
 
-            // one entry per row: (label text, value text, their x positions)
             var pieces = new List<(string Text, float X, float Y, bool IsValue)>();
             float width, height;
 
@@ -240,7 +230,7 @@ namespace PhasmaStrap.Integrations.Overlays
             using (var g = Graphics.FromImage(bitmap))
             {
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                // no ClearType on a transparent background: it needs an opaque one to blend against
+
                 g.TextRenderingHint = style.BackgroundOpacity >= 100 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAliasGridFit;
                 g.Clear(Color.Transparent);
 

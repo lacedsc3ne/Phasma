@@ -4,15 +4,6 @@ using System.Windows.Threading;
 
 namespace PhasmaStrap.Integrations.GameChat
 {
-    /// <summary>
-    /// Owns the lifetime of the game chat overlay and its keyboard hook for a single Roblox session.
-    /// Wired up from <see cref="Watcher"/> only when <c>App.Settings.Prop.GameChatEnabled</c> is true
-    /// (the feature defaults to off, since it installs a global keyboard hook).
-    ///
-    /// The overlay itself runs on the main WPF dispatcher; the keyboard hook runs on its own dedicated
-    /// STA thread with its own dispatcher, so a slow/blocked UI never risks Windows silently unhooking
-    /// the low-level keyboard hook (WH_KEYBOARD_LL hook procedures have a short timeout).
-    /// </summary>
     public class GameChatIntegration : IDisposable
     {
         private const string Tag = "GameChatIntegration";
@@ -160,10 +151,6 @@ namespace PhasmaStrap.Integrations.GameChat
             App.Logger.WriteException(Tag + "::HookDispatcher", e.Exception);
         }
 
-        // Watches the overlay's heartbeat (ticked once a second on its own dispatcher) so that if the
-        // overlay's UI thread ever hangs, we hide the (now unresponsive but still topmost/always-on-top)
-        // window rather than leave an unkillable overlay stuck on top of the user's screen, and we turn
-        // the feature back off so it doesn't keep happening every session.
         private async Task MonitorOverlayAsync(CancellationToken token)
         {
             try
@@ -218,9 +205,6 @@ namespace PhasmaStrap.Integrations.GameChat
 
         private void OnGameLeave(object? sender, EventArgs e)
         {
-            // PhasmaStrap's ActivityWatcher doesn't expose a live "currently teleporting" flag (see the
-            // matching note in GameChatOverlay.LeaveGame), so we always disable the hook on leave rather
-            // than keeping it armed through a teleport's brief join/leave gap.
             SetHookEnabled(false);
             GameChatOverlay? overlay;
             lock (_overlayGate)

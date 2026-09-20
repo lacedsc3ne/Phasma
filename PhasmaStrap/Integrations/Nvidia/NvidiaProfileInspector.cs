@@ -28,17 +28,6 @@ namespace PhasmaStrap.Integrations.Nvidia
         public List<string> Failures { get; } = new List<string>();
     }
 
-    // Reads and writes a dedicated NVIDIA driver profile for Roblox via the raw NVAPI
-    // wrapper in NvApi.cs. This talks to the driver directly - it is a completely
-    // separate mechanism from Roblox's own FastFlags/ClientSettings, and affects
-    // rendering at the driver level (DX/OpenGL/Vulkan submission), not the game client.
-    //
-    // Ported and trimmed down from Voidstrap's Integrations/Nvidia/NvidiaProfileInspector.cs.
-    // The original also backed a full profile-inspector-style editor (arbitrary setting
-    // ID/value rows, .nip import/export, "copy settings from another app" dialogs); none
-    // of that generic editing machinery was ported, only the read/apply/reset primitives
-    // that PhasmaStrap's curated NVIDIA settings page needs. See NvidiaViewModel for the
-    // specific setting IDs actually exposed to the user.
     public static class NvidiaProfileInspector
     {
         private sealed class Session : IDisposable

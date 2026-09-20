@@ -1,7 +1,5 @@
 namespace PhasmaStrap
 {
-    // https://stackoverflow.com/a/53873141/11852173
-
     public class Logger
     {
         private readonly object _writeLock = new();
@@ -21,11 +19,6 @@ namespace PhasmaStrap
             string directory = useTempDir ? Path.Combine(Paths.TempLogs) : Path.Combine(Paths.Base, "Logs");
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'");
 
-            // process ID keeps this unique even when two real PhasmaStrap processes start within the same
-            // UTC second (e.g. two near-simultaneous browser Play clicks) - without it, the second process's
-            // File.Exists check below would see the first process's just-created log file at the identical
-            // path, take that as "another instance beat me to it", and silently self-terminate below without
-            // ever processing its own launch request (dropping that Play click with no error, no fallback)
             string filename = $"{App.ProjectName}_{timestamp}_{Environment.ProcessId}.log";
             string location = Path.Combine(directory, filename);
 
@@ -62,8 +55,8 @@ namespace PhasmaStrap
                 WriteLine(LOG_IDENT, $"Failed to initialize because PhasmaStrap cannot write to {directory}");
 
                 Frontend.ShowMessageBox(
-                    String.Format(Strings.Logger_NoWriteMode, directory), 
-                    System.Windows.MessageBoxImage.Warning, 
+                    String.Format(Strings.Logger_NoWriteMode, directory),
+                    System.Windows.MessageBoxImage.Warning,
                     System.Windows.MessageBoxButton.OK
                 );
 
@@ -71,7 +64,6 @@ namespace PhasmaStrap
 
                 return;
             }
-            
 
             Initialized = true;
 
@@ -82,7 +74,6 @@ namespace PhasmaStrap
 
             FileLocation = location;
 
-            // delete older logs if there are more than 15
             if (Paths.Initialized && Directory.Exists(Paths.Logs))
             {
                 const int maxLogs = 15;
@@ -119,7 +110,6 @@ namespace PhasmaStrap
 
             History.Add(outlog);
 
-            // keep the in-memory copy bounded - it only backs the crash-report bundler/log viewer
             if (History.Count > 6000)
                 History.RemoveRange(0, History.Count - 5000);
         }
@@ -137,9 +127,6 @@ namespace PhasmaStrap
             Thread.CurrentThread.CurrentUICulture = Locale.CurrentCulture;
         }
 
-        // written and flushed before returning: the async version lost whatever was logged just
-        // before Environment.Exit (App.Terminate) - e.g. every line of an upgrade that then handed
-        // over to an already open window
         private void WriteToLog(string message)
         {
             if (!Initialized)
@@ -154,7 +141,6 @@ namespace PhasmaStrap
                 }
                 catch (Exception)
                 {
-                    // a full or vanished disk must never take the app down with it
                 }
             }
         }

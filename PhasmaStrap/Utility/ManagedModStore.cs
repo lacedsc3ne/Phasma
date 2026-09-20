@@ -1,18 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Backing store for the "Mod Management" tab on ModsPage. Each managed mod is a named,
-    /// independently indexed folder of files under <see cref="Paths.ManagedModPackages"/>
-    /// (<c>ManagedMods\Packages\&lt;guid&gt;\...</c>), tracked in <see cref="Paths.ManagedModIndex"/>.
-    /// This is a straight adaptation of Voidstrap's ManagedModStore - same on-disk layout and
-    /// scanning behaviour, retargeted to PhasmaStrap's Paths/App.Logger.
-    ///
-    /// This store only owns the package library itself (create/rename/enable/reorder/delete/scan).
-    /// Getting enabled files onto disk where Roblox will actually see them is a separate step -
-    /// see Bootstrapper.ApplyModifications, which materializes <see cref="ScanEnabledFiles"/>'s
-    /// output into the existing flat <see cref="Paths.Modifications"/> mod folder so it flows
-    /// through the same apply/restore pipeline as any manually placed mod.
-    /// </summary>
     public sealed class ManagedModRecord
     {
         public string Id { get; set; } = string.Empty;

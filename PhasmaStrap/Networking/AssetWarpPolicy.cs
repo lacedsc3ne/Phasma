@@ -2,25 +2,6 @@ using System.Text.Json.Nodes;
 
 namespace PhasmaStrap.Networking
 {
-    // "AssetWarp": lets the user selectively block whole categories of asset (textures,
-    // decals, images, animations, meshes) that a Roblox game would otherwise load.
-    //
-    // Scoped down from Voidstrap's version, which additionally supports per-asset ID
-    // replacement/redirection (including redirecting to arbitrary local files or third-party
-    // CDN URLs) and requires intercepting the actual asset-content CDN hosts to serve
-    // substituted bytes back to the client. That is a much bigger, higher-blast-radius change
-    // than this proxy's existing narrow allowlist is meant for - those CDN hosts carry
-    // high-volume, latency-sensitive traffic, and bidirectional binary substitution has a lot
-    // more ways to go wrong than a JSON transform.
-    //
-    // What this DOES do instead: Roblox's client doesn't fetch asset bytes directly by ID -
-    // it first POSTs a batch of {assetId, assetType, ...} to assetdelivery.roblox.com's
-    // /v1/assets/batch to resolve each one to a real CDN URL, then fetches from *that* URL
-    // separately. By removing entries of blocked types from the outgoing batch request
-    // here, the client never receives a CDN URL for them and therefore never fetches them at
-    // all - no need to intercept the CDN hosts themselves. Ported (in reduced scope) from
-    // Voidstrap.Integrations.AssetProxy.TextureStripper and
-    // Voidstrap.Core.AssetWarp.AssetTypeRemovalPolicy.
     public static class AssetWarpPolicy
     {
         private const string LOG_IDENT = "AssetWarpPolicy";
@@ -91,7 +72,6 @@ namespace PhasmaStrap.Networking
             return JsonSerializer.SerializeToUtf8Bytes(output);
         }
 
-        // same type-id/type-name matching Voidstrap uses (Voidstrap.Core.AssetWarp.AssetTypeRemovalPolicy)
         private static bool ShouldRemove(string typeId, string typeName)
         {
             bool textures = App.Settings.Prop.AssetWarpDisableAllTextures && (typeId == "63" || typeName == "texture" || typeName == "texturepack");

@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap.Models.SettingTasks
+namespace PhasmaStrap.Models.SettingTasks
 {
     public class ShortcutTask : BoolBaseTask
     {

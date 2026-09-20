@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using Wpf.Ui.Controls.Interfaces;
@@ -6,9 +6,6 @@ using Wpf.Ui.Mvvm.Contracts;
 
 namespace PhasmaStrap.UI.Elements.About
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : INavigationWindow
     {
         public MainWindow()

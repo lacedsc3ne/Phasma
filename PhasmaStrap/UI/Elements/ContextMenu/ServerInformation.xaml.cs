@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +17,6 @@ using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for ServerInformation.xaml
-    /// </summary>
     public partial class ServerInformation
     {
         public ServerInformation(Watcher watcher)

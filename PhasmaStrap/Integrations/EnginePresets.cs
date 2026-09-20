@@ -2,11 +2,6 @@ using PhasmaStrap.Models.Persistable;
 
 namespace PhasmaStrap.Integrations
 {
-    // Named bundles of the Roblox process optimizer's 5 tunable properties (PerformancePage's
-    // "Runtime optimizer" section), plus per-place resolution so a specific game can either use a
-    // different bundle than the global default or be excluded from optimization entirely. Mirrors
-    // MatchmakerExcludedPlaces (a flat exclusion list) - see Bootstrapper.TryApplyMatchmakingAsync
-    // for the equivalent pattern elsewhere in this codebase.
     public sealed record EnginePresetValues(
         bool OptimizeRoblox,
         bool RobloxEfficiencyMode,
@@ -47,7 +42,6 @@ namespace PhasmaStrap.Integrations
                 RobloxPriorityLimit: "Below Normal"),
         };
 
-        // used for the excluded-places bundle - neutralizes every optimizer knob for that session
         public static readonly EnginePresetValues Off = Presets["Default"];
 
         public static string[] PresetNames => Presets.Keys.ToArray();
@@ -68,11 +62,6 @@ namespace PhasmaStrap.Integrations
             settings.RobloxPriorityLimit = values.RobloxPriorityLimit;
         }
 
-        // resolves the effective optimizer bundle for a specific place: excluded places always win
-        // (never optimize that game), then a per-place preset assignment if one exists, else the
-        // global settings currently configured on the Performance page (which may not match any
-        // named preset if the user tweaked individual toggles by hand - that's fine, it's still a
-        // valid bundle).
         public static EnginePresetValues Resolve(long placeId)
         {
             Settings settings = App.Settings.Prop;

@@ -1,14 +1,7 @@
-﻿namespace PhasmaStrap.Utility
+namespace PhasmaStrap.Utility
 {
     internal static class Http
     {
-        /// <summary>
-        /// Gets and deserializes a JSON API response to the specified object
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <exception cref="JsonException"></exception>
         public static async Task<T> GetJson<T>(string url)
         {
             var request = await App.HttpClient.GetAsync(url);
@@ -16,14 +9,10 @@
             request.EnsureSuccessStatusCode();
 
             string json = await request.Content.ReadAsStringAsync();
-            
+
             return JsonSerializer.Deserialize<T>(json)!;
         }
 
-        /// <summary>
-        /// Reads the content of an HTTP response as a string, refusing to buffer more than <paramref name="maxBytes"/>.
-        /// Used by network-facing integrations (e.g. GameChat) so a malicious or misbehaving endpoint can't exhaust memory.
-        /// </summary>
         public static async Task<string> ReadStringBoundedAsync(HttpContent content, int maxBytes, CancellationToken token = default)
         {
             if (content.Headers.ContentLength is long contentLength && contentLength > maxBytes)
@@ -48,12 +37,6 @@
             return Encoding.UTF8.GetString(output.ToArray());
         }
 
-        /// <summary>
-        /// Binary counterpart to <see cref="ReadStringBoundedAsync"/> - reads the content of an HTTP response as a
-        /// byte array, refusing to buffer more than <paramref name="maxBytes"/>. Used for API/metadata responses
-        /// that are not text but must still be bounded (e.g. GitHub release JSON read via a raw byte buffer before
-        /// UTF-8/JSON parsing, so a misbehaving endpoint can't exhaust memory).
-        /// </summary>
         public static async Task<byte[]> ReadBytesBoundedAsync(HttpContent content, int maxBytes, CancellationToken token = default)
         {
             if (content.Headers.ContentLength is long contentLength && contentLength > maxBytes)
@@ -78,11 +61,6 @@
             return output.ToArray();
         }
 
-        /// <summary>
-        /// GETs a URL and reads the response as a string, refusing to buffer more than
-        /// <paramref name="maxBytes"/>. Analogous to <see cref="ReadStringBoundedAsync"/> but
-        /// covers the request as well, for callers (e.g. TranslationService) that only have a URL.
-        /// </summary>
         public static async Task<string> GetStringBoundedAsync(HttpClient client, string url, int maxBytes, CancellationToken token = default)
         {
             using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);

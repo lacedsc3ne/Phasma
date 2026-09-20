@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace PhasmaStrap.Models
 {
-    // A single row shown in FFlagSearchDialog's search/browse result grids.
-    // Ported from Voidstrap's UI/Elements/Dialogs/FlagSearchResult.cs.
     public class FlagSearchResult : INotifyPropertyChanged
     {
         private string _name = "";

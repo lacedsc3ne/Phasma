@@ -23,10 +23,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.OverlayDiagnosticsEnabled = value; OnPropertyChanged(nameof(DiagnosticsEnabled)); }
         }
 
-        // --- extra HUD rows (Phase 7). The recorder for these only runs inside an active Watcher
-        // session (same process-separation limitation as everywhere else this page's siblings
-        // note) - this page only edits Settings.Prop. ---
-
         public bool ShowFrameTime
         {
             get => App.Settings.Prop.OverlayHudShowFrameTime;
@@ -57,15 +53,46 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.OverlayHudShowRegion = value; HudChanged(nameof(ShowRegion)); }
         }
 
-        // ---- HUD look and position (Integrations/Overlays/OverlayHud.cs HudStyle) ----
+        public bool ShowGame
+        {
+            get => App.Settings.Prop.OverlayHudShowGame;
+            set { App.Settings.Prop.OverlayHudShowGame = value; HudChanged(nameof(ShowGame)); }
+        }
+
+        public bool ShowSessionTime
+        {
+            get => App.Settings.Prop.OverlayHudShowSessionTime;
+            set { App.Settings.Prop.OverlayHudShowSessionTime = value; HudChanged(nameof(ShowSessionTime)); }
+        }
 
         private static Models.Persistable.Settings S => App.Settings.Prop;
 
         private void HudChanged(string property)
         {
             OnPropertyChanged(property);
+            OnPropertyChanged(nameof(ExtraRowsSummary));
             OnPropertyChanged(nameof(HudPreview));
             OnPropertyChanged(nameof(HudPreviewActual));
+        }
+
+        public string ExtraRowsSummary
+        {
+            get
+            {
+                var on = new List<string>();
+
+                if (S.OverlayHudShowFrameTime) on.Add("Frame time");
+                if (S.OverlayHudShowCpu) on.Add("CPU");
+                if (S.OverlayHudShowRam) on.Add("RAM");
+                if (S.OverlayHudShowPing) on.Add("Ping");
+                if (S.OverlayHudShowRegion) on.Add("Region");
+                if (S.OverlayHudShowGame) on.Add("Game name");
+                if (S.OverlayHudShowSessionTime) on.Add("Session time");
+
+                return on.Count == 0
+                    ? "Nothing extra is on, so the HUD shows FPS on its own."
+                    : "On right now: " + string.Join(", ", on) + ".";
+            }
         }
 
         public string[] HudPositionOptions { get; } = { "Top left", "Top middle", "Top right", "Bottom left", "Bottom middle", "Bottom right" };
@@ -91,7 +118,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool HudShowLabels { get => S.OverlayHudShowLabels; set { S.OverlayHudShowLabels = value; HudChanged(nameof(HudShowLabels)); } }
         public bool HudTextShadow { get => S.OverlayHudTextShadow; set { S.OverlayHudTextShadow = value; HudChanged(nameof(HudTextShadow)); } }
 
-        // colours as #RRGGBB; anything else typed is ignored until it becomes a colour
         private static bool IsHex(string? value) => value is not null && System.Text.RegularExpressions.Regex.IsMatch(value.Trim(), "^#?[0-9a-fA-F]{6}$");
         private static string Hex(string value) => "#" + value.Trim().TrimStart('#').ToUpperInvariant();
 
@@ -127,7 +153,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(string.Empty);
         });
 
-        // the rows the HUD shows with the current choices, with made-up values
         private static (string[] Labels, string[] Values) SampleRows()
         {
             var labels = new List<string> { "FPS" };
@@ -137,6 +162,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (S.OverlayHudShowRam) { labels.Add("RAM"); values.Add("41%"); }
             if (S.OverlayHudShowPing) { labels.Add("PING"); values.Add("32ms"); }
             if (S.OverlayHudShowRegion) { labels.Add("REGION"); values.Add("Frankfurt, DE"); }
+            if (S.OverlayHudShowGame) { labels.Add("GAME"); values.Add("Blade Ball"); }
+            if (S.OverlayHudShowSessionTime) { labels.Add("TIME"); values.Add("18:42"); }
             return (labels.ToArray(), values.ToArray());
         }
 
@@ -155,7 +182,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // the HUD at its real size
         public System.Windows.Media.ImageSource HudPreviewActual
         {
             get
@@ -166,7 +192,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // a 1920x1080 screen at half size, with the HUD where it will sit
         public System.Windows.Media.ImageSource HudPreview
         {
             get
@@ -189,21 +214,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-
-        // --- Overlay Focus Mode: a manual suppress-all switch for the HUD/crosshair, toggleable
-        // here or via the Toggle Overlay Focus Mode hotkey (bind one on the Hotkeys page) -
-        // there's no reliable general Windows API for detecting "something is capturing my screen
-        // right now", so this is deliberately a manual switch rather than automatic detection. ---
-
         public bool FocusModeEnabled
         {
             get => App.Settings.Prop.OverlayFocusModeEnabled;
             set { App.Settings.Prop.OverlayFocusModeEnabled = value; OverlayHub.Refresh(); }
         }
-
-        // --- per-game overlay profiles: places with an assignment here override HUD/crosshair
-        // enabled state while joined to that place, regardless of the global toggles above.
-        // Mirrors PerformanceViewModel's per-game engine preset assignment pattern. ---
 
         public sealed record OverlayPlaceAssignment(string PlaceId, bool HudEnabled, bool CrosshairEnabled)
         {
@@ -268,8 +283,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.Crosshair = value; OverlayHub.Refresh(); }
         }
 
-        // ---- the crosshair editor
-
         public System.Windows.Media.ImageSource? CrosshairPreview
         {
             get
@@ -312,8 +325,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(CrosshairName));
             OverlayHub.Refresh();
         });
-
-        // ---- stream-safe mode (Integrations/Overlays/StreamSafe)
 
         public bool StreamSafeEnabled
         {

@@ -3,16 +3,6 @@ using System.Xml.Linq;
 
 namespace PhasmaStrap.Integrations.Nvidia
 {
-    // Writes the curated NVIDIA driver settings PhasmaStrap manages (see NvidiaViewModel)
-    // out to an NVIDIA Profile Inspector-compatible .nip document, either to disk or as an
-    // in-memory string for the clipboard. This is intentionally write-only: PhasmaStrap
-    // never needs to parse a .nip file back in, since NvidiaPage always reads its settings
-    // straight from the driver via NvidiaProfileInspector.ReadValues - there was previously
-    // no .nip writer at all here (Voidstrap's full read/write/apply .nip round-trip and its
-    // generic row-editor were deliberately left out when NvidiaProfileInspector.cs was
-    // ported, see the comment at the top of that file), only this export path was missing.
-    //
-    // Ported (write path only) from Voidstrap's Models/ProfileManager.cs (NvidiaProfileManager).
     public static class NvidiaProfileManager
     {
         private static readonly string[] RobloxExecutables = new[] { "RobloxPlayerBeta.exe", "RobloxStudioBeta.exe" };
@@ -36,8 +26,6 @@ namespace PhasmaStrap.Integrations.Nvidia
             doc.Save(writer);
         }
 
-        // Same document as SaveToNip, but returned as a string for clipboard use instead of
-        // being written to disk (used by CopyNvidiaSettingsDialog's "NIP profile"/"Base64 NIP" formats).
         public static string BuildNipText(IEnumerable<NvidiaSetting> settings, string? profileName = null)
         {
             XDocument doc = BuildDocument(settings, profileName);

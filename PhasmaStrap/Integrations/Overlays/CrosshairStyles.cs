@@ -1,7 +1,5 @@
 namespace PhasmaStrap.Integrations.Overlays
 {
-    // The crosshair in use, wherever it is stored: the editor's design, or - for settings written
-    // before the editor existed - the old shape / size / gap values turned into a design.
     internal static class CrosshairStyles
     {
         public static CrosshairStyle Current => App.Settings.Prop.CrosshairActive?.Clamped() ?? FromLegacy(App.Settings.Prop);
@@ -20,25 +18,25 @@ namespace PhasmaStrap.Integrations.Overlays
 
             switch (prop.CrosshairShapeIndex)
             {
-                case 1: // dot
+                case 1:
                     style.Arms = false;
                     style.Dot = true;
                     style.DotRound = true;
                     style.DotSize = Math.Clamp(prop.CrosshairSize, 1, 16);
                     break;
 
-                case 2: // ring
+                case 2:
                     style.Arms = false;
                     style.Ring = true;
                     style.RingRadius = Math.Clamp(prop.CrosshairSize / 2, 2, 60);
                     style.RingThickness = Math.Clamp(prop.CrosshairLineThickness, 1, 12);
                     break;
 
-                case 3: // "none"
+                case 3:
                     style.Arms = false;
                     break;
 
-                default: // cross
+                default:
                     style.ArmLength = prop.CrosshairSize;
                     style.ArmThickness = prop.CrosshairLineThickness;
                     style.Gap = prop.CrosshairGap;

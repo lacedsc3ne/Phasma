@@ -1,17 +1,11 @@
-﻿namespace PhasmaStrap.Models.Entities
+namespace PhasmaStrap.Models.Entities
 {
-    /// <summary>
-    /// Explicit loading. Load from cache before and after a fetch.
-    /// </summary>
     public class UniverseDetails
     {
         private static List<UniverseDetails> _cache { get; set; } = new();
 
         public GameDetailResponse Data { get; set; } = null!;
 
-        /// <summary>
-        /// Returns data for a 128x128 icon
-        /// </summary>
         public ThumbnailResponse Thumbnail { get; set; } = null!;
 
         public static UniverseDetails? LoadFromCache(long id)

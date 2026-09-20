@@ -11,12 +11,6 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using PhasmaStrap.UI.Elements.Base;
 using PhasmaStrap.UI.Elements.Dialogs;
 
-// Ported (trimmed down) from Voidstrap's UI/Elements/ContextMenu/CustomThemeEditor.xaml.cs.
-// Dropped relative to the original: the "open in an external editor" flow and its
-// FileSystemWatcher hot-reload (ExternalEditor/ExternalEditorPickerDialog don't exist in this
-// codebase and aren't essential), the custom RinColorPickerDialog (replaced with the standard
-// System.Windows.Forms.ColorDialog, which this project already links via UseWindowsForms), and
-// the "Publish" button (explicitly out of scope - PhasmaStrap has no hosted theme site).
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
     public partial class AppColorThemeEditor : WpfUiWindow
@@ -108,9 +102,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 Color fallback = AppColorTheme.TryParseColor(info.Fallback, out Color fb) ? fb : Colors.Black;
                 Color color = existing.TryGetValue(info.Key, out Color found) ? found : fallback;
 
-                // a fully transparent colour carries no visible hue, so start the row from the schema's
-                // (it may have been saved as transparent black, which stays invisible at any opacity
-                // over a dark window)
                 if (info.AllowAlpha && color.A == 0)
                     color = Color.FromArgb(0, fallback.R, fallback.G, fallback.B);
 
@@ -207,7 +198,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 _previewDict = dict;
                 merged.Add(dict);
 
-                // the accent isn't a plain resource - see AppColorTheme.AccentColorKey
                 Base.WpfUiWindow.ApplyAccentFrom(dict);
             }
             catch (Exception ex)
@@ -223,7 +213,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 if (_previewDict != null)
                     Application.Current.Resources.MergedDictionaries.Remove(_previewDict);
 
-                // back to whatever is actually saved
                 Base.WpfUiWindow.ApplyAccentFrom(App.Settings.Prop.CustomColorThemeEnabled ? AppColorTheme.LoadForApp() : null);
             }
             catch
@@ -322,9 +311,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         {
             if (sender is not FrameworkElement fe || fe.DataContext is not ThemeColorItem item)
                 return;
-            // the Windows colour dialog has no alpha and always answers fully opaque - keep the row's
-            // own opacity (its slider), or a translucent glow/sidebar would turn solid on every pick
-            // ...except when the row is fully transparent: someone choosing a colour wants to see it
+
             if (TryPickColor(item.Color, out Color picked))
             {
                 byte alpha = item.AllowAlpha && item.Color.A > 0 ? item.Color.A : (byte)255;

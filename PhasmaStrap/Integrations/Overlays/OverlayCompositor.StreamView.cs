@@ -9,10 +9,6 @@ using Interop = PhasmaStrap.Integrations.Overlays.OverlayInterop;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    // Stream-safe mode's window (see StreamSafe): the same picture the overlay shows, with the
-    // marked areas pixelated, presented in a normal window OBS can capture. It uses the
-    // compositor's device and DirectComposition device, and sits at the bottom of the z-order at
-    // Roblox's position and size, so the capture has the game's resolution and nobody sees it.
     internal sealed partial class OverlayCompositor
     {
         private const string StreamShaderSource = @"
@@ -20,8 +16,8 @@ struct VSOut { float4 pos : SV_Position; float2 uv : TEXCOORD0; };
 
 cbuffer StreamSafeParams : register(b0)
 {
-    float4 dims;      // width, height, 1/width, 1/height
-    float4 params;    // regions, block size in pixels, style (0 pixelate, 1 black)
+    float4 dims;
+    float4 params;
     float4 regions[16];
 };
 
@@ -50,7 +46,6 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
             if (params.z > 0.5)
                 return float4(0.07, 0.07, 0.08, 1.0);
 
-            // every pixel of a block shows the average of four points inside it
             float b = params.y;
             float2 c = (floor(p / b) + 0.5) * b;
             float q = b * 0.25;
@@ -111,9 +106,7 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
 
         private bool StreamLive => _streamHwnd != IntPtr.Zero && _streamSwapChain != null;
 
-        // the stream view comes and goes with its setting; the overlay window itself is only shown
-        // when something drawn on it is wanted (stream-safe alone shouldn't cover the game)
-        private void SyncStreamView()
+        private void SyncStreamWindow()
         {
             bool wanted = App.Settings.Prop.StreamSafeEnabled;
 
@@ -122,20 +115,25 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
                 try
                 {
                     CreateStreamView();
+                    App.Logger.WriteLine("OverlayCompositor::StreamView", $"Stream view window is up as \"{StreamSafe.WindowTitle}\" ({_streamHwnd.ToInt64():X}), {_width}x{_height}");
                 }
                 catch (Exception ex)
                 {
                     App.Logger.WriteException("OverlayCompositor::CreateStreamView", ex);
                     DestroyStreamView();
-                    // not tried again this session - it would fail the same way every frame
+
                     _streamFailed = true;
                 }
             }
             else if (!wanted && StreamLive)
             {
+                App.Logger.WriteLine("OverlayCompositor::StreamView", "Stream-safe mode is off, closing the stream view window");
                 DestroyStreamView();
             }
+        }
 
+        private void SyncStreamView()
+        {
             bool overlayNeeded = OverlaySettings.OverlayWindowNeeded;
             if (!overlayNeeded && !_overlayHiddenForStream)
             {
@@ -172,7 +170,6 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
                 Marshal.FreeHGlobal(classNamePtr);
             }
 
-            // a normal window (not a tool window, not excluded from capture) so OBS lists and captures it
             int exStyle = Interop.WS_EX_NOACTIVATE | Interop.WS_EX_NOREDIRECTIONBITMAP;
             _streamHwnd = Interop.CreateWindowExW(exStyle, new IntPtr(_streamClassAtom), StreamSafe.WindowTitle, Interop.WS_POPUP, _rectLeft, _rectTop, _width, _height, IntPtr.Zero, IntPtr.Zero, _hInstance, IntPtr.Zero);
             if (_streamHwnd == IntPtr.Zero)
@@ -236,7 +233,6 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
             _streamRtv = _device!.CreateRenderTargetView(_streamBackBuffer);
         }
 
-        // keeps the stream view at Roblox's position and size, at the very bottom of the z-order
         private void PositionStreamView()
         {
             if (!StreamLive)
@@ -267,7 +263,7 @@ float4 PSStreamSafe(VSOut inp) : SV_Target
             var data = new StreamSafeParams
             {
                 Dims = _dims,
-                // blocks about a thirtieth of the picture's height: no text survives that
+
                 Params = new Vector4(regions.Count, Math.Max(8, _height / 30), App.Settings.Prop.StreamSafeStyle == StreamSafe.StyleBlack ? 1 : 0, 0),
             };
             for (int i = 0; i < regions.Count; i++)

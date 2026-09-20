@@ -1,4 +1,4 @@
-using PhasmaStrap.AppData;
+﻿using PhasmaStrap.AppData;
 using PhasmaStrap.Integrations;
 using PhasmaStrap.Integrations.GameChat;
 using PhasmaStrap.Integrations.Overlays;
@@ -26,7 +26,6 @@ namespace PhasmaStrap
 
         public readonly SessionTracker? SessionTracker;
 
-        // Diagnostics > Stutter / auto-tuner: measures when the settings window (or the tray) orders it
         private readonly PerformanceMeasurer? _performanceMeasurer;
 
         public readonly GameChatIntegration? GameChat;
@@ -74,25 +73,18 @@ namespace PhasmaStrap
             if (App.Settings.Prop.EnableActivityTracking)
             {
                 ActivityWatcher = new(_watcherData.LogFile);
+                NowPlaying.Follow(ActivityWatcher);
 
-                // OverlayHub is the single lifecycle owner for the whole GPU overlay compositor -
-                // RiShade/Anti-Aliasing/Frame Generation all run as stages inside it (see
-                // OverlayCompositor.RenderFrame) rather than having their own game-join/leave wiring.
                 ActivityWatcher.OnGameJoin += (sender, _) => OverlayHub.OnGameJoin((sender as ActivityWatcher)?.Data.PlaceId ?? 0);
                 ActivityWatcher.OnGameLeave += delegate { OverlayHub.OnGameLeave(); };
 
-                // the HUD's "Show ping" row - checked live (not gated at startup like most of the
-                // handlers below) since it costs nothing to subscribe and this way toggling it on
-                // the Overlays page takes effect on the very next game join, no relaunch needed
                 ActivityWatcher.OnGameJoin += (sender, _) =>
                 {
-                    // the region badge shows the ping next to the region in the tray menu
                     if (App.Settings.Prop.OverlayHudShowPing || App.Settings.Prop.OverlayHudShowRegion)
                         ServerPingMonitor.Start((sender as ActivityWatcher)?.Data.MachineAddress);
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => ServerPingMonitor.Stop();
 
-                // where the server is - an offline lookup, always on (tray menu + optional HUD row)
                 ActivityWatcher.OnGameJoin += (sender, _) => ServerRegion.OnGameJoin((sender as ActivityWatcher)?.Data.MachineAddress);
                 ActivityWatcher.OnGameLeave += (_, _) => ServerRegion.OnGameLeave();
 
@@ -109,8 +101,6 @@ namespace PhasmaStrap
                 if (App.Settings.Prop.UseDiscordRichPresence)
                     RichPresence = new(ActivityWatcher);
 
-                // opt-in only: this feature installs a global (system-wide) low-level keyboard hook
-                // while a Roblox session is active, so it defaults to off and requires explicit consent
                 if (App.Settings.Prop.GameChatEnabled)
                     GameChat = new(ActivityWatcher, _watcherData.ProcessId);
 
@@ -142,10 +132,6 @@ namespace PhasmaStrap
                     ActivityWatcher.OnGameLeave += (_, _) => HeadsetAudio.Stop();
                 }
 
-                // checked live (not gated at startup like most handlers here) so turning Instant
-                // Replay on from the Capture page takes effect on the very next game join - Roblox
-                // is very often already running by the time someone finds this toggle, and gating
-                // this at Watcher startup like the others would silently require a relaunch first
                 ActivityWatcher.OnGameJoin += (_, _) =>
                 {
                     if (App.Settings.Prop.InstantReplayEnabled)
@@ -153,30 +139,22 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => _instantReplay.Stop();
 
-                // an update that dropped some of your flags is mentioned once (RobloxVersions)
                 _ = Task.Run(() =>
                 {
                     try { Utility.RobloxVersions.ShowPendingFlagNotice(); }
                     catch (Exception ex) { App.Logger.WriteLine("Watcher", $"Flag notice failed: {ex.Message}"); }
 
-                    // account guard: hosts / certificates / proxy, once per Roblox session
                     Utility.AccountGuard.ScanAndNotify();
                 });
 
-                // a game joined from inside the Roblox app never went through a launch that could
-                // apply its FastFlag profile - see FlagProfileSession
                 ActivityWatcher.OnGameJoin += (sender, _) =>
                 {
                     if (sender is ActivityWatcher watcher)
                         Utility.FlagProfileSession.OnGameJoined(watcher.Data);
                 };
 
-                // the Capture page saves the toggle immediately and this process reloads the file
-                // (SettingsHotReload) - so flipping it mid-game starts/stops the buffer right away
                 Utility.SettingsHotReload.Reloaded += (_, _) =>
                 {
-                    // hotkeys bound/changed while the game runs - RegisterHotKey must run on the
-                    // thread that owns the message window, so marshal back
                     try
                     {
                         App.Current.Dispatcher.BeginInvoke(() => _hotkeys?.ApplyBindings());
@@ -209,15 +187,9 @@ namespace PhasmaStrap
                     }
                 };
 
-                // always wired: the setting and the per-game resolutions are read at each join, so
-                // turning it on (and Save) works without restarting Roblox
                 ActivityWatcher.OnGameJoin += (sender, _) => ForcedResolution.OnGameJoin((sender as ActivityWatcher)?.Data.PlaceId ?? 0);
                 ActivityWatcher.OnGameLeave += (_, _) => ForcedResolution.OnGameLeave();
 
-                // also wire up the optimizer if any per-game preset is assigned, even when the
-                // global toggles are all off - a place-specific preset should still fire (see
-                // EnginePresets.Resolve, invoked from StartProcessOptimizer once the join's place
-                // ID is known)
                 if (RobloxProcessOptimizer.ShouldRun(App.Settings.Prop) || App.Settings.Prop.EnginePlaceProfiles.Count > 0)
                 {
                     ActivityWatcher.OnGameJoin += (_, _) => StartProcessOptimizer();
@@ -241,14 +213,14 @@ namespace PhasmaStrap
             if (RobloxWindowCustomizer.IsEnabled)
                 RobloxWindowCustomizer.Start(ActivityWatcher);
 
-            // the same actions are also exposed on the tray icon's context menu (MenuContainer),
-            // so they live as methods below rather than inline lambdas
             _hotkeys = new GlobalHotkeyManager();
             _hotkeys.RegisterAction(HotkeyActions.CleanRamNow, CleanRamNow);
             _hotkeys.RegisterAction(HotkeyActions.ToggleHeadsetAudio, ToggleHeadsetAudio);
             _hotkeys.RegisterAction(HotkeyActions.TakeScreenshot, TakeScreenshot);
             _hotkeys.RegisterAction(HotkeyActions.SaveInstantReplay, SaveInstantReplay);
             _hotkeys.RegisterAction(HotkeyActions.ToggleOverlayFocusMode, ToggleOverlayFocusMode);
+            _hotkeys.RegisterAction(HotkeyActions.RaiseFrameLimit, RaiseFrameLimit);
+            _hotkeys.RegisterAction(HotkeyActions.LowerFrameLimit, LowerFrameLimit);
             _hotkeys.ApplyBindings();
 
             _notifyIcon = new(this);
@@ -259,8 +231,6 @@ namespace PhasmaStrap
             if (_watcherData is null)
                 return;
 
-            // ActivityWatcher.Data.PlaceId is already resolved by the time OnGameJoin fires, so the
-            // per-place preset/exclusion (EnginePresets.Resolve) can be looked up right here
             long placeId = ActivityWatcher?.Data.PlaceId ?? 0;
             EnginePresetValues effective = placeId != 0 ? EnginePresets.Resolve(placeId) : EnginePresets.FromSettings(App.Settings.Prop);
 
@@ -280,15 +250,60 @@ namespace PhasmaStrap
 
         public void CleanRamNow()
         {
-            // deliberately the unelevated trim only - the standby list purge needs an elevated
-            // relaunch (a UAC prompt), which would interrupt whatever's in focus (a game) every
-            // single time this fires. That part stays a manual, explicit action from the
-            // Rendering page's Clean RAM button, same reasoning as AutoRamCleaner.
             SystemMemoryCleaner.TrimResult result = SystemMemoryCleaner.TrimAllProcessWorkingSets();
             NotificationCenter.Notify(
                 "RAM cleaned",
                 $"Trimmed {result.ProcessesTrimmed} processes (~{result.BytesFreed / 1048576.0:0.#} MB).",
-                NotificationCategory.General);
+                NotificationCategory.General,
+                kind: NotificationKindId.RamCleaned);
+        }
+
+        public void RaiseFrameLimit() => StepFrameLimit(true);
+
+        public void LowerFrameLimit() => StepFrameLimit(false);
+
+        private void StepFrameLimit(bool up)
+        {
+            if (!Integrations.Nvidia.FrameLimiter.Available)
+            {
+                NotificationCenter.Notify(
+                    "Frame rate limit needs an NVIDIA card",
+                    Integrations.Nvidia.FrameLimiter.UnavailableReason,
+                    NotificationCategory.General,
+                    kind: NotificationKindId.FrameRateLimit);
+                return;
+            }
+
+            int current = Integrations.Nvidia.FrameLimiter.Current();
+            int wanted = up
+                ? Integrations.Nvidia.FrameLimiter.Raise(current)
+                : Integrations.Nvidia.FrameLimiter.Lower(current);
+
+            if (wanted == current)
+            {
+                NotificationCenter.Notify(
+                    $"Frame rate limit: {Integrations.Nvidia.FrameLimiter.Describe(current)}",
+                    up ? "Already at the top of your list." : "Already at the bottom of your list.",
+                    NotificationCategory.General,
+                    kind: NotificationKindId.FrameRateLimit);
+                return;
+            }
+
+            if (!Integrations.Nvidia.FrameLimiter.Set(wanted))
+            {
+                NotificationCenter.Notify(
+                    "Frame rate limit did not change",
+                    "The NVIDIA driver would not take the new limit. The log has the reason.",
+                    NotificationCategory.General,
+                    kind: NotificationKindId.FrameRateLimit);
+                return;
+            }
+
+            NotificationCenter.Notify(
+                $"Frame rate limit: {Integrations.Nvidia.FrameLimiter.Describe(wanted)}",
+                "This is the NVIDIA driver's limiter for Roblox. If the change does not show up straight away, it takes effect the next time Roblox starts.",
+                NotificationCategory.General,
+                kind: NotificationKindId.FrameRateLimit);
         }
 
         public void ToggleHeadsetAudio()
@@ -315,7 +330,6 @@ namespace PhasmaStrap
                 return;
             }
 
-            // "pick an area": freeze the game's picture and let the user drag over what they want
             if (_pickingArea)
                 return;
 
@@ -333,7 +347,7 @@ namespace PhasmaStrap
                 {
                     _pickingArea = false;
                     if (picked is null)
-                        return; // cancelled - nothing to say
+                        return;
 
                     using (picked)
                         ScreenshotTaken(ScreenshotCapture.Save(picked));
@@ -360,10 +374,10 @@ namespace PhasmaStrap
                 NotificationCategory.General,
                 onClick: path is not null ? NotificationCenter.RevealFile(path) : null,
                 actionText: path is not null ? "Edit" : null,
-                action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null);
+                action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null,
+                kind: NotificationKindId.Screenshot);
         }
 
-        // runs after a capture has been saved - the only moment old captures are ever cleaned up
         private static void TidyCaptures()
         {
             int limitMb = App.Settings.Prop.CaptureStorageLimitMB;
@@ -406,7 +420,7 @@ namespace PhasmaStrap
 
             if (!App.Settings.Prop.InstantReplayEnabled)
             {
-                NotificationCenter.Notify("Instant Replay is off", "Turn it on under Capture > Instant Replay - it starts buffering as soon as you're in a game.", NotificationCategory.General);
+                NotificationCenter.Notify("Instant Replay is off", "Turn it on under Capture > Instant Replay - it starts buffering as soon as you're in a game.", NotificationCategory.General, kind: NotificationKindId.ReplayNotReady);
                 return;
             }
 
@@ -414,30 +428,25 @@ namespace PhasmaStrap
             {
                 if (ActivityWatcher?.InGame == true)
                 {
-                    // enabled but never started (e.g. enabled before this build) - start now
                     _instantReplay.Start();
-                    NotificationCenter.Notify("Instant Replay just started", "It's buffering now - press the hotkey again in a few seconds to save a clip.", NotificationCategory.General);
+                    NotificationCenter.Notify("Instant Replay just started", "It's buffering now - press the hotkey again in a few seconds to save a clip.", NotificationCategory.General, kind: NotificationKindId.ReplayNotReady);
                 }
                 else
                 {
-                    NotificationCenter.Notify("Not in a game yet", "Instant Replay only buffers while you're in a Roblox game.", NotificationCategory.General);
+                    NotificationCenter.Notify("Not in a game yet", "Instant Replay only buffers while you're in a Roblox game.", NotificationCategory.General, kind: NotificationKindId.ReplayNotReady);
                 }
                 return;
             }
 
             if (Interlocked.CompareExchange(ref _replaySaving, 1, 0) != 0)
             {
-                NotificationCenter.Notify("Still saving the last clip", "Give it a moment before pressing the hotkey again.", NotificationCategory.General);
+                NotificationCenter.Notify("Still saving the last clip", "Give it a moment before pressing the hotkey again.", NotificationCategory.General, kind: NotificationKindId.ReplayNotReady);
                 return;
             }
 
-            // encoding takes a few seconds - it must never run on this thread (the hotkey/message
-            // thread), or every later hotkey press and tray interaction queues up behind it
-            // on the graphics card the clip is already encoded and saves in a fraction of a second -
-            // only the "Replay saved" notification is shown then
             int seconds = App.Settings.Prop.InstantReplayClipSeconds;
             if (!_instantReplay.OnGpu)
-                NotificationCenter.Notify("Saving replay...", $"Encoding the last {seconds}s to MP4 - this takes a few seconds.", NotificationCategory.General, 4);
+                NotificationCenter.Notify("Saving replay...", $"Encoding the last {seconds}s to MP4 - this takes a few seconds.", NotificationCategory.General, 4, kind: NotificationKindId.Replay);
             App.Logger.WriteLine(LOG_IDENT, "Encoding clip on a background thread");
 
             _ = Task.Run(() =>
@@ -472,7 +481,8 @@ namespace PhasmaStrap
                         NotificationCategory.General, 6,
                         onClick: path is not null ? NotificationCenter.RevealFile(path) : null,
                         actionText: path is not null ? "Edit" : null,
-                        action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null);
+                        action: path is not null ? () => Utility.CaptureLibrary.OpenEditor(path) : null,
+                        kind: NotificationKindId.Replay);
                 });
             });
         }
@@ -487,7 +497,8 @@ namespace PhasmaStrap
             NotificationCenter.Notify(
                 enabled ? "Overlay Focus Mode on" : "Overlay Focus Mode off",
                 enabled ? "HUD and crosshair are hidden until you toggle this again." : "HUD and crosshair are back.",
-                NotificationCategory.General);
+                NotificationCategory.General,
+                kind: NotificationKindId.OverlayFocusMode);
         }
 
         public void KillRobloxProcess()
@@ -524,6 +535,38 @@ namespace PhasmaStrap
             }
         }
 
+        private async Task WaitForRobloxExitAsync()
+        {
+            int pid = _watcherData!.ProcessId;
+
+            try
+            {
+                using Process roblox = Process.GetProcessById(pid);
+
+                if (string.Equals(roblox.ProcessName, App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase))
+                {
+                    App.Logger.WriteLine("Watcher::Run", $"Holding a handle on Roblox ({pid}), waiting for it to exit");
+                    await roblox.WaitForExitAsync();
+                    return;
+                }
+
+                App.Logger.WriteLine("Watcher::Run", $"Process {pid} is '{roblox.ProcessName}', not Roblox, so there is nothing to watch");
+                return;
+            }
+            catch (ArgumentException)
+            {
+                App.Logger.WriteLine("Watcher::Run", $"Roblox ({pid}) had already exited");
+                return;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("Watcher::Run", $"Could not hold a handle on Roblox ({pid}), falling back to polling: {ex.Message}");
+            }
+
+            while (Utilities.GetProcessesSafe().Any(x => x.Id == pid && string.Equals(x.ProcessName, App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)))
+                await Task.Delay(1000);
+        }
+
         public async Task Run()
         {
             if (!_lock.IsAcquired || _watcherData is null)
@@ -531,17 +574,10 @@ namespace PhasmaStrap
 
             ActivityWatcher?.Start();
 
-            while (Utilities.GetProcessesSafe().Any(x => x.Id == _watcherData.ProcessId))
-                await Task.Delay(1000);
+            await WaitForRobloxExitAsync();
 
-            // ActivityWatcher.InGame only ever goes back to false via a clean disconnect/leave log
-            // line (see ActivityWatcher's GameDisconnectedEntry/GameLeavingEntry handling) - if the
-            // process is gone but that never happened, nothing ever told us the session ended
-            // normally, so this is the closest honest signal for "Roblox crashed" available without
-            // reading process exit codes (which Roblox's own client doesn't set meaningfully anyway).
             bool possibleCrash = ActivityWatcher is not null && ActivityWatcher.InGame;
 
-            // not a crash if FlagProfileSession just closed Roblox on purpose to restart it
             bool intentional = Utility.FlagProfileSession.RestartedRecently || _killedOnPurpose;
             if (possibleCrash && intentional)
                 possibleCrash = false;
@@ -554,8 +590,6 @@ namespace PhasmaStrap
 
                 if (crash is not null)
                 {
-                    // the log ends with Roblox's regular shutdown and nothing else points at a crash:
-                    // the player simply closed the game while still in a server
                     if (crash.CleanExit && crash.Confidence.Length == 0)
                     {
                         possibleCrash = false;
@@ -564,12 +598,11 @@ namespace PhasmaStrap
                     {
                         CrashReports.Save(crash);
 
-                        // an "unclear" ending outside a game is most likely someone ending the process -
-                        // written down for the Diagnostics page, but not worth interrupting anyone for
                         if (possibleCrash || crash.Confidence != "Unclear")
                         {
                             NotificationCenter.Notify("Roblox closed unexpectedly", crash.Cause, NotificationCategory.General, 12,
-                                onClick: () => { try { Process.Start(Paths.Process, "-settings"); } catch { } });
+                                onClick: () => { try { Process.Start(Paths.Process, "-settings"); } catch { } },
+                                kind: NotificationKindId.RobloxClosed);
                             crashToast = true;
                         }
                     }
@@ -580,15 +613,10 @@ namespace PhasmaStrap
             {
                 await TryAutoRejoinAsync();
 
-                // LaunchHandler.LaunchWatcher tears this whole process down (Dispose + App.Terminate)
-                // the instant Run() returns - without this, the final "rejoin succeeded/failed" toast
-                // never gets a chance to render, since NotificationCenter.Notify only queues it onto
-                // the dispatcher and returns immediately rather than waiting for the animation
                 await Task.Delay(TimeSpan.FromSeconds(6));
             }
             else if (crashToast)
             {
-                // same reason: let the toast be seen before this process goes away
                 await Task.Delay(TimeSpan.FromSeconds(12));
             }
 
@@ -602,7 +630,6 @@ namespace PhasmaStrap
                 Process.Start(Paths.Process, "-settings -testmode");
         }
 
-        // set when PhasmaStrap itself ends Roblox (tray "Close Roblox") - not something to analyse
         private bool _killedOnPurpose;
 
         private async Task<CrashReport?> AnalyzeExitAsync()
@@ -615,7 +642,6 @@ namespace PhasmaStrap
                 if (string.IsNullOrEmpty(log) || !File.Exists(log))
                     return null;
 
-                // Windows writes its "application fault" event a moment after the process is gone
                 await Task.Delay(2500);
 
                 CrashReport report = await Task.Run(() => CrashReports.Analyze(log));
@@ -654,7 +680,8 @@ namespace PhasmaStrap
                 NotificationCenter.Notify(
                     "Possible crash detected",
                     $"Attempting to rejoin (try {attempt} of {maxAttempts})...",
-                    NotificationCategory.General);
+                    NotificationCategory.General,
+                    kind: NotificationKindId.AutoRejoin);
 
                 await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
 
@@ -669,47 +696,63 @@ namespace PhasmaStrap
                     continue;
                 }
 
-                // give the freshly-launched process a moment to actually start before deciding
-                // whether this attempt "took" - if a Roblox player process is now running, stop
-                // here rather than launching several overlapping instances
                 await Task.Delay(TimeSpan.FromSeconds(3));
 
                 if (Utilities.GetProcessesSafe().Any(x => x.ProcessName.Equals(App.RobloxPlayerAppName, StringComparison.OrdinalIgnoreCase)))
                 {
-                    NotificationCenter.Notify("Rejoin successful", "Roblox relaunched.", NotificationCategory.General);
+                    NotificationCenter.Notify("Rejoin successful", "Roblox relaunched.", NotificationCategory.General, kind: NotificationKindId.AutoRejoin);
                     return;
                 }
             }
 
-            NotificationCenter.Notify("Rejoin failed", $"Could not relaunch Roblox after {maxAttempts} attempt(s).", NotificationCategory.General);
+            NotificationCenter.Notify("Rejoin failed", $"Could not relaunch Roblox after {maxAttempts} attempt(s).", NotificationCategory.General, kind: NotificationKindId.AutoRejoin);
         }
 
         public void Dispose()
         {
             App.Logger.WriteLine("Watcher::Dispose", "Disposing Watcher");
 
-            OverlayHub.Shutdown();
-            ServerPingMonitor.Stop();
-
-            _notifyIcon?.Dispose();
-            RichPresence?.Dispose();
-            GameChat?.Dispose();
-            IntegrationWatcher?.Dispose();
-            PlayTimeWatcher?.Dispose();
-            SessionTracker?.Dispose();
-            _performanceMeasurer?.Dispose();
-            PlayTimeStore.Shutdown();
-            FakeExclusiveFullscreen.Shutdown();
-            AudioDucker.Shutdown();
-            HeadsetAudio.Shutdown();
-            ForcedResolution.Shutdown();
-            RobloxWindowCustomizer.Shutdown();
-            StopProcessOptimizer();
-            MemoryManager.Shutdown();
-            _hotkeys?.Dispose();
-            _instantReplay.Dispose();
+            Step("now playing", NowPlaying.Forget);
+            Step("overlays", OverlayHub.Shutdown);
+            Step("ping monitor", ServerPingMonitor.Stop);
+            Step("tray icon", () => _notifyIcon?.Dispose());
+            Step("discord", () => RichPresence?.Dispose());
+            Step("game chat", () => GameChat?.Dispose());
+            Step("integrations", () => IntegrationWatcher?.Dispose());
+            Step("playtime", () => PlayTimeWatcher?.Dispose());
+            Step("sessions", () => SessionTracker?.Dispose());
+            Step("performance", () => _performanceMeasurer?.Dispose());
+            Step("playtime store", PlayTimeStore.Shutdown);
+            Step("fullscreen", FakeExclusiveFullscreen.Shutdown);
+            Step("audio ducking", AudioDucker.Shutdown);
+            Step("headset audio", HeadsetAudio.Shutdown);
+            Step("resolution", ForcedResolution.Shutdown);
+            Step("window customizer", RobloxWindowCustomizer.Shutdown);
+            Step("process optimizer", StopProcessOptimizer);
+            Step("memory manager", MemoryManager.Shutdown);
+            Step("hotkeys", () => _hotkeys?.Dispose());
+            Step("instant replay", _instantReplay.Dispose);
+            Step("activity watcher", () => ActivityWatcher?.Dispose());
+            Step("watcher lock", _lock.Dispose);
 
             GC.SuppressFinalize(this);
+        }
+
+        private static void Step(string name, Action action)
+        {
+            var clock = Stopwatch.StartNew();
+
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("Watcher::Dispose", $"{name} threw: {ex.Message}");
+            }
+
+            if (clock.ElapsedMilliseconds > 750)
+                App.Logger.WriteLine("Watcher::Dispose", $"{name} took {clock.ElapsedMilliseconds} ms");
         }
     }
 }

@@ -6,14 +6,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// A real, isolated embedded browser (WebView2 - the same engine Roblox's own client already
-    /// depends on and normally installs, see Bootstrapper's WebView2RuntimeInstaller handling) for
-    /// signing into Roblox the normal way instead of hunting down a raw cookie value manually. Once
-    /// login succeeds, the .ROBLOSECURITY cookie is read straight out of THIS window's own isolated
-    /// browser profile via WebView2's CookieManager API - nothing is read from the user's actual
-    /// browser, which has no sanctioned way to hand its cookies to another app anyway.
-    /// </summary>
     public partial class BrowserLoginWindow : WpfUiWindow
     {
         private const string LOG_IDENT = "BrowserLoginWindow";
@@ -27,8 +19,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Loaded += BrowserLoginWindow_Loaded;
         }
 
-        /// <summary>Shows the window and waits for a successful login, returning the .ROBLOSECURITY
-        /// cookie value, or null if the window was closed/failed before that happened.</summary>
         public static async Task<string?> ShowAndWaitForCookieAsync(Window? owner)
         {
             var window = new BrowserLoginWindow();
@@ -45,7 +35,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             }
             catch
             {
-                // already closing/closed - fine
             }
 
             return cookie;
@@ -55,8 +44,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
         {
             try
             {
-                // a real, persistent profile folder (not the default next-to-the-exe location) so a
-                // session survives between uses, same as any normal browser would
                 string userDataFolder = Path.Combine(Paths.Base, "BrowserLogin");
                 Directory.CreateDirectory(userDataFolder);
 

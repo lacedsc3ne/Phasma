@@ -5,13 +5,6 @@ using System.Windows.Media;
 
 namespace PhasmaStrap.UI.Elements.Controls
 {
-    /// <summary>
-    /// Attached property for inner scrollable regions (a capped-height list, a DataGrid) that live
-    /// on a page which itself scrolls: once the inner region has hit its top or bottom, the mouse
-    /// wheel is handed to the outer page scroller instead of being swallowed, so the page keeps
-    /// scrolling naturally as the cursor passes over the list.
-    /// <code>&lt;ScrollViewer controls:ScrollBubbling.Enabled="True" ... /&gt;</code>
-    /// </summary>
     public static class ScrollBubbling
     {
         public static readonly DependencyProperty EnabledProperty = DependencyProperty.RegisterAttached(
@@ -49,7 +42,6 @@ namespace PhasmaStrap.UI.Elements.Controls
             if (innerCanHandle)
                 return;
 
-            // hand the wheel to whatever scrolls above us
             e.Handled = true;
 
             var forwarded = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)

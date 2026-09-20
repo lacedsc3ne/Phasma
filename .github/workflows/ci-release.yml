@@ -42,9 +42,6 @@ jobs:
       contents: write
 
     steps:
-      # This fork doesn't have access to Bloxstrap Labs' SignPath organization, so releases here
-      # are unsigned - Windows SmartScreen will flag them on first run. See the release notes
-      # this step writes for the same disclaimer shown on manually-published releases.
       - name: Download artifact
         uses: actions/download-artifact@v6
         with:

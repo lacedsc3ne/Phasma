@@ -1,22 +1,8 @@
-using PhasmaStrap.Models.Entities;
+﻿using PhasmaStrap.Models.Entities;
 using PhasmaStrap.UI;
 
 namespace PhasmaStrap.Utility
 {
-    // Keeps track of which FastFlag profile the RUNNING Roblox was started with, so a game's
-    // profile applies no matter how the game was joined.
-    //
-    // Roblox reads its flags once, when its process starts. A PhasmaStrap launch writes the right
-    // flags for the game being launched - but a game joined from inside the Roblox app, or a
-    // browser "Play" while Roblox is already open, keeps whatever flags that Roblox started with.
-    // Nothing is ever restarted automatically:
-    //   - the Watcher, on a join to a game whose profile isn't the one Roblox started with, shows
-    //     a toast; clicking it restarts Roblox straight back into the same server;
-    //   - optionally (off by default) a launch closes an already running Roblox first when it
-    //     needs a different profile, so a browser "Play" picks the new flags up.
-    //
-    // Profiles are compared by content (FlagLayers.Signature), so editing a profile while Roblox
-    // runs counts as "not active" too.
     internal static class FlagProfileSession
     {
         private const string LOG_IDENT = "FlagProfileSession";
@@ -71,14 +57,10 @@ namespace PhasmaStrap.Utility
 
         private static bool CloseRunningOnLaunch => App.Settings.Prop.UseFastFlagManager && App.Settings.Prop.FastFlagPresetCloseRunningRoblox;
 
-        // games already mentioned this session - one toast per game, not one per server hop
         private static readonly HashSet<long> _notifiedPlaces = new();
 
-        // true for a short while after Roblox was closed on purpose - the Watcher uses it so its
-        // "Roblox vanished mid-game, must have crashed" handling doesn't fire on top
         public static bool RestartedRecently => (DateTime.UtcNow - Read().RestartUtc).TotalSeconds < 45;
 
-        // Roblox is about to be closed on purpose by something else (the tray's account switch)
         public static void MarkIntentionalRestart()
         {
             Marker marker = Read();
@@ -108,6 +90,12 @@ namespace PhasmaStrap.Utility
             {
                 try
                 {
+                    if (process.MainWindowHandle != IntPtr.Zero && process.CloseMainWindow())
+                    {
+                        if (process.WaitForExit(3000))
+                            continue;
+                    }
+
                     process.Kill();
                 }
                 catch (Exception ex)
@@ -124,21 +112,34 @@ namespace PhasmaStrap.Utility
                 await Task.Delay(250);
         }
 
-        // ------------------------------------------------------------------ Bootstrapper side
-
-        // Called before the flags for this launch are written. Returns true when a new Roblox
-        // process is going to start (so the marker should be updated afterwards).
-        // gameKnown: false when the launch link didn't say which game (open the app, a share link).
         public static async Task<bool> PrepareLaunchAsync(Wanted wanted, bool gameKnown)
         {
             if (!IsRobloxRunning())
                 return true;
 
-            // nothing to compare yet - the Watcher sorts it out once the join shows the game
-            if (!gameKnown || !CloseRunningOnLaunch)
+            Marker running = Read();
+
+            if (!CloseRunningOnLaunch)
+            {
+                if (gameKnown && !wanted.IsNone && !string.Equals(wanted.Signature, running.Signature, StringComparison.Ordinal))
+                {
+                    App.Logger.WriteLine(LOG_IDENT, $"Roblox is already running with {Describe(running.Profile, running.Signature)}; this launch wants {Describe(wanted.ProfileName, wanted.Signature)}, which will not apply until Roblox restarts");
+
+                    NotificationCenter.Notify(
+                        $"FastFlag profile \"{wanted.ProfileName}\" will not apply",
+                        "Roblox is already open, and it only reads FastFlags when it starts. Close Roblox and launch this game again, or turn on closing Roblox on launch in FastFlag settings.",
+                        NotificationCategory.General,
+                        durationSeconds: 10,
+                        kind: NotificationKindId.FastFlagProfile);
+                }
+
+                return false;
+            }
+
+            if (!gameKnown)
                 return false;
 
-            Marker marker = Read();
+            Marker marker = running;
             if (string.Equals(wanted.Signature, marker.Signature, StringComparison.Ordinal))
                 return false;
 
@@ -151,6 +152,21 @@ namespace PhasmaStrap.Utility
             return true;
         }
 
+        public static void NoteLaunchWithoutGame(FlagProfileData profiles)
+        {
+            if (profiles.Rules.Count == 0)
+                return;
+
+            App.Logger.WriteLine(LOG_IDENT, $"Roblox is opening without a game, so none of your {profiles.Rules.Count} per-game flag profiles can be picked for this session");
+
+            NotificationCenter.Notify(
+                "Per-game FastFlags need a game to launch into",
+                "Roblox is opening on its own, so PhasmaStrap cannot tell which game you will pick. Launch the game from the Games page to get its profile.",
+                NotificationCategory.General,
+                durationSeconds: 10,
+                kind: NotificationKindId.FastFlagProfile);
+        }
+
         public static void RecordLaunch(Wanted applied)
         {
             Marker marker = Read();
@@ -159,14 +175,11 @@ namespace PhasmaStrap.Utility
             Write(marker);
         }
 
-        // ------------------------------------------------------------------ Watcher side
-
         public static void OnGameJoined(ActivityData data)
         {
             if (data.PlaceId <= 0)
                 return;
 
-            // this is the one moment the place -> game pairing is known for certain
             if (data.UniverseId > 0)
                 GameLookup.Remember(data.PlaceId, data.UniverseId);
 
@@ -177,16 +190,9 @@ namespace PhasmaStrap.Utility
             FlagProfile? profile = FlagLayers.ProfileFor(profiles, data.PlaceId, data.UniverseId);
             Wanted wanted = Wanted.Of(profile);
 
-            // only worth a mention when this game HAS a profile that isn't running; a profile left
-            // over from the previous game is not something to nag about
             if (wanted.IsNone)
                 return;
 
-            // The flags file Roblox actually read decides it, when it can be known: the running
-            // Roblox's own ClientAppSettings.json, unchanged since that Roblox started. (The marker
-            // below was only updated when a launch looked like it would start a new Roblox, so a
-            // launch while an old one was still closing left it behind - a warning with the
-            // profile's flags plainly working.)
             bool? inRunning = ProfileInRunningRoblox(profile!);
             if (inRunning == true)
             {
@@ -218,10 +224,10 @@ namespace PhasmaStrap.Utility
                     : "Roblox only reads FastFlags when it starts, and it was started with other flags. Close Roblox and launch this game again to get its profile.",
                 NotificationCategory.General,
                 durationSeconds: 10,
-                onClick: canRejoin ? () => RestartInto(placeId, jobId) : null);
+                onClick: canRejoin ? () => RestartInto(placeId, jobId) : null,
+                kind: NotificationKindId.FastFlagProfile);
         }
 
-        // only ever runs because the toast was clicked
         private static void RestartInto(long placeId, string jobId)
         {
             if (Interlocked.Exchange(ref _restarting, 1) != 0)
@@ -249,8 +255,6 @@ namespace PhasmaStrap.Utility
             });
         }
 
-        // true / false when the running Roblox's flags file shows it; null when that can't be
-        // known (no Roblox, or the file was rewritten after that Roblox started)
         private static bool? ProfileInRunningRoblox(FlagProfile profile)
         {
             bool? answer = null;
@@ -259,7 +263,6 @@ namespace PhasmaStrap.Utility
             {
                 bool? has = ProfileInFlagsFile(profile, Path.Combine(folder, "ClientSettings", "ClientAppSettings.json"), started);
 
-                // any running Roblox with the profile counts (a second window, say)
                 if (has == true)
                     return true;
                 answer ??= has;
@@ -275,7 +278,6 @@ namespace PhasmaStrap.Utility
                 if (!File.Exists(file))
                     return profile.Flags.Count > 0 ? false : null;
 
-                // written after this Roblox started: not what it read
                 if (File.GetLastWriteTimeUtc(file) > startedUtc.AddSeconds(1))
                     return null;
 

@@ -6,21 +6,9 @@ namespace PhasmaStrap.Networking
         public string ContentType = "";
         public int TypeId;
         public long AssetId;
-        public long OriginalBytes;      // what Roblox's CDN delivered, before any shrinking
+        public long OriginalBytes;
     }
 
-    // The persistent asset cache: the actual bytes of textures, meshes, sounds and animations, kept
-    // on disk across sessions and across games (the same hat or sound is one entry however many
-    // games use it).
-    //
-    // Keyed by the CDN's content hash (AssetRoute.ContentKey), so an entry can never go stale -
-    // changed content is a different hash. `variant` separates processed copies ("s512" = shrunk
-    // to 512 px) from the original under the same key.
-    //
-    //   <root>\ab\abcdef...  one file per entry: "PHAC", header length, JSON header, body
-    //
-    // Least recently used entries go first once the size limit is passed. The root folder is a
-    // parameter, so it can be exercised from a console harness.
     public sealed class AssetContentCache
     {
         public static Action<string>? Log;
@@ -72,7 +60,6 @@ namespace PhasmaStrap.Networking
 
                 Header header = JsonSerializer.Deserialize<Header>(file.AsSpan(8, headerLength)) ?? new Header();
 
-                // "used just now" - what eviction goes by
                 try { File.SetLastAccessTimeUtc(path, DateTime.UtcNow); } catch { }
 
                 return new CachedAsset
@@ -104,8 +91,6 @@ namespace PhasmaStrap.Networking
 
                 byte[] header = JsonSerializer.SerializeToUtf8Bytes(new Header { ContentType = asset.ContentType, TypeId = asset.TypeId, AssetId = asset.AssetId, OriginalBytes = asset.OriginalBytes });
 
-                // written beside and moved into place: a reader never sees half an entry, and two
-                // downloads of the same asset finishing together cannot interleave
                 string temp = $"{path}.{Guid.NewGuid():N}.tmp";
                 using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
@@ -154,8 +139,6 @@ namespace PhasmaStrap.Networking
             return (count, bytes);
         }
 
-        // cheap to call after every Put: only walks the folder when the running total says it is
-        // worth it, and at most every 20 s
         private void MaybeEvict(long limitBytes)
         {
             if (limitBytes <= 0)
@@ -181,7 +164,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // down to 90 % of the limit, least recently used first
         public int Evict(long limitBytes)
         {
             int removed = 0;
@@ -216,7 +198,6 @@ namespace PhasmaStrap.Networking
 
                 Interlocked.Exchange(ref _approximateBytes, total);
 
-                // leftovers of a write that was interrupted
                 foreach (FileInfo temp in new DirectoryInfo(_root).EnumerateFiles("*.tmp", SearchOption.AllDirectories).Where(f => (DateTime.UtcNow - f.LastWriteTimeUtc).TotalMinutes > 10))
                 {
                     try { temp.Delete(); } catch { }

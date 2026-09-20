@@ -23,15 +23,15 @@ namespace PhasmaStrap
         public LaunchFlag UninstallFlag             { get; } = new("uninstall");
 
         public LaunchFlag NoLaunchFlag              { get; } = new("nolaunch");
-        
+
         public LaunchFlag TestModeFlag              { get; } = new("testmode");
 
         public LaunchFlag NoGPUFlag                 { get; } = new("nogpu");
 
         public LaunchFlag UpgradeFlag               { get; } = new("upgrade");
-        
+
         public LaunchFlag PlayerFlag                { get; } = new("player");
-        
+
         public LaunchFlag StudioFlag                { get; } = new("studio");
 
         public LaunchFlag VersionFlag               { get; } = new("version");
@@ -40,25 +40,16 @@ namespace PhasmaStrap
 
         public LaunchFlag ForceFlag                 { get; } = new("force");
 
-        // internal use only - launched by ClassicHostRedirect.RunElevated() under UAC elevation to apply/remove
-        // the classic client hosts file redirect; data is "on" or "off"
         public LaunchFlag ClassicRedirectFlag       { get; } = new("classicredirect");
 
-        // syncs BOTH hosts-file blocks in one elevated run; data is "proxy=on|off;telemetry=on|off"
         public LaunchFlag ApplyHostsFlag            { get; } = new("applyhosts");
 
-        // -editclip "<path to mp4>": opens the Capture page's clip editor on that file directly
         public LaunchFlag EditClipFlag              { get; } = new("editclip");
 
-        // -switchaccount <userId>: close Roblox, sign in as that saved account, start Roblox again
-        // (the tray menu's "Switch account" - see Utility.AccountQuickSwitch)
         public LaunchFlag SwitchAccountFlag         { get; } = new("switchaccount");
 
-        // -discordjoin <application id>: started by Discord when a friend's Join button is clicked
-        // (see Integrations.DiscordJoin)
         public LaunchFlag DiscordJoinFlag           { get; } = new("discordjoin");
 
-        // -guard: the account guard's background process (Utility.AccountGuard), started at sign-in
         public LaunchFlag GuardFlag                 { get; } = new("guard");
 
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
@@ -69,8 +60,6 @@ namespace PhasmaStrap
 
         public LaunchFlag RemoveTelemetryBlockFlag  { get; } = new("removetelemetryblock");
 
-        // internal use only - launched by Utility.SystemMemoryCleaner.PurgeStandbyListElevated() under
-        // UAC elevation to purge the system standby list
         public LaunchFlag PurgeStandbyFlag          { get; } = new("purgestandby");
 
 #if DEBUG
@@ -83,9 +72,6 @@ namespace PhasmaStrap
 
         public string RobloxLaunchArgs { get; set; } = "";
 
-        /// <summary>
-        /// Original launch arguments
-        /// </summary>
         public string[] Args { get; private set; }
 
         public LaunchSettings(string[] args)
@@ -100,7 +86,6 @@ namespace PhasmaStrap
 
             Dictionary<string, LaunchFlag> flagMap = new();
 
-            // build flag map
             foreach (var prop in this.GetType().GetProperties())
             {
                 if (prop.PropertyType != typeof(LaunchFlag))
@@ -115,12 +100,11 @@ namespace PhasmaStrap
 
             int startIdx = 0;
 
-            // infer roblox launch uris
             if (Args.Length >= 1)
             {
                 string arg = Args[0];
 
-                if (arg.StartsWith("roblox:", StringComparison.OrdinalIgnoreCase) 
+                if (arg.StartsWith("roblox:", StringComparison.OrdinalIgnoreCase)
                     || arg.StartsWith("roblox-player:", StringComparison.OrdinalIgnoreCase))
                 {
                     App.Logger.WriteLine(LOG_IDENT, "Got Roblox player argument");
@@ -137,7 +121,6 @@ namespace PhasmaStrap
                 }
             }
 
-            // parse
             for (int i = startIdx; i < Args.Length; i++)
             {
                 string arg = Args[i];
@@ -177,7 +160,7 @@ namespace PhasmaStrap
             }
 
             if (VersionFlag.Active)
-                RobloxLaunchMode = LaunchMode.Unknown; // determine in bootstrapper
+                RobloxLaunchMode = LaunchMode.Unknown;
 
             if (PlayerFlag.Active)
                 ParsePlayer(PlayerFlag.Data);
@@ -227,7 +210,6 @@ namespace PhasmaStrap
             }
             else
             {
-                // likely a local path
                 App.Logger.WriteLine(LOG_IDENT, "Got Roblox Studio local place file");
                 RobloxLaunchArgs = $"-task EditFile -localPlaceFile \"{data}\"";
             }

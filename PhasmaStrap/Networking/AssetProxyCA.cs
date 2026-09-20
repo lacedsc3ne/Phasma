@@ -3,11 +3,6 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace PhasmaStrap.Networking
 {
-    // generates and manages the local root certificate authority PhasmaStrap uses to
-    // terminate TLS for the specific Roblox API hosts it intercepts. The CA is generated
-    // once and stored under LocalAppData; it is never installed into the trust store
-    // automatically - that's a separate, explicitly user-triggered action, since it's a
-    // system trust-boundary change that affects every app on the machine, not just this one.
     public static class AssetProxyCA
     {
         private const string LOG_IDENT = "AssetProxyCA";
@@ -18,9 +13,6 @@ namespace PhasmaStrap.Networking
 
         private static X509Certificate2? _cached;
 
-        // ca.pfx's write time when _cached was read. Every PhasmaStrap process (settings window,
-        // game watcher) holds its own copy: when one of them makes a new CA, the others notice
-        // here instead of signing with - and reporting on - the old one for the rest of their life
         private static DateTime _cachedWriteTimeUtc;
 
         private static readonly Dictionary<string, X509Certificate2> LeafCache = new(StringComparer.OrdinalIgnoreCase);
@@ -48,8 +40,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // the CA on disk, or null when there is none (or it's unusable) - never makes one, so the
-        // status texts can't quietly replace the CA that Windows and Roblox were given
         private static X509Certificate2? LoadRoot()
         {
             lock (Sync)
@@ -84,7 +74,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // everything worked out from the old CA
         private static void ForgetDerived()
         {
             LeafCache.Clear();
@@ -104,12 +93,9 @@ namespace PhasmaStrap.Networking
 
             X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(2));
 
-            // re-import as exportable so it can be persisted and used to sign leaf certs later
             return new X509Certificate2(cert.Export(X509ContentType.Pfx), (string?)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
         }
 
-        // generates (or returns a cached) leaf certificate for a given hostname, signed by
-        // the local root CA, for use when terminating TLS for that specific host
         public static X509Certificate2 GetLeafCertificate(string hostname)
         {
             lock (Sync)
@@ -130,8 +116,7 @@ namespace PhasmaStrap.Networking
                 request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection { new Oid("1.3.6.1.5.5.7.3.1") }, false));
 
                 byte[] serial = RandomNumberGenerator.GetBytes(16);
-                // a leaf can't outlive its CA: in the CA's last year a flat "one year" is refused
-                // and every handshake would fail
+
                 DateTimeOffset notAfter = DateTimeOffset.Now.AddYears(1);
                 DateTimeOffset rootEnd = new DateTimeOffset(root.NotAfter).AddMinutes(-1);
                 if (notAfter > rootEnd)
@@ -146,9 +131,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // the status texts on the Networking/Asset Warp pages evaluate this on every binding
-        // refresh - opening the user's root store each time is slow, so it's cached briefly (the
-        // store can change outside this process: certmgr, another PhasmaStrap process)
         private static bool? _trustStoreCached;
         private static DateTime _trustStoreCheckedUtc;
 
@@ -171,9 +153,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // installs the root CA into the CURRENT USER'S trust store only (not machine-wide,
-        // so it doesn't require administrator rights) - only call this from an explicit,
-        // clearly-labelled user action, never automatically
         public static bool InstallToTrustStore()
         {
             try
@@ -215,15 +194,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // --- Roblox's own trust bundle ---
-        //
-        // The Roblox client does NOT use the Windows certificate store: its networking is
-        // libcurl built against its own bundled root list at <version>\ssl\cacert.pem. So
-        // installing the CA into the user store (above) is only enough for PhasmaStrap's own
-        // HttpClient - every TLS handshake Roblox makes to an intercepted host still fails
-        // unless the CA is ALSO appended to that bundle. Without this, the proxy sees nothing
-        // but aborted handshakes and every spoof toggle silently does nothing.
-
         private const string BundleMarker = "# PhasmaStrap Local Proxy CA - added automatically, removed when the proxy is disabled";
 
         private static string? _rootPemCached;
@@ -248,8 +218,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // IsRobloxTrustBundlePatched is bound from status text getters; re-reading every ~200 KB
-        // bundle per binding refresh is wasteful, so results are cached per bundle by write time
         private static readonly Dictionary<string, (DateTime WriteTimeUtc, bool Patched)> BundleStateCache = new(StringComparer.OrdinalIgnoreCase);
 
         private static IEnumerable<string> FindTrustBundles()
@@ -275,8 +243,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // strips any earlier PhasmaStrap block (marker line + the certificate that follows it),
-        // so re-patching after a CA regeneration never leaves a stale cert behind
         private static string StripOwnBlock(string content)
         {
             int index;
@@ -403,10 +369,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // Whether the Roblox that's open now read a bundle with the CA in it: false when its bundle
-        // lacks the CA or was patched after that Roblox started (it reads the file once, at
-        // start); null when no Roblox is running. A patched file alone says nothing about a Roblox
-        // that was already open.
         public static bool? RunningRobloxTrustsProxy()
         {
             try
@@ -429,8 +391,6 @@ namespace PhasmaStrap.Networking
                     if (!File.ReadAllText(bundle).Replace("\r\n", "\n").Contains(pem, StringComparison.Ordinal))
                         return false;
 
-                    // the bundle can't be older than the patch that added the CA, so a write after
-                    // the start means this Roblox read it without
                     if (File.GetLastWriteTimeUtc(bundle) > started)
                         return false;
                 }

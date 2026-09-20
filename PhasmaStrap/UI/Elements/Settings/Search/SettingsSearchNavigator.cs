@@ -13,18 +13,14 @@ using PhasmaStrap.UI.Elements.Controls;
 
 namespace PhasmaStrap.UI.Elements.Settings.Search
 {
-    /// <summary>
-    /// Takes a search result and actually gets the user to it: navigates to the page, switches to
-    /// the right tab, waits for any embedded page frame to load, expands the group the option lives
-    /// in, scrolls it into view and flashes a highlight around it.
-    /// </summary>
     internal static class SettingsSearchNavigator
     {
         private const string LOG_IDENT = "SettingsSearchNavigator";
 
         public static void Reveal(INavigation navigation, Frame frame, SettingsSearchEntry entry)
         {
-            bool alreadyThere = frame.Content is FrameworkElement current && current.GetType() == entry.PageType;
+            Type host = SectionHosts.Resolve(entry.PageType);
+            bool alreadyThere = frame.Content is FrameworkElement current && current.GetType() == host;
 
             if (!alreadyThere)
             {
@@ -32,16 +28,47 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 handler = (_, _) =>
                 {
                     frame.Navigated -= handler;
-                    if (frame.Content is FrameworkElement page && page.GetType() == entry.PageType)
-                        RunWhenLoaded(page, () => RevealOnPage(page, entry));
+                    if (frame.Content is FrameworkElement page && page.GetType() == host)
+                        EnterSection(page, entry);
                 };
 
                 frame.Navigated += handler;
-                navigation.Navigate(entry.PageType);
+                navigation.Navigate(host);
                 return;
             }
 
-            RunWhenLoaded((FrameworkElement)frame.Content, () => RevealOnPage((FrameworkElement)frame.Content, entry));
+            EnterSection((FrameworkElement)frame.Content, entry);
+        }
+
+        private static void EnterSection(FrameworkElement hostPage, SettingsSearchEntry entry)
+        {
+            if (hostPage is not ISectionHostPage sectioned)
+            {
+                RunWhenLoaded(hostPage, () => RevealOnPage(hostPage, entry));
+                return;
+            }
+
+            sectioned.SectionHost.Show(entry.PageType);
+            RunWhenLoaded(hostPage, () => WaitForSection(hostPage, entry));
+        }
+
+        private static void WaitForSection(FrameworkElement hostPage, SettingsSearchEntry entry, int attempt = 0)
+        {
+            FrameworkElement? page = Descendants<FrameworkElement>(hostPage).FirstOrDefault(e => e.GetType() == entry.PageType);
+
+            if (page is null)
+            {
+                if (attempt < MaxAttempts)
+                {
+                    RetryLater(hostPage, () => WaitForSection(hostPage, entry, attempt + 1));
+                    return;
+                }
+
+                App.Logger.WriteLine(LOG_IDENT, $"Section {entry.PageType.Name} never appeared inside {hostPage.GetType().Name}");
+                return;
+            }
+
+            RunWhenLoaded(page, () => RevealOnPage(page, entry));
         }
 
         private static void RunWhenLoaded(FrameworkElement element, Action action)
@@ -61,8 +88,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             element.Loaded += handler;
         }
 
-        // a page that was just navigated to (or a tab that was just selected) may not have its
-        // visual tree built yet when the dispatcher gets to us - poll briefly rather than give up
         private const int MaxAttempts = 15;
 
         private static void RetryLater(FrameworkElement owner, Action action)
@@ -76,8 +101,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             timer.Start();
         }
 
-        // which tab to open on the page the sidebar navigates to: for an entry living inside an
-        // embedded page that's the host tab holding the frame; for a Tab entry it's the tab itself
         private static string TabOnHostPage(SettingsSearchEntry entry)
         {
             if (entry.NestedPageType is not null)
@@ -96,10 +119,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             {
                 string tabName = TabOnHostPage(entry);
 
-                // 1. tab - a TabItem's content is presented by the TabControl's content presenter,
-                //    not inside the TabItem's own visual tree, so after selecting it the search for
-                //    the control still runs from the page root (only the selected tab's content is
-                //    realised, so there's no risk of matching another tab's controls)
                 if (tabName.Length > 0)
                 {
                     TabItem? tab = Descendants<TabItem>(page).FirstOrDefault(t => HeaderText(t.Header) == tabName);
@@ -128,7 +147,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 
                         if (changed)
                         {
-                            // let the newly selected tab's content get templated/laid out first
                             page.Dispatcher.BeginInvoke(() => RevealAfterTab(page, entry), DispatcherPriority.Loaded);
                             return;
                         }
@@ -155,7 +173,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
         {
             try
             {
-                // 2. embedded page frame
                 if (entry.NestedPageType is not null)
                 {
                     Frame? nested = Descendants<Frame>(page).FirstOrDefault();
@@ -192,7 +209,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             }
         }
 
-        // 3. inside an embedded page: open its own tab (if the entry sits on one), then find the control
         private static void RevealInNestedPage(FrameworkElement nestedPage, SettingsSearchEntry entry, int attempt = 0)
         {
             try
@@ -257,9 +273,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 
             ExpandAncestors(target);
 
-            // expanding runs an animation and the expander's content only gets measured on a later
-            // layout pass - scrolling straight away would aim at the still-collapsed position, so
-            // scroll on a Background-priority pass, then once more after that layout settles
             target.Dispatcher.BeginInvoke(() =>
             {
                 target.UpdateLayout();
@@ -273,8 +286,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             }, DispatcherPriority.Background);
         }
 
-        // centres the target in the nearest scrollable ancestor rather than BringIntoView's
-        // "just barely visible at the bottom edge"
         private static void ScrollTo(FrameworkElement target)
         {
             ScrollViewer? viewer = null;
@@ -318,7 +329,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                     return (FrameworkElement?)Descendants<OptionControl>(scope).FirstOrDefault(o => (o.Header ?? "") == entry.Header)
                         ?? (FrameworkElement?)Descendants<ToggleSwitch>(scope).FirstOrDefault(t => HeaderText(t.Content) == entry.Header)
                         ?? (FrameworkElement?)Descendants<CheckBox>(scope).FirstOrDefault(c => HeaderText(c.Content) == entry.Header)
-                        // rows built from data templates (hotkey bindings, lists) - land on the row's title text
+
                         ?? Descendants<TextBlock>(scope).FirstOrDefault(t => !IsIcon(t) && t.Text == entry.Header);
 
                 case SettingsSearchEntryKind.Group:
@@ -368,7 +379,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             return parent ?? LogicalTreeHelper.GetParent(element);
         }
 
-        /// <summary>Text of a Header/Content object: a string, or the first TextBlock inside an element.</summary>
         internal static string HeaderText(object? header)
         {
             switch (header)
@@ -380,16 +390,13 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 case TextBlock tb when !IsIcon(tb):
                     return tb.Text ?? "";
                 case DependencyObject d:
-                    // wpfui's SymbolIcon/FontIcon derive from TextBlock - skip them or a tab header
-                    // like [icon][Text] would resolve to the icon's glyph
+
                     return Descendants<TextBlock>(d).FirstOrDefault(t => !IsIcon(t) && !string.IsNullOrWhiteSpace(t.Text))?.Text ?? header.ToString() ?? "";
                 default:
                     return header.ToString() ?? "";
             }
         }
 
-        // wpfui's SymbolIcon/FontIcon render their glyph through a TextBlock inside their template -
-        // a TextBlock whose (near) ancestor is one of those is the icon glyph, not real text
         private static bool IsIcon(TextBlock tb)
         {
             DependencyObject? current = tb;
@@ -416,13 +423,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 if (!ReferenceEquals(node, root) && node is T match)
                     yield return match;
 
-                // visual children first (this is what's actually on screen)...
                 int visualChildren = node is Visual or System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetChildrenCount(node) : 0;
                 for (int i = visualChildren - 1; i >= 0; i--)
                     stack.Push(VisualTreeHelper.GetChild(node, i));
 
-                // ...then logical children not yet realised as visuals (unselected TabItems' content,
-                // collapsed expanders' InnerContent)
                 if (visualChildren == 0)
                 {
                     foreach (object child in LogicalTreeHelper.GetChildren(node))
@@ -433,8 +437,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 }
             }
         }
-
-        // --- highlight ---
 
         private static void Highlight(FrameworkElement target)
         {

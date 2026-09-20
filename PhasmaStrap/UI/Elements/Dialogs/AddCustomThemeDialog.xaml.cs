@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.UI.Elements.Base;
+using PhasmaStrap.UI.Elements.Base;
 using PhasmaStrap.UI.ViewModels.Dialogs;
 using Microsoft.Win32;
 using System.IO.Compression;
@@ -6,9 +6,6 @@ using System.Windows;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Interaction logic for AddCustomThemeDialog.xaml
-    /// </summary>
     public partial class AddCustomThemeDialog : WpfUiWindow
     {
         private const int CreateNewTabId = 0;
@@ -42,9 +39,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             int i = count + 1;
             string name = string.Format(Strings.CustomTheme_DefaultName, i);
 
-            // TODO: this sucks
             if (File.Exists(GetThemePath(name)))
-                name = string.Format(Strings.CustomTheme_DefaultName, $"{i}-{Random.Shared.Next(1, 100000)}"); // easy
+                name = string.Format(Strings.CustomTheme_DefaultName, $"{i}-{Random.Shared.Next(1, 100000)}");
 
             return name;
         }
@@ -63,7 +59,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                     return newName;
             }
 
-            // last resort
             return $"{name}_{Random.Shared.Next(maxTries+1, 1_000_000)}";
         }
 
@@ -115,13 +110,12 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 return false;
             }
 
-            // better to check for the file instead of the directory so broken themes can be overwritten
             string path = Path.Combine(Paths.CustomThemes, _viewModel.Name, "Theme.xml");
             if (File.Exists(path))
             {
                 _viewModel.NameError = Strings.CustomTheme_Add_Errors_NameTaken;
                 return false;
-            }    
+            }
 
             return true;
         }

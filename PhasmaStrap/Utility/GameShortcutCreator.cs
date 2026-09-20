@@ -1,25 +1,21 @@
 using System.Drawing;
-using System.Runtime.InteropServices;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 
 using PhasmaStrap.Models.Entities;
 
 namespace PhasmaStrap.Utility
 {
-    // Creates a desktop shortcut that deep-links straight into one specific game, using that
-    // game's own live icon rather than PhasmaStrap's icon - distinct from the generic app/player/
-    // studio shortcuts on ShortcutsPage, which all point at the bootstrapper itself. Icon files are
-    // cached under Paths.Base by place ID so re-creating the same game's shortcut doesn't re-download.
     internal static class GameShortcutCreator
     {
         private const string LOG_IDENT = "GameShortcutCreator";
 
         private static readonly Regex PlaceIdInUrl = new(@"roblox\.com/(?:[a-z-]+/)?games/(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        [DllImport("user32.dll")]
-        private static extern bool DestroyIcon(IntPtr hIcon);
+        private static readonly int[] IconSizes = { 16, 24, 32, 48, 64, 128, 256 };
 
-        private static string IconCacheFolder => Path.Combine(Paths.Base, "GameShortcutIcons");
+        public static string IconCacheFolder => Path.Combine(Paths.Base, "GameShortcutIcons");
 
         public sealed record Result(bool Success, string Message);
 
@@ -83,7 +79,7 @@ namespace PhasmaStrap.Utility
             Directory.CreateDirectory(IconCacheFolder);
             string icoPath = Path.Combine(IconCacheFolder, $"{placeId}.ico");
 
-            if (File.Exists(icoPath))
+            if (File.Exists(icoPath) && CountsAllSizes(icoPath))
                 return icoPath;
 
             using HttpResponseMessage response = await App.HttpClient.GetAsync(imageUrl);
@@ -93,19 +89,77 @@ namespace PhasmaStrap.Utility
             using var pngStream = new MemoryStream(pngBytes);
             using var bitmap = new Bitmap(pngStream);
 
-            IntPtr hIcon = bitmap.GetHicon();
-            try
-            {
-                using Icon icon = Icon.FromHandle(hIcon);
-                using var fileStream = new FileStream(icoPath, FileMode.Create, FileAccess.Write);
-                icon.Save(fileStream);
-            }
-            finally
-            {
-                DestroyIcon(hIcon);
-            }
+            WriteIcon(bitmap, icoPath);
 
             return icoPath;
+        }
+
+        private static bool CountsAllSizes(string icoPath)
+        {
+            try
+            {
+                byte[] header = new byte[6];
+
+                using var stream = File.OpenRead(icoPath);
+
+                if (stream.Read(header, 0, header.Length) != header.Length)
+                    return false;
+
+                return BitConverter.ToUInt16(header, 4) >= IconSizes.Length;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void WriteIcon(Bitmap source, string icoPath)
+        {
+            var frames = new List<(int Size, byte[] Png)>(IconSizes.Length);
+
+            foreach (int size in IconSizes)
+            {
+                using var scaled = new Bitmap(size, size, PixelFormat.Format32bppArgb);
+
+                using (var graphics = Graphics.FromImage(scaled))
+                {
+                    graphics.CompositingQuality = CompositingQuality.HighQuality;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    graphics.SmoothingMode = SmoothingMode.HighQuality;
+                    graphics.DrawImage(source, new Rectangle(0, 0, size, size));
+                }
+
+                using var buffer = new MemoryStream();
+                scaled.Save(buffer, ImageFormat.Png);
+                frames.Add((size, buffer.ToArray()));
+            }
+
+            using var fileStream = new FileStream(icoPath, FileMode.Create, FileAccess.Write);
+            using var writer = new BinaryWriter(fileStream);
+
+            writer.Write((short)0);
+            writer.Write((short)1);
+            writer.Write((short)frames.Count);
+
+            int offset = 6 + (16 * frames.Count);
+
+            foreach ((int size, byte[] png) in frames)
+            {
+                writer.Write((byte)(size >= 256 ? 0 : size));
+                writer.Write((byte)(size >= 256 ? 0 : size));
+                writer.Write((byte)0);
+                writer.Write((byte)0);
+                writer.Write((short)1);
+                writer.Write((short)32);
+                writer.Write(png.Length);
+                writer.Write(offset);
+
+                offset += png.Length;
+            }
+
+            foreach ((_, byte[] png) in frames)
+                writer.Write(png);
         }
     }
 }

@@ -15,15 +15,6 @@ namespace PhasmaStrap.Utility
         public string ChangeType { get; init; } = "";
     }
 
-    // Named, on-disk snapshots of App.FastFlags.Prop (the full applied flag set), used for two
-    // things: a "live A/B toggle" (Apply swaps the ENTIRE current flag set for a saved one, so
-    // flipping between two snapshots is a clean compare, never a merge), and a diff viewer
-    // (Diff between any two snapshots, or between a snapshot and the live current set).
-    //
-    // Deliberately not "your flags vs Roblox's real defaults" - PhasmaStrap's FastFlags.json only
-    // ever stores explicit overrides to begin with (there's no bundled/fetched copy of Roblox's
-    // actual default values to diff against), so a snapshot-to-snapshot diff is the honest,
-    // actually-buildable version of this feature.
     public static class FastFlagSnapshotManager
     {
         private static string SnapshotDir => Path.Combine(Paths.Base, "FastFlagSnapshots");
@@ -75,9 +66,6 @@ namespace PhasmaStrap.Utility
                 File.Delete(path);
         }
 
-        // Replaces the entire current flag set with the snapshot's - clears any key not present
-        // in the snapshot too, so applying A then B always leaves you with exactly B, never a
-        // merge of whatever you'd hand-tweaked in between.
         public static void Apply(FastFlagSnapshot snapshot)
         {
             foreach (string existingKey in App.FastFlags.Prop.Keys.ToList())

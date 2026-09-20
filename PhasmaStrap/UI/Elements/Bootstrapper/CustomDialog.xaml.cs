@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.UI.Elements.Bootstrapper.Base;
+using PhasmaStrap.UI.Elements.Bootstrapper.Base;
 using PhasmaStrap.UI.ViewModels.Bootstrapper;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -6,9 +6,6 @@ using System.Windows.Shell;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
-    /// <summary>
-    /// Interaction logic for CustomDialog.xaml
-    /// </summary>
     public partial class CustomDialog : IBootstrapperDialog
     {
         private readonly BootstrapperDialogViewModel _viewModel;

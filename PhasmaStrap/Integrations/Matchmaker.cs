@@ -5,13 +5,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
-    // picks a better server to join than Roblox's own random assignment, by geolocating
-    // yourself and a batch of candidate public servers (learning real observed ping over
-    // time) and scoring them on estimated latency plus population. This is what actually
-    // reads your live Roblox session cookie (via RobloxCookie) and probes Roblox's real
-    // join-game-instance API - see PhasmaStrap.Integrations.RobloxCookie for why, and
-    // Models/Persistable/Settings.cs for the knobs that bound how aggressive it is.
-    // Ported from Voidstrap.
     public static class Matchmaker
     {
         private const string LOG_IDENT = "Matchmaker";
@@ -382,9 +375,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // The same search PickBestCoreAsync does, but handing back EVERY server it could place on
-        // the map (nearest first) instead of choosing one - for the join-time server picker, where
-        // the choosing is the player's. Blocked datacenters are left out; nothing else is filtered.
         public static async Task<List<MatchmakerCandidate>> ListCandidatesAsync(long placeId, int maxCandidates, CancellationToken token)
         {
             string? cookie = RobloxCookie.Get();
@@ -761,8 +751,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // whether join-instance requests should use Roblox's newer v2 gamejoin endpoint instead of the
-        // long-stable v1 one - user-selectable via Settings.MatchmakerGamejoinApiVersion (Matchmaker tab)
         private static bool UseV2GamejoinApi() => App.Settings.Prop.MatchmakerGamejoinApiVersion >= 2;
 
         private static HttpRequestMessage BuildJoinRequest(long placeId, string jobId, string cookie, string? csrf)

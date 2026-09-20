@@ -9,13 +9,13 @@ namespace PhasmaStrap.Utility
 {
     public sealed class PerformanceSample
     {
-        public double Second { get; set; }              // seconds into the measurement
-        public double GameCpuPercent { get; set; }      // of the whole CPU (all cores = 100)
+        public double Second { get; set; }
+        public double GameCpuPercent { get; set; }
         public double GameMemoryMb { get; set; }
         public double PageFaultsPerSecond { get; set; }
         public double FreeMemoryMb { get; set; }
-        public string BusiestOther { get; set; } = "";  // the other process using most CPU that second
-        public double BusiestOtherPercent { get; set; } // of ONE core
+        public string BusiestOther { get; set; } = "";
+        public double BusiestOtherPercent { get; set; }
     }
 
     public sealed class Stutter
@@ -31,38 +31,27 @@ namespace PhasmaStrap.Utility
         public string Label { get; set; } = "";
         public string Game { get; set; } = "";
         public long PlaceId { get; set; }
-        public string Experiment { get; set; } = "";    // auto-tuner: which experiment / variant this run belongs to
+        public string Experiment { get; set; } = "";
         public string Variant { get; set; } = "";
 
-        public double Seconds { get; set; }             // time actually measured (game in front)
+        public double Seconds { get; set; }
         public int Frames { get; set; }
         public double AverageFps { get; set; }
         public double MedianFrameMs { get; set; }
-        public double Low1Fps { get; set; }             // average of the slowest 1 % of frames, as fps
+        public double Low1Fps { get; set; }
         public double Low01Fps { get; set; }
         public double WorstFrameMs { get; set; }
         public double StuttersPerMinute { get; set; }
-        public int CapFps { get; set; }                 // 0 = no frame cap recognised
+        public int CapFps { get; set; }
 
         public List<Stutter> Stutters { get; set; } = new();
-        public List<double> WorstPerSlice { get; set; } = new();   // worst frame time per 250 ms, for the graph
+        public List<double> WorstPerSlice { get; set; } = new();
         public List<double> FpsPerSecond { get; set; } = new();
         public List<PerformanceSample> Samples { get; set; } = new();
         public List<string> Findings { get; set; } = new();
         public string Verdict { get; set; } = "";
     }
 
-    // Measures how smoothly the game is running, without admin rights and without touching the
-    // game: Windows' desktop duplication reports when each new frame reached the screen and how
-    // many were presented since the last look, so with the game as the window in front those ARE
-    // the game's frame times. Nothing is copied - a frame is acquired and released straight away.
-    //
-    // Next to it, once a second: the game's CPU use, memory and page faults, free system memory
-    // and which other process is busiest. The analysis lines stutters up against those to say
-    // what was going on when the game hitched - and says so plainly when nothing on the PC's
-    // side explains it.
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public sealed class FrameTimeProbe
     {
         public static Action<string>? Log;
@@ -76,11 +65,8 @@ namespace PhasmaStrap.Utility
             _processName = processName;
         }
 
-        /// <summary>0..1 while measuring.</summary>
         public double Progress { get; private set; }
 
-        // Blocks for about `seconds` of in-front game time (gives up after three times that).
-        // Returns null when the game was never in front or duplication is unavailable.
         public PerformanceReport? Measure(int seconds, CancellationToken token)
         {
             var frameTimes = new List<(double At, double Ms)>(seconds * 250);
@@ -95,14 +81,12 @@ namespace PhasmaStrap.Utility
             try
             {
                 var wall = Stopwatch.StartNew();
-                double measured = 0;            // seconds with the game in front
+                double measured = 0;
                 long lastPresent = 0;
                 double lastTick = 0;
                 IntPtr hwnd = IntPtr.Zero;
                 double hwndChecked = -10;
 
-                // The once-a-second look at every process takes tens of milliseconds - on its own
-                // thread, so that it cannot make this loop miss frames.
                 double sharedMeasured = 0;
                 bool inFront = false, sampling = true;
                 var samplerThread = new Thread(() =>
@@ -133,14 +117,12 @@ namespace PhasmaStrap.Utility
 
                 try
                 {
-
                 while (measured < seconds && wall.Elapsed.TotalSeconds < seconds * 3 + 20)
                 {
                     token.ThrowIfCancellationRequested();
                     Progress = Math.Min(1, measured / seconds);
                     Volatile.Write(ref sharedMeasured, measured);
 
-                    // looking the window up means listing processes - far too slow for every frame
                     if (hwnd == IntPtr.Zero || !IsWindow(hwnd) || wall.Elapsed.TotalSeconds - hwndChecked > 3)
                     {
                         hwnd = FindWindow(_processName);
@@ -152,7 +134,6 @@ namespace PhasmaStrap.Utility
 
                     if (!front)
                     {
-                        // not in front: what is on screen is not the game - time stands still
                         lastPresent = 0;
                         lastTick = 0;
                         Thread.Sleep(150);
@@ -189,7 +170,6 @@ namespace PhasmaStrap.Utility
                         {
                             if (lastPresent != 0 && info.AccumulatedFrames > 0)
                             {
-                                // QPC ticks; when several frames went by between two looks, the gap is theirs together
                                 double ms = (info.LastPresentTime - lastPresent) * 1000.0 / Stopwatch.Frequency / info.AccumulatedFrames;
                                 if (ms > 0 && ms < 5000)
                                 {
@@ -203,8 +183,6 @@ namespace PhasmaStrap.Utility
                     }
                     catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.WaitTimeout)
                     {
-                        // nothing new on screen for 100 ms - that IS a (very long) frame, and it is
-                        // picked up by the next present's timestamp
                         double now = wall.Elapsed.TotalSeconds;
                         if (lastTick > 0)
                             measured += Math.Min(0.25, now - lastTick);
@@ -224,7 +202,6 @@ namespace PhasmaStrap.Utility
                             try { duplication?.ReleaseFrame(); } catch { }
                         }
                     }
-
                 }
                 }
                 finally
@@ -290,8 +267,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ analysis
-
         public static PerformanceReport Analyse(List<(double At, double Ms)> frames, List<PerformanceSample> samples)
         {
             var report = new PerformanceReport { Id = Guid.NewGuid().ToString("N"), WhenLocal = DateTime.Now, Samples = samples };
@@ -308,7 +283,6 @@ namespace PhasmaStrap.Utility
             report.Low1Fps = 1000.0 / sorted.Skip((int)(sorted.Count * 0.99)).DefaultIfEmpty(sorted[^1]).Average();
             report.Low01Fps = 1000.0 / sorted.Skip((int)(sorted.Count * 0.999)).DefaultIfEmpty(sorted[^1]).Average();
 
-            // a stutter: a frame that took far longer than its neighbours (not just "a slow game")
             var window = new Queue<double>();
             double windowSum = 0;
 
@@ -319,7 +293,6 @@ namespace PhasmaStrap.Utility
 
                 if (ms > usual * 2.5 && ms > usual + 12)
                 {
-                    // frames that come from one long gap (AccumulatedFrames > 1) are one stutter
                     if (report.Stutters.Count == 0 || frames[i].At - report.Stutters[^1].Second > 0.05)
                         report.Stutters.Add(new Stutter { Second = frames[i].At, Milliseconds = ms });
                 }
@@ -363,8 +336,6 @@ namespace PhasmaStrap.Utility
             List<PerformanceSample> samples = report.Samples;
             List<Stutter> stutters = report.Stutters;
 
-            // how big the hitches are matters as much as how many: 20 ms once in a while at 190 fps
-            // is a blip, 80 ms is a jolt
             double typicalStutter = stutters.Count > 0 ? stutters.Select(s => s.Milliseconds).OrderBy(ms => ms).ElementAt(stutters.Count / 2) : 0;
 
             report.Verdict = report.StuttersPerMinute < 1 && report.Low1Fps > report.AverageFps * 0.6
@@ -381,7 +352,6 @@ namespace PhasmaStrap.Utility
             if (samples.Count == 0)
                 return;
 
-            // which seconds had a stutter
             var bad = new HashSet<int>(stutters.Select(s => (int)s.Second));
             List<PerformanceSample> during = samples.Where(s => bad.Contains((int)s.Second) || bad.Contains((int)s.Second - 1)).ToList();
             List<PerformanceSample> calm = samples.Except(during).ToList();
@@ -396,7 +366,6 @@ namespace PhasmaStrap.Utility
                 if (faultsDuring > 4000 && faultsDuring > faultsCalm * 3)
                     findings.Add($"In the seconds with stutters the game took {faultsDuring:0} page faults a second, against {faultsCalm:0} otherwise. It was pulling data in (new assets streaming in, or memory that had been paged out) right when it hitched - typical while an area loads, and much worse when memory is short or the game sits on a hard disk.");
 
-                // another program that is busy exactly when the game hitches
                 foreach (var group in during.Where(s => s.BusiestOther.Length > 0 && s.BusiestOtherPercent >= 25).GroupBy(s => s.BusiestOther).OrderByDescending(g => g.Count()))
                 {
                     double shareDuring = group.Count() / (double)during.Count;
@@ -414,7 +383,6 @@ namespace PhasmaStrap.Utility
             if (cpu > 85)
                 findings.Add($"Roblox used {cpu:0} % of the whole processor on average - the CPU is the limit here, and anything else that runs takes frames away.");
 
-            // regular as clockwork = a timer somewhere, not the game
             if (stutters.Count >= 6)
             {
                 List<double> gaps = stutters.Zip(stutters.Skip(1), (a, b) => b.Second - a.Second).ToList();
@@ -431,8 +399,6 @@ namespace PhasmaStrap.Utility
             if (findings.Count == (report.CapFps > 0 ? 1 : 0) && stutters.Count > 0)
                 findings.Add("Nothing on the PC's side lines up with the stutters: memory was free, no other program was busy at those moments and the processor had room. What is left is the game itself - scripts doing heavy work in one frame, or new parts of the map loading in.");
         }
-
-        // ------------------------------------------------------------------ once-a-second sampling
 
         private sealed class Sampler
         {
@@ -465,7 +431,6 @@ namespace PhasmaStrap.Utility
                     }
                     catch
                     {
-                        // protected / exited processes
                     }
                 }
 

@@ -4,12 +4,6 @@ using PhasmaStrap.Resources;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Simplified single-entry version of Voidstrap's AddNvidiaFFlagWindow "Single" tab - lets
-    // the user add one arbitrary NVIDIA driver profile setting beyond NvidiaPage's curated
-    // toggles. PhasmaStrap's NVAPI wrapper (NvApi.cs) only ever writes Dword values (see
-    // NvApi.SetDwordSetting) - same as Voidstrap's underlying plumbing actually does despite its
-    // model exposing Boolean/Hex/String/Binary "types" - so unlike AddNvidiaFFlagWindow there's
-    // no value-type picker or NIP import tabs here, just a name, a setting ID, and a value.
     public partial class AddNvidiaCustomSettingDialog
     {
         private readonly Func<uint, bool> _isIdTaken;

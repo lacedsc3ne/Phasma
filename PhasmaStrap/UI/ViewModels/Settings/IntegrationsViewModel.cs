@@ -24,10 +24,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand DeleteRPCTemplateCommand => new RelayCommand(DeleteRPCTemplate);
 
-        // opens the Custom RPC template editor (list/detail editor for per-game Discord presence
-        // templates) - moved out of the inline tab into its own window to match Voidstrap's "Custom
-        // RPC" card + View button layout, without losing the multi-template editing this already had.
-        // also on the Shortcuts page (Studio companion) - the same setting
         public bool StudioRichPresenceEnabled
         {
             get => App.Settings.Prop.StudioRichPresenceEnabled;
@@ -47,7 +43,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // also on the Game chat page - the same setting
         public bool RpcAutoTranslate
         {
             get => App.Settings.Prop.RpcAutoTranslate;
@@ -56,15 +51,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand OpenCustomRPCCommand => new RelayCommand(() => new RPCTemplatesWindow(this).Show());
 
-        // opens the standalone Roblox account switcher (Integrations > Roblox tab) - see
-        // AccountSwitcherViewModel.cs for how switching an account actually works end to end
         public ICommand AccountWindowCommand => new RelayCommand(() => new AccountSwitcherWindow().Show());
 
-        // Settings is always its own separate process from an active Roblox launch (see LaunchHandler.cs/
-        // Watcher.cs - DiscordRichPresence only exists on a live Watcher instance, which Settings never
-        // has access to), so there's no way to show this tab's preview card from a real, currently-active
-        // presence. Instead it cycles through the user's own real play history (same PlayTimeStore data
-        // Home's "Continue Playing" uses) - a real game, with its real icon, just not a live session.
         private readonly List<PlayTimeEntry> _previewEntries = PlayTimeStore.GetAll()
             .OrderByDescending(x => x.LastPlayed)
             .Take(5)
@@ -224,8 +212,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int SelectedCustomIntegrationIndex { get; set; }
         public bool IsCustomIntegrationSelected => SelectedCustomIntegration is not null;
 
-        // user-authored Discord Rich Presence templates (per-game), ported/scoped-down from Voidstrap's
-        // RPCCustomizer feature - see Models/RPCTemplate.cs and Integrations/DiscordRichPresence.cs
         public ObservableCollection<RPCTemplate> RPCTemplates
         {
             get => App.Settings.Prop.RPCTemplates;

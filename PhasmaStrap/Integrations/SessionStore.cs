@@ -8,7 +8,6 @@ namespace PhasmaStrap.Integrations
         public string Name { get; set; } = "";
     }
 
-    // one stay on one server
     public sealed class ServerVisit
     {
         public long PlaceId { get; set; }
@@ -22,18 +21,14 @@ namespace PhasmaStrap.Integrations
         public DateTime JoinedUtc { get; set; }
         public DateTime LeftUtc { get; set; }
 
-        // one reading every SessionStore.FpsSampleSeconds while in the server; 0 = no reading
-        // (nothing was measuring: neither the overlay HUD nor Instant Replay was running)
         public List<int> Fps { get; set; } = new();
 
-        // friends seen on this same server (only collected when that is switched on)
         public List<SessionFriend> Friends { get; set; } = new();
 
         [System.Text.Json.Serialization.JsonIgnore]
         public TimeSpan Length => LeftUtc > JoinedUtc ? LeftUtc - JoinedUtc : TimeSpan.Zero;
     }
 
-    // one run of Roblox, from launch to close
     public sealed class SessionRecord
     {
         public string Id { get; set; } = "";
@@ -48,16 +43,6 @@ namespace PhasmaStrap.Integrations
         public List<SessionRecord> Sessions { get; set; } = new();
     }
 
-    // The history behind the Activity page: every Roblox session, every server joined in it, with
-    // what is needed for the timeline (region, FPS readings, which captures fall inside it), the
-    // playtime charts (PlayTimeStore only keeps a running total per game, which cannot answer
-    // "how much did I play last week") and "played with".
-    //
-    // Written by the Watcher process, read by the settings window. Several Watchers can be alive
-    // at once (multi-instance), so a save never writes "what I have in memory": under a named
-    // mutex it re-reads the file, swaps in its own session and writes that back.
-    //
-    // Purely local. The file path is a parameter, so it can be exercised from a console harness.
     public sealed class SessionStore
     {
         public static Action<string>? Log;
@@ -78,11 +63,8 @@ namespace PhasmaStrap.Integrations
         public static SessionStore Shared => _shared ??= new SessionStore(Path.Combine(Paths.PlayTime, "Sessions.json"));
         private static SessionStore? _shared;
 
-        // ------------------------------------------------------------------ reading
-
         public SessionData Load() => TryLoad(out SessionData data) ? data : new SessionData();
 
-        // false = there is a file, but it cannot be read
         private bool TryLoad(out SessionData result)
         {
             result = new SessionData();
@@ -111,9 +93,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // ------------------------------------------------------------------ writing
-
-        // merges `session` into the file (replacing the stored copy with the same Id)
         public void Save(SessionRecord session)
         {
             if (string.IsNullOrEmpty(session.Id))
@@ -133,14 +112,12 @@ namespace PhasmaStrap.Integrations
                     return;
                 }
 
-                // an unreadable history is set aside, never silently written over
                 if (!TryLoad(out SessionData data))
                 {
                     string aside = _path + $".unreadable-{DateTime.Now:yyyyMMdd_HHmmss}";
                     try { File.Move(_path, aside, true); Log?.Invoke($"Kept the unreadable history as {aside}"); } catch { }
                 }
 
-                // a session that never reached a server is not worth a line in the history
                 data.Sessions.RemoveAll(s => s.Id == session.Id);
                 if (session.Visits.Count > 0)
                     data.Sessions.Add(session);
@@ -176,7 +153,6 @@ namespace PhasmaStrap.Integrations
         }
     }
 
-    // Everything the Activity page shows, worked out from the stored sessions. Pure functions.
     public static class SessionStats
     {
         public sealed class GameTotal
@@ -190,7 +166,7 @@ namespace PhasmaStrap.Integrations
 
         public sealed class Bucket
         {
-            public DateTime Start;      // local time, start of the day / week
+            public DateTime Start;
             public double Minutes;
         }
 
@@ -241,14 +217,12 @@ namespace PhasmaStrap.Integrations
             return end > start ? end - start : TimeSpan.Zero;
         }
 
-        // `count` consecutive days ending today (local time); a visit over midnight is split
         public static List<Bucket> PerDay(SessionData data, int count, DateTime nowLocal)
         {
             DateTime first = nowLocal.Date.AddDays(-(count - 1));
             return Buckets(data, first, count, TimeSpan.FromDays(1));
         }
 
-        // `count` consecutive weeks (Monday to Sunday) ending with this one
         public static List<Bucket> PerWeek(SessionData data, int count, DateTime nowLocal)
         {
             int sinceMonday = ((int)nowLocal.DayOfWeek + 6) % 7;
@@ -270,7 +244,6 @@ namespace PhasmaStrap.Integrations
             return buckets;
         }
 
-        // days in a row with any play, counting back from today (or from yesterday if today is still empty)
         public static int Streak(SessionData data, DateTime nowLocal)
         {
             List<Bucket> days = PerDay(data, 400, nowLocal);
@@ -293,7 +266,6 @@ namespace PhasmaStrap.Integrations
         {
             var result = new Dictionary<long, Companion>();
 
-            // a visit whose name lookup failed borrows the name from another visit to the same game
             Dictionary<string, string> names = Visits(data)
                 .Where(v => v.GameName.Length > 0)
                 .GroupBy(KeyOf)
@@ -320,14 +292,12 @@ namespace PhasmaStrap.Integrations
             return result.Values.OrderByDescending(c => c.LastSeenUtc).ToList();
         }
 
-        // average / lowest of the readings that exist; null when nothing measured the visit
         public static (int Average, int Low)? FpsSummary(ServerVisit visit)
         {
             List<int> readings = visit.Fps.Where(f => f > 0).ToList();
             if (readings.Count == 0)
                 return null;
 
-            // "low" as the 5th percentile: one hitch while a menu opened should not define the visit
             List<int> sorted = readings.OrderBy(f => f).ToList();
             int low = sorted[Math.Min(sorted.Count - 1, (int)(sorted.Count * 0.05))];
             return ((int)Math.Round(readings.Average()), low);

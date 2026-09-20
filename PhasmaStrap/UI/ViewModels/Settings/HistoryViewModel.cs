@@ -44,7 +44,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 : $"{Entries.Count} game(s) tracked.";
         }
 
-        // names the places of games that show up more than once, then shows the list again
         private async Task FillPlaceNamesAsync()
         {
             if (await PhasmaStrap.Utility.PlaceNames.FillAsync(Entries.ToList()))

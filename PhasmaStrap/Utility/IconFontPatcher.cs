@@ -6,25 +6,8 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility
 {
-    // Replaces one named glyph of a TrueType icon font with a shape traced from a picture.
-    //
-    // Why this exists: Roblox's in-game top bar no longer draws its logo from an image. Every
-    // icon there is a glyph of the "Builder Icons" font that ships with the client
-    // (BuilderIcons-Regular.ttf / -Filled.ttf), and the round menu button is the glyph named
-    // "tilt". Putting another mark on that button therefore means changing that glyph's outline
-    // inside the font. The font gains icons with Roblox updates, so a pre-made replacement font
-    // would go stale and break newer icons - the glyph is swapped in whatever font the version
-    // being launched ships, found by its name in the 'post' table.
-    //
-    // Scope is deliberately narrow: TrueType outlines ('glyf'), glyph names from 'post' format
-    // 2.0, which is what the Builder Icons fonts are. Anything else is left untouched (the caller
-    // gets null) rather than guessed at.
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public static class IconFontPatcher
     {
-        // ------------------------------------------------------------------ tracing
-
         public sealed class ColorLayer
         {
             public List<List<PointF>> Contours = new();
@@ -33,9 +16,6 @@ namespace PhasmaStrap.Utility
 
         private const int WorkingSize = 512;
 
-        // The picture enlarged to the working resolution, as ARGB ints. Tracing on an enlarged
-        // copy turns the source's pixel staircase into sub-pixel edge positions, which the
-        // simplifier then keeps as clean diagonals.
         private static int[] Rasterize(Bitmap image, out int w, out int h)
         {
             w = h = WorkingSize;
@@ -76,20 +56,12 @@ namespace PhasmaStrap.Utility
         private static double Luminance(int argb) =>
             0.2126 * ((argb >> 16) & 0xFF) + 0.7152 * ((argb >> 8) & 0xFF) + 0.0722 * (argb & 0xFF);
 
-        // Closed outlines of everything in `image` that is more opaque than not, in image pixel
-        // coordinates (y down). Outer edges run clockwise on screen, holes the other way round.
         public static List<List<PointF>> Trace(Bitmap image, double tolerance = 1.1)
         {
             int[] pixels = Rasterize(image, out int w, out int h);
             return TraceMask(pixels.Select(IsOpaque).ToArray(), w, h, (double)image.Width / w, (double)image.Height / h, tolerance);
         }
 
-        // The picture as a stack of flat-colour shapes, bottom first - what a COLR/CPAL colour font
-        // can hold (solid fills only, no gradients). The mark is two families of colour: the greys
-        // of the hood and the reds of the triangle and eyes. Each family is cut into brightness
-        // bands, and every band is traced CUMULATIVELY ("this bright or brighter"), each painted over
-        // the darker one below. Nested shapes can't leave hairline gaps between bands the way
-        // side-by-side ones would, and the whole silhouette in the darkest tone sits underneath.
         public static List<ColorLayer> TraceColorLayers(Bitmap image, int greyBands = 4, int redBands = 2, double tolerance = 1.1)
         {
             int[] pixels = Rasterize(image, out int w, out int h);
@@ -108,7 +80,6 @@ namespace PhasmaStrap.Utility
                     double from = values[(int)((long)values.Length * band / bands)];
                     double to = band + 1 < bands ? values[(int)((long)values.Length * (band + 1) / bands)] : double.MaxValue;
 
-                    // the band's own colour: the average of the pixels that fall in it
                     long r = 0, g = 0, b = 0, n = 0;
                     foreach (int p in pixels)
                     {
@@ -145,8 +116,6 @@ namespace PhasmaStrap.Utility
         {
             bool At(int x, int y) => x >= 0 && y >= 0 && x < w && y < h && filled[y * w + x];
 
-            // one directed edge per filled-pixel side that faces an empty pixel, oriented so the
-            // filled pixel is on the right: chained together these are the closed boundaries
             var edges = new Dictionary<(int, int), List<(int X, int Y)>>();
             void AddEdge(int x1, int y1, int x2, int y2)
             {
@@ -197,7 +166,6 @@ namespace PhasmaStrap.Utility
                 if (loop.Count < 8)
                     continue;
 
-                // specks (stray anti-aliasing) are not worth a contour
                 if (Math.Abs(SignedArea(loop)) < 6 * scaleX * scaleY * 4)
                     continue;
 
@@ -220,8 +188,6 @@ namespace PhasmaStrap.Utility
             return area / 2;
         }
 
-        // Douglas-Peucker on a closed polygon: split it at its two most distant points, simplify
-        // both halves
         private static List<PointF> Simplify(List<PointF> points, double tolerance)
         {
             int far = 0;
@@ -239,7 +205,6 @@ namespace PhasmaStrap.Utility
             return result;
         }
 
-        // appends points[from .. to) - the end point belongs to the next range
         private static void SimplifyRange(List<PointF> points, int from, int to, double tolerance, List<PointF> output)
         {
             var keep = new bool[points.Count];
@@ -286,29 +251,19 @@ namespace PhasmaStrap.Utility
             return Distance(p, new PointF((float)(a.X + t * dx), (float)(a.Y + t * dy)));
         }
 
-        // ------------------------------------------------------------------ font surgery
-
         private sealed class Table
         {
             public string Tag = "";
             public byte[] Data = Array.Empty<byte>();
         }
 
-        // Returns the font with glyph `glyphName` replaced by `contours` (image coordinates, y
-        // down), scaled to sit where the original glyph sat. Null when the font isn't the kind this
-        // handles or has no such glyph.
-        //
-        // With `layers`, the font also becomes a colour font for that one glyph: each layer is added
-        // as an extra glyph, and COLR/CPAL tables (version 0 - the format of Roblox's own
-        // RobloxEmoji.ttf and TwemojiMozilla.ttf) tell the text engine to paint them in order. An
-        // engine that ignores colour tables still draws the plain outline.
         public static byte[]? ReplaceGlyph(byte[] font, string glyphName, List<List<PointF>> contours, List<ColorLayer>? layers = null, double sizeFactor = 1.12)
         {
             if (font.Length < 12 || contours.Count == 0)
                 return null;
 
             uint sfntVersion = BinaryPrimitives.ReadUInt32BigEndian(font);
-            if (sfntVersion != 0x00010000 && sfntVersion != 0x74727565) // TrueType outlines only
+            if (sfntVersion != 0x00010000 && sfntVersion != 0x74727565)
                 return null;
 
             int tableCount = BinaryPrimitives.ReadUInt16BigEndian(font.AsSpan(4));
@@ -340,7 +295,6 @@ namespace PhasmaStrap.Utility
             if (glyphId < 0)
                 return null;
 
-            // glyph offsets
             var offsets = new int[glyphCount + 1];
             for (int i = 0; i <= glyphCount; i++)
             {
@@ -349,7 +303,6 @@ namespace PhasmaStrap.Utility
                     : BinaryPrimitives.ReadUInt16BigEndian(loca.Data.AsSpan(i * 2)) * 2;
             }
 
-            // where the original glyph sits, so the new one takes its place at the same size
             int originalStart = offsets[glyphId], originalLength = offsets[glyphId + 1] - originalStart;
             double centreX, centreY, extent;
 
@@ -369,19 +322,16 @@ namespace PhasmaStrap.Utility
                 extent = unitsPerEm * 0.8;
             }
 
-            // never wider than the glyph's own advance, or it would be clipped by its neighbours
             int metricsCount = BinaryPrimitives.ReadUInt16BigEndian(hhea.Data.AsSpan(34));
             int advance = BinaryPrimitives.ReadUInt16BigEndian(hmtx.Data.AsSpan(Math.Min(glyphId, metricsCount - 1) * 4));
             double target = extent * sizeFactor;
             if (advance > 0)
                 target = Math.Min(target, advance);
 
-            // one placement for the outline and every colour layer, or the layers would not line up
             RectangleF source = Bounds(contours);
 
             byte[] newGlyph = BuildGlyph(contours, source, centreX, centreY, target, out int pointCount, out int contourCount, out _);
 
-            // a font that already has colour tables is left monochrome rather than merged into
             bool colour = layers is { Count: > 0 } && Find("COLR") is null && Find("CPAL") is null && glyphCount + layers.Count < 0xFFFF;
 
             var layerGlyphs = new List<byte[]>();
@@ -400,7 +350,6 @@ namespace PhasmaStrap.Utility
 
             int newGlyphCount = glyphCount + layerGlyphs.Count;
 
-            // reassemble glyf + loca (always written long: no offset limit, no evenness rule)
             using var glyfStream = new MemoryStream();
             var newOffsets = new uint[newGlyphCount + 1];
 
@@ -428,11 +377,8 @@ namespace PhasmaStrap.Utility
 
             if (colour)
             {
-                // every table with one entry per glyph has to grow with the glyph count
                 BinaryPrimitives.WriteUInt16BigEndian(maxp.Data.AsSpan(4), (ushort)newGlyphCount);
 
-                // hmtx: glyphs past numberOfHMetrics carry only a left side bearing and share the last
-                // advance - fine for layers, which are positioned by the base glyph
                 int expectedHmtx = metricsCount * 4 + (glyphCount - metricsCount) * 2;
                 if (hmtx.Data.Length < expectedHmtx)
                     return null;
@@ -451,7 +397,6 @@ namespace PhasmaStrap.Utility
 
             BinaryPrimitives.WriteInt16BigEndian(head.Data.AsSpan(50), 1);
 
-            // maxp must cover the largest simple glyph
             if (maxp.Data.Length >= 10)
             {
                 if (pointCount > BinaryPrimitives.ReadUInt16BigEndian(maxp.Data.AsSpan(6)))
@@ -474,8 +419,6 @@ namespace PhasmaStrap.Utility
             return RectangleF.FromLTRB(minX, minY, maxX, maxY);
         }
 
-        // 'post' format 2.0 lists a name index per glyph followed by the custom names - add one of
-        // each per new glyph ("tilt.color0", ...)
         private static byte[] GrowPost(byte[] post, string baseName, int extra)
         {
             if (post.Length < 34 || BinaryPrimitives.ReadUInt32BigEndian(post) != 0x00020000)
@@ -513,43 +456,41 @@ namespace PhasmaStrap.Utility
             return stream.ToArray();
         }
 
-        // COLR v0: one base glyph record pointing at a run of (glyph, palette entry) layer records
         private static byte[] BuildColr(int baseGlyph, int firstLayerGlyph, int layerCount)
         {
             const int header = 14;
             var data = new byte[header + 6 + layerCount * 4];
 
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);                   // version
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), 1);                   // numBaseGlyphRecords
-            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(4), header);              // baseGlyphRecordsOffset
-            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header + 6);          // layerRecordsOffset
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), (ushort)layerCount); // numLayerRecords
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), 1);
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(4), header);
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header + 6);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), (ushort)layerCount);
 
             BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header), (ushort)baseGlyph);
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 2), 0);          // firstLayerIndex
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 2), 0);
             BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 4), (ushort)layerCount);
 
             for (int i = 0; i < layerCount; i++)
             {
                 BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 6 + i * 4), (ushort)(firstLayerGlyph + i));
-                BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 8 + i * 4), (ushort)i); // palette entry
+                BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(header + 8 + i * 4), (ushort)i);
             }
 
             return data;
         }
 
-        // CPAL v0: a single palette, one BGRA entry per layer
         private static byte[] BuildCpal(List<Color> colors)
         {
             const int header = 14;
             var data = new byte[header + colors.Count * 4];
 
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);                       // version
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), (ushort)colors.Count);    // numPaletteEntries
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(4), 1);                       // numPalettes
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(6), (ushort)colors.Count);    // numColorRecords
-            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header);                  // colorRecordsArrayOffset
-            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), 0);                      // colorRecordIndices[0]
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(0), 0);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(2), (ushort)colors.Count);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(4), 1);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(6), (ushort)colors.Count);
+            BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(8), header);
+            BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(12), 0);
 
             for (int i = 0; i < colors.Count; i++)
             {
@@ -592,9 +533,6 @@ namespace PhasmaStrap.Utility
             return -1;
         }
 
-        // A simple (non-composite) glyph made of straight segments only - every point is on-curve.
-        // `source` is the box (in picture coordinates) that gets mapped onto the glyph's place - the
-        // whole mark's box, also when building a single colour layer of it
         private static byte[] BuildGlyph(List<List<PointF>> contours, RectangleF source, double centreX, double centreY, double target, out int pointCount, out int contourCount, out int xMinOut)
         {
             double scale = target / Math.Max(source.Width, source.Height);
@@ -608,7 +546,6 @@ namespace PhasmaStrap.Utility
 
                 foreach (PointF p in contour)
                 {
-                    // image y runs down, font y runs up
                     var point = ((int)Math.Round(centreX + (p.X - sourceCentreX) * scale), (int)Math.Round(centreY - (p.Y - sourceCentreY) * scale));
                     if (points.Count == 0 || points[^1] != point)
                         points.Add(point);
@@ -617,9 +554,6 @@ namespace PhasmaStrap.Utility
                 if (points.Count > 1 && points[0] == points[^1])
                     points.RemoveAt(points.Count - 1);
 
-                // The flip mirrored the winding. TrueType wants outer contours clockwise (with y up)
-                // and holes counter-clockwise; the tracer's screen-clockwise outers are now
-                // counter-clockwise, so reverse everything to restore the convention.
                 points.Reverse();
 
                 if (points.Count >= 3)
@@ -657,10 +591,8 @@ namespace PhasmaStrap.Utility
                 WriteUInt16(end);
             }
 
-            WriteUInt16(0); // no hinting instructions
+            WriteUInt16(0);
 
-            // flag 0x01 = on-curve; with neither "short" nor "same" bit set, each coordinate is a
-            // signed 16-bit delta from the previous point
             for (int i = 0; i < pointCount; i++)
                 stream.WriteByte(0x01);
 
@@ -683,7 +615,6 @@ namespace PhasmaStrap.Utility
 
         private static byte[] Assemble(uint sfntVersion, List<Table> tables)
         {
-            // the directory is sorted by tag; the data keeps the font's original table order
             var directoryOrder = tables.OrderBy(t => t.Tag, StringComparer.Ordinal).ToList();
 
             int headerLength = 12 + tables.Count * 16;
@@ -699,7 +630,7 @@ namespace PhasmaStrap.Utility
             byte[] output = new byte[position];
 
             Table head = tables.First(t => t.Tag == "head");
-            BinaryPrimitives.WriteUInt32BigEndian(head.Data.AsSpan(8), 0); // checkSumAdjustment, filled in last
+            BinaryPrimitives.WriteUInt32BigEndian(head.Data.AsSpan(8), 0);
 
             BinaryPrimitives.WriteUInt32BigEndian(output, sfntVersion);
             BinaryPrimitives.WriteUInt16BigEndian(output.AsSpan(4), (ushort)tables.Count);

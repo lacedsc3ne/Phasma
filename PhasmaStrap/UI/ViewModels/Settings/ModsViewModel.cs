@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Input;
@@ -149,27 +149,24 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 using var dialog = new System.Windows.Forms.FolderBrowserDialog
                 {
-                    Description = "Select a folder containing your custom cursor images (ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png)."
+                    Description = "Select a folder containing your custom cursor images, named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + "."
                 };
 
                 if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                     return;
 
-                bool foundAny = CustomCursorModPresetTask.RecognizedFileNames
-                    .Any(fileName => File.Exists(Path.Combine(dialog.SelectedPath, fileName)));
+                bool foundAny = CursorImages.AnyIn(dialog.SelectedPath, CustomCursorModPresetTask.RecognizedFileNames);
 
                 if (!foundAny)
                 {
                     Frontend.ShowMessageBox(
-                        "The selected folder doesn't contain any recognized cursor images (ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png).",
+                        "The selected folder doesn't contain any recognized cursor images. It needs at least one file named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + ".",
                         MessageBoxImage.Error);
                     return;
                 }
 
                 CustomCursorSetTask.NewState = dialog.SelectedPath;
 
-                // a custom folder and the bundled preset both write the same target files -
-                // applying one should take precedence over the other, so clear the bundled pick
                 if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))
                     CursorTypeTask.NewState = default;
             }
@@ -200,7 +197,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 PInvoke.SHObjectProperties(HWND.Null, SHOP_TYPE.SHOP_FILEPATH, path, "Compatibility");
             else
                 Frontend.ShowMessageBox(Strings.Common_RobloxNotInstalled, MessageBoxImage.Error);
-
         }
 
         #region Preset Mod - mod apply target
@@ -464,8 +460,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 CursorSetStore.Apply(SelectedCursorSet.Id);
 
-                // the manager and the "quick" single-folder override both write the same target
-                // files - applying a saved set should take precedence, so clear the others
                 if (!String.IsNullOrEmpty(CustomCursorSetTask.NewState))
                     CustomCursorSetTask.NewState = "";
                 if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))
@@ -551,7 +545,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (SelectedCursorSet is null || parameter is not string fileName)
                 return;
 
-            var dialog = new OpenFileDialog { Filter = "Images|*.png" };
+            var dialog = new OpenFileDialog { Filter = CursorImages.PickerFilter };
 
             if (dialog.ShowDialog() != true)
                 return;
@@ -559,7 +553,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             try
             {
                 Directory.CreateDirectory(SelectedCursorSet.Folder);
-                File.Copy(dialog.FileName, Path.Combine(SelectedCursorSet.Folder, fileName), true);
+
+                foreach (string extension in CursorImages.Extensions)
+                {
+                    string existing = Path.Combine(SelectedCursorSet.Folder, Path.GetFileNameWithoutExtension(fileName) + extension);
+
+                    if (File.Exists(existing))
+                        File.Delete(existing);
+                }
+
+                CursorImages.WritePng(dialog.FileName, Path.Combine(SelectedCursorSet.Folder, fileName));
                 SelectedCursorSet.RefreshPreviews();
             }
             catch (Exception ex)
@@ -670,8 +673,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                     foreach (ManagedModFile file in scan.Files)
                     {
-                        // materialized copies already counted above via the Modifications scan -
-                        // only tally source-owner relationships here, not a second physical count
                         if (!pathsByMod.TryGetValue(file.Mod.Id, out HashSet<string>? paths))
                         {
                             paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -680,10 +681,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         paths.Add(file.Relative);
                     }
 
-                    // a path is contended if more than one enabled managed mod claims it (they'll
-                    // overwrite each other when materialized) - manual files sharing the path only
-                    // ever get overwritten, which pathCounts alone can't distinguish, so tally
-                    // managed-mod claim counts separately
                     Dictionary<string, int> managedClaimCounts = new(StringComparer.OrdinalIgnoreCase);
                     foreach (var paths in pathsByMod.Values)
                         foreach (string path in paths)
@@ -905,8 +902,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         #endregion
 
-        // Homepage background is still preview-only, not a live overlay - see the doc comments
-        // on HomepageBackgroundPreviewWindow and Integrations.Overlays.OverlayCompositor for why.
         #region Overlays - homepage background
 
         public bool TopBarPhasmaLogo

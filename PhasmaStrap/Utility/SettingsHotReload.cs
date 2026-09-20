@@ -1,13 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Every PhasmaStrap process (settings window, game-session watcher, bootstrapper) has its own
-    /// copy of Settings.json in memory, loaded at start. Without this, a toggle flipped in the
-    /// settings window while Roblox is running (Instant Replay, overlays, spoofers...) wouldn't
-    /// reach the watcher until the next launch. Non-settings processes poll the file's timestamp
-    /// and reload when it changes, then raise <see cref="Reloaded"/> so long-lived features can
-    /// react (start/stop recorders, re-register hotkeys, ...).
-    /// </summary>
     public static class SettingsHotReload
     {
         private const string LOG_IDENT = "SettingsHotReload";
@@ -16,12 +8,10 @@ namespace PhasmaStrap.Utility
         private static DateTime _lastWriteUtc = DateTime.MinValue;
         private static int _busy;
 
-        /// <summary>Raised on a thread-pool thread after the settings were reloaded from disk.</summary>
         public static event EventHandler? Reloaded;
 
         public static void Start()
         {
-            // the settings window owns the file - reloading there would clobber unsaved edits
             if (App.LaunchSettings.MenuFlag.Active)
                 return;
 

@@ -8,18 +8,12 @@ using PhasmaStrap.Integrations;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
-    /// <summary>
-    /// A single Rich Presence button, as shown in the RPC Debug viewer's button list.
-    /// </summary>
     public sealed class RPCButtonRow
     {
         public string Label { get; init; } = "";
         public string Url { get; init; } = "";
     }
 
-    // Shows a live-updating, read-only view of whatever PhasmaStrap is currently telling Discord to
-    // display (see Integrations/DiscordRichPresence.cs's CurrentSnapshot/PresenceChanged). This viewer
-    // is purely a passive read-along of that state - it never sends anything to Discord itself.
     internal sealed class RPCWindowViewModel : NotifyPropertyChangedViewModel, IDisposable
     {
         private readonly DiscordRichPresence _richPresence;

@@ -1,0 +1,17 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.PeoplePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:pages="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      mc:Ignorable="d"
+      Title="PeoplePage"
+      Scrollable="False">
+    <controls:SectionHost x:Name="Host" Margin="0,4,0,0">
+        <controls:SectionItem Label="Accounts" PageType="{x:Type pages:AccountsPage}" />
+        <controls:SectionItem Label="Friends" PageType="{x:Type pages:FriendsPage}" />
+        <controls:SectionItem Label="Activity" PageType="{x:Type pages:ActivityPage}" />
+    </controls:SectionHost>
+</ui:UiPage>

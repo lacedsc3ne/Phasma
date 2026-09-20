@@ -4,18 +4,35 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    /// <summary>
-    /// Backs the combined Releases / What's New page. Pulls straight from PhasmaStrap's own GitHub
-    /// releases (<see cref="App.ProjectRepository"/>) rather than a hosted news feed/CMS, since
-    /// PhasmaStrap has no such feed of its own to point a separate News page at - each release's
-    /// notes (usually short markdown) double as the "what's new" entry, rendered with the existing
-    /// <see cref="PhasmaStrap.UI.Elements.Controls.MarkdownTextBlock"/> control rather than a new
-    /// full rich-content renderer.
-    /// </summary>
     public class ReleasesViewModel : NotifyPropertyChangedViewModel
     {
         private const int MaxReleasesToShow = 30;
         private const string LOG_IDENT = "ReleasesViewModel";
+
+        public class ReleaseAsset
+        {
+            public string Name { get; }
+            public string SizeText { get; }
+            public string DownloadUrl { get; }
+
+            public ReleaseAsset(GithubReleaseAsset asset)
+            {
+                Name = asset.Name ?? "";
+                SizeText = FormatSize(asset.Size);
+                DownloadUrl = asset.BrowserDownloadUrl ?? "";
+            }
+        }
+
+        private static string FormatSize(long bytes)
+        {
+            if (bytes >= 1024 * 1024)
+                return string.Format(CultureInfo.CurrentCulture, "{0:0.0} MB", bytes / 1024.0 / 1024.0);
+
+            if (bytes >= 1024)
+                return string.Format(CultureInfo.CurrentCulture, "{0:0.0} KB", bytes / 1024.0);
+
+            return string.Format(CultureInfo.CurrentCulture, "{0} bytes", bytes);
+        }
 
         public class ReleaseItem
         {
@@ -26,6 +43,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             public bool IsInstalled { get; }
             public string HtmlUrl { get; }
             public int AssetCount { get; }
+            public List<ReleaseAsset> Assets { get; }
+
+            public System.Windows.Visibility AssetsVisibility => Assets.Count > 0
+                ? System.Windows.Visibility.Visible
+                : System.Windows.Visibility.Collapsed;
+
+            public string? InstallerUrl => Assets
+                .FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))?.DownloadUrl;
 
             public ReleaseItem(GithubRelease release, bool isInstalled)
             {
@@ -36,6 +61,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 IsInstalled = isInstalled;
                 HtmlUrl = $"https://github.com/{App.ProjectRepository}/releases/tag/{TagName}";
                 AssetCount = release.Assets?.Count ?? 0;
+                Assets = (release.Assets ?? new List<GithubReleaseAsset>())
+                    .Select(a => new ReleaseAsset(a))
+                    .ToList();
 
                 if (DateTime.TryParse(release.CreatedAt, CultureInfo.InvariantCulture,
                         DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out DateTime published))
@@ -45,8 +73,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // every release body ends with the same two download notes (unsigned build, .NET 6) -
-        // they're not news
         private static string StripBoilerplate(string? body)
         {
             if (string.IsNullOrWhiteSpace(body))
@@ -57,8 +83,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                          && !p.TrimStart().StartsWith("**Requires the [.NET", StringComparison.OrdinalIgnoreCase));
             return string.Join("\n\n", kept).Trim();
         }
-
-        // ---- "What's new": this version's section of the changelog built into the app
 
         public string WhatsNewTitle { get; } = $"What's new in {App.Version}";
 
@@ -84,8 +108,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // the "## <version>" section's text (without its heading); the newest section when the
-        // version has none
         public static string ChangelogSection(string changelog, string version)
         {
             var sections = new List<(string Version, string Text)>();
@@ -118,6 +140,98 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private List<ReleaseItem> _allReleases = new();
 
         public ObservableCollection<ReleaseItem> Releases { get; } = new();
+
+        private ReleaseItem? _selectedRelease;
+        public ReleaseItem? SelectedRelease
+        {
+            get => _selectedRelease;
+            set
+            {
+                _selectedRelease = value;
+                OnPropertyChanged(nameof(SelectedRelease));
+                OnPropertyChanged(nameof(DetailVisibility));
+                OnPropertyChanged(nameof(NoSelectionVisibility));
+            }
+        }
+
+        public System.Windows.Visibility DetailVisibility => SelectedRelease is null
+            ? System.Windows.Visibility.Collapsed
+            : System.Windows.Visibility.Visible;
+
+        public System.Windows.Visibility NoSelectionVisibility => SelectedRelease is null
+            ? System.Windows.Visibility.Visible
+            : System.Windows.Visibility.Collapsed;
+
+        public string InstalledVersionText => string.Format(CultureInfo.CurrentCulture, "You are running {0}.", App.Version);
+
+        private ReleaseItem? _updateRelease;
+
+        private string _updateHeadline = "Checking for a newer version";
+        public string UpdateHeadline
+        {
+            get => _updateHeadline;
+            private set { _updateHeadline = value; OnPropertyChanged(nameof(UpdateHeadline)); }
+        }
+
+        private string _updateDetail = "";
+        public string UpdateDetail
+        {
+            get => _updateDetail;
+            private set { _updateDetail = value; OnPropertyChanged(nameof(UpdateDetail)); }
+        }
+
+        public System.Windows.Visibility UpdateActionVisibility => _updateRelease is null
+            ? System.Windows.Visibility.Collapsed
+            : System.Windows.Visibility.Visible;
+
+        public ICommand UpdateCommand => new RelayCommand(RunUpdate);
+
+        private void RunUpdate()
+        {
+            if (_updateRelease is null)
+                return;
+
+            Utilities.ShellExecute(_updateRelease.InstallerUrl ?? _updateRelease.HtmlUrl);
+        }
+
+        private void RefreshUpdateState()
+        {
+            ReleaseItem? newest = _allReleases.FirstOrDefault();
+            ReleaseItem? available = null;
+
+            if (newest is not null && !string.IsNullOrWhiteSpace(newest.TagName))
+            {
+                try
+                {
+                    if (Utilities.CompareVersions(App.Version, newest.TagName) == VersionComparison.LessThan)
+                        available = newest;
+                }
+                catch
+                {
+                    available = null;
+                }
+            }
+
+            _updateRelease = available;
+
+            if (available is not null)
+            {
+                UpdateHeadline = string.Format(CultureInfo.CurrentCulture, "{0} is ready to install", available.Name);
+                UpdateDetail = string.Format(CultureInfo.CurrentCulture, "{0} It was published on {1}.", InstalledVersionText, available.PublishedText);
+            }
+            else if (newest is null)
+            {
+                UpdateHeadline = "Could not check for a newer version";
+                UpdateDetail = InstalledVersionText;
+            }
+            else
+            {
+                UpdateHeadline = "PhasmaStrap is up to date";
+                UpdateDetail = InstalledVersionText;
+            }
+
+            OnPropertyChanged(nameof(UpdateActionVisibility));
+        }
 
         private bool _isLoading;
         public bool IsLoading
@@ -187,6 +301,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     .ToList();
 
                 ApplyFilter();
+                RefreshUpdateState();
 
                 StatusText = _allReleases.Count == 0
                     ? Strings.Menu_Releases_Empty
@@ -196,6 +311,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Failed to load releases: {ex.Message}");
                 StatusText = Strings.Menu_Releases_Error;
+                RefreshUpdateState();
             }
             finally
             {
@@ -214,8 +330,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
             catch
             {
-                // some tags (e.g. hand-written non-numeric tags) don't parse as a System.Version -
-                // just treat those as "not the installed release" rather than failing the whole load
                 return false;
             }
         }
@@ -237,6 +351,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             foreach (ReleaseItem item in filtered)
                 Releases.Add(item);
+
+            if (SelectedRelease is null || !Releases.Contains(SelectedRelease))
+                SelectedRelease = Releases.FirstOrDefault(r => r.IsInstalled) ?? Releases.FirstOrDefault();
         }
     }
 }

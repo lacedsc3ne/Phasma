@@ -72,13 +72,11 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
         public Visibility PlaceholderVisibility => _thumbnail is null ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    // one line of cards - the list is virtualised by rows, so only what's on screen is built
     public sealed class CaptureRow
     {
         public List<CaptureItem> Items { get; init; } = new();
     }
 
-    // The Captures window: every screenshot or clip, with search, filters, rename and the rest.
     public sealed class CaptureLibraryViewModel : NotifyPropertyChangedViewModel, IDisposable
     {
         public const int ScreenshotsTab = 0;
@@ -98,8 +96,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             Watch(ScreenshotCapture.ScreenshotsDir);
             Watch(InstantReplayRecorder.ClipsDir);
         }
-
-        // ---- tab
 
         private int _tab;
         public int Tab
@@ -122,8 +118,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
 
         public Visibility TypeVisibility => _tab == ClipsTab ? Visibility.Visible : Visibility.Collapsed;
 
-        // ---- filters
-
         private string _search = "";
         public string Search { get => _search; set { if (_search == value) return; _search = value; OnPropertyChanged(nameof(Search)); Apply(); } }
 
@@ -135,15 +129,12 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
         private string _game = AllGames;
         public string? Game { get => _game; set { if (value is null || _game == value) return; _game = value; OnPropertyChanged(nameof(Game)); Apply(); } }
 
-        // 0 any time, 1 today, 2 last 7 days, 3 last 30 days
         private int _dateIndex;
         public int DateIndex { get => _dateIndex; set { if (_dateIndex == value) return; _dateIndex = value; OnPropertyChanged(nameof(DateIndex)); Apply(); } }
 
-        // 0 all, 1 videos, 2 GIFs
         private int _typeIndex;
         public int TypeIndex { get => _typeIndex; set { if (_typeIndex == value) return; _typeIndex = value; OnPropertyChanged(nameof(TypeIndex)); Apply(); } }
 
-        // 0 newest, 1 oldest, 2 name, 3 largest
         private int _sortIndex;
         public int SortIndex { get => _sortIndex; set { if (_sortIndex == value) return; _sortIndex = value; OnPropertyChanged(nameof(SortIndex)); Apply(); } }
 
@@ -181,13 +172,10 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             BuildRows();
         }
 
-        // ---- loading
-
         private void Reload()
         {
             var index = new CaptureLibrary.GameIndex();
 
-            // unchanged files keep their item, so their thumbnail isn't made again
             List<CaptureItem> Merge(List<CaptureItem> old, List<CaptureFile> files)
             {
                 var known = old.ToDictionary(i => i.Path, StringComparer.OrdinalIgnoreCase);
@@ -215,8 +203,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             if (!options.Contains(_game))
                 _game = AllGames;
 
-            // rebuilding the list makes the box drop its selection - only rebuild when it changed,
-            // and hand the selection back once the box has taken in the new list
             if (options.SequenceEqual(GameOptions))
                 return;
 
@@ -287,8 +273,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                 Rows.Add(new CaptureRow { Items = _shown.Skip(i).Take(_columns).ToList() });
         }
 
-        // ---- the folders change while this is open (a clip saved in game, a rename in Explorer)
-
         private readonly List<FileSystemWatcher> _watchers = new();
         private System.Windows.Threading.DispatcherTimer? _debounce;
 
@@ -338,8 +322,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                 watcher.Dispose();
             _watchers.Clear();
         }
-
-        // ---- actions
 
         public ICommand OpenCommand => new RelayCommand<CaptureItem>(item =>
         {
@@ -400,7 +382,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                     return;
                 }
 
-                // ask again with what they typed, so a typo isn't lost
                 Frontend.ShowMessageBox(error ?? "That name can't be used.", MessageBoxImage.Warning);
                 current = dialog.Value;
             }

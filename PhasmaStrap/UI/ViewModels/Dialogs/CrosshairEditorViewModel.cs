@@ -55,8 +55,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             RenderPreview();
         }
 
-        // ------------------------------------------------------------------ preview
-
         private ImageSource? _preview;
         public ImageSource? Preview { get => _preview; private set { _preview = value; OnPropertyChanged(nameof(Preview)); } }
 
@@ -90,7 +88,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                 }, 90)),
             });
 
-            // the newest screenshot, centred - the most honest background there is
             try
             {
                 if (Directory.Exists(PhasmaStrap.Utility.ScreenshotCapture.ScreenshotsDir))
@@ -105,7 +102,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                         image.EndInit();
                         image.Freeze();
 
-                        // 1:1 pixels around the middle of the screen, where the crosshair sits
                         var brush = new ImageBrush(image) { Stretch = Stretch.None, AlignmentX = AlignmentX.Center, AlignmentY = AlignmentY.Center };
                         Backdrops.Add(new CrosshairBackdrop { Name = "My last screenshot", Brush = Frozen(brush) });
                     }
@@ -124,7 +120,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
 
         private static ImageSource Render(CrosshairStyle style, int size)
         {
-            // thumbnails show the design at its real in-game size
             int canvas = size;
             using System.Drawing.Bitmap bitmap = CrosshairRenderer.Render(style, canvas);
 
@@ -151,8 +146,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
 
         public bool HasChanges => _style.Signature != _original;
         public Visibility EmptyVisibility => _style.HasVisibleParts ? Visibility.Collapsed : Visibility.Visible;
-
-        // ------------------------------------------------------------------ the design's values
 
         private T Get<T>(Func<CrosshairStyle, T> read) => read(_style);
 
@@ -183,7 +176,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
         public bool Outline { get => Get(s => s.Outline); set => Set(s => s.Outline = value); }
         public int OutlineThickness { get => Get(s => s.OutlineThickness); set => Set(s => s.OutlineThickness = value); }
 
-        // colours: typed hex, applied once it is a valid colour
         public string ColorText
         {
             get => Get(s => s.Color);
@@ -250,8 +242,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
                 LoadStyle(choice.Style);
         });
 
-        // ------------------------------------------------------------------ my designs
-
         public string DesignName { get => _style.Name; set { _style.Name = value ?? ""; OnPropertyChanged(nameof(DesignName)); } }
 
         private string _status = "";
@@ -302,21 +292,47 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             Status = $"Deleted \"{choice.Name}\".";
         });
 
-        // ------------------------------------------------------------------ sharing
-
         public string ShareCode => _style.ToShareCode();
 
         private string _importCode = "";
         public string ImportCode { get => _importCode; set { _importCode = value ?? ""; OnPropertyChanged(nameof(ImportCode)); } }
 
-        public ICommand CopyCodeCommand => new RelayCommand(() =>
+        public ICommand CopyCodeCommand => new RelayCommand(async () =>
         {
-            Status = PhasmaStrap.Utility.ClipboardShare.CopyText(ShareCode) ? "Code copied - anyone with PhasmaStrap can paste it into their editor." : "Could not reach the clipboard - try again.";
+            Status = "Making a link...";
+
+            string code = ShareCode;
+            string? link = await PhasmaStrap.Utility.PhasmaAccount.ShortLinkAsync("crosshair", _style.Name, code);
+
+            if (!PhasmaStrap.Utility.ClipboardShare.CopyText(link ?? code))
+            {
+                Status = "Could not reach the clipboard - try again.";
+                return;
+            }
+
+            Status = link is null
+                ? "Code copied - anyone with PhasmaStrap can paste it into their editor."
+                : $"{link} copied - paste it into anyone's editor, or open it in a browser.";
         });
 
-        public ICommand ImportCodeCommand => new RelayCommand(() =>
+        public ICommand ImportCodeCommand => new RelayCommand(async () =>
         {
-            CrosshairStyle? style = CrosshairStyle.FromShareCode(_importCode);
+            string text = _importCode;
+            string? id = PhasmaStrap.Utility.PhasmaAccount.GalleryIdIn(text);
+
+            if (id is not null)
+            {
+                Status = "Fetching that link...";
+                text = await PhasmaStrap.Utility.PhasmaAccount.GalleryTakeAsync(id) ?? "";
+
+                if (text.Length == 0)
+                {
+                    Status = "That link has expired, or it never existed.";
+                    return;
+                }
+            }
+
+            CrosshairStyle? style = CrosshairStyle.FromShareCode(text);
             if (style is null)
             {
                 Status = "That is not a crosshair code (they start with PHX).";
@@ -327,8 +343,6 @@ namespace PhasmaStrap.UI.ViewModels.Dialogs
             ImportCode = "";
             Status = $"Loaded{(style.Name.Length > 0 ? $" \"{style.Name}\"" : "")}. Press Apply to use it, or save it to your designs.";
         });
-
-        // ------------------------------------------------------------------ apply
 
         public ICommand ApplyCommand => new RelayCommand(Apply);
 

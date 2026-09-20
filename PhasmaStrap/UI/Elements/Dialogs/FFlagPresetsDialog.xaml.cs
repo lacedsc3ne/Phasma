@@ -6,13 +6,6 @@ using PhasmaStrap.Resources;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // A small helper dialog that offers commonly-used FastFlag values (booleans, round
-    // numbers, FPS caps, etc) so users don't have to remember/retype them by hand when
-    // filling in a flag's value in AddFastFlagDialog. This is unrelated to
-    // FastFlagManager.PresetFlags (which maps friendly names to individual flags) or the
-    // curated optimization toggles on FastFlagsPage - it's purely a value picker.
-    //
-    // Ported from Voidstrap's UI/Elements/Dialogs/FFlagPresetsDialog.xaml.cs.
     public partial class FFlagPresetsDialog
     {
         private readonly (string CategoryKey, string[] Values)[] _presetCategories = new (string, string[])[]

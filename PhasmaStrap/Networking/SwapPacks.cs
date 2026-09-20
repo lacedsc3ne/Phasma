@@ -5,7 +5,7 @@ namespace PhasmaStrap.Networking
     public sealed class AssetSwap
     {
         public long AssetId { get; set; }
-        public string File { get; set; } = "";      // file name inside the pack's folder
+        public string File { get; set; } = "";
         public string Note { get; set; } = "";
     }
 
@@ -16,26 +16,13 @@ namespace PhasmaStrap.Networking
         public string Description { get; set; } = "";
         public bool Enabled { get; set; } = true;
 
-        // place IDs this pack applies to; empty = every game
         public List<long> Places { get; set; } = new();
         public List<AssetSwap> Swaps { get; set; } = new();
 
         [System.Text.Json.Serialization.JsonIgnore]
-        public string Folder { get; set; } = "";    // folder name under the packs root
+        public string Folder { get; set; } = "";
     }
 
-    // Asset swap packs: "whenever a game asks for asset 123, give it this file instead" - a sound,
-    // a texture, a skybox face, a mesh. Nothing in Roblox's folders is touched; the replacement is
-    // handed out by the proxy when the game downloads the asset (AssetRoute).
-    //
-    //   <root>\<pack folder>\pack.json + the replacement files
-    //
-    // A pack can be limited to certain games, switched off without deleting it, and shared as a
-    // single .phasmapack file (a zip of that folder). Replacement files have to be in a format
-    // Roblox itself accepts for that kind of asset: PNG/JPG for images, OGG/MP3 for sounds, .mesh
-    // for meshes.
-    //
-    // The root folder is a parameter, so it can be exercised from a console harness.
     public sealed class SwapPackStore
     {
         public static Action<string>? Log;
@@ -80,7 +67,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // packs are edited in the settings window and used in the watcher - reload when they change
         public List<SwapPack> List()
         {
             lock (_lock)
@@ -163,7 +149,6 @@ namespace PhasmaStrap.Networking
             return candidate;
         }
 
-        // copies `sourceFile` into the pack and points asset `assetId` at it
         public void AddSwap(SwapPack pack, long assetId, string sourceFile, string note)
         {
             if (pack.Folder.Length == 0)
@@ -188,10 +173,6 @@ namespace PhasmaStrap.Networking
             Save(pack);
         }
 
-        // ------------------------------------------------------------------ what the proxy asks
-
-        // the enabled pack that replaces `assetId` in `placeId` ("" = none). A pack made for this
-        // game wins over one that applies everywhere.
         public string PackFor(long assetId, long placeId)
         {
             string everywhere = "";
@@ -217,7 +198,6 @@ namespace PhasmaStrap.Networking
 
         public bool AnyEnabled() => List().Any(p => p.Enabled && p.Swaps.Count > 0);
 
-        // the replacement's bytes and content type, or null when the pack / file is gone
         public (byte[] Body, string ContentType)? Read(string packFolder, long assetId)
         {
             try
@@ -227,7 +207,6 @@ namespace PhasmaStrap.Networking
                 if (pack is null || swap is null)
                     return null;
 
-                // the manifest is user-editable (and importable): never step outside the pack's folder
                 string folder = Path.GetFullPath(Path.Combine(_root, pack.Folder)) + Path.DirectorySeparatorChar;
                 string file = Path.GetFullPath(Path.Combine(folder, swap.File));
                 if (!file.StartsWith(folder, StringComparison.OrdinalIgnoreCase) || !File.Exists(file))
@@ -253,8 +232,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // ------------------------------------------------------------------ sharing
-
         public void Export(SwapPack pack, string destination)
         {
             string folder = Path.Combine(_root, pack.Folder);
@@ -264,9 +241,6 @@ namespace PhasmaStrap.Networking
             ZipFile.CreateFromDirectory(folder, destination, CompressionLevel.Optimal, includeBaseDirectory: false);
         }
 
-        // A pack file comes from someone else: every entry is checked before anything is written -
-        // no paths that climb out of the folder, no absurd sizes, and it has to contain a manifest.
-        // Imported packs arrive switched OFF.
         public SwapPack Import(string packFile)
         {
             using ZipArchive archive = ZipFile.OpenRead(packFile);
@@ -301,7 +275,6 @@ namespace PhasmaStrap.Networking
                         if (entry.FullName.EndsWith('/') || entry.FullName.Equals("pack.json", StringComparison.OrdinalIgnoreCase))
                             continue;
 
-                        // flat packs only: a file name, nothing that is or could become a path
                         string name = Path.GetFileName(entry.FullName);
                         string target = Path.GetFullPath(Path.Combine(folder, name));
 
@@ -315,7 +288,6 @@ namespace PhasmaStrap.Networking
                         entry.ExtractToFile(target, true);
                     }
 
-                    // only swaps whose file really arrived
                     pack.Swaps = pack.Swaps.Where(s => s.AssetId > 0 && s.File == Path.GetFileName(s.File) && File.Exists(Path.Combine(folder, s.File))).ToList();
                     File.WriteAllText(Path.Combine(folder, "pack.json"), JsonSerializer.Serialize(pack, Json));
                 }

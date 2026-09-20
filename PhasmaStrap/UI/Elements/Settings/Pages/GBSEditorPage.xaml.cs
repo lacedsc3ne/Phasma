@@ -5,10 +5,6 @@ using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Raw key/value/type editor for every setting in Roblox's GlobalBasicSettings file - the
-    /// FastFlagEditorPage-style complete counterpart to the curated toggles on PerformancePage.
-    /// </summary>
     public partial class GBSEditorPage
     {
         private readonly GBSEditorViewModel _viewModel = new();
@@ -94,7 +90,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 }
             }
 
-            // defer the actual mutation until after the grid commits the edited value back to the entry
             Dispatcher.BeginInvoke(new Action(() => _viewModel.Persist()));
         }
     }

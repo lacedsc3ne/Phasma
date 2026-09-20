@@ -1,8 +1,5 @@
 namespace PhasmaStrap
 {
-    // limits how many logical processors the PhasmaStrap process itself may run on.
-    // ported from Voidstrap - note this only affects the bootstrapper's own process,
-    // not the Roblox client, since that's how the original implementation works
     public static class CpuCoreLimiter
     {
         private static readonly object Sync = new();

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Xml.Linq;
@@ -51,9 +51,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             return (T)parsed;
         }
 
-        /// <summary>
-        /// ParseXmlAttribute but the default value is always null
-        /// </summary>
         private static T? ParseXmlAttributeNullable<T>(XElement element, string attributeName) where T : struct
         {
             var attribute = element.Attribute(attributeName);
@@ -84,7 +81,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
                 throw new CustomThemeException("CustomTheme.Errors.ElementAttributeMustBeSmallerThanMax", elementName, attributeName, max);
         }
 
-        // You can't do numeric only generics in .NET 6. The feature is exclusive to .NET 7+.
         private static int ParseXmlAttributeClamped(XElement element, string attributeName, int? defaultValue = null, int? min = null, int? max = null)
         {
             int value = ParseXmlAttribute<int>(element, attributeName, defaultValue);
@@ -98,8 +94,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             if (string.IsNullOrEmpty(value))
                 value = "Normal";
 
-            // bruh
-            // https://learn.microsoft.com/en-us/dotnet/api/system.windows.fontweights?view=windowsdesktop-6.0
             switch (value)
             {
                 case "Thin":
@@ -190,7 +184,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
         private static string? GetTranslatedText(string? text)
         {
             if (text == null || !text.StartsWith('{') || !text.EndsWith('}'))
-                return text; // can't be translated (not in the correct format)
+                return text;
 
             string resourceName = text[1..^1];
 
@@ -205,7 +199,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             if (sourcePath == null)
                 return null;
 
-            // TODO: this is bad :(
             return sourcePath.Replace("theme://", $"{dialog.ThemeDir}\\");
         }
 

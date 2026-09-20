@@ -1,8 +1,7 @@
-﻿namespace PhasmaStrap.UI.ViewModels.Installer
+namespace PhasmaStrap.UI.ViewModels.Installer
 {
     public class WelcomeViewModel : NotifyPropertyChangedViewModel
     {
-        // formatting is done here instead of in xaml, it's just a bit easier
         public string MainText => String.Format(
             Strings.Installer_Welcome_MainText,
             $"[github.com/{App.ProjectRepository}](https://github.com/{App.ProjectRepository})"
@@ -16,7 +15,6 @@
 
         public event EventHandler? CanContinueEvent;
 
-        // called by codebehind on page load
         public async void DoChecks()
         {
             var releaseInfo = await App.GetLatestRelease();

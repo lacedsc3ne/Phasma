@@ -2,9 +2,6 @@ using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for ChatLogs.xaml
-    /// </summary>
     public partial class ChatLogs
     {
         private readonly ChatLogsViewModel _viewModel;

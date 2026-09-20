@@ -1,4 +1,4 @@
-﻿public class GithubReleaseAsset
+public class GithubReleaseAsset
 {
     [JsonPropertyName("browser_download_url")]
     public string BrowserDownloadUrl { get; set; } = null!;
@@ -6,8 +6,6 @@
     [JsonPropertyName("name")]
     public string Name { get; set; } = null!;
 
-    // optional integrity metadata GitHub includes on some release assets - not every
-    // caller needs these, so they're left nullable/default rather than required
     [JsonPropertyName("digest")]
     public string? Digest { get; set; } = null;
 

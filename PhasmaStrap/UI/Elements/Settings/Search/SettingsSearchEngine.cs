@@ -31,13 +31,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
         }
     }
 
-    /// <summary>
-    /// Ranks <see cref="SettingsSearchIndex"/> entries against a free-text query. Every word of the
-    /// query has to match somewhere (header, breadcrumb or description) - a word that matches the
-    /// header outranks one that only matches the description, and word-start matches outrank
-    /// substring matches, so typing "fps" surfaces "FPS cap" before "Show performance stats".
-    /// Short typos are tolerated through an in-order character (subsequence) match on the header.
-    /// </summary>
     internal static class SettingsSearchEngine
     {
         public const int DefaultMaxResults = 40;
@@ -72,7 +65,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 if (!allMatched)
                     continue;
 
-                // whole-query bonuses: the query as a phrase inside the header, or equal to it
                 if (entry.NormalizedHeader == normalized)
                     total += 80;
                 else if (entry.NormalizedHeader.StartsWith(normalized, StringComparison.Ordinal))
@@ -115,7 +107,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
         {
             int best = 0;
 
-            // header
             if (entry.NormalizedHeader == token)
                 best = Math.Max(best, 120);
             else if (entry.NormalizedHeader.StartsWith(token, StringComparison.Ordinal))
@@ -128,17 +119,14 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             if (best >= 85)
                 return best;
 
-            // breadcrumb (page / tab / section / group)
             if (StartsAnyWord(entry.BreadcrumbWords, token))
                 best = Math.Max(best, 40);
             else if (entry.NormalizedBreadcrumb.Contains(token, StringComparison.Ordinal))
                 best = Math.Max(best, 30);
 
-            // description
             if (entry.NormalizedDescription.Length > 0 && entry.NormalizedDescription.Contains(token, StringComparison.Ordinal))
                 best = Math.Max(best, 22);
 
-            // typo tolerance: characters in order inside the header ("fstflag" -> "fastflag")
             if (best == 0 && token.Length >= 3 && IsSubsequence(token, entry.NormalizedHeader))
                 best = 12;
 

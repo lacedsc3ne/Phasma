@@ -1,7 +1,5 @@
 namespace PhasmaStrap.Integrations.Overlays
 {
-    // One area of the game picture that stream-safe mode hides, as fractions of the Roblox window
-    // (0..1), so it stays in place whatever size the window is.
     public sealed class StreamSafeRegion
     {
         public string Name { get; set; } = "";
@@ -26,13 +24,6 @@ namespace PhasmaStrap.Integrations.Overlays
         }
     }
 
-    // Stream-safe mode: a second window, "PhasmaStrap Stream View", shows the game with the marked
-    // areas pixelated (or blacked out). OBS captures that window instead of the game, so chat, the
-    // player list or anything else marked never reaches the stream - while your own screen is
-    // untouched. It sits under every other window (behind Roblox); Window Capture still sees it.
-    //
-    // It can't go through PhasmaStrap's normal overlay: that window is excluded from capture on
-    // purpose (the compositor captures the screen, and would otherwise capture itself).
     public static class StreamSafe
     {
         public const string WindowTitle = "PhasmaStrap Stream View";
@@ -43,7 +34,6 @@ namespace PhasmaStrap.Integrations.Overlays
 
         public const int MaxRegions = 16;
 
-        // where Roblox's own chat and player list sit by default
         public static List<StreamSafeRegion> Defaults() => new()
         {
             new StreamSafeRegion { Name = "Chat", X = 0.0, Y = 0.05, W = 0.34, H = 0.38 },

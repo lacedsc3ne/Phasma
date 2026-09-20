@@ -10,20 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
-// Ported from Voidstrap's ControllerNavigator.cs - lets an Xbox/generic XInput controller
-// drive the settings window (focus movement, a virtual cursor rendered as a crosshair
-// adorner, and "clicking" via UI Automation) instead of requiring a mouse/keyboard.
-//
-// Simplified from the original for this codebase:
-//  - Voidstrap.Utility.SystemAccent doesn't exist here, so the crosshair just uses the
-//    same Phasma brand accent color WpfUiWindow paints the window chrome with.
-//  - Uses classic [DllImport] instead of Voidstrap's [LibraryImport] partial P/Invoke,
-//    since this project targets net6.0-windows (LibraryImport source generation needs
-//    .NET 7+).
 namespace PhasmaStrap.UI
 {
-    // the little pulsing ring drawn at the virtual cursor position while a controller is
-    // actively driving the UI
     public sealed class ControllerCrosshairAdorner : Adorner
     {
         private Point _pos;
@@ -70,15 +58,10 @@ namespace PhasmaStrap.UI
         }
     }
 
-    // Static/app-wide by design: only one window ever needs controller navigation at a
-    // time (the settings window), so there's no benefit to an instance per window. It's
-    // started/stopped by MainWindow (Settings) based on Settings.Prop.ControllerNavigationEnabled
-    // rather than from App::OnStartup, since it's only meaningful while that window is open.
     public static class ControllerService
     {
         private const string LOG_IDENT = "ControllerService";
 
-        // Phasma brand accent (coral-red), matches WpfUiWindow's window-chrome accent
         private static readonly Color AccentColor = Color.FromRgb(0xF4, 0x55, 0x4B);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -172,10 +155,6 @@ namespace PhasmaStrap.UI
         private static long _ignoreMouseUntil;
         private static bool _holdingClick;
 
-        // Begins polling for a connected XInput controller (via a lightweight 500ms
-        // watchdog timer) and, once one is detected moving a stick or pressing a button,
-        // takes over focus navigation and draws the virtual cursor. Safe to call multiple
-        // times; only the first call does anything.
         public static void Initialize()
         {
             if (_initialized)
@@ -691,9 +670,6 @@ namespace PhasmaStrap.UI
             }
         }
 
-        // Fallback path for when the synthetic mouse click above can't reach the control
-        // under the cursor (e.g. it's blocked) - drives the element's UI Automation
-        // invoke/toggle/select pattern directly instead.
         private static void ActivateAtCursorFallback()
         {
             try

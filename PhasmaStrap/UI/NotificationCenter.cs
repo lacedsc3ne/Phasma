@@ -1,12 +1,7 @@
-using PhasmaStrap.UI.Elements.ContextMenu;
+﻿using PhasmaStrap.UI.Elements.ContextMenu;
 
 namespace PhasmaStrap.UI
 {
-    /// <summary>
-    /// What triggered a notification. Used to gate individual notifications behind their own
-    /// per-event-type setting (see <see cref="Models.Persistable.Settings.NotificationsJoinToastEnabled"/>
-    /// etc.) and, in future, to pick an icon/accent per category.
-    /// </summary>
     public enum NotificationCategory
     {
         General,
@@ -14,13 +9,30 @@ namespace PhasmaStrap.UI
         GameLeave
     }
 
-    /// <summary>
-    /// A single entry in the notification center's history, as shown on the Notifications settings
-    /// page. History is kept in memory only for the lifetime of the process - PhasmaStrap has no
-    /// notification backend/server to source a persistent history from (unlike Voidstrap's website
-    /// account notification feed, which this deliberately does not attempt to replicate - see
-    /// NotificationsPage remarks).
-    /// </summary>
+    public enum NotificationKindId
+    {
+        Other,
+        ServerJoined,
+        ServerLeft,
+        ServerRegion,
+        RobloxClosed,
+        AutoRejoin,
+        FastFlagProfile,
+        FrameRateLimit,
+        RamCleaned,
+        OverlayFocusMode,
+        PerformanceRun,
+        InviteLink,
+        Screenshot,
+        Replay,
+        ReplayNotReady,
+        FriendOnline,
+        FriendPlaying,
+        AccountGuard,
+        ProxyCertificate,
+        FlagsRemoved
+    }
+
     public sealed class NotificationRecord
     {
         public string Title { get; }
@@ -28,34 +40,21 @@ namespace PhasmaStrap.UI
         public NotificationCategory Category { get; }
         public DateTime Timestamp { get; }
 
-        /// <summary>What clicking the toast does (open the saved file, ...), if anything.</summary>
         public Action? OnClick { get; }
 
-        public NotificationRecord(string title, string message, NotificationCategory category, Action? onClick = null)
+        public NotificationKindId Kind { get; }
+
+        public NotificationRecord(string title, string message, NotificationCategory category, Action? onClick = null, NotificationKindId kind = NotificationKindId.Other)
         {
             Title = title;
             Message = message;
             Category = category;
             Timestamp = DateTime.Now;
             OnClick = onClick;
+            Kind = kind;
         }
     }
 
-    /// <summary>
-    /// PhasmaStrap's in-app notification center. Shows a custom animated toast popup
-    /// (<see cref="NotificationToast"/>) sliding in from the corner of the screen, and keeps a capped,
-    /// session-only history of everything shown so far for the Notifications settings page.
-    /// </summary>
-    /// <remarks>
-    /// This is intentionally independent of <see cref="NotifyIconWrapper.ShowAlert"/>, which drives the
-    /// separate Windows balloon-tip alerts already shown from the tray icon (server join info, etc).
-    /// Routing through the balloon-tip mechanism instead of building this was considered, but a
-    /// balloon tip can't be styled to match the app, doesn't queue/animate multiple notifications
-    /// nicely, and Windows increasingly suppresses/throttles balloon tips outside of focus-assist
-    /// exemptions - a custom always-on-top WPF window (matching Voidstrap's own approach) avoids all of
-    /// that at the cost of one more window class, which is a good trade for a feature meant to be the
-    /// primary in-app notification surface going forward.
-    /// </remarks>
     public static class NotificationCenter
     {
         private const int MaxHistory = 50;
@@ -65,10 +64,6 @@ namespace PhasmaStrap.UI
 
         private static NotificationToast? s_toast;
 
-        /// <summary>
-        /// Raised (off the UI thread - marshal before touching UI state) whenever <see cref="History"/>
-        /// changes, so the settings page can refresh its list.
-        /// </summary>
         public static event EventHandler? HistoryChanged;
 
         public static IReadOnlyList<NotificationRecord> History
@@ -80,24 +75,74 @@ namespace PhasmaStrap.UI
             }
         }
 
-        /// <summary>
-        /// Shows a toast notification and records it in <see cref="History"/>, provided the master
-        /// switch and (for <see cref="NotificationCategory.GameJoin"/>/<see cref="NotificationCategory.GameLeave"/>)
-        /// the relevant per-event-type setting are both enabled.
-        /// </summary>
-        // actionText/action: an optional button on the toast (e.g. "Edit" on a saved screenshot)
-        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null)
+        public static bool IsKindEnabled(NotificationKindId kind) => kind switch
+        {
+            NotificationKindId.ServerJoined => App.Settings.Prop.NotificationsJoinToastEnabled,
+            NotificationKindId.ServerLeft => App.Settings.Prop.NotificationsLeaveToastEnabled,
+            NotificationKindId.ServerRegion => App.Settings.Prop.NotificationServerRegionEnabled,
+            NotificationKindId.RobloxClosed => App.Settings.Prop.NotificationRobloxClosedEnabled,
+            NotificationKindId.AutoRejoin => App.Settings.Prop.NotificationAutoRejoinEnabled,
+            NotificationKindId.FastFlagProfile => App.Settings.Prop.NotificationFastFlagProfileEnabled,
+            NotificationKindId.FrameRateLimit => App.Settings.Prop.NotificationFrameRateLimitEnabled,
+            NotificationKindId.RamCleaned => App.Settings.Prop.NotificationRamCleanedEnabled,
+            NotificationKindId.OverlayFocusMode => App.Settings.Prop.NotificationOverlayFocusEnabled,
+            NotificationKindId.PerformanceRun => App.Settings.Prop.NotificationPerformanceRunEnabled,
+            NotificationKindId.InviteLink => App.Settings.Prop.NotificationInviteLinkEnabled,
+            NotificationKindId.Screenshot => App.Settings.Prop.NotificationScreenshotEnabled,
+            NotificationKindId.Replay => App.Settings.Prop.NotificationReplayEnabled,
+            NotificationKindId.ReplayNotReady => App.Settings.Prop.NotificationReplayNotReadyEnabled,
+            NotificationKindId.FriendOnline => App.Settings.Prop.NotificationFriendOnlineEnabled,
+            NotificationKindId.FriendPlaying => App.Settings.Prop.NotificationFriendPlayingEnabled,
+            NotificationKindId.AccountGuard => App.Settings.Prop.NotificationAccountGuardEnabled,
+            NotificationKindId.ProxyCertificate => App.Settings.Prop.NotificationProxyCertificateEnabled,
+            NotificationKindId.FlagsRemoved => App.Settings.Prop.NotificationFlagsRemovedEnabled,
+            _ => true
+        };
+
+        public static void SetKindEnabled(NotificationKindId kind, bool enabled)
+        {
+            switch (kind)
+            {
+                case NotificationKindId.ServerJoined: App.Settings.Prop.NotificationsJoinToastEnabled = enabled; break;
+                case NotificationKindId.ServerLeft: App.Settings.Prop.NotificationsLeaveToastEnabled = enabled; break;
+                case NotificationKindId.ServerRegion: App.Settings.Prop.NotificationServerRegionEnabled = enabled; break;
+                case NotificationKindId.RobloxClosed: App.Settings.Prop.NotificationRobloxClosedEnabled = enabled; break;
+                case NotificationKindId.AutoRejoin: App.Settings.Prop.NotificationAutoRejoinEnabled = enabled; break;
+                case NotificationKindId.FastFlagProfile: App.Settings.Prop.NotificationFastFlagProfileEnabled = enabled; break;
+                case NotificationKindId.FrameRateLimit: App.Settings.Prop.NotificationFrameRateLimitEnabled = enabled; break;
+                case NotificationKindId.RamCleaned: App.Settings.Prop.NotificationRamCleanedEnabled = enabled; break;
+                case NotificationKindId.OverlayFocusMode: App.Settings.Prop.NotificationOverlayFocusEnabled = enabled; break;
+                case NotificationKindId.PerformanceRun: App.Settings.Prop.NotificationPerformanceRunEnabled = enabled; break;
+                case NotificationKindId.InviteLink: App.Settings.Prop.NotificationInviteLinkEnabled = enabled; break;
+                case NotificationKindId.Screenshot: App.Settings.Prop.NotificationScreenshotEnabled = enabled; break;
+                case NotificationKindId.Replay: App.Settings.Prop.NotificationReplayEnabled = enabled; break;
+                case NotificationKindId.ReplayNotReady: App.Settings.Prop.NotificationReplayNotReadyEnabled = enabled; break;
+                case NotificationKindId.FriendOnline: App.Settings.Prop.NotificationFriendOnlineEnabled = enabled; break;
+                case NotificationKindId.FriendPlaying: App.Settings.Prop.NotificationFriendPlayingEnabled = enabled; break;
+                case NotificationKindId.AccountGuard: App.Settings.Prop.NotificationAccountGuardEnabled = enabled; break;
+                case NotificationKindId.ProxyCertificate: App.Settings.Prop.NotificationProxyCertificateEnabled = enabled; break;
+                case NotificationKindId.FlagsRemoved: App.Settings.Prop.NotificationFlagsRemovedEnabled = enabled; break;
+            }
+        }
+
+        public static void Notify(string title, string message, NotificationCategory category = NotificationCategory.General, double durationSeconds = 5, Action? onClick = null, string? actionText = null, Action? action = null, NotificationKindId kind = NotificationKindId.Other)
         {
             if (!App.Settings.Prop.NotificationsEnabled)
                 return;
 
-            if (category == NotificationCategory.GameJoin && !App.Settings.Prop.NotificationsJoinToastEnabled)
+            NotificationKindId effective = kind != NotificationKindId.Other
+                ? kind
+                : category switch
+                {
+                    NotificationCategory.GameJoin => NotificationKindId.ServerJoined,
+                    NotificationCategory.GameLeave => NotificationKindId.ServerLeft,
+                    _ => NotificationKindId.Other
+                };
+
+            if (!IsKindEnabled(effective))
                 return;
 
-            if (category == NotificationCategory.GameLeave && !App.Settings.Prop.NotificationsLeaveToastEnabled)
-                return;
-
-            var record = new NotificationRecord(title, message, category, onClick);
+            var record = new NotificationRecord(title, message, category, onClick, effective);
 
             lock (s_lock)
             {
@@ -109,13 +154,10 @@ namespace PhasmaStrap.UI
 
             HistoryChanged?.Invoke(null, EventArgs.Empty);
 
-            // Do Not Disturb suppresses only the on-screen popup - history above is recorded
-            // either way, so nothing's lost, it just doesn't interrupt the session
             if (!App.Settings.Prop.DoNotDisturbEnabled)
-                ShowToast(title, message, category, durationSeconds, onClick, actionText, action);
+                ShowToast(title, message, effective, durationSeconds, onClick, actionText, action);
         }
 
-        /// <summary>A click action that reveals a saved file in Explorer (for screenshot/replay toasts).</summary>
         public static Action RevealFile(string path) => () =>
         {
             try
@@ -139,7 +181,7 @@ namespace PhasmaStrap.UI
             HistoryChanged?.Invoke(null, EventArgs.Empty);
         }
 
-        private static void ShowToast(string title, string message, NotificationCategory category, double durationSeconds, Action? onClick, string? actionText, Action? action)
+        private static void ShowToast(string title, string message, NotificationKindId kind, double durationSeconds, Action? onClick, string? actionText, Action? action)
         {
             var app = System.Windows.Application.Current;
 
@@ -153,7 +195,7 @@ namespace PhasmaStrap.UI
                     if (s_toast is null || !s_toast.IsUsable)
                         s_toast = new NotificationToast();
 
-                    s_toast.ShowNotification(title, message, category, durationSeconds, onClick, actionText, action);
+                    s_toast.ShowNotification(title, message, kind, durationSeconds, onClick, actionText, action);
                 }
                 catch (Exception ex)
                 {

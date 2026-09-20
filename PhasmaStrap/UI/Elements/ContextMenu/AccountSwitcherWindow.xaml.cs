@@ -2,9 +2,6 @@ using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for AccountSwitcherWindow.xaml
-    /// </summary>
     public partial class AccountSwitcherWindow
     {
         private readonly AccountSwitcherViewModel _viewModel;

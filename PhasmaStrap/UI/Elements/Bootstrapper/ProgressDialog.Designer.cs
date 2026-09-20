@@ -1,18 +1,11 @@
-﻿using System.Windows.Forms;
+using System.Windows.Forms;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
     partial class ProgressDialog
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -24,10 +17,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             ProgressBar = new ProgressBar();
@@ -38,9 +27,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             ((System.ComponentModel.ISupportInitialize)IconBox).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
-            // 
-            // ProgressBar
-            // 
+
             ProgressBar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             ProgressBar.Location = new System.Drawing.Point(29, 241);
             ProgressBar.MarqueeAnimationSpeed = 20;
@@ -48,9 +35,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             ProgressBar.Size = new System.Drawing.Size(460, 20);
             ProgressBar.Style = ProgressBarStyle.Marquee;
             ProgressBar.TabIndex = 0;
-            // 
-            // labelMessage
-            // 
+
             labelMessage.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             labelMessage.Location = new System.Drawing.Point(29, 199);
             labelMessage.Name = "labelMessage";
@@ -59,9 +44,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             labelMessage.Text = "Please wait...";
             labelMessage.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             labelMessage.UseMnemonic = false;
-            // 
-            // IconBox
-            // 
+
             IconBox.BackgroundImageLayout = ImageLayout.Zoom;
             IconBox.ImageLocation = "";
             IconBox.Location = new System.Drawing.Point(212, 66);
@@ -69,9 +52,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             IconBox.Size = new System.Drawing.Size(92, 92);
             IconBox.TabIndex = 2;
             IconBox.TabStop = false;
-            // 
-            // panel1
-            // 
+
             panel1.BackColor = System.Drawing.SystemColors.Window;
             panel1.Controls.Add(buttonCancel);
             panel1.Controls.Add(labelMessage);
@@ -81,9 +62,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             panel1.Name = "panel1";
             panel1.Size = new System.Drawing.Size(518, 318);
             panel1.TabIndex = 4;
-            // 
-            // buttonCancel
-            // 
+
             buttonCancel.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             buttonCancel.ForeColor = System.Drawing.Color.FromArgb(75, 75, 75);
             buttonCancel.Image = Properties.Resources.CancelButton;
@@ -97,9 +76,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             buttonCancel.Click += ButtonCancel_Click;
             buttonCancel.MouseEnter += ButtonCancel_MouseEnter;
             buttonCancel.MouseLeave += ButtonCancel_MouseLeave;
-            // 
-            // ProgressDialog
-            // 
+
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = System.Drawing.SystemColors.ActiveBorder;

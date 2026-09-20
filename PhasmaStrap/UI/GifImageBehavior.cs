@@ -6,21 +6,6 @@ using System.Windows.Media.Imaging;
 
 using Image = System.Windows.Controls.Image;
 
-// Lets a plain <Image> show a still image or play an animated GIF, used by GlobalBackground for
-// the settings window's background.
-//
-// Second version. What the first one (a port of Voidstrap's) got wrong:
-//   - it showed the GIF decoder's raw frames. Those are not pictures of the whole animation:
-//     an optimised GIF stores only the rectangle that changed, positioned by an offset, with a
-//     disposal rule saying what to do with it afterwards. Shown raw, most real-world GIFs jitter,
-//     smear or flash. Frames are now composited onto a canvas the way a browser does it.
-//   - it decoded on the UI thread (a 100-frame GIF froze the window for a moment) and decoded
-//     again for every refresh - toggling the background or nudging the dim slider re-read the
-//     whole file each time. Decoding now happens once, on a worker thread, and the result is
-//     cached by path + size + timestamp and shared.
-//   - it opened files by URI, which goes through WPF's image cache: replace a file under the same
-//     name and the old picture kept coming back until restart. Files are now read from a stream
-//     with the cache bypassed.
 namespace PhasmaStrap.UI
 {
     public static class GifImageBehavior
@@ -29,7 +14,6 @@ namespace PhasmaStrap.UI
 
         private const long MaxEncodedBytes = 128L * 1024 * 1024;
 
-        // composited frames are 4 bytes a pixel; frames are scaled down to stay inside this
         private const long MaxDecodedBytes = 384L * 1024 * 1024;
 
         private const int MaxFrames = 900;
@@ -43,8 +27,6 @@ namespace PhasmaStrap.UI
             public TimeSpan Duration;
             public bool IsAnimated => Frames.Length > 1;
         }
-
-        // ------------------------------------------------------------------ attached property
 
         public static readonly DependencyProperty SourcePathProperty =
             DependencyProperty.RegisterAttached("SourcePath", typeof(string), typeof(GifImageBehavior), new PropertyMetadata(null, OnSourcePathChanged));
@@ -65,7 +47,6 @@ namespace PhasmaStrap.UI
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
                 return;
 
-            // start transparent and fade in once - not per frame
             image.BeginAnimation(UIElement.OpacityProperty, null);
             image.Opacity = 0;
 
@@ -73,7 +54,6 @@ namespace PhasmaStrap.UI
             {
                 image.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    // the path was changed again while this one was decoding
                     if (!string.Equals(GetSourcePath(image), path, StringComparison.OrdinalIgnoreCase))
                         return;
 
@@ -105,17 +85,11 @@ namespace PhasmaStrap.UI
                     time += media.Delays[i];
                 }
 
-                // Without this WPF ticks a running animation at the monitor's refresh rate - 240
-                // times a second on a 240 Hz screen - although a GIF rarely changes more than 10-25
-                // times a second. Every one of those ticks re-renders the settings window, which
-                // cost most of a CPU core for a 10 fps background. The animation needs no more ticks
-                // than its fastest frame.
                 double shortest = media.Delays.Where(d => d > TimeSpan.Zero).DefaultIfEmpty(TimeSpan.FromMilliseconds(100)).Min().TotalMilliseconds;
                 Timeline.SetDesiredFrameRate(animation, Math.Clamp((int)Math.Ceiling(1000.0 / shortest), 1, 60));
 
                 animation.Freeze();
 
-                // an animation started on an element that isn't in the tree yet can be dropped
                 if (image.IsLoaded)
                 {
                     image.BeginAnimation(Image.SourceProperty, animation);
@@ -138,14 +112,10 @@ namespace PhasmaStrap.UI
             });
         }
 
-        // ------------------------------------------------------------------ loading + cache
-
         private static readonly object _cacheLock = new();
         private static string _cacheKey = "";
         private static Media? _cacheMedia;
 
-        // Decodes (or returns the cached copy of) an image or GIF. Safe to call from any thread;
-        // every bitmap it returns is frozen.
         public static Media Load(string path)
         {
             var info = new FileInfo(path);
@@ -166,7 +136,6 @@ namespace PhasmaStrap.UI
                 ? $"Loaded '{info.Name}': {media.Frames.Length} frames, {media.Frames[0].PixelWidth}x{media.Frames[0].PixelHeight}, {media.Duration.TotalSeconds:0.0}s loop, {timer.ElapsedMilliseconds}ms"
                 : $"Loaded '{info.Name}' as a still image, {timer.ElapsedMilliseconds}ms");
 
-            // one entry: only one background is ever on screen, and a decoded GIF is large
             lock (_cacheLock)
             {
                 _cacheKey = key;
@@ -185,15 +154,12 @@ namespace PhasmaStrap.UI
             }
         }
 
-        // First frame only, small - for the picker's thumbnails.
         public static BitmapSource? LoadThumbnail(string path, int width)
         {
             try
             {
                 using FileStream stream = File.OpenRead(path);
-                // no IgnoreImageCache here: a stream has no URI for WPF's image cache to key on, and
-                // BitmapImage throws "Key cannot be null" if asked to bypass it - which silently left
-                // every thumbnail empty
+
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
@@ -248,7 +214,6 @@ namespace PhasmaStrap.UI
                 return new Media { Frames = new[] { only }, Delays = new[] { TimeSpan.Zero } };
             }
 
-            // the logical screen: the canvas every frame is drawn onto
             int canvasWidth = ReadInt(decoder.Metadata, "/logscrdesc/Width", decoder.Frames[0].PixelWidth);
             int canvasHeight = ReadInt(decoder.Metadata, "/logscrdesc/Height", decoder.Frames[0].PixelHeight);
             canvasWidth = Math.Max(1, canvasWidth);
@@ -277,14 +242,12 @@ namespace PhasmaStrap.UI
                 int disposal = ReadInt(metadata, "/grctlext/Disposal", 0);
                 int delay = ReadInt(metadata, "/grctlext/Delay", 10);
 
-                // browsers treat 0-1 centiseconds as "unspecified" and play those at 10fps
                 if (delay < 2)
                     delay = 10;
 
                 int width = Math.Min(raw.PixelWidth, canvasWidth - left);
                 int height = Math.Min(raw.PixelHeight, canvasHeight - top);
 
-                // disposal 3 = put back what was there before this frame
                 if (disposal == 3)
                     restore = (byte[])canvas.Clone();
 
@@ -302,7 +265,6 @@ namespace PhasmaStrap.UI
 
                         for (int x = 0; x < width; x++, source += 4, target += 4)
                         {
-                            // GIF transparency is all-or-nothing: a transparent pixel leaves the canvas as it was
                             if (pixels[source + 3] == 0)
                                 continue;
 
@@ -323,7 +285,6 @@ namespace PhasmaStrap.UI
                 delays[i] = TimeSpan.FromMilliseconds(delay * 10);
                 total += delays[i];
 
-                // apply this frame's disposal before the next one is drawn
                 if (disposal == 2 && width > 0 && height > 0 && left >= 0 && top >= 0)
                 {
                     for (int y = 0; y < height; y++)
@@ -339,8 +300,6 @@ namespace PhasmaStrap.UI
             return new Media { Frames = frames, Delays = delays, Duration = total };
         }
 
-        // turns a lazy bitmap chain (transform / format conversion) into plain pixels, so the source
-        // frames behind it can be collected
         private static BitmapSource Materialize(BitmapSource source)
         {
             BitmapSource bgra = source.Format == PixelFormats.Bgra32 || source.Format == PixelFormats.Pbgra32

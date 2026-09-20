@@ -12,13 +12,7 @@
       Title="FastFlagEditorPage"
       Loaded="Page_Loaded"
       Unloaded="Page_Unloaded">
-    <!-- The whole editor scrolls; the flag list keeps a usable minimum height and scrolls on its
-         own. The layout height is worked out in code-behind (UpdateLayoutHeight) because a
-         star-sized row inside a ScrollViewer would otherwise grow to fit every flag and switch
-         virtualization off.
 
-         One list, two kinds of thing to edit: "your flags" (every game) or one profile (only the
-         games it is given to, on the Per-game flags tab). The Editing box at the top switches. -->
     <ScrollViewer x:Name="PageScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" SizeChanged="PageScroller_SizeChanged">
     <Grid x:Name="RootLayout" Margin="0,0,14,14" VerticalAlignment="Top" Height="700" LayoutUpdated="RootLayout_LayoutUpdated">
         <Grid.RowDefinitions>
@@ -45,7 +39,6 @@
                         Severity="Warning" IsOpen="True" IsClosable="False" Visibility="Collapsed" />
         </StackPanel>
 
-        <!-- what is being edited -->
         <Border Grid.Row="3" Margin="0,0,0,16" Padding="14,12" CornerRadius="8" BorderThickness="1"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
             <StackPanel>

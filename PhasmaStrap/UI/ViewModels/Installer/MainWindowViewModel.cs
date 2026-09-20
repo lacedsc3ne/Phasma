@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
 namespace PhasmaStrap.UI.ViewModels.Installer
@@ -14,9 +14,9 @@ namespace PhasmaStrap.UI.ViewModels.Installer
         public int ButtonWidth { get; } = Locale.CurrentCulture.Name.StartsWith("bg") ? 112 : 96;
 
         public ICommand BackPageCommand => new RelayCommand(BackPage);
-        
+
         public ICommand NextPageCommand => new RelayCommand(NextPage);
-        
+
         public ICommand CloseWindowCommand => new RelayCommand(CloseWindow);
 
         public event EventHandler<string>? PageRequest;

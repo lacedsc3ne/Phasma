@@ -4,22 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-// Adapted from Voidstrap (UI/GlobalBackground.cs). Voidstrap's version is a large static
-// subsystem: it persists its own JSON settings file, can target every open window, supports
-// video backgrounds via MediaElement, and reparents each window's Content into a dedicated host
-// Grid. That doesn't fit PhasmaStrap cleanly - the settings/state model here is a single
-// Settings.cs object (not a side file), and only the settings window's background is in scope.
-//
-// This trimmed port keeps only the visible payoff: a static or animated-GIF image plus a dimming
-// overlay, built as plain elements that WpfUiWindow inserts directly into its root Grid (the same
-// place it already inserts its glass tint Border) - no window reparenting. Videos are played by
-// VideoBackground, a self-contained element of the same kind.
 namespace PhasmaStrap.UI
 {
     internal static class GlobalBackground
     {
-        // builds the (image, overlay) pair to insert behind a window's content; returns null if
-        // the configured background image can't be used (missing/unreadable file)
         public static (FrameworkElement Image, FrameworkElement Overlay)? TryCreateLayers(string filePath, double overlayOpacity)
         {
             try
@@ -43,9 +31,7 @@ namespace PhasmaStrap.UI
                     IsHitTestVisible = false,
                     ClipToBounds = true
                 };
-                // GifImageBehavior fades the picture in once it has decoded. ImageFx.SmoothLoad must
-                // NOT be used here: it restarts a fade on every Source change, and an animated GIF
-                // changes Source on every frame - the background pulsed constantly.
+
                 GifImageBehavior.SetSourcePath(image, filePath);
 
                 var overlay = new Border

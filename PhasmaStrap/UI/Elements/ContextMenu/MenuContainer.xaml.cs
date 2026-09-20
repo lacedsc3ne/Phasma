@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -14,13 +14,8 @@ using PhasmaStrap.Integrations.Overlays;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for NotifyIconMenu.xaml
-    /// </summary>
     public partial class MenuContainer
     {
-        // i wouldve gladly done this as mvvm but turns out that data binding just does not work with menuitems for some reason so idk this sucks
-
         private readonly Watcher _watcher;
 
         private ActivityWatcher? _activityWatcher => _watcher.ActivityWatcher;
@@ -35,7 +30,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private RPCWindow? _rpcWindow;
 
-        // live "Session info" readouts (play time, Roblox memory) refresh on this while in a game
         private readonly DispatcherTimer _sessionTimer = new(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(2) };
 
         private int _joinClosestActive;
@@ -75,7 +69,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             FrameGenMenuItem.IsChecked = FrameGenSettings.ModeIndex > 0;
             OverlayFocusModeMenuItem.IsChecked = App.Settings.Prop.OverlayFocusModeEnabled;
 
-            // the overlay-related items only make sense when the HUD/crosshair are actually on
             bool overlaysOn = App.Settings.Prop.OverlayHudEnabled || App.Settings.Prop.Crosshair;
             OverlayFocusModeMenuItem.Visibility = overlaysOn ? Visibility.Visible : Visibility.Collapsed;
             CantSeeOverlaysMenuItem.Visibility = overlaysOn && App.Settings.Prop.OverlayDiagnosticsEnabled ? Visibility.Visible : Visibility.Collapsed;
@@ -106,12 +99,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             }
             catch
             {
-                // process gone - the leave handler will reset the readouts
             }
         }
 
-        // "Server: Public · Frankfurt, DE · 23 ms" - the region arrives a moment after the join,
-        // the ping only when the ping monitor runs (HUD ping or region row switched on)
         private void UpdateServerLine(ActivityData data)
         {
             string region = PhasmaStrap.Utility.ServerRegion.Current;
@@ -152,7 +142,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             if (string.IsNullOrEmpty(name))
             {
-                // PlayTimeStore already has the name/icon of anything played before
                 var entry = PlayTimeStore.GetAll().FirstOrDefault(x => x.UniverseId == universeId);
                 if (entry is not null)
                 {
@@ -304,8 +293,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     return;
                 }
 
-                // same deep-link + fresh -player process route the auto-rejoin and Friends "Join"
-                // already use - Roblox's own singleton hands the join over to the running client
                 Process.Start(Paths.Process, $"-player \"roblox://experiences/start?placeId={data.PlaceId}&gameInstanceId={best.JobId}\"");
             }
             catch (Exception ex)
@@ -328,9 +315,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void FrameGenMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            App.Settings.Prop.FrameGenModeIndex = FrameGenMenuItem.IsChecked ? 1 : 0;
-            App.Settings.Save();
-            OverlayHub.Refresh();
+            Integrations.FrameGeneration.FrameGenManager.SetMode(FrameGenMenuItem.IsChecked ? 1 : 0, true);
+            FrameGenMenuItem.IsChecked = Integrations.FrameGeneration.FrameGenSettings.ModeIndex > 0;
         }
 
         private void OverlayFocusModeMenuItem_Click(object sender, RoutedEventArgs e)
@@ -366,14 +352,10 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         private void Window_Loaded(object? sender, RoutedEventArgs e)
         {
-            // this is an awful hack lmao im so sorry to anyone who reads this
-            // this is done to register the context menu wrapper as a tool window so it doesnt appear in the alt+tab switcher
-            // https://stackoverflow.com/a/551847/11852173
-
             HWND hWnd = (HWND)new WindowInteropHelper(this).Handle;
 
             int exStyle = PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
-            exStyle |= 0x00000080; //NativeMethods.WS_EX_TOOLWINDOW;
+            exStyle |= 0x00000080;
             PInvoke.SetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, exStyle);
         }
 
@@ -390,11 +372,9 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 return;
 
             Clipboard.SetDataObject(link);
-            NotificationCenter.Notify("Invite link copied", "Anyone with PhasmaStrap or Roblox can open it to join your server.", NotificationCategory.General);
+            NotificationCenter.Notify("Invite link copied", "Anyone with PhasmaStrap or Roblox can open it to join your server.", NotificationCategory.General, kind: NotificationKindId.InviteLink);
         }
 
-        // the tray double-click counts as the user's own input, so Windows lets this process move
-        // another window to the front
         public void BringRobloxToFront()
         {
             int pid = _watcher.RobloxProcessId;
@@ -407,7 +387,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 return;
 
             if (IsIconic(window))
-                ShowWindow(window, 9 /* SW_RESTORE */);
+                ShowWindow(window, 9 );
 
             SetForegroundWindow(window);
         }
@@ -431,12 +411,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                 Utilities.ShellExecute(location);
         }
 
-        // the result arrives as a toast and on Diagnostics > Stutter
         private void MeasurePerformanceMenuItem_Click(object sender, RoutedEventArgs e) =>
             PhasmaStrap.Utility.PerformanceRuns.WriteRequest(new PhasmaStrap.Utility.MeasureRequest { Label = "Measured from the tray", Seconds = 60 });
-
-        // ---- Switch account: the saved logins from the Accounts page. Picking one restarts Roblox
-        // on that account, through a separate process (this one ends when Roblox closes).
 
         private void PopulateAccounts()
         {
@@ -445,7 +421,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             SwitchAccountMenuItem.Items.Clear();
             SwitchAccountMenuItem.Visibility = accounts.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-            // known only once a game has been joined in this session (it comes from the join log line)
             long currentUserId = _activityWatcher?.Data?.UserId ?? 0;
 
             foreach (var account in accounts)
@@ -488,7 +463,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
             try
             {
-                // closing Roblox mid-game on purpose is not a crash - no auto-rejoin on the old account
                 PhasmaStrap.Utility.FlagProfileSession.MarkIntentionalRestart();
 
                 Process.Start(Paths.Process, $"-switchaccount {account.UserId}");
@@ -560,6 +534,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             else
                 _chatLogsWindow.Activate();
         }
+
+        private void DonateMenuItem_Click(object sender, RoutedEventArgs e) => Utilities.ShellExecute(App.ProjectDonateLink);
 
         private void RPCDebugMenuItem_Click(object sender, RoutedEventArgs e)
         {

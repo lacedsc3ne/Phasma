@@ -10,9 +10,6 @@ using ShapeRect = System.Windows.Shapes.Rectangle;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // "Pick an area" screenshots: the game's picture is frozen over the Roblox window, you drag over
-    // the part you want and it's saved. Enter or a double-click takes the whole window, Esc (or
-    // switching away) cancels. Built in code - it's one picture and a rectangle.
     public sealed class ScreenshotAreaWindow : Window
     {
         private readonly System.Drawing.Bitmap _shot;
@@ -36,7 +33,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         private Rect _selection = Rect.Empty;
         private bool _finished;
 
-        // shot: the Roblox window's picture; screenRect: where that window is, in screen pixels
         public static void Pick(System.Drawing.Bitmap shot, System.Drawing.Rectangle screenRect, Action<System.Drawing.Bitmap?> done)
         {
             var window = new ScreenshotAreaWindow(shot, screenRect, done);
@@ -91,9 +87,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             SourceInitialized += (_, _) =>
             {
-                // exactly over the game, in real pixels whatever the display scaling
                 IntPtr hwnd = new WindowInteropHelper(this).Handle;
-                SetWindowPos(hwnd, new IntPtr(-1) /* HWND_TOPMOST */, _screenRect.X, _screenRect.Y, _screenRect.Width, _screenRect.Height, 0x0040 /* SHOWWINDOW */);
+                SetWindowPos(hwnd, new IntPtr(-1) , _screenRect.X, _screenRect.Y, _screenRect.Width, _screenRect.Height, 0x0040 );
             };
 
             Loaded += (_, _) => UpdateShade();
@@ -104,7 +99,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             MouseLeftButtonUp += OnUp;
             MouseRightButtonUp += (_, _) =>
             {
-                // right-click drops the selection; with none, it cancels
                 if (_selection.IsEmpty)
                     Finish(null);
                 else
@@ -156,7 +150,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             _start = null;
             ReleaseMouseCapture();
 
-            // a click without a drag isn't a choice yet
             System.Drawing.Rectangle pixels = ToPixels(_selection);
             if (pixels.Width < 4 || pixels.Height < 4)
             {
@@ -189,7 +182,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
             catch (InvalidOperationException)
             {
-                // already closing (Deactivated fires while the window closes)
             }
 
             try
@@ -240,7 +232,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Canvas.SetTop(_sizeTag, rect.Bottom + 6 + 22 > _canvas.ActualHeight ? Math.Max(0, rect.Top - 28) : rect.Bottom + 6);
         }
 
-        // everything but the selection is dimmed
         private void UpdateShade()
         {
             var all = new RectangleGeometry(new Rect(0, 0, _canvas.ActualWidth, _canvas.ActualHeight));

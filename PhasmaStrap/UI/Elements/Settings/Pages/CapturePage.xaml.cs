@@ -1,16 +1,14 @@
-using PhasmaStrap.UI.ViewModels.Settings;
+using PhasmaStrap.UI.Elements.Controls;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    public partial class CapturePage
+    public partial class CapturePage : ISectionHostPage
     {
         public CapturePage()
         {
-            DataContext = new CaptureViewModel();
             InitializeComponent();
-
-            // the page is cached between visits - re-check the hotkey bindings each time it shows
-            Loaded += (_, _) => ((CaptureViewModel)DataContext).RefreshHotkeyHint();
         }
+
+        public SectionHost SectionHost => Host;
     }
 }

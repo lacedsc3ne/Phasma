@@ -8,10 +8,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    /// <summary>
-    /// Accounts page > Account guard. The toggles apply when Save is pressed (that's also when the
-    /// background watcher is started or its start-up entry removed).
-    /// </summary>
     public sealed class AccountGuardViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<GuardFinding> Findings { get; } = new();

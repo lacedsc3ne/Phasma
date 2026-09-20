@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,9 +15,6 @@ using PhasmaStrap.UI.ViewModels.Dialogs;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Interaction logic for LanguageSelectorDialog.xaml
-    /// </summary>
     public partial class LanguageSelectorDialog
     {
         public LanguageSelectorDialog()

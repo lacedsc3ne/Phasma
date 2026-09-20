@@ -3,7 +3,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Shows exactly which flags a game starts with, and where each one comes from
     public partial class FlagPreviewDialog : WpfUiWindow
     {
         public sealed record Row(string Name, string Value, string From, string Tone);

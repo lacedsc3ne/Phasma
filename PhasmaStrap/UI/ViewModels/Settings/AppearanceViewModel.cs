@@ -90,8 +90,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 App.Settings.Prop.ControllerNavigationEnabled = value;
 
-                // take effect immediately for the currently open settings window, rather
-                // than requiring a restart
                 if (value)
                     ControllerService.Initialize();
                 else
@@ -111,8 +109,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 App.Settings.Prop.Locale = identifier;
                 Locale.Set(identifier);
 
-                // take effect immediately in every currently open window, rather than requiring
-                // a restart - see UI/LiveLanguageRefresher.cs for how/why
                 LiveLanguageRefresher.RefreshAllOpenWindows();
             }
         }
@@ -125,7 +121,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set
             {
                 App.Settings.Prop.BootstrapperStyle = value;
-                OnPropertyChanged(nameof(CustomThemesExpanded)); // TODO: only fire when needed
+                OnPropertyChanged(nameof(CustomThemesExpanded));
             }
         }
 
@@ -136,7 +132,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public BootstrapperIcon Icon
         {
             get => App.Settings.Prop.BootstrapperIcon;
-            set => App.Settings.Prop.BootstrapperIcon = value; 
+            set => App.Settings.Prop.BootstrapperIcon = value;
         }
 
         public string Title
@@ -261,7 +257,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 return;
             }
 
-            // better to check for the file instead of the directory so broken themes can be overwritten
             string path = Path.Combine(Paths.CustomThemes, SelectedCustomThemeName, "Theme.xml");
             if (File.Exists(path))
             {
@@ -346,7 +341,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (string directory in Directory.GetDirectories(Paths.CustomThemes))
             {
                 if (!File.Exists(Path.Combine(directory, "Theme.xml")))
-                    continue; // missing the main theme file, ignore
+                    continue;
 
                 string name = Path.GetFileName(directory);
                 CustomThemes.Add(name);
@@ -403,14 +398,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.SmoothProgressBarsEnabled = value;
         }
 
-        // the expander below this toggle is bound OneWay to GlobalBackgroundEnabled with a
-        // no-user-expansion style, so without a change notification here it never opened and
-        // the file picker inside it was unreachable - that's why "you can't set a background
-        // image". Each of these also re-applies the background to the live window immediately
-        // rather than only on the next launch.
-        // Every change here applies to the open window AND saves straight away. It used to only
-        // change the in-memory settings: the new picture showed immediately, which looked saved, but
-        // unless the Save button was pressed the next launch went back to whatever was on disk.
         public bool GlobalBackgroundEnabled
         {
             get => App.Settings.Prop.GlobalBackgroundEnabled;
@@ -448,7 +435,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 App.Settings.SaveDeferred();
                 OnPropertyChanged(nameof(GlobalBackgroundOverlayOpacity));
 
-                // cheap now - the window only moves its dim layer, the picture is left alone
                 Elements.Base.WpfUiWindow.RefreshGlobalBackgroundOnAllWindows();
             }
         }
@@ -463,7 +449,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             public bool IsAnimated { get; init; }
             public bool IsVideo { get; init; }
 
-            // a file outside the library (set by an older version, or by hand in Settings.json)
             public bool IsLinked { get; init; }
 
             public bool IsSelected
@@ -503,7 +488,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (wasSelected)
                 GlobalBackgroundFilePath = "";
 
-            // a linked file belongs to the user - only library copies are deleted
             if (!item.IsLinked)
                 BackgroundLibrary.Remove(item.Path);
         });
@@ -536,7 +520,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 IsSelected = selected,
             };
 
-            // thumbnails decode off the UI thread and pop in when ready
             Task.Run(() => BackgroundLibrary.LoadThumbnail(path, 320)).ContinueWith(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion && task.Result is not null)
@@ -588,7 +571,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         ? $"Checking and copying {System.IO.Path.GetFileName(file)} ({size / 1048576.0:0} MB)..."
                         : "";
 
-                    // copying (and for a video, test-opening) a big file must not freeze the window
                     string imported = await Task.Run(() => BackgroundLibrary.Import(file));
 
                     BackgroundStatus = BackgroundLibrary.IsVideo(file) && size > BackgroundLibrary.LargeVideoBytes
@@ -615,7 +597,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (last is null)
                 return;
 
-            // picking a picture means wanting to see it
             if (!GlobalBackgroundEnabled)
                 GlobalBackgroundEnabled = true;
 
@@ -630,8 +611,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         #endregion
 
-        // app UI colour theme (AppColorTheme) - distinct from the CustomThemes above, which are
-        // *bootstrapper dialog* themes, not colours for PhasmaStrap's own settings/menu UI
         public bool CustomColorThemeEnabled
         {
             get => App.Settings.Prop.CustomColorThemeEnabled;

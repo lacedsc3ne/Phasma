@@ -4,16 +4,6 @@ using System.Windows.Media.Imaging;
 
 namespace PhasmaStrap.Networking
 {
-    // Downscales images on their way to the game, so a 2048 px texture arrives as a 512 px one:
-    // less to decode, far less video memory, and the game still looks like itself (the older
-    // "disable all textures" switches simply remove them).
-    //
-    // Only what can be decoded safely is touched - PNG, JPEG, BMP, GIF, TIFF, recognised by their
-    // first bytes. Anything else (Roblox's compressed texture formats, meshes that happen to be
-    // typed as images) passes through unchanged, as does an image that is already small enough or
-    // that would come out BIGGER than it went in. PNG in, PNG out (alpha kept); JPEG in, JPEG out.
-    //
-    // Decoding is Windows Imaging (WPF), on whatever thread calls it. No App dependencies.
     public static class TextureShrinker
     {
         public sealed class Outcome
@@ -37,7 +27,6 @@ namespace PhasmaStrap.Networking
             return "";
         }
 
-        // null = leave it alone (not an image we handle, already small, would not get smaller, or undecodable)
         public static Outcome? Shrink(byte[] data, int maxDimension)
         {
             string format = Sniff(data);
@@ -51,7 +40,6 @@ namespace PhasmaStrap.Networking
                 {
                     var decoder = BitmapDecoder.Create(input, BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.OnLoad);
 
-                    // an animated GIF is more than its first frame
                     if (decoder.Frames.Count != 1)
                         return null;
 
@@ -66,12 +54,8 @@ namespace PhasmaStrap.Networking
                 double scale = (double)maxDimension / longest;
                 int newWidth = Math.Max(1, (int)Math.Round(width * scale)), newHeight = Math.Max(1, (int)Math.Round(height * scale));
 
-                // premultiplied BGRA: scaling straight alpha bleeds the (usually black) colour of
-                // fully transparent pixels into the edges of a sprite
                 BitmapSource source = new FormatConvertedBitmap(frame, PixelFormats.Pbgra32, null, 0);
 
-                // TransformedBitmap scales inside Windows Imaging (Fant filter) and, unlike rendering
-                // a visual, needs no dispatcher or render channel - safe on any pool thread
                 var scaled = new TransformedBitmap(source, new ScaleTransform((double)newWidth / width, (double)newHeight / height));
                 scaled.Freeze();
 
@@ -101,7 +85,6 @@ namespace PhasmaStrap.Networking
             }
             catch
             {
-                // a broken or exotic file is the game's to deal with, unchanged
                 return null;
             }
         }

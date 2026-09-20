@@ -1,6 +1,5 @@
-﻿namespace PhasmaStrap.Models.APIs.Roblox
+namespace PhasmaStrap.Models.APIs.Roblox
 {
-    // lmao its just one property
     public class UniverseIdResponse
     {
         [JsonPropertyName("universeId")]

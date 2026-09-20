@@ -2,8 +2,6 @@ namespace PhasmaStrap
 {
     static class Paths
     {
-        // note that these are directories that aren't tethered to the basedirectory
-        // so these can safely be called before initialization
         public static string Temp => Path.Combine(Path.GetTempPath(), App.ProjectName);
         public static string UserProfile => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public static string LocalAppData => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -30,14 +28,10 @@ namespace PhasmaStrap
         public static string CustomThemes { get; private set; } = "";
         public static string AccountBackups { get; private set; } = "";
 
-        // mod management library (ModsPage's "Mod Management" tab) - each managed mod lives in
-        // its own subfolder under Packages, keyed by a GUID; Index.json tracks name/enabled/order
         public static string ManagedMods { get; private set; } = "";
         public static string ManagedModPackages { get; private set; } = "";
         public static string ManagedModIndex { get; private set; } = "";
 
-        // custom cursor set library (ModsPage's Preset Mod tab, cursor set manager) - each saved
-        // set lives in its own subfolder under Sets, keyed by a GUID; Index.json tracks names/order
         public static string CursorSets { get; private set; } = "";
         public static string CursorSetsRoot { get; private set; } = "";
         public static string CursorSetsIndex { get; private set; } = "";
@@ -46,20 +40,12 @@ namespace PhasmaStrap
 
         public static string CustomFont => Path.Combine(Modifications, "content\\fonts\\CustomFont.ttf");
 
-        // custom death sound source (Preset Mod tab) - mirrors CustomFont's layout, applied over
-        // Roblox's own content\sounds\oof.ogg by CustomDeathSoundModPresetTask
         public static string CustomDeathSound => Path.Combine(Modifications, "content\\sounds\\oof.ogg");
 
-        // custom skybox faces (Preset Mod tab, skybox manager) - written directly under
-        // Modifications so the existing flat mod-copy pipeline in Bootstrapper.ApplyModifications
-        // picks them up like any other mod file, no bootstrapper changes required
         public static string CustomSkybox => Path.Combine(Modifications, "PlatformContent\\pc\\textures\\sky");
 
-        // app UI colour theme override (AppColorTheme) - distinct from CustomThemes above, which
-        // holds custom *bootstrapper dialog* definitions, not app colour schemes
         public static string CustomColorThemeXaml => Path.Combine(Base, "CustomColorTheme.xaml");
 
-        // rolling snapshots of Settings.json / ClientAppSettings.json (Utility.SettingsBackups)
         public static string SettingsBackups => Path.Combine(Base, "Backups");
 
         public static bool Initialized => !String.IsNullOrEmpty(Base);

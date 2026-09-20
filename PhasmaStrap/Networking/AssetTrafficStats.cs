@@ -4,9 +4,9 @@ namespace PhasmaStrap.Networking
     {
         public int Requests { get; set; }
         public int CacheHits { get; set; }
-        public long DownloadedBytes { get; set; }       // really fetched from Roblox
-        public long ServedFromCacheBytes { get; set; }  // handed over without touching the network
-        public long ShrinkSavedBytes { get; set; }      // what the texture shrinker took off
+        public long DownloadedBytes { get; set; }
+        public long ServedFromCacheBytes { get; set; }
+        public long ShrinkSavedBytes { get; set; }
         public int Shrunk { get; set; }
         public int Swapped { get; set; }
         public int Failed { get; set; }
@@ -38,12 +38,6 @@ namespace PhasmaStrap.Networking
         public Dictionary<long, PlaceTraffic> Places { get; set; } = new();
     }
 
-    // The traffic report: per game, how much was downloaded, how much the cache and the shrinker
-    // saved, what kinds of assets it was, and which of Roblox's servers were slow to answer.
-    //
-    // Only covers what passes through PhasmaStrap (routed asset downloads); the game's own
-    // real-time connection to the server does not. Counted in memory, written out every half
-    // minute. The file path is a parameter, so it can be exercised from a console harness.
     public sealed class AssetTrafficStats
     {
         public static Action<string>? Log;
@@ -161,8 +155,6 @@ namespace PhasmaStrap.Networking
 
                 try
                 {
-                    // (only the one process that owns the proxy's port ever counts, so there is
-                    // nobody to merge with - the file is simply this process's totals)
                     TrafficData merged = _data;
 
                     if (_data.Places.Count > MaxPlaces)
@@ -184,7 +176,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // a fresh read from disk, for the page
         public TrafficData Load()
         {
             try

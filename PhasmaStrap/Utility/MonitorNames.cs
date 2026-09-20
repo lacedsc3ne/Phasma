@@ -2,12 +2,8 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility
 {
-    // The monitors' own names ("AOC 24G2", "DELL S2721DGF"...), from Windows' display
-    // configuration. EnumDisplayDevices only knows the driver's name, which for almost every
-    // monitor is "Generic PnP Monitor".
     public static class MonitorNames
     {
-        // \\.\DISPLAY1 -> the monitor's name
         public static Dictionary<string, string> ByDeviceName()
         {
             var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -97,7 +93,6 @@ namespace PhasmaStrap.Utility
             public uint flags;
         }
 
-        // 64 bytes; only its size matters here
         [StructLayout(LayoutKind.Sequential, Size = 64)]
         private struct DISPLAYCONFIG_MODE_INFO
         {

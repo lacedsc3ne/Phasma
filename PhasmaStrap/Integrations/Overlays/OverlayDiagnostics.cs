@@ -9,13 +9,6 @@ using Interop = PhasmaStrap.Integrations.Overlays.OverlayInterop;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>
-    /// Tracks which WPF windows are "overlay" windows (so the compositor's foreground
-    /// detection doesn't hide itself behind its own UI) and produces a human-readable
-    /// explanation of why overlays might not be visible. Ported from Voidstrap's
-    /// Overlays subsystem; RiShade/Anti Aliasing/Frame Generation specific causes were
-    /// dropped since those subsystems aren't part of this port.
-    /// </summary>
     public static class OverlayDiagnostics
     {
         private const int GWL_STYLE = -16;

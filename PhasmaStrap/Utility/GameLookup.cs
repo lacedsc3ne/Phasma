@@ -2,9 +2,6 @@ namespace PhasmaStrap.Utility
 {
     public sealed record GameInfo(long UniverseId, long RootPlaceId, string Name, string IconUrl = "");
 
-    // Finding games for the per-game flag rules: which game a place belongs to (remembered on
-    // disk, so a launch rarely has to ask Roblox), where a friend is playing (for "join a friend"
-    // launches, whose link has no place in it), and searching games by name.
     public static class GameLookup
     {
         private const string LOG_IDENT = "GameLookup";
@@ -62,7 +59,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // the game a place belongs to, from what is already known locally
         public static long? KnownUniverseOf(long placeId)
         {
             if (placeId <= 0)
@@ -102,7 +98,6 @@ namespace PhasmaStrap.Utility
             return universeId;
         }
 
-        // where a user is playing right now, when their presence can be seen by the signed-in account
         public static async Task<(long PlaceId, long UniverseId)?> WhereIsUserAsync(long userId, TimeSpan timeout)
         {
             try
@@ -128,8 +123,6 @@ namespace PhasmaStrap.Utility
                 return null;
             }
         }
-
-        // ------------------------------------------------------------------ search (settings page)
 
         public static async Task<List<GameInfo>> SearchAsync(string query, CancellationToken ct = default)
         {
@@ -180,7 +173,6 @@ namespace PhasmaStrap.Utility
             return await WithIconsAsync(result, ct);
         }
 
-        // a single game from a link or place ID
         public static async Task<GameInfo?> FromPlaceAsync(long placeId, CancellationToken ct = default)
         {
             long? universeId = await Integrations.UniversePlaces.GetUniverseIdAsync(placeId, ct);

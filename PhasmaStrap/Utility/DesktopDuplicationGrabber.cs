@@ -8,21 +8,13 @@ using D3D11 = Vortice.Direct3D11.D3D11;
 
 namespace PhasmaStrap.Utility
 {
-    // Grabs a rectangle of the desktop through DXGI desktop duplication - the GPU hands over the
-    // composed frame, so a 1080p grab costs a few milliseconds instead of the ~25ms that
-    // PrintWindow takes. Instant Replay uses it while Roblox is the foreground window (when what
-    // is on screen IS the game) to reach 60fps; PrintWindow stays the fallback for everything
-    // else. Same technique OverlayCompositor uses, kept separate so the recorder works with
-    // overlays switched off and owns its own device.
-    //
-    // Free of App dependencies so it can run in a console harness.
     public sealed class DesktopDuplicationGrabber : IDisposable
     {
         public enum GrabResult
         {
-            Frame,          // `bitmap` holds a new frame
-            NoNewFrame,     // nothing on screen changed since the last grab - keep showing the previous frame
-            Unavailable,    // duplication can't be used right now (HDR surface, access lost, other GPU...)
+            Frame,
+            NoNewFrame,
+            Unavailable,
         }
 
         public static Action<string>? Log;
@@ -36,7 +28,6 @@ namespace PhasmaStrap.Utility
         private int _stagingWidth, _stagingHeight;
         private int _outputLeft, _outputTop, _outputRight, _outputBottom;
 
-        // Grabs the given screen rectangle. `bitmap` is a new 32bppRgb bitmap the caller owns.
         public GrabResult TryGrab(int left, int top, int width, int height, int timeoutMs, out Bitmap? bitmap)
         {
             bitmap = null;
@@ -56,7 +47,6 @@ namespace PhasmaStrap.Utility
                         _duplication!.AcquireNextFrame(timeoutMs, out OutduplFrameInfo info, out resource);
                         acquired = true;
 
-                        // a mouse-only update carries no new image
                         if (info.LastPresentTime == 0)
                             return GrabResult.NoNewFrame;
                     }
@@ -66,7 +56,6 @@ namespace PhasmaStrap.Utility
                     }
                     catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.AccessLost)
                     {
-                        // resolution / fullscreen change or secure desktop - rebuilt on the next call
                         ReleaseDuplication();
                         return GrabResult.Unavailable;
                     }
@@ -77,7 +66,6 @@ namespace PhasmaStrap.Utility
                     using ID3D11Texture2D desktop = resource.QueryInterface<ID3D11Texture2D>();
                     Texture2DDescription desc = desktop.Description;
 
-                    // HDR desktops duplicate as 16-bit float, which would need a tone-mapping pass
                     if (desc.Format != Format.B8G8R8A8_UNorm)
                     {
                         Log?.Invoke($"Desktop surface is {desc.Format}, not BGRA8 - duplication capture unavailable");
@@ -196,7 +184,6 @@ namespace PhasmaStrap.Utility
                 adapter.Dispose();
             }
 
-            // the window is on a monitor driven by a different GPU than the default one
             Log?.Invoke("No duplicable output contains the game window");
             return false;
         }

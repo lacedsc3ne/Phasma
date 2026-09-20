@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +17,6 @@ using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Interaction logic for BehaviourPage.xaml
-    /// </summary>
     public partial class BehaviourPage
     {
         public BehaviourPage()
@@ -30,7 +27,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void ToggleSwitch_Checked(object sender, RoutedEventArgs e)
         {
-
         }
     }
 }

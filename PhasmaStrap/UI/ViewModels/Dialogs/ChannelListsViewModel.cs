@@ -6,20 +6,8 @@ using PhasmaStrap.RobloxInterfaces;
 
 namespace PhasmaStrap.UI.ViewModels.Dialogs
 {
-    /// <summary>
-    /// Backs <see cref="Elements.Dialogs.ChannelListsDialog"/>.
-    /// </summary>
-    /// <remarks>
-    /// Roblox does not publish a live "list every deployment channel" API - channel names are
-    /// arbitrary and only discoverable by already knowing them. So unlike a page that lists e.g.
-    /// GitHub releases, this dialog works from a small curated list of channel names (the same
-    /// ones offered on the main Channel settings page) and resolves each one's currently deployed
-    /// version live via the real Roblox client-version endpoint (<see cref="Deployment.GetInfo"/>,
-    /// which hits clientsettingscdn.roblox.com / clientsettings.roblox.com).
-    /// </remarks>
     public class ChannelListsViewModel : NotifyPropertyChangedViewModel
     {
-        // same curated set of commonly-used channels offered on the Channel settings page
         private static readonly string[] KnownChannelNames =
         {
             "production",

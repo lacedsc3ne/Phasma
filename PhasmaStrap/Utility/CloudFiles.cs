@@ -2,11 +2,6 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility;
 
-// Detects OneDrive (and other cloud-sync provider) placeholder files - files that show up in
-// directory listings but are actually cloud-only stubs Windows hasn't downloaded yet - so that
-// install/update file copies don't silently fail when the install folder or a Roblox version
-// folder ends up inside a synced directory (eg. via Known Folder Move redirecting AppData/Desktop
-// to OneDrive after installation). Ported from Voidstrap.
 internal static class CloudFiles
 {
     private const int Pinned = 0x00080000;
@@ -29,9 +24,6 @@ internal static class CloudFiles
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetFileAttributes(string fileName, uint attributes);
 
-    /// <summary>
-    /// Checks whether the given path is a cloud-sync placeholder (ie. not actually present on disk yet).
-    /// </summary>
     public static bool IsPlaceholder(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -47,10 +39,6 @@ internal static class CloudFiles
         }
     }
 
-    /// <summary>
-    /// Checks whether the given path lives under a folder synced by a known cloud storage provider
-    /// (OneDrive, Dropbox, Google Drive, etc), regardless of whether the file itself is a placeholder.
-    /// </summary>
     public static bool IsCloudSyncedPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -103,10 +91,6 @@ internal static class CloudFiles
         return false;
     }
 
-    /// <summary>
-    /// Determines whether an exception thrown from a file operation was likely caused by the target
-    /// being an unhydrated cloud-sync placeholder, rather than a genuine I/O or permissions failure.
-    /// </summary>
     public static bool IsCloudFailure(Exception exception, string? path)
     {
         if (exception is not IOException && exception is not UnauthorizedAccessException)
@@ -115,10 +99,6 @@ internal static class CloudFiles
         return IsPlaceholder(path) || IsCloudSyncedPath(path);
     }
 
-    /// <summary>
-    /// Forces a cloud-sync placeholder to be downloaded locally by reading a byte from it.
-    /// Returns true if the file is now available locally (or wasn't a placeholder to begin with).
-    /// </summary>
     public static bool Hydrate(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
@@ -142,10 +122,6 @@ internal static class CloudFiles
         }
     }
 
-    /// <summary>
-    /// Pins a file or folder so the cloud-sync provider keeps it available locally instead of
-    /// letting it be dehydrated back into a placeholder.
-    /// </summary>
     public static void PinLocally(string? path)
     {
         if (string.IsNullOrWhiteSpace(path) || !OperatingSystem.IsWindows())

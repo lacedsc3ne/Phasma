@@ -2,12 +2,6 @@ using System.ComponentModel;
 
 namespace PhasmaStrap.Networking
 {
-    // manages the block of hosts-file entries that redirect specific Roblox API hostnames
-    // to the local proxy. Writing to the hosts file needs administrator rights, which
-    // PhasmaStrap does not run with by default (and should not, just for this one
-    // feature) - so the actual write happens in a short-lived elevated relaunch of the
-    // app itself (-writeproxyhosts / -removeproxyhosts), triggered here via a single UAC
-    // prompt, rather than elevating the whole application.
     public static class HostsFileManager
     {
         private const string LOG_IDENT = "HostsFileManager";
@@ -15,18 +9,6 @@ namespace PhasmaStrap.Networking
         private const string BlockStart = "# PhasmaStrap proxy - do not edit this block by hand";
         private const string BlockEnd = "# PhasmaStrap proxy end";
 
-        // NOTE: AssetWarpPolicy.Host/AssetWarpThumbnailPolicy.Host are always included here,
-        // same as the other policies below - they're unconditionally registered with
-        // AssetProxyServer too (see NetworkingController.RegisterAssetWarpHosts), and it's the
-        // policies themselves (AssetWarpPolicy.IsEnabled / AssetWarpThumbnailPolicy.IsEnabled)
-        // that gate whether anything actually gets stripped. Without an entry here, Windows
-        // would resolve those hostnames normally and Roblox would talk to them directly,
-        // bypassing the proxy (and therefore AssetWarp) entirely regardless of its toggles.
-        //
-        // The exception is JoinPickerPolicy.Host (gamejoin.roblox.com): every join in every game
-        // would then depend on the proxy being up, so it is only listed while the server picker is
-        // actually switched on. Toggling the picker makes the block "not current", and it is
-        // rewritten through the usual elevated run.
         public static string[] InterceptedHostnames => new[]
             {
                 PresenceSpoofPolicy.Host,
@@ -57,9 +39,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // true only when the block exists AND lists exactly the hostnames this build intercepts -
-        // a block written by an older build (different host list) would leave new policies
-        // bypassed, or worse, keep redirecting a host nothing listens for any more
         public static bool IsBlockCurrent()
         {
             try
@@ -93,8 +72,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // runs the elevated write, prompting for UAC once. Returns true only if the
-        // elevated process reports success.
         public static bool RequestInstall()
         {
             return RunElevated("-writeproxyhosts");
@@ -128,7 +105,6 @@ namespace PhasmaStrap.Networking
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
             {
-                // the user declined the UAC prompt
                 App.Logger.WriteLine(LOG_IDENT, "User declined the elevation prompt");
                 return false;
             }
@@ -139,8 +115,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // called only from within the short-lived elevated process (already running as
-        // administrator at this point), never from the normal app process
         public static bool WriteBlockElevated()
         {
             const string LOG_IDENT = "HostsFileManager::WriteBlockElevated";

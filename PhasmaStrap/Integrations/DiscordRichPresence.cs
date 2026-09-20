@@ -4,13 +4,6 @@ using DiscordRPC;
 
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// A read-only snapshot of the fields most recently sent to Discord, as shown by the standalone
-    /// RPC Debug viewer window (UI/Elements/ContextMenu/RPCWindow.xaml). Deliberately mirrors only
-    /// what's actually presented to Discord - it's built from <see cref="DiscordRPC.RichPresence"/>
-    /// right before/after <see cref="DiscordRpcClient.SetPresence"/>/<see cref="DiscordRpcClient.ClearPresence"/>,
-    /// not from any of the intermediate BloxstrapRPC/template state that produced it.
-    /// </summary>
     public sealed class RichPresenceSnapshot
     {
         public bool IsActive { get; init; }
@@ -28,14 +21,10 @@ namespace PhasmaStrap.Integrations
 
     public class DiscordRichPresence : IDisposable
     {
-        // PhasmaStrap's own Discord application (named "PhasmaStrap", with the logo as its icon) -
-        // this is what makes the profile read "Playing PhasmaStrap". The alternative is the shared
-        // "Roblox" application Bloxstrap registered, selected by Settings.DiscordShowAsPhasmaStrap.
         public const string PhasmaStrapApplicationId = "1550192013452906538";
 
         public const string RobloxApplicationId = "1005469189907173486";
 
-        // the real PhasmaStrap mark (Resources/PhasmaStrapLogo.png on the main branch) - shown as the small badge
         public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/Phasma/main/PhasmaStrap/Resources/PhasmaStrapLogo.png";
 
         public static string ResolveApplicationId() =>
@@ -48,7 +37,6 @@ namespace PhasmaStrap.Integrations
         private DiscordRPC.RichPresence? _currentPresence;
         private DiscordRPC.RichPresence? _originalPresence;
 
-        // the current game's player limit, for the Discord party (DiscordJoin)
         private int _maxPlayers;
 
         private FixedSizeList<ThumbnailCacheEntry> _thumbnailCache = new FixedSizeList<ThumbnailCacheEntry>(20);
@@ -61,18 +49,8 @@ namespace PhasmaStrap.Integrations
 
         private readonly DateTime _sessionStartUtc = DateTime.UtcNow;
 
-        /// <summary>
-        /// The last presence snapshot actually sent to (or cleared from) Discord. Updated at the end
-        /// of every <see cref="UpdatePresence"/> call, which raises <see cref="PresenceChanged"/> -
-        /// used by the standalone RPC Debug viewer window to observe live presence state without
-        /// duplicating any of the RPC building logic above.
-        /// </summary>
         public RichPresenceSnapshot CurrentSnapshot { get; private set; } = new RichPresenceSnapshot { IsActive = false };
 
-        /// <summary>
-        /// Raised (off the UI thread - marshal before touching UI state) whenever <see cref="CurrentSnapshot"/>
-        /// changes.
-        /// </summary>
         public event EventHandler? PresenceChanged;
 
         public DiscordRichPresence(ActivityWatcher activityWatcher)
@@ -97,20 +75,14 @@ namespace PhasmaStrap.Integrations
             _rpcClient.OnConnectionEstablished += (_, e) =>
                 App.Logger.WriteLine(LOG_IDENT, "Established connection with Discord RPC");
 
-            //spams log as it tries to connect every ~15 sec when discord is closed so not now
-            //_rpcClient.OnConnectionFailed += (_, e) =>
-            //    App.Logger.WriteLine(LOG_IDENT, "Failed to establish connection with Discord RPC");
-
             _rpcClient.OnClose += (_, e) =>
                 App.Logger.WriteLine(LOG_IDENT, $"Lost connection to Discord RPC - {e.Reason} ({e.Code})");
 
-            // a friend's Discord Join lands here when this PhasmaStrap is the one connected
             _rpcClient.OnJoin += (_, e) => DiscordJoin.Launch(e.Secret);
             DiscordJoin.Subscribe(_rpcClient, ResolveApplicationId());
 
             _rpcClient.Initialize();
 
-            // show the idle card right away - Roblox's own app is open before any game is
             _ = Task.Run(() => SetCurrentGame());
         }
 
@@ -127,8 +99,6 @@ namespace PhasmaStrap.Integrations
                 _messageQueue.Enqueue(message);
                 return;
             }
-
-            // a lot of repeated code here, could this somehow be cleaned up?
 
             if (message.Command == "SetLaunchData")
             {
@@ -283,11 +253,9 @@ namespace PhasmaStrap.Integrations
             else if (presenceData.TimestampEnd is not null)
                 _currentPresence.Timestamps.EndUnixMilliseconds = presenceData.TimestampEnd * 1000;
 
-            // set these to start fetching
             ulong? smallImgFetch = null;
             ulong? largeImgFetch = null;
 
-            // only set small image if account display is disabled, doesnt make sense to override it if it is true
             if (presenceData.SmallImage is not null && !App.Settings.Prop.ShowAccountOnRichPresence)
             {
                 if (presenceData.SmallImage.Clear)
@@ -388,15 +356,13 @@ namespace PhasmaStrap.Integrations
         public async Task<bool> SetCurrentGame()
         {
             const string LOG_IDENT = "DiscordRichPresence::SetCurrentGame";
-            
+
             if (!_activityWatcher.InGame)
             {
                 _messageQueue.Clear();
 
                 if (App.Settings.Prop.DiscordShowAsPhasmaStrap)
                 {
-                    // Roblox is open but no game is - keep "Playing PhasmaStrap" up with an idle
-                    // card (logo as the big image) instead of vanishing from the profile
                     App.Logger.WriteLine(LOG_IDENT, "Not in game, showing the idle PhasmaStrap presence");
 
                     _currentPresence = new DiscordRPC.RichPresence
@@ -426,23 +392,17 @@ namespace PhasmaStrap.Integrations
             string smallImageText = "Roblox";
             string smallImage = "roblox";
 
-            // Discord's activity card never shows the application's own icon - the only pictures
-            // on it are the large image (the game) and the small badge in its corner. So the
-            // PhasmaStrap logo lives in that badge (the account avatar takes the spot instead when
-            // "Show account on profile" is on). Discord fetches image URLs through its own proxy.
             if (App.Settings.Prop.DiscordShowAsPhasmaStrap)
             {
                 smallImage = PhasmaStrapLogoUrl;
                 smallImageText = $"PhasmaStrap v{App.Version}";
             }
-            
 
             var activity = _activityWatcher.Data;
             long placeId = activity.PlaceId;
 
             App.Logger.WriteLine(LOG_IDENT, $"Setting presence for Place ID {placeId}");
 
-            // preserve time spent playing if we're teleporting between places in the same universe
             var timeStarted = activity.TimeJoined;
 
             if (activity.RootActivity is not null)
@@ -473,7 +433,7 @@ namespace PhasmaStrap.Integrations
                 var userDetails = await UserDetails.Fetch(activity.UserId);
 
                 smallImage = userDetails.Thumbnail.ImageUrl!;
-                smallImageText = $"Playing on {userDetails.Data.DisplayName} (@{userDetails.Data.Name})"; // i.e. "axell (@Axelan_se)"
+                smallImageText = $"Playing on {userDetails.Data.DisplayName} (@{userDetails.Data.Name})";
             }
 
             if (!_activityWatcher.InGame || placeId != activity.PlaceId)
@@ -510,16 +470,8 @@ namespace PhasmaStrap.Integrations
                 }
             };
 
-            // apply the user's own rich presence template (if one is configured for this game) as the
-            // new baseline, *before* snapshotting into _originalPresence. this means a game's own
-            // BloxstrapRPC messages (processed below/afterwards via ProcessRPCMessage) still take full
-            // priority and can override any field at runtime same as before, but "<reset>" from a game
-            // now resets back to the user's templated defaults rather than the raw computed ones - the
-            // template only controls the idle/default appearance, never live gameplay data a game
-            // reports about itself.
             ApplyUserTemplate(placeId, activity.UniverseId, universeDetails.Data.Name, status, universeDetails.Data.Creator.Name);
 
-            // this is used for configuration from BloxstrapRPC
             _originalPresence = _currentPresence.Clone();
 
             if (_messageQueue.Any())
@@ -527,15 +479,12 @@ namespace PhasmaStrap.Integrations
                 App.Logger.WriteLine(LOG_IDENT, "Processing queued messages");
                 ProcessRPCMessage(_messageQueue.Dequeue(), false);
             }
-            
+
             UpdatePresence();
 
             return true;
         }
 
-        // fills in the current presence from a matching user-authored RPCTemplate (see Models/RPCTemplate.cs),
-        // substituting {gameName}, {status}, {creator}, {placeId} and {universeId} placeholder tokens.
-        // does nothing if no enabled template is configured for this place ID.
         private void ApplyUserTemplate(long placeId, long universeId, string gameName, string status, string creatorName)
         {
             const string LOG_IDENT = "DiscordRichPresence::ApplyUserTemplate";
@@ -569,8 +518,6 @@ namespace PhasmaStrap.Integrations
             if (!String.IsNullOrWhiteSpace(template.LargeImageUrl))
                 _currentPresence.Assets.LargeImageKey = template.LargeImageUrl;
 
-            // only override the small image if account display is disabled, same rule the BloxstrapRPC
-            // handler above already applies, so the two features don't fight over the same slot
             if (!String.IsNullOrWhiteSpace(template.SmallImageUrl) && !App.Settings.Prop.ShowAccountOnRichPresence)
                 _currentPresence.Assets.SmallImageKey = template.SmallImageUrl;
 
@@ -584,7 +531,6 @@ namespace PhasmaStrap.Integrations
                 if (_currentPresence.Buttons is not null)
                     buttons.AddRange(_currentPresence.Buttons);
 
-                // discord only allows a maximum of 2 buttons
                 if (buttons.Count > 2)
                     buttons = buttons.Take(2).ToList();
 
@@ -629,7 +575,7 @@ namespace PhasmaStrap.Integrations
         public void UpdatePresence()
         {
             const string LOG_IDENT = "DiscordRichPresence::UpdatePresence";
-            
+
             if (_currentPresence is null)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Presence is empty, clearing");
@@ -645,9 +591,6 @@ namespace PhasmaStrap.Integrations
                 DiscordJoin.Apply(_currentPresence, _activityWatcher.Data, _maxPlayers);
                 _rpcClient.SetPresence(_currentPresence);
 
-                // fire-and-forget: send the untranslated presence immediately (above), then swap
-                // in the translated fields once TranslationService resolves them, without ever
-                // blocking this (synchronous) UpdatePresence caller on a network round-trip
                 if (Utility.RpcTranslationService.IsEnabled)
                     _ = ApplyPresenceTranslationAsync(_currentPresence);
             }
@@ -688,8 +631,6 @@ namespace PhasmaStrap.Integrations
                 return;
             }
 
-            // only re-send if this is still the current presence and we're still visible - avoids
-            // clobbering a newer presence that was set while the translation was in flight
             if (_visible && ReferenceEquals(_currentPresence, presence))
                 _rpcClient.SetPresence(presence);
         }
@@ -697,9 +638,25 @@ namespace PhasmaStrap.Integrations
         public void Dispose()
         {
             App.Logger.WriteLine("DiscordRichPresence::Dispose", "Cleaning up Discord RPC and Presence");
-            _rpcClient.ClearPresence();
+
             PublishSnapshot(null);
-            _rpcClient.Dispose();
+
+            bool finished = Task.Run(() =>
+            {
+                try
+                {
+                    _rpcClient.ClearPresence();
+                    _rpcClient.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteLine("DiscordRichPresence::Dispose", $"Discord cleanup failed: {ex.Message}");
+                }
+            }).Wait(TimeSpan.FromSeconds(4));
+
+            if (!finished)
+                App.Logger.WriteLine("DiscordRichPresence::Dispose", "Discord did not answer, leaving it behind");
+
             GC.SuppressFinalize(this);
         }
     }

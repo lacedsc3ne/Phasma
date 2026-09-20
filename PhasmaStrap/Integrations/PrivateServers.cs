@@ -18,14 +18,10 @@ namespace PhasmaStrap.Integrations
         public bool WillRenew { get; init; }
     }
 
-    // Your private servers, through the signed-in Roblox account: the ones you own and the ones
-    // shared with you. Joining uses the server's access code (what Roblox's own "Join" button
-    // uses); the invite link and "new link" are for servers you own.
     public static class PrivateServers
     {
         private const string LOG_IDENT = "PrivateServers";
 
-        // no cookie jar: the cookie is set per request, as RobloxCookie.AuthClient does
         private static readonly HttpClient _client = new(new HttpClientHandler { UseCookies = false }) { Timeout = TimeSpan.FromSeconds(15) };
 
         private static string? _csrfToken;
@@ -55,7 +51,6 @@ namespace PhasmaStrap.Integrations
 
                 HttpResponseMessage response = await _client.SendAsync(request, ct);
 
-                // Roblox wants a CSRF token on anything that changes something; the first try gets it
                 if (response.StatusCode == HttpStatusCode.Forbidden && attempt == 0 && response.Headers.TryGetValues("x-csrf-token", out IEnumerable<string>? tokens))
                 {
                     _csrfToken = tokens.FirstOrDefault();
@@ -103,7 +98,6 @@ namespace PhasmaStrap.Integrations
         private static bool Bool(JsonElement item, string name) =>
             item.TryGetProperty(name, out JsonElement value) && value.ValueKind == JsonValueKind.True;
 
-        // every private server you own, then every one shared with you
         public static async Task<List<PrivateServerInfo>> ListAsync(CancellationToken ct = default)
         {
             var result = new List<PrivateServerInfo>();
@@ -124,7 +118,6 @@ namespace PhasmaStrap.Integrations
                     {
                         foreach (JsonElement item in data.EnumerateArray())
                         {
-                            // the field names only, never the values - so a changed API shape can be seen in the log
                             if (!loggedShape)
                             {
                                 App.Logger.WriteLine(LOG_IDENT, "Fields: " + string.Join(", ", item.EnumerateObject().Select(p => p.Name)));
@@ -159,7 +152,6 @@ namespace PhasmaStrap.Integrations
             return result;
         }
 
-        // the code Roblox's own Join button uses for a private server you can enter
         public static async Task<string?> GetAccessCodeAsync(PrivateServerInfo server, CancellationToken ct = default)
         {
             string? cursor = null;
@@ -208,20 +200,17 @@ namespace PhasmaStrap.Integrations
             if (link.Length > 0)
                 return link;
 
-            // older shape: just the code for a roblox.com/games/...?privateServerLinkCode= link
             string joinCode = Text(root, "joinCode");
             long placeId = root.TryGetProperty("game", out JsonElement game) && game.TryGetProperty("rootPlace", out JsonElement place) ? Long(place, "id") : 0;
             return joinCode.Length > 0 && placeId > 0 ? $"https://www.roblox.com/games/{placeId}?privateServerLinkCode={joinCode}" : null;
         }
 
-        // the invite link of a server you own
         public static async Task<string?> GetLinkAsync(PrivateServerInfo server, CancellationToken ct = default)
         {
             using JsonDocument doc = await GetJsonAsync($"https://games.roblox.com/v1/vip-servers/{server.Id}", ct);
             return ReadLink(doc.RootElement);
         }
 
-        // replaces the invite link of a server you own - the old one stops working
         public static async Task<string?> NewLinkAsync(PrivateServerInfo server, CancellationToken ct = default)
         {
             using HttpResponseMessage response = await SendAsync(HttpMethod.Patch, $"https://games.roblox.com/v1/vip-servers/{server.Id}", "{\"newJoinCode\":true}", ct);

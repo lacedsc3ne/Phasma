@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -138,7 +138,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
             if (sourceData.IsIcon)
             {
-                // bind the icon property
                 Binding binding = new Binding("Icon") { Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(imageBrush, ImageBrush.ImageSourceProperty, binding);
             }
@@ -198,7 +197,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         private static void ApplyBrush_UIElement(CustomDialog dialog, FrameworkElement uiElement, string name, DependencyProperty dependencyProperty, XElement xmlElement)
         {
-            // check if attribute exists
             object? brushAttr = GetBrushFromXElement(xmlElement, name);
             if (brushAttr is Brush)
             {
@@ -211,7 +209,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
                 return;
             }
 
-            // check if element exists
             var brushElement = xmlElement.Element($"{xmlElement.Name}.{name}");
             if (brushElement == null)
                 return;
@@ -281,7 +278,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
         #region Elements
         private static void HandleXmlElement_FrameworkElement(CustomDialog dialog, FrameworkElement uiElement, XElement xmlElement)
         {
-            // prevent two elements from having the same name
             string? name = xmlElement.Attribute("Name")?.Value?.ToString();
             if (name != null)
             {
@@ -303,7 +299,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             uiElement.Height = ParseXmlAttribute<double>(xmlElement, "Height", double.NaN);
             uiElement.Width = ParseXmlAttribute<double>(xmlElement, "Width", double.NaN);
 
-            // default values of these were originally Stretch but that was no good
             uiElement.HorizontalAlignment = ParseXmlAttribute<HorizontalAlignment>(xmlElement, "HorizontalAlignment", HorizontalAlignment.Left);
             uiElement.VerticalAlignment = ParseXmlAttribute<VerticalAlignment>(xmlElement, "VerticalAlignment", VerticalAlignment.Top);
 
@@ -355,7 +350,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             uiElement.FontWeight = GetFontWeightFromXElement(xmlElement);
             uiElement.FontStyle = GetFontStyleFromXElement(xmlElement);
 
-            // NOTE: font family can both be the name of the font or a uri
             string? fontFamily = GetFullPath(dialog, xmlElement.Attribute("FontFamily")?.Value);
             if (fontFamily != null)
                 uiElement.FontFamily = new System.Windows.Media.FontFamily(fontFamily);
@@ -363,13 +357,12 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         private static UIElement HandleXmlElement_PhasmaStrapCustomBootstrapper(CustomDialog dialog, XElement xmlElement)
         {
-            xmlElement.SetAttributeValue("Visibility", "Collapsed"); // don't show the bootstrapper yet!!!
+            xmlElement.SetAttributeValue("Visibility", "Collapsed");
             xmlElement.SetAttributeValue("IsEnabled", "True");
             HandleXmlElement_Control(dialog, dialog, xmlElement);
 
             dialog.Opacity = 1;
 
-            // transfer effect to element grid
             dialog.ElementGrid.RenderTransform = dialog.RenderTransform;
             dialog.RenderTransform = null;
             dialog.ElementGrid.LayoutTransform = dialog.LayoutTransform;
@@ -390,13 +383,10 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
             dialog.WindowCornerPreference = ParseXmlAttribute<Wpf.Ui.Appearance.WindowCornerPreference>(xmlElement, "WindowCornerPreference", Wpf.Ui.Appearance.WindowCornerPreference.Round);
 
-            // disable default window border if border is modified
             if (xmlElement.Attribute("BorderBrush") != null || xmlElement.Attribute("BorderThickness") != null)
                 dialog.DefaultBorderEnabled = false;
 
-            // set the margin & padding on the element grid
             dialog.ElementGrid.Margin = dialog.Margin;
-            // TODO: put elementgrid inside a border?
 
             dialog.Margin = new Thickness(0, 0, 0, 0);
             dialog.Padding = new Thickness(0, 0, 0, 0);
@@ -416,25 +406,22 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         private static UIElement HandleXmlElement_PhasmaStrapCustomBootstrapper_Fake(CustomDialog dialog, XElement xmlElement)
         {
-            // this only exists to error out the theme if someone tries to use two PhasmaStrapCustomBootstrappers
             throw new CustomThemeException("CustomTheme.Errors.ElementInvalidChild", xmlElement.Parent!.Name, xmlElement.Name);
         }
 
         private static DummyFrameworkElement HandleXmlElement_TitleBar(CustomDialog dialog, XElement xmlElement)
         {
-            xmlElement.SetAttributeValue("Name", "TitleBar"); // prevent two titlebars from existing
+            xmlElement.SetAttributeValue("Name", "TitleBar");
             xmlElement.SetAttributeValue("IsEnabled", "True");
             HandleXmlElement_Control(dialog, dialog.RootTitleBar, xmlElement);
 
-            // get rid of all effects
             dialog.RootTitleBar.RenderTransform = null;
             dialog.RootTitleBar.LayoutTransform = null;
 
             dialog.RootTitleBar.Effect = null;
 
-            Panel.SetZIndex(dialog.RootTitleBar, 1001); // always show above others
+            Panel.SetZIndex(dialog.RootTitleBar, 1001);
 
-            // properties we dont want modifiable
             dialog.RootTitleBar.Height = double.NaN;
             dialog.RootTitleBar.Width = double.NaN;
             dialog.RootTitleBar.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -446,7 +433,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             string? title = xmlElement.Attribute("Title")?.Value?.ToString() ?? "PhasmaStrap";
             dialog.RootTitleBar.Title = title;
 
-            return new DummyFrameworkElement(); // dont add anything
+            return new DummyFrameworkElement();
         }
 
         private static UIElement HandleXmlElement_Button(CustomDialog dialog, XElement xmlElement)
@@ -553,7 +540,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             textBlock.IsHyphenationEnabled = ParseXmlAttribute<bool>(xmlElement, "IsHyphenationEnabled", false);
             textBlock.BaselineOffset = ParseXmlAttribute<double>(xmlElement, "BaselineOffset", double.NaN);
 
-            // NOTE: font family can both be the name of the font or a uri
             string? fontFamily = GetFullPath(dialog, xmlElement.Attribute("FontFamily")?.Value);
             if (fontFamily != null)
                 textBlock.FontFamily = new System.Windows.Media.FontFamily(fontFamily);
@@ -599,13 +585,12 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             image.Stretch = ParseXmlAttribute<Stretch>(xmlElement, "Stretch", Stretch.Uniform);
             image.StretchDirection = ParseXmlAttribute<StretchDirection>(xmlElement, "StretchDirection", StretchDirection.Both);
 
-            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality); // should this be modifiable by the user?
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
 
             var sourceData = GetImageSourceData(dialog, "Source", xmlElement);
 
             if (sourceData.IsIcon)
             {
-                // bind the icon property
                 Binding binding = new Binding("Icon") { Mode = BindingMode.OneWay };
                 BindingOperations.SetBinding(image, Image.SourceProperty, binding);
             }
@@ -712,7 +697,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
                 }
                 else if (element.Name.ToString().StartsWith("Grid."))
                 {
-                    continue; // ignore others
+                    continue;
                 }
                 else
                 {

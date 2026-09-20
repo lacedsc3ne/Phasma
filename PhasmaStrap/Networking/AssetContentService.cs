@@ -4,17 +4,6 @@ using System.Net.Http;
 
 namespace PhasmaStrap.Networking
 {
-    // The proxy's asset desk: where the rewritten asset URLs (AssetRoute) land.
-    //
-    //   batch response  -> RewriteBatch:  locations point back at the proxy (all of them when
-    //                                     routing is on, only swapped IDs when it is not)
-    //   /phasma-asset/  -> HandleAsync:   swap pack file  |  disk cache  |  download, maybe shrink,
-    //                                     cache  - and count it for the traffic report
-    //
-    // Whatever goes wrong in here, the game still gets its asset: the answer is then a redirect to
-    // the original CDN address that travelled inside the rewritten URL.
-    //
-    // All of it is opt-in (AssetRouteEnabled / swap packs), on top of the proxy being on at all.
     internal static class AssetContentService
     {
         private const string LOG_IDENT = "AssetContentService";
@@ -24,8 +13,6 @@ namespace PhasmaStrap.Networking
         public static readonly SwapPackStore Packs = new(Path.Combine(Paths.Base, "SwapPacks"));
         public static readonly AssetTrafficStats Traffic = new(Path.Combine(Paths.Base, "AssetCache", "traffic.json"));
 
-        // pooled connections to the CDN (the proxy's own upstream code opens one per request,
-        // which is fine for a handful of API calls and hopeless for two thousand assets)
         private static readonly HttpClient Http = new(new SocketsHttpHandler
         {
             AutomaticDecompression = DecompressionMethods.All,
@@ -37,10 +24,8 @@ namespace PhasmaStrap.Networking
         })
         { Timeout = TimeSpan.FromSeconds(60) };
 
-        // images that came out no smaller: not worth trying again every time they are asked for
         private static readonly ConcurrentDictionary<string, byte> Unshrinkable = new();
 
-        // one download per asset even when the game asks for it several times at once
         private static readonly ConcurrentDictionary<string, Lazy<Task<CachedAsset?>>> InFlight = new();
 
         private static bool _logsHooked;
@@ -60,8 +45,6 @@ namespace PhasmaStrap.Networking
         public static bool SwapsEnabled => App.Settings.Prop.SwapPacksEnabled && Packs.AnyEnabled();
         private static long CacheLimitBytes => Math.Max(256, App.Settings.Prop.AssetCacheLimitMb) * 1048576L;
 
-        // ------------------------------------------------------------------ what each game uses
-
         public sealed class ManifestEntry
         {
             public long AssetId { get; set; }
@@ -69,8 +52,6 @@ namespace PhasmaStrap.Networking
             public string Key { get; set; } = "";
         }
 
-        // place -> asset ID -> entry. Written to AssetCache\manifests\<place>.json; it is what lets
-        // "prefetch this game" know which assets the game needs before the game asks for them.
         private static readonly ConcurrentDictionary<long, ConcurrentDictionary<long, ManifestEntry>> Manifests = new();
         private static readonly ConcurrentDictionary<long, byte> DirtyManifests = new();
         private static System.Threading.Timer? _manifestTimer;
@@ -135,7 +116,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // (placeId, assets known, of which on disk)
         public static List<(long PlaceId, int Known, int Cached)> ListManifests()
         {
             var result = new List<(long, int, int)>();
@@ -162,9 +142,6 @@ namespace PhasmaStrap.Networking
             return result;
         }
 
-        // Downloads whatever this game is known to use and is not on disk (any more). The asset
-        // IDs have to be resolved to fresh signed URLs first, which is done with the user's Roblox
-        // login (private assets need it) - hence only ever on request.
         public static async Task<(int Fetched, int Failed, int AlreadyThere)> PrefetchAsync(long placeId, Action<double> progress, CancellationToken token)
         {
             HookLogs();
@@ -226,7 +203,7 @@ namespace PhasmaStrap.Networking
                         if (Cache.Contains(info.Key) || await DownloadAsync(info, token) is not null)
                         {
                             Interlocked.Increment(ref fetched);
-                            Remember(info); // the content may have changed since the manifest was written
+                            Remember(info);
                         }
                         else
                         {
@@ -245,8 +222,6 @@ namespace PhasmaStrap.Networking
             App.Logger.WriteLine(LOG_IDENT, $"Prefetch of place {placeId}: {fetched} fetched, {failed} failed, {already} were already on disk");
             return (fetched, failed, already);
         }
-
-        // ------------------------------------------------------------------ batch response
 
         public static byte[]? RewriteBatch(ProxiedRequest request, ProxiedResponse response)
         {
@@ -281,8 +256,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // ------------------------------------------------------------------ asset requests
-
         private static ProxiedResponse Ok(byte[] body, string contentType) => new(200, "OK", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["Content-Type"] = contentType.Length > 0 ? contentType : "application/octet-stream",
@@ -291,7 +264,6 @@ namespace PhasmaStrap.Networking
 
         private static ProxiedResponse Redirect(string url) => new(302, "Found", new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["Location"] = url }, Array.Empty<byte>());
 
-        // null = this request is not an asset request (the proxy carries on as usual)
         public static async Task<ProxiedResponse?> HandleAsync(ProxiedRequest request, CancellationToken token)
         {
             AssetRouteInfo? info = AssetRoute.TryParse(request.Path);
@@ -305,7 +277,6 @@ namespace PhasmaStrap.Networking
 
             try
             {
-                // ---- a swap pack's replacement
                 if (info.SwapPack.Length > 0 && App.Settings.Prop.SwapPacksEnabled && Packs.Read(info.SwapPack, info.AssetId) is { } replacement)
                 {
                     happened.Swapped = true;
@@ -322,7 +293,6 @@ namespace PhasmaStrap.Networking
                 int shrinkTo = App.Settings.Prop.TextureShrinkEnabled ? Math.Clamp(App.Settings.Prop.TextureShrinkMaxSize, 64, 4096) : 0;
                 string variant = shrinkTo > 0 ? $"s{shrinkTo}" : "";
 
-                // ---- the shrunk copy, if that is what is wanted and it exists
                 if (variant.Length > 0 && Cache.TryGet(info.Key, variant) is CachedAsset small)
                 {
                     happened.CacheHit = true;
@@ -331,7 +301,6 @@ namespace PhasmaStrap.Networking
                     return Ok(small.Body, small.ContentType);
                 }
 
-                // ---- the original: from disk, or from Roblox
                 CachedAsset? asset = Cache.TryGet(info.Key);
                 bool fromCache = asset is not null;
 
@@ -352,7 +321,6 @@ namespace PhasmaStrap.Networking
                     happened.UpstreamHost = new Uri(info.OriginalUrl).Host;
                 }
 
-                // ---- shrink on the way out
                 if (variant.Length > 0 && !Unshrinkable.ContainsKey(info.Key))
                 {
                     TextureShrinker.Outcome? outcome = TextureShrinker.Shrink(asset.Body, shrinkTo);

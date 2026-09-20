@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,6 @@ namespace PhasmaStrap.UI.ViewModels.Bootstrapper
     {
         public BackgroundType WindowBackdropType { get; set; } = BackgroundType.Acrylic;
 
-        // dark, near-opaque tint over the acrylic blur - glassy at the edges, but reads dark overall
         public SolidColorBrush BackgroundColourBrush { get; set; } = new SolidColorBrush(Color.FromArgb(230, 0x0E, 0x0E, 0x12));
 
         [Obsolete("Do not use this! This is for the designer only.", true)]

@@ -1,4 +1,4 @@
-<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagsPage"
+﻿<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.FastFlagsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -76,7 +76,15 @@
             </StackPanel>
         </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Presets_Categories_Rendering}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <TabControl Margin="0,14,0,0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Options24" Margin="0,0,6,0" />
+                        <TextBlock Text="Presets" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
         <controls:MarkdownTextBlock MarkdownText="{Binding Source={x:Static resources:Strings.Menu_FastFlags_Presets_D3DExclusiveFullscreenInfo}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://bloxstraplabs.com/wiki/features/engine-settings/#exclusive-fullscreen'}"  Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
         <controls:OptionControl
@@ -108,60 +116,17 @@
             </ComboBox>
         </controls:OptionControl>
 
-        <!-- ================= Telemetry ================= -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Telemetry}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-
-        <ui:CardExpander Margin="0,8,0,0">
-            <ui:CardExpander.Header>
-                <StackPanel>
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_TelemetryPrivacy}" />
-                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_BlockDataRobloxThirdPartiesCollect}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableTelemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableTelemetry_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding DisableTelemetry, Mode=TwoWay}" />
-                </controls:OptionControl>
+            </TabItem>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableWebview2Telemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableWebview2Telemetry_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding DisableWebview2Telemetry, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableVoiceChatTelemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableVoiceChatTelemetry_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding DisableVoiceChatTelemetry, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_BlockTencent_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_BlockTencent_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding BlockTencent, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_PingBreakdown_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_PingBreakdown_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding PingBreakdown, Mode=TwoWay}" />
-                </controls:OptionControl>
-            </StackPanel>
-        </ui:CardExpander>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ShowChunks_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ShowChunks_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ShowChunks, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FlagState_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FlagState_Description}">
-            <ui:TextBox Width="220" Text="{Binding FlagState, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </controls:OptionControl>
-
-        <!-- ================= Voice Chat ================= -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_VoiceChat}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChatBubbles_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ChatBubbles_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ChatBubble, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChatTranslation_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ChatTranslation_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding ChatTranslation, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <!-- ================= Rendering ================= -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Rendering}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="VideoClip24" Margin="0,0,6,0" />
+                        <TextBlock Text="Rendering" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
 
         <ui:CardExpander Margin="0,8,0,0">
             <ui:CardExpander.Header>
@@ -198,7 +163,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FRMQualityLevel_Description}">
-                    <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" IsEnabled="{Binding FRMQualityLevelEditable}" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
+                    <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding QualityLevels.Keys, Mode=OneTime}" Text="{Binding SelectedQualityLevel, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
@@ -303,12 +268,14 @@
                     </ComboBox>
                 </controls:OptionControl>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_GraySky_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding EnableGraySky, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_WhiteSky_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding WhiteSky, Mode=TwoWay}" />
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_GraySky_Title}" Description="White needs the gray flag as well, so this is one setting with three steps instead of two switches that fight.">
+                    <ComboBox Margin="5,0,0,0" Padding="10,5,10,5" Width="200" ItemsSource="{Binding SkyModes, Mode=OneTime}" Text="{Binding SelectedSkyMode, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=., Converter={StaticResource EnumNameConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
@@ -370,7 +337,7 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ShadersRoughnessClamp_Title}">
-                    <ui:NumberBox IntegersOnly="True" Width="160" Min="-64000000" Max="0" Value="{Binding ShadersLimit, Mode=TwoWay}" />
+                    <ui:NumberBox IntegersOnly="True" Width="160" Min="-640000000" Max="0" Value="{Binding ShadersLimit, Mode=TwoWay}" />
                 </controls:OptionControl>
             </StackPanel>
         </ui:CardExpander>
@@ -439,63 +406,17 @@
             </StackPanel>
         </ui:CardExpander>
 
-        <!-- ================= Networking ================= -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-
-        <ui:CardExpander Margin="0,8,0,0">
-            <ui:CardExpander.Header>
-                <StackPanel>
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_LoadingReplication}" />
-                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_HowQuicklyPlacesLoadHowClient}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RobloxCoreTuning_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding RobloxCore, Mode=TwoWay}" />
-                </controls:OptionControl>
+            </TabItem>
 
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_NoPayloadLimit_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_NoPayloadLimit_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding NoPayloadLimit, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_EnableLargeReplicator_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding EnableLargeReplicator, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FasterLoading_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FasterLoading_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding FasterLoading, Mode=TwoWay}" />
-                </controls:OptionControl>
-            </StackPanel>
-        </ui:CardExpander>
-
-        <ui:CardExpander Margin="0,8,0,0">
-            <ui:CardExpander.Header>
-                <StackPanel>
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_ConnectionPackets}" />
-                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_LowLevelNetworkingLagSpikesPacket}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
-                </StackPanel>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_LessLagSpikes_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_LessLagSpikes_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding LessLagSpikes, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_BetterPacketSending_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_BetterPacketSending_Description}">
-                    <ui:ToggleSwitch IsChecked="{Binding BetterPacketSending, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MtuSize_Title}">
-                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="1500" Value="{Binding MtuSize, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ResendBufferArrayLength_Title}">
-                    <ui:NumberBox IntegersOnly="True" Width="160" Min="0" Max="2147483647" Value="{Binding BufferArrayLength, Mode=TwoWay}" />
-                </controls:OptionControl>
-            </StackPanel>
-        </ui:CardExpander>
-
-        <!-- ================= UI & Misc ================= -->
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_UIMisc}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Window24" Margin="0,0,6,0" />
+                        <TextBlock Text="Interface" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
 
         <ui:CardExpander Margin="0,8,0,0">
             <ui:CardExpander.Header>
@@ -541,10 +462,6 @@
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_EnableDarkMode_Title}">
                     <ui:ToggleSwitch IsChecked="{Binding EnableDarkMode, Mode=TwoWay}" />
-                </controls:OptionControl>
-
-                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChromeUI_Title}">
-                    <ui:ToggleSwitch IsChecked="{Binding ChromeUI, Mode=TwoWay}" />
                 </controls:OptionControl>
 
                 <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_OldChromeUI_Description}">
@@ -727,7 +644,6 @@
             </StackPanel>
         </ui:CardExpander>
 
-        <!-- ================= Reset ================= -->
         <controls:OptionControl
             Margin="0,16,0,0"
             Header="{x:Static resources:Strings.Menu_FastFlags_Reset_Title}">
@@ -740,5 +656,142 @@
                 <TextBlock Margin="0,2,0,0" FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_Editor_Description}" Padding="0,0,16,0"  Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
             </StackPanel>
         </ui:CardAction>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="DataUsage24" Margin="0,0,6,0" />
+                        <TextBlock Text="Telemetry" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+
+        <ui:CardExpander Margin="0,8,0,0">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_TelemetryPrivacy}" />
+                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_BlockDataRobloxThirdPartiesCollect}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableTelemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableTelemetry_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding DisableTelemetry, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableWebview2Telemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableWebview2Telemetry_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding DisableWebview2Telemetry, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_DisableVoiceChatTelemetry_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_DisableVoiceChatTelemetry_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding DisableVoiceChatTelemetry, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_BlockTencent_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_BlockTencent_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding BlockTencent, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_PingBreakdown_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_PingBreakdown_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding PingBreakdown, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ShowChunks_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ShowChunks_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding ShowChunks, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FlagState_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FlagState_Description}">
+            <ui:TextBox Width="220" Text="{Binding FlagState, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:OptionControl>
+
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Globe24" Margin="0,0,6,0" />
+                        <TextBlock Text="Networking" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+
+        <ui:CardExpander Margin="0,8,0,0">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_LoadingReplication}" />
+                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_HowQuicklyPlacesLoadHowClient}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_RobloxCoreTuning_Title}">
+                    <ui:ToggleSwitch IsChecked="{Binding RobloxCore, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_NoPayloadLimit_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_NoPayloadLimit_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding NoPayloadLimit, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_EnableLargeReplicator_Title}">
+                    <ui:ToggleSwitch IsChecked="{Binding EnableLargeReplicator, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_FasterLoading_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_FasterLoading_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding FasterLoading, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
+
+        <ui:CardExpander Margin="0,8,0,0">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlags_ConnectionPackets}" />
+                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlags_LowLevelNetworkingLagSpikesPacket}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_LessLagSpikes_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_LessLagSpikes_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding LessLagSpikes, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_BetterPacketSending_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_BetterPacketSending_Description}">
+                    <ui:ToggleSwitch IsChecked="{Binding BetterPacketSending, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_MtuSize_Title}">
+                    <ui:NumberBox IntegersOnly="True" Width="140" Min="0" Max="1500" Value="{Binding MtuSize, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ResendBufferArrayLength_Title}">
+                    <ui:NumberBox IntegersOnly="True" Width="160" Min="0" Max="2147483647" Value="{Binding BufferArrayLength, Mode=TwoWay}" />
+                </controls:OptionControl>
+            </StackPanel>
+        </ui:CardExpander>
+
+                </StackPanel>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Mic24" Margin="0,0,6,0" />
+                        <TextBlock Text="Voice and chat" />
+                    </StackPanel>
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChatBubbles_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ChatBubbles_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding ChatBubble, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_FastFlags_ChatTranslation_Title}" Description="{x:Static resources:Strings.Menu_FastFlags_ChatTranslation_Description}">
+            <ui:ToggleSwitch IsChecked="{Binding ChatTranslation, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+                </StackPanel>
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

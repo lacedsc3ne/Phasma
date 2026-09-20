@@ -1,17 +1,11 @@
 namespace PhasmaStrap.Networking
 {
-    // resolves hostnames via DNS-over-HTTPS rather than the OS resolver. This is necessary
-    // because the whole point of intercepting these specific hosts is that the OS hosts
-    // file points them at 127.0.0.1 - the proxy still needs the REAL address to actually
-    // forward requests to Roblox's servers.
     public static class DohResolver
     {
         private const string LOG_IDENT = "DohResolver";
 
         private static readonly HttpClient Client = new() { Timeout = TimeSpan.FromSeconds(5) };
 
-        // tried in order; a network that blocks one resolver (some ISPs/VPNs null-route
-        // cloudflare-dns.com) shouldn't take the whole proxy down with it
         private static readonly string[] Resolvers =
         {
             "https://cloudflare-dns.com/dns-query",
@@ -51,7 +45,6 @@ namespace PhasmaStrap.Networking
 
                     foreach (JsonElement answer in answers.EnumerateArray())
                     {
-                        // type 1 == A record
                         if (answer.TryGetProperty("type", out JsonElement type) && type.GetInt32() == 1
                             && answer.TryGetProperty("data", out JsonElement data))
                         {
@@ -72,7 +65,6 @@ namespace PhasmaStrap.Networking
                 }
             }
 
-            // serve a stale cache entry rather than nothing - the IP is almost certainly still valid
             lock (Sync)
             {
                 if (Cache.TryGetValue(hostname, out var stale))

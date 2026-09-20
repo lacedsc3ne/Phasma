@@ -1,5 +1,6 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.Input;
@@ -15,8 +16,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private string? _avatarUrl;
 
-        // starts as the remote thumbnail URL (or the cached file if we already have one) and is
-        // swapped to the on-disk copy once AvatarCache has it, so revisits don't re-download
         public string? AvatarUrl
         {
             get => _avatarUrl;
@@ -37,7 +36,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public int SortRank => Rank(Type);
 
-        // ---- your own star and note (FriendNotesStore) - local only
+        public string GroupName => Type switch
+        {
+            FriendPresenceType.InGame => "In game",
+            FriendPresenceType.Offline => "Offline",
+            _ => "Online",
+        };
+
+        public int GroupRank => Type switch
+        {
+            FriendPresenceType.InGame => 0,
+            FriendPresenceType.Offline => 2,
+            _ => 1,
+        };
 
         public Action<FriendRow>? FavouriteChanged;
 
@@ -78,7 +89,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // for loading - no write-back, no events
         public void LoadNote(bool favourite, string note)
         {
             _isFavourite = favourite;
@@ -95,18 +105,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Username { get; init; } = "";
     }
 
-    /// <summary>
-    /// Backs the Friends page: an online-status/current-game leaderboard (real "hours played"
-    /// isn't buildable - Roblox never exposes another user's playtime through any API, only your
-    /// own), join-a-friend, and the Friend Activity Alerts toggle (the actual polling/toast logic
-    /// lives in Utility.FriendActivityMonitor, which runs independent of this page being open -
-    /// same "works whether or not Settings is even the active window" shape as AutoCleanRam).
-    /// </summary>
     public sealed class FriendsViewModel : NotifyPropertyChangedViewModel
     {
         private const string LOG_IDENT = "FriendsViewModel";
 
-        // downloads any headshot we don't have a fresh disk copy of, then points the row at the file
         private static async Task CacheAvatarsAsync(List<FriendRow> rows, Dictionary<long, string> remote)
         {
             foreach (FriendRow row in rows)
@@ -127,7 +129,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<FriendRow> Friends { get; } = new();
 
-        // everything that was loaded; Friends is this, filtered and sorted
         private List<FriendRow> _all = new();
 
         private string _search = "";
@@ -150,14 +151,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.FriendActivityFavouritesOnly = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(AlertFavouritesOnly)); }
         }
 
-        // favourites on top, then who is in a game / online, then by name
         private void ApplyView()
         {
             string search = _search.Trim();
+            long? selectedId = _selectedFriend?.UserId;
 
             List<FriendRow> rows = _all
                 .Where(r => (!_favouritesOnly || r.IsFavourite) && r.Matches(search))
-                .OrderByDescending(r => r.IsFavourite)
+                .OrderBy(r => r.GroupRank)
+                .ThenByDescending(r => r.IsFavourite)
                 .ThenBy(r => r.SortRank)
                 .ThenBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
@@ -166,9 +168,33 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (FriendRow row in rows)
                 Friends.Add(row);
 
+            SelectedFriend = selectedId is null ? null : rows.FirstOrDefault(r => r.UserId == selectedId.Value);
+
             OnPropertyChanged(nameof(HasFriends));
             OnPropertyChanged(nameof(EmptyStateVisibility));
         }
+
+        private FriendRow? _selectedFriend;
+
+        public FriendRow? SelectedFriend
+        {
+            get => _selectedFriend;
+            set
+            {
+                if (ReferenceEquals(_selectedFriend, value))
+                    return;
+
+                _selectedFriend = value;
+                OnPropertyChanged(nameof(SelectedFriend));
+                OnPropertyChanged(nameof(HasSelection));
+                OnPropertyChanged(nameof(SelectionVisibility));
+                OnPropertyChanged(nameof(NoSelectionVisibility));
+            }
+        }
+
+        public bool HasSelection => _selectedFriend is not null;
+        public Visibility SelectionVisibility => _selectedFriend is null ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility NoSelectionVisibility => _selectedFriend is null ? Visibility.Visible : Visibility.Collapsed;
 
         private bool _loading;
         public bool Loading { get => _loading; private set { _loading = value; OnPropertyChanged(nameof(Loading)); } }
@@ -207,6 +233,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             JoinCommand = new RelayCommand<FriendRow?>(Join);
 
+            var view = CollectionViewSource.GetDefaultView(Friends);
+            view.GroupDescriptions.Clear();
+            view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FriendRow.GroupName)));
+
             _ = RefreshAsync();
         }
 
@@ -225,6 +255,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     Status = "Sign into Roblox to see your friends list.";
                     _all = new();
                     Friends.Clear();
+                    SelectedFriend = null;
                     return;
                 }
 
@@ -235,6 +266,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     Status = "No friends found (or this account's friends list is private).";
                     _all = new();
                     Friends.Clear();
+                    SelectedFriend = null;
                     return;
                 }
 

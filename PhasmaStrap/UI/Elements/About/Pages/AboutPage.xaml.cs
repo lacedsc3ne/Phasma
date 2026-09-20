@@ -1,13 +1,10 @@
-﻿using PhasmaStrap.UI.ViewModels.About;
+using PhasmaStrap.UI.ViewModels.About;
 
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 
 namespace PhasmaStrap.UI.Elements.About.Pages
 {
-    /// <summary>
-    /// Interaction logic for AboutPage.xaml
-    /// </summary>
     public partial class AboutPage
     {
         private readonly Queue<Key> _keys = new();

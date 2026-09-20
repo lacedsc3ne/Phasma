@@ -4,9 +4,6 @@ using PhasmaStrap.UI.ViewModels.Installer;
 
 namespace PhasmaStrap.UI.Elements.Installer.Pages
 {
-    /// <summary>
-    /// Interaction logic for ManagerPage.xaml
-    /// </summary>
     public partial class ManagerPage
     {
         private readonly ManagerViewModel _viewModel = new();

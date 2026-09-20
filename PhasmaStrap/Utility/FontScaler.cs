@@ -2,12 +2,6 @@ using System.Buffers.Binary;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// General-purpose TTF binary scaler: rescales glyph outlines (or, as a fallback, the
-    /// em-square) of a raw sfnt font directly, with no external font-rendering dependency.
-    /// Ported from Voidstrap's FontScaler - it isn't specific to the Google Fonts feature, it's
-    /// a standalone utility other font-related features can call into as well.
-    /// </summary>
     public static class FontScaler
     {
         private const string LogIdent = "FontScaler";

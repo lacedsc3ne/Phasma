@@ -1,0 +1,18 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.AppPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:pages="clr-namespace:PhasmaStrap.UI.Elements.Settings.Pages"
+      mc:Ignorable="d"
+      Title="AppPage"
+      Scrollable="False">
+    <controls:SectionHost x:Name="Host" Margin="0,4,0,0">
+        <controls:SectionItem Label="PhasmaStrap" PageType="{x:Type pages:PhasmaStrapPage}" />
+        <controls:SectionItem Label="Integrations" PageType="{x:Type pages:IntegrationsPage}" />
+        <controls:SectionItem Label="News" PageType="{x:Type pages:ReleasesPage}" />
+        <controls:SectionItem Label="Developer tools" PageType="{x:Type pages:DeveloperToolsPage}" />
+    </controls:SectionHost>
+</ui:UiPage>

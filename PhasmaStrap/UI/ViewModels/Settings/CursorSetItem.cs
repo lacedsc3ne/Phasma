@@ -19,8 +19,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Folder = CursorSetStore.GetFolder(record.Id);
         }
 
-        // decoded once per file and cached - these getters are re-evaluated by every binding
-        // refresh, and decoding four PNGs from disk each time made the cursor tab hitch
         private readonly Dictionary<string, BitmapImage?> _previewCache = new(StringComparer.OrdinalIgnoreCase);
 
         public BitmapImage? ArrowCursorPreview => LoadPreview("ArrowCursor.png");
@@ -52,9 +50,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private BitmapImage? DecodePreview(string fileName)
         {
-            string path = Path.Combine(Folder, fileName);
+            string? path = CursorImages.FindSource(Folder, fileName);
 
-            if (!File.Exists(path))
+            if (path is null)
                 return null;
 
             try
@@ -63,7 +61,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 image.BeginInit();
                 image.CacheOption = BitmapCacheOption.OnLoad;
                 image.DecodePixelHeight = 96;
-                // avoid holding a file lock and pick up edits made outside a running app session
+
                 image.UriSource = new Uri(path, UriKind.Absolute);
                 image.EndInit();
                 image.Freeze();

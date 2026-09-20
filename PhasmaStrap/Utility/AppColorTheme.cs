@@ -4,43 +4,22 @@ using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 
-// Ported (with modification) from Voidstrap's Utility/CustomTheme.cs. That class edits and
-// applies an XAML colour/brush ResourceDictionary that skins Voidstrap's own settings UI - a
-// completely different concept from PhasmaStrap's pre-existing "CustomTheme" feature (see
-// CustomThemeException.cs / AddCustomThemeDialog.xaml.cs / Paths.CustomThemes), which is an
-// XML *bootstrapper dialog* definition (what the little loading window looks like), not an
-// app UI colour scheme. To avoid colliding with that established "CustomTheme" naming and
-// vocabulary, this app-UI colour override engine is named AppColorTheme throughout.
-//
-// The schema below only lists resource keys that PhasmaStrap's own Dark.xaml/Light.xaml
-// dictionaries (UI/Style/) actually define, rather than Voidstrap's key names (which belong
-// to a differently-skinned base theme and mostly don't exist here).
 namespace PhasmaStrap.Utility
 {
     public sealed class ThemeKeyInfo
     {
-        /// <summary>
-        /// Identifier used to key preview/edit state for this row. Matches <see cref="BrushKey"/>
-        /// when present, otherwise <see cref="ColorKey"/>.
-        /// </summary>
         public string Key => BrushKey ?? ColorKey!;
 
         public string Label { get; init; } = "";
 
         public string Group { get; init; } = "";
 
-        /// <summary>Resource key of a Color resource to write, or null if this row has none.</summary>
         public string? ColorKey { get; init; }
 
-        /// <summary>Resource key of a SolidColorBrush resource to write, or null if this row has none.</summary>
         public string? BrushKey { get; init; }
 
         public string Fallback { get; init; } = "#FF202020";
 
-        /// <summary>
-        /// True for colours whose transparency is part of the look (glows, the sidebar panel,
-        /// secondary text). The editor gives these rows an opacity slider.
-        /// </summary>
         public bool AllowAlpha { get; init; }
     }
 
@@ -85,26 +64,15 @@ namespace PhasmaStrap.Utility
 
         public const string AccentColorKey = "PhasmaAccentColor";
 
-        // Resource keys that PhasmaStrap's own UI/Style/Dark.xaml and Light.xaml define, plus the
-        // Wpf.Ui text colours and the accent (see AccentColorKey).
         public static IReadOnlyList<ThemeKeyInfo> Schema { get; } = new List<ThemeKeyInfo>
         {
             new() { Label = "App background", Group = "Window", ColorKey = "ApplicationBackgroundColor", BrushKey = "ApplicationBackgroundBrush", Fallback = "#FF0E0E12" },
-            // the two drifting, pulsing glows behind the settings window (the red mist by default).
-            // Lower the alpha (first two hex digits) to make one fainter, or 00 to hide it.
+
             new() { Label = "Background glow (top left)", Group = "Window", ColorKey = "BackgroundGlowPrimaryColor", BrushKey = "BackgroundGlowPrimaryBrush", Fallback = "#FFF4554B", AllowAlpha = true },
             new() { Label = "Background glow (right)", Group = "Window", ColorKey = "BackgroundGlowSecondaryColor", BrushKey = "BackgroundGlowSecondaryBrush", Fallback = "#FFCF3B32", AllowAlpha = true },
 
-            // A panel behind the search box and navigation list. Fully transparent by default (the
-            // sidebar has no background of its own); raise the opacity for a solid or frosted look.
-            // The hidden default is a lighter slate, NOT black: a black panel over the near-black
-            // window is invisible at any opacity, which made the slider look like it did nothing.
             new() { Label = "Sidebar panel (raise opacity to show)", Group = "Window", ColorKey = "SidebarBackgroundColor", BrushKey = "SidebarBackgroundBrush", Fallback = "#002C2C38", AllowAlpha = true },
 
-            // Not an ordinary resource: Wpf.Ui derives a whole family of accent colours and brushes
-            // from one colour and writes them straight into Application.Resources, where a merged
-            // dictionary can't override them. WpfUiWindow.ApplyAccentFrom reads this key and feeds
-            // it to Wpf.Ui instead (buttons, toggles, sliders, the selected page marker, links...).
             new() { Label = "Accent colour", Group = "Accent", ColorKey = AccentColorKey, Fallback = "#FFF4554B" },
 
             new() { Label = "Text", Group = "Text", ColorKey = "TextFillColorPrimary", BrushKey = "TextFillColorPrimaryBrush", Fallback = "#FFFFFFFF" },
@@ -242,10 +210,6 @@ namespace PhasmaStrap.Utility
             return result;
         }
 
-        /// <summary>
-        /// Fills in any schema keys missing from the user dictionary with their fallback colour,
-        /// so the returned dictionary can be merged on top of the active base theme wholesale.
-        /// </summary>
         public static ResourceDictionary Merge(ResourceDictionary? user)
         {
             ResourceDictionary merged = new();
@@ -280,10 +244,6 @@ namespace PhasmaStrap.Utility
             return merged;
         }
 
-        /// <summary>
-        /// Loads the saved app colour theme (if any and if enabled) merged over the schema
-        /// fallbacks, ready to be added to Application.Current.Resources.MergedDictionaries.
-        /// </summary>
         public static ResourceDictionary LoadForApp()
         {
             string path = Paths.CustomColorThemeXaml;
@@ -397,10 +357,6 @@ namespace PhasmaStrap.Utility
             return false;
         }
 
-        /// <summary>
-        /// Reads back the effective colour for every schema row out of a resolved dictionary
-        /// (preferring the brush's colour, falling back to the plain Color resource).
-        /// </summary>
         public static void ReadColors(ResourceDictionary dict, Dictionary<string, Color> map)
         {
             foreach (ThemeKeyInfo info in Schema)

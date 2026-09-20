@@ -29,11 +29,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public PointCollection Spark { get; init; } = new();
     }
 
-    /// <summary>
-    /// Backs the Diagnostics page. Each tab is a tool that answers one question in plain words:
-    /// is the installation healthy, where does the connection go wrong, why did it crash, why does
-    /// it stutter, which flags are actually faster.
-    /// </summary>
     public sealed partial class DiagnosticsViewModel : NotifyPropertyChangedViewModel
     {
         private static readonly Brush Green = Frozen("#2ECC71"), Amber = Frozen("#F5B301"), Red = Frozen("#E74C3C"), Grey = Frozen("#8A8F98");
@@ -55,10 +50,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             InitialiseMore();
         }
 
-        // further tabs hook in here (partial class files)
         partial void InitialiseMore();
-
-        // ------------------------------------------------------------------ health check
 
         public ObservableCollection<HealthRow> Health { get; } = new();
         public ICommand RunHealthCommand { get; }
@@ -133,8 +125,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 _ = RunHealthAsync();
             }),
         };
-
-        // ------------------------------------------------------------------ connection
 
         public ObservableCollection<PingRow> PingRows { get; } = new();
         public ObservableCollection<string> ConnectionFindings { get; } = new();
@@ -262,7 +252,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // 300 x 40; a lost ping is a gap dropping to the floor
         private static PointCollection Spark(List<int> samples)
         {
             var points = new PointCollection();

@@ -2,9 +2,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap
 {
-    // local HTTP bridge the Studio companion plugin (PhasmaStrapStudio.lua) talks to,
-    // so the plugin can report what you're working on in Studio and receive the app's
-    // branding palette back. Ported from Voidstrap, without its TCP-listener fallback path.
     public static class StudioBridge
     {
         private const string LOG_IDENT = "StudioBridge";
@@ -154,7 +151,6 @@ namespace PhasmaStrap
                 }
                 catch (JsonException)
                 {
-                    // malformed payload from the plugin - ignore this tick, keep the server alive
                 }
 
                 using JsonDocument paletteDoc = JsonDocument.Parse(Integrations.StudioTheme.GetPaletteJson());
@@ -182,7 +178,6 @@ namespace PhasmaStrap
                 }
                 catch (Exception)
                 {
-                    // response may already be closed/disposed, nothing more to do
                 }
             }
         }

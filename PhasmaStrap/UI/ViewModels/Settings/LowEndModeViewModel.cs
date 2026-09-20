@@ -8,10 +8,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    /// <summary>
-    /// Rendering > Performance > Low-end mode. Applying changes settings and flags in memory; Save
-    /// keeps them, like everything else.
-    /// </summary>
     public sealed class LowEndModeViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<LowEndChange> Changes { get; } = new();
@@ -46,7 +42,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ? "Off."
             : $"{LowEndMode.Active} is on" + (App.Settings.Prop.LowEndBackupFlags.Count > 0 ? " - press Save to keep it, Turn off puts back what you had before." : ".");
 
-        // which strength the list below describes (and the buttons highlight)
         private string _preview;
         public string Preview { get => _preview; private set { _preview = value; OnPropertyChanged(nameof(Preview)); RefreshChanges(); } }
 
@@ -92,7 +87,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(StatusText));
             OnPropertyChanged(nameof(TurnOffVisibility));
 
-            // overlays (shaders, frame generation) follow at once in a running game
             Integrations.Overlays.OverlayHub.Refresh();
         }
     }

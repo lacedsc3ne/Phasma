@@ -8,170 +8,241 @@
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
       xmlns:dmodels="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       mc:Ignorable="d"
-      d:DataContext="{d:DesignInstance dmodels:DeveloperToolsViewModel, IsDesignTimeCreatable=True}"
+      d:DataContext="{d:DesignInstance dmodels:DeveloperToolsViewModel, IsDesignTimeCreatable=False}"
       Title="DeveloperToolsPage"
-      Scrollable="True"
+      Scrollable="False"
       Loaded="Page_Loaded"
       Unloaded="Page_Unloaded">
-    <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_DeveloperTools}" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_FastFlagSnapshotsDiffingLiveProxyTraffic}" />
-
-        <ui:CardExpander Margin="0,12,0,0" Icon="Flag24">
-            <ui:CardExpander.Header>
-                <StackPanel>
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_FastFlagSnapshots}" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentFlagSetFlipBetween}" />
-                </StackPanel>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_SnapshotName}" Text="{Binding NewSnapshotName, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentAsSnapshot}" Icon="Save24" Command="{Binding SaveSnapshotCommand, Mode=OneTime}" />
-                </StackPanel>
-
-                <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Snapshots, Mode=OneWay}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,0,0,4" Padding="8,6" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock FontSize="13" Text="{Binding Name}" />
-                                        <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                            <Run Text="{Binding FlagCount, Mode=OneWay}" /><Run Text="{x:Static resources:Strings.Menu_DeveloperTools_FlagSSaved}" /><Run Text="{Binding CreatedDisplay, Mode=OneWay}" />
-                                        </TextBlock>
-                                    </StackPanel>
-                                    <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_GoogleFonts_Apply}" Appearance="Secondary"
-                                               Command="{Binding DataContext.ApplySnapshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                               CommandParameter="{Binding}" />
-                                    <ui:Button Grid.Column="2" Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16"
-                                               Command="{Binding DataContext.DeleteSnapshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                               CommandParameter="{Binding}" />
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_CompareTwoSnapshots}" FontSize="14" FontWeight="Medium" Margin="0,16,0,4" />
-                <StackPanel Orientation="Horizontal">
-                    <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotA, Mode=TwoWay}" />
-                    <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_Vs}" VerticalAlignment="Center" Margin="8,0" />
-                    <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotB, Mode=TwoWay}" />
-                </StackPanel>
-                <TextBlock Margin="0,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding DiffSummary, Mode=OneWay}" />
-
-                <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding DiffEntries, Mode=OneWay}">
-                    <ItemsControl.Template>
-                        <ControlTemplate TargetType="ItemsControl">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220" controls:ScrollBubbling.Enabled="True">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,0,0,3">
+    <ui:UiPage.Resources>
+        <Style x:Key="ToolRailItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Fill" Background="Transparent" CornerRadius="5" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" FontSize="11" Width="60" Text="{Binding ChangeType}" Foreground="{DynamicResource SystemFillColorCautionBrush}" />
-                                <TextBlock Grid.Column="1" FontSize="11" FontFamily="Consolas" Text="{Binding Key}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                    <Run Text="{Binding OldValue, Mode=OneWay}" /><Run Text=" → " /><Run Text="{Binding NewValue, Mode=OneWay}" />
-                                </TextBlock>
+                                <Border x:Name="Marker" Grid.Column="0" Width="3" Height="16" Margin="-6,0,9,0" CornerRadius="2"
+                                        Background="{DynamicResource SystemAccentColorSecondaryBrush}" Visibility="Collapsed" />
+                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center" SnapsToDevicePixels="True" />
                             </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ui:CardExpander>
-
-        <ui:CardExpander Margin="0,8,0,0" Icon="ArrowSwap24">
-            <ui:CardExpander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_LiveProxyTraffic}" />
-                        <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_RequestsHandledByLocalProxyRunning}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshProxyTrafficCommand, Mode=OneTime}" />
-                        <ui:Button Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearProxyTrafficCommand, Mode=OneTime}" />
-                    </StackPanel>
-                </Grid>
-            </ui:CardExpander.Header>
-            <ItemsControl ItemsSource="{Binding ProxyTraffic, Mode=OneWay}">
-                <ItemsControl.Template>
-                    <ControlTemplate TargetType="ItemsControl">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="240" controls:ScrollBubbling.Enabled="True">
-                            <ItemsPresenter />
-                        </ScrollViewer>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Fill" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Fill" Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+                                <Setter TargetName="Marker" Property="Visibility" Value="Visible" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
-                </ItemsControl.Template>
-                <ItemsControl.ItemTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ui:UiPage.Resources>
+
+    <Grid Margin="0,0,14,14">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Width="200" Margin="0,2,18,0">
+            <TextBlock Margin="10,4,0,8" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="TOOLS" />
+            <ListBox x:Name="ToolRail"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ItemsSource="{Binding Tools, Mode=OneTime}"
+                     SelectedItem="{Binding SelectedTool, Mode=TwoWay}"
+                     ItemContainerStyle="{StaticResource ToolRailItemStyle}"
+                     SelectionChanged="ToolRail_SelectionChanged">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0,0,0,3">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="{Binding Symbol}" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Label}" FontSize="13" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <Grid Grid.Column="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding ScrollableToolVisibility, Mode=OneWay}">
+                <Grid Margin="0,0,4,0">
+
+                    <StackPanel Visibility="{Binding SnapshotsVisibility, Mode=OneWay}">
+                        <TextBlock FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_DeveloperTools_FastFlagSnapshots}" />
+                        <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentFlagSetFlipBetween}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <ui:TextBox Width="220" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_SnapshotName}" Text="{Binding NewSnapshotName, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_SaveCurrentAsSnapshot}" Icon="Save24" Command="{Binding SaveSnapshotCommand, Mode=OneTime}" />
+                        </StackPanel>
+
+                        <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding SnapshotStatus, Mode=OneWay}" />
+
+                        <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Snapshots, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,4" Padding="10,8" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock FontSize="13" Text="{Binding Name}" />
+                                                <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                                    <Run Text="{Binding FlagCount, Mode=OneWay}" /><Run Text="{x:Static resources:Strings.Menu_DeveloperTools_FlagSSaved}" /><Run Text="{Binding CreatedDisplay, Mode=OneWay}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_GoogleFonts_Apply}" Appearance="Secondary"
+                                                       Command="{Binding DataContext.ApplySnapshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                       CommandParameter="{Binding}" />
+                                            <ui:Button Grid.Column="2" Margin="8,0,0,0" Padding="4" Appearance="Transparent" Icon="Delete16"
+                                                       Command="{Binding DataContext.DeleteSnapshotCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                       CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_CompareTwoSnapshots}" FontSize="14" FontWeight="Medium" Margin="0,18,0,6" />
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotA, Mode=TwoWay}" />
+                            <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_Vs}" VerticalAlignment="Center" Margin="8,0" />
+                            <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotB, Mode=TwoWay}" />
+                        </StackPanel>
+                        <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding DiffSummary, Mode=OneWay}" />
+
+                        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding DiffEntries, Mode=OneWay}">
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260" controls:ScrollBubbling.Enabled="True">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="11" Width="60" Text="{Binding ChangeType}" Foreground="{DynamicResource SystemFillColorCautionBrush}" />
+                                        <TextBlock Grid.Column="1" FontSize="11" FontFamily="Consolas" Text="{Binding Key}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                            <Run Text="{Binding OldValue, Mode=OneWay}" /><Run Text=" → " /><Run Text="{Binding NewValue, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding ProxyVisibility, Mode=OneWay}">
+                        <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" FontSize="11" Width="60" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Timestamp, StringFormat='HH:mm:ss'}" />
-                            <TextBlock Grid.Column="1" FontSize="11" FontFamily="Consolas" Text="{Binding Summary}" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding OutcomeDisplay}" />
+                            <TextBlock Grid.Column="0" FontSize="20" FontWeight="Medium" VerticalAlignment="Center" Text="{x:Static resources:Strings.Menu_DeveloperTools_LiveProxyTraffic}" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshProxyTrafficCommand, Mode=OneTime}" />
+                                <ui:Button Content="{x:Static resources:Strings.ContextMenu_OutputConsole_Clear}" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearProxyTrafficCommand, Mode=OneTime}" />
+                            </StackPanel>
                         </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ui:CardExpander>
+                        <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Static resources:Strings.Menu_DeveloperTools_RequestsHandledByLocalProxyRunning}" />
 
-        <ui:CardExpander Margin="0,8,0,0" Icon="DocumentText24">
-            <ui:CardExpander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_LogViewer}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Content="{x:Static resources:Strings.Common_Copy}" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
-                        <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
+                        <ui:InfoBar Margin="0,12,0,0" Padding="8" IsOpen="True" IsClosable="False" Severity="Informational" Message="{Binding ProxyStatus, Mode=OneWay}" />
+
+                        <ItemsControl Margin="0,12,0,0" ItemsSource="{Binding ProxyTraffic, Mode=OneWay}">
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="360" controls:ScrollBubbling.Enabled="True">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="11" Width="60" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Timestamp, StringFormat='HH:mm:ss'}" />
+                                        <TextBlock Grid.Column="1" FontSize="11" FontFamily="Consolas" Text="{Binding Summary}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding OutcomeDisplay}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
-                </Grid>
-            </ui:CardExpander.Header>
-            <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Padding="8">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="300" controls:ScrollBubbling.Enabled="True">
-                    <TextBlock FontFamily="Consolas" FontSize="11" Text="{Binding LogText, Mode=OneWay}" TextWrapping="NoWrap" />
-                </ScrollViewer>
-            </Border>
-        </ui:CardExpander>
 
-        <ui:CardExpander Margin="0,8,0,0" Icon="PuzzleCube24">
-            <ui:CardExpander.Header>
-                <StackPanel>
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_DeveloperTools_StudioPluginInstaller}" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_DeveloperTools_InstallAnyStudioPluginByIts}" />
-                </StackPanel>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_AssetID}" Text="{Binding PluginAssetId, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ArrowDownload24" Command="{Binding InstallPluginCommand, Mode=OneTime}" />
-                    <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_OpenPluginsFolder}" Appearance="Secondary" Icon="Folder24" Command="{Binding OpenPluginsFolderCommand, Mode=OneTime}" />
-                </StackPanel>
-                <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PluginInstallStatus, Mode=OneWay}" />
-            </StackPanel>
-        </ui:CardExpander>
-    </StackPanel>
+                    <StackPanel Visibility="{Binding LogsVisibility, Mode=OneWay}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" FontSize="20" FontWeight="Medium" VerticalAlignment="Center" Text="{x:Static resources:Strings.Menu_DeveloperTools_LogViewer}" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <ui:Button Content="{x:Static resources:Strings.Common_Copy}" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
+                                <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding LogDescription, Mode=OneTime}" />
+                        <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding LogStatus, Mode=OneWay}" />
+
+                        <Border Margin="0,10,0,0" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="6" Padding="8">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MaxHeight="420" controls:ScrollBubbling.Enabled="True">
+                                <TextBlock FontFamily="Consolas" FontSize="11" Text="{Binding LogText, Mode=OneWay}" TextWrapping="NoWrap" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding PluginsVisibility, Mode=OneWay}">
+                        <TextBlock FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_DeveloperTools_StudioPluginInstaller}" />
+                        <TextBlock Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Static resources:Strings.Menu_DeveloperTools_InstallAnyStudioPluginByIts}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_DeveloperTools_AssetID}" Text="{Binding PluginAssetId, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ArrowDownload24" Command="{Binding InstallPluginCommand, Mode=OneTime}" />
+                            <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_DeveloperTools_OpenPluginsFolder}" Appearance="Secondary" Icon="Folder24" Command="{Binding OpenPluginsFolderCommand, Mode=OneTime}" />
+                        </StackPanel>
+                        <TextBlock Margin="0,10,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding PluginInstallStatus, Mode=OneWay}" />
+                    </StackPanel>
+
+                </Grid>
+            </ScrollViewer>
+
+            <Frame x:Name="DiagnosticsFrame"
+                   Visibility="{Binding DiagnosticsVisibility, Mode=OneWay}"
+                   NavigationUIVisibility="Hidden"
+                   JournalOwnership="OwnsJournal"
+                   Background="Transparent" />
+        </Grid>
+    </Grid>
 </ui:UiPage>

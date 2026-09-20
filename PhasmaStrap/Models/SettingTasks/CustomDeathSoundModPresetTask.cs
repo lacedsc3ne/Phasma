@@ -2,11 +2,6 @@ using PhasmaStrap.Models.SettingTasks.Base;
 
 namespace PhasmaStrap.Models.SettingTasks
 {
-    /// <summary>
-    /// Applies a user-chosen audio file over Roblox's death/"ouch" sound
-    /// (<c>content\sounds\oof.ogg</c>), mirroring <see cref="FontModPresetTask"/>'s
-    /// browse-now/apply-on-save pattern.
-    /// </summary>
     public class CustomDeathSoundModPresetTask : StringBaseTask
     {
         public CustomDeathSoundModPresetTask() : base("ModPreset", "CustomDeathSound")

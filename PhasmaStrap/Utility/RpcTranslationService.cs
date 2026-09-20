@@ -1,10 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Auto-translates the Discord Rich Presence strings (Details/State/asset hover text/button
-    /// labels) using <see cref="TranslationService"/>, ported from Voidstrap's
-    /// RpcTranslationService with no behavioural changes.
-    /// </summary>
     public static class RpcTranslationService
     {
         public static bool IsEnabled =>

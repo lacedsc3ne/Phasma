@@ -1,11 +1,5 @@
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// Launches and supervises PhasmaStrap.Server.exe (the ported ClientServer subsystem, i.e. PhasmaStrap.Server
-    /// project - see PhasmaStrap.Server.csproj) as a child process, and coordinates it with
-    /// <see cref="ClassicHostRedirect"/> so the roblox.com hosts redirect is never left dangling if the server
-    /// process or PhasmaStrap itself dies unexpectedly.
-    /// </summary>
     public static class ClassicServerManager
     {
         private const string LOG_IDENT = "ClassicServerManager";
@@ -27,11 +21,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        /// <summary>
-        /// Starts PhasmaStrap.Server.exe for the given classic client, applies the hosts redirect (elevating if
-        /// necessary), and starts the background thread that will release the redirect once the classic session
-        /// ends. Returns null on success, or a user-facing error message on failure.
-        /// </summary>
         public static string? Start(string client)
         {
             const string LOG_IDENT_LOCAL = LOG_IDENT + "::Start";
@@ -42,7 +31,7 @@ namespace PhasmaStrap.Integrations
             lock (s_lock)
             {
                 if (s_serverProcess is { HasExited: false })
-                    return null; // already running
+                    return null;
 
                 if (!ClassicClients.ServerEngineInstalled)
                     return "The classic private server engine (PhasmaStrap.Server.exe) was not found at " + ClassicClients.ServerPath + ".";
@@ -93,10 +82,6 @@ namespace PhasmaStrap.Integrations
             return null;
         }
 
-        /// <summary>
-        /// Stops the server process (if running) and removes the hosts redirect. Safe to call multiple times,
-        /// and safe to call from the process-exit / unhandled-exception handlers - it must never throw.
-        /// </summary>
         public static void Stop()
         {
             const string LOG_IDENT_LOCAL = LOG_IDENT + "::Stop";
@@ -125,8 +110,6 @@ namespace PhasmaStrap.Integrations
                 }
             }
 
-            // always attempt to remove the redirect, even if we didn't think a server process was running -
-            // this is the last line of defense against a stale hosts entry on app exit
             try
             {
                 ClassicHostRedirect.Set(false);

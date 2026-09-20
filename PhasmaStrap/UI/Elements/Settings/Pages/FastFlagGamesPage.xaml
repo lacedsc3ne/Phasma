@@ -14,8 +14,7 @@
     <ui:UiPage.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </ui:UiPage.Resources>
-    <!-- Which games get which FastFlag profile. The profiles' flags are edited on the Fast Flag
-         Editor tab; this page only pairs games with them. -->
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,14,14">
             <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagGames_PerGameFlags}" FontSize="20" FontWeight="Medium" />
@@ -30,7 +29,6 @@
                 <TextBlock TextWrapping="Wrap" Text="{Binding Status}" />
             </Border>
 
-            <!-- ============================================================ games with a profile -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_Games}" />
 
             <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Visibility="{Binding NoRulesVisibility}"
@@ -74,7 +72,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- ============================================================ add a game -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_AddGame}" />
 
             <Border Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
@@ -132,7 +129,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- the picked game -->
                     <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1" Visibility="{Binding SelectedVisibility}"
                             BorderBrush="{DynamicResource AccentFillColorDefaultBrush}" Background="{DynamicResource ControlFillColorSecondaryBrush}">
                         <StackPanel>
@@ -172,7 +168,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- ============================================================ already running -->
             <TextBlock Margin="0,20,0,8" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_FastFlagGames_WhenRobloxAlreadyOpen}" />
 
             <TextBlock Margin="0,0,0,8" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"

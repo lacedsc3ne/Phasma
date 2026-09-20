@@ -6,10 +6,6 @@ using System.Windows.Media.Imaging;
 
 namespace PhasmaStrap.Utility
 {
-    // Small pictures for the saved clips list. Videos use Windows' own thumbnail (fast, and Windows
-    // keeps it cached); if Windows has none, a frame from the middle of the clip is decoded. GIFs
-    // show their first frame. One background thread does them in order, so a long list never
-    // stalls the window.
     public static class ClipThumbnails
     {
         private const string LOG_IDENT = "ClipThumbnails";
@@ -25,7 +21,6 @@ namespace PhasmaStrap.Utility
             {
                 if (_worker is null)
                 {
-                    // shell thumbnail providers expect a single-threaded apartment
                     _worker = new Thread(Run) { IsBackground = true, Name = "ClipThumbnails", Priority = ThreadPriority.BelowNormal };
                     _worker.SetApartmentState(ApartmentState.STA);
                     _worker.Start();
@@ -65,7 +60,6 @@ namespace PhasmaStrap.Utility
             if (!File.Exists(path))
                 return null;
 
-            // pictures (screenshots, GIFs' first frame) decode straight to thumbnail size
             if (!path.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase))
             {
                 var gif = new BitmapImage();
@@ -88,14 +82,13 @@ namespace PhasmaStrap.Utility
                 SHCreateItemFromParsingName(path, IntPtr.Zero, typeof(IShellItemImageFactory).GUID, out IShellItemImageFactory factory);
                 try
                 {
-                    // THUMBNAILONLY: no file-type icon when Windows has no picture for it
                     if (factory.GetImage(new SIZE { cx = Size, cy = Size }, SIIGBF_THUMBNAILONLY | SIIGBF_BIGGERSIZEOK, out IntPtr hbitmap) != 0 || hbitmap == IntPtr.Zero)
                         return null;
 
                     try
                     {
                         BitmapSource source = Imaging.CreateBitmapSourceFromHBitmap(hbitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                        // the shell's bitmap carries an alpha channel that is often empty - draw it opaque
+
                         var opaque = new FormatConvertedBitmap(source, System.Windows.Media.PixelFormats.Bgr32, null, 0);
                         opaque.Freeze();
                         return opaque;
@@ -116,7 +109,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // a frame from the middle of the clip
         private static BitmapSource? FromClip(string path)
         {
             List<ClipProcessor.Thumbnail> frames = ClipProcessor.GrabThumbnails(path, 2, Size);

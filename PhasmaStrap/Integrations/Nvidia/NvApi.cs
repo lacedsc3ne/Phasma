@@ -33,11 +33,6 @@ namespace PhasmaStrap.Integrations.Nvidia
         UnicodeString = 3,
     }
 
-    // Hand-rolled P/Invoke wrapper around the unofficial, unversioned NVAPI ABI.
-    // NVIDIA does not ship a public header for this - the function IDs below are
-    // the well-known community-reverse-engineered "QueryInterface" ids used by
-    // NVIDIA Profile Inspector and similar tools to read/write driver profiles.
-    // Ported from Voidstrap's Integrations/Nvidia/NvApi.cs.
     internal static class NvApi
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

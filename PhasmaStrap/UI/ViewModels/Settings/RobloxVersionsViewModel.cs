@@ -35,10 +35,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
     }
 
-    /// <summary>
-    /// Behaviour > Roblox version: hold or pin the Roblox version, keep the previous one for going
-    /// back, and see which of your flags an update removed. Settings apply when Save is pressed.
-    /// </summary>
     public sealed class RobloxVersionsViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<RobloxVersionRow> OnDisk { get; } = new();
@@ -56,7 +52,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (RobloxVersionRecord record in RobloxVersions.OnDisk())
                 OnDisk.Add(new RobloxVersionRow { Record = record, IsInstalled = string.Equals(record.Guid, installed, StringComparison.OrdinalIgnoreCase) });
 
-            // the version in use is listed even before it has its package list copy (next launch)
             if (!string.IsNullOrEmpty(installed) && !OnDisk.Any(r => r.IsInstalled) && File.Exists(Path.Combine(RobloxVersions.FolderOf(installed), "RobloxPlayerBeta.exe")))
                 OnDisk.Insert(0, new RobloxVersionRow { Record = new RobloxVersionRecord { Guid = installed, FileVersion = RobloxVersions.FileVersionOf(installed), InstalledUtc = Directory.GetCreationTimeUtc(RobloxVersions.FolderOf(installed)) }, IsInstalled = true });
 
@@ -94,8 +89,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     : $"Roblox's newest is {data.LatestFileVersion} ({data.LatestGuid}) - you're not on it.";
             }
         }
-
-        // ------------------------------------------------------------------ mode
 
         private string Mode
         {
@@ -156,8 +149,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public Visibility NothingKeptVisibility => OnDisk.Count(r => !r.IsInstalled) == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        // ------------------------------------------------------------------ flags
-
         public bool CheckFlags
         {
             get => App.Settings.Prop.RobloxCheckFlagsAfterUpdate;
@@ -184,7 +175,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private string _compareStatus = "";
         public string CompareStatus { get => _compareStatus; private set { _compareStatus = value; OnPropertyChanged(nameof(CompareStatus)); } }
 
-        // the same check by hand: the version in use against the newest other one on this PC
         public ICommand CompareCommand => new AsyncRelayCommand(async () =>
         {
             string current = App.PlayerState.Prop.VersionGuid;

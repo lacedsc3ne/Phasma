@@ -5,7 +5,7 @@ namespace PhasmaStrap.Utility
     static class WindowsRegistry
     {
         private const string RobloxPlaceKey = "Roblox.Place";
-        
+
         public static readonly List<RegistryKey> Roots = new() { Registry.CurrentUser, Registry.LocalMachine };
 
         public static void RegisterProtocol(string key, string name, string handler, string handlerParam = "%1")
@@ -29,9 +29,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        /// <summary>
-        /// Registers Roblox Player protocols for PhasmaStrap
-        /// </summary>
         public static void RegisterPlayer() => RegisterPlayer(Paths.Application, "-player \"%1\"");
 
         public static void RegisterPlayer(string handler, string handlerParam)
@@ -39,13 +36,9 @@ namespace PhasmaStrap.Utility
             RegisterProtocol("roblox", "Roblox", handler, handlerParam);
             RegisterProtocol("roblox-player", "Roblox", handler, handlerParam);
 
-            // so a friend's Discord Join can start PhasmaStrap (Integrations.DiscordJoin)
             Integrations.DiscordJoin.RegisterLaunchCommands();
         }
 
-        /// <summary>
-        /// Registers all Roblox Studio classes for PhasmaStrap
-        /// </summary>
         public static void RegisterStudio()
         {
             RegisterStudioProtocol(Paths.Application, "-studio \"%1\"");
@@ -53,31 +46,18 @@ namespace PhasmaStrap.Utility
             RegisterStudioFileTypes();
         }
 
-        /// <summary>
-        /// Registers roblox-studio and roblox-studio-auth protocols
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="handlerParam"></param>
         public static void RegisterStudioProtocol(string handler, string handlerParam)
         {
             RegisterProtocol("roblox-studio", "Roblox", handler, handlerParam);
             RegisterProtocol("roblox-studio-auth", "Roblox", handler, handlerParam);
         }
 
-        /// <summary>
-        /// Registers file associations for Roblox.Place class
-        /// </summary>
         public static void RegisterStudioFileTypes()
         {
             RegisterStudioFileType(".rbxl");
             RegisterStudioFileType(".rbxlx");
         }
 
-        /// <summary>
-        /// Registers Roblox.Place class
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="handlerParam"></param>
         public static void RegisterStudioFileClass(string handler, string handlerParam)
         {
             const string keyValue = "Roblox Place";
@@ -113,18 +93,12 @@ namespace PhasmaStrap.Utility
 
         private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
-        /// <summary>
-        /// Adds a per-user Run key so PhasmaStrap opens to the settings window on Windows sign-in.
-        /// </summary>
         public static void RegisterStartup()
         {
             using RegistryKey runKey = Registry.CurrentUser.CreateSubKey(RunKeyPath);
             runKey.SetValueSafe(App.ProjectName, $"\"{Paths.Application}\" -settings");
         }
 
-        /// <summary>
-        /// Removes the Run key added by <see cref="RegisterStartup"/>. Safe to call even if it was never set.
-        /// </summary>
         public static void UnregisterStartup()
         {
             using RegistryKey? runKey = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true);

@@ -1,9 +1,5 @@
 namespace PhasmaStrap
 {
-    // writes the PhasmaStrap Studio companion plugin into Roblox's local plugins folder.
-    // Ported from Voidstrap's StudioPluginInstaller, without its icon-file installation step
-    // (that copied a texture into every detected Studio install directory - skipped here
-    // since there's no matching bundled icon asset for it to install).
     public static class StudioPluginInstaller
     {
         private const string LOG_IDENT = "StudioPluginInstaller";

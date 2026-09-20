@@ -10,15 +10,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    // Hotkey capture. Clicking a row's button starts listening through a low-level keyboard hook
-    // rather than WPF key events, because WPF never sees a lot of what people want to bind:
-    // PrintScreen only raises KeyUp, Win and Alt combinations are taken by the shell, and anything
-    // the running game session already listens for would be consumed before it got here. The hook
-    // swallows every key while listening, so nothing typed during capture leaks into the window or
-    // triggers an existing hotkey.
-    //
-    // Listening always ends: on the key press, Esc (cancel - the old binding stays), clicking
-    // anywhere else, the window losing focus, leaving the page, or a timeout.
     public partial class HotkeysPage
     {
         private const int VK_ESCAPE = 0x1B;
@@ -30,7 +21,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-        private readonly HotkeysViewModel _viewModel = new();
+        private readonly HotkeysViewModel _viewModel = HotkeysViewModel.Shared;
         private readonly LowLevelKeyboardHook _hook;
         private readonly DispatcherTimer _listenTimeout;
         private readonly DispatcherTimer _drainTimeout;
@@ -69,6 +60,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             foreach (HotkeyRow row in _viewModel.Hotkeys)
                 DescribeBinding(row, null);
+
+            _viewModel.Refresh();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -93,7 +86,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             EndDrain();
         }
 
-        // a click anywhere except the listening row's own button cancels (that button toggles itself)
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (_listening is null)
@@ -110,8 +102,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private static DependencyObject? GetParent(DependencyObject node) =>
             node is Visual or System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node);
-
-        // ---------------------------------------------------------------- listening
 
         private void CaptureButton_Click(object sender, RoutedEventArgs e)
         {
@@ -150,9 +140,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 row.GestureText = "";
                 row.SetStatus("");
             }
+
+            _viewModel.RefreshKeyboard();
         }
 
-        // Ends listening without changing the binding. `message` replaces the row's status when given.
         private void StopListening(string? message)
         {
             HotkeyRow? row = _listening;
@@ -164,7 +155,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 _hook.Uninstall();
         }
 
-        // `row` has already been taken out of _listening (or is being, by StopListening)
         private void FinishListening(HotkeyRow row, string? message)
         {
             _listenTimeout.Stop();
@@ -177,8 +167,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DescribeBinding(row, message);
         }
 
-        // After a key is accepted the hook stays up, still swallowing, until that key is released -
-        // otherwise its auto-repeat and key-up would land in the window as stray input.
         private void BeginDrain(int virtualKey)
         {
             _drainKey = virtualKey;
@@ -195,13 +183,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 _hook.Uninstall();
         }
 
-        // Runs inside the keyboard hook, on the UI thread. True = swallow the key. Windows drops a
-        // hook whose callback is slow, so this only records what happened - saving the binding and
-        // everything else is posted to the dispatcher.
-        //
-        // Modifier key-UPs are never swallowed: if Ctrl was already down when listening started and
-        // its release were eaten here, the rest of the system would think Ctrl was stuck down. A
-        // key-up whose key-down was swallowed is harmless (a lone Win-up doesn't open Start).
         private bool OnKey(int vk, bool isDown)
         {
             bool isModifier = LowLevelKeyboardHook.IsModifier(vk);
@@ -231,7 +212,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             if (!isDown)
                 return true;
 
-            // decided: stop treating keys as input for this row right now, finish up afterwards
             HotkeyRow row = _listening;
             ModifierKeys modifiers = HeldModifiers();
 
@@ -267,8 +247,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             return modifiers;
         }
 
-        // ---------------------------------------------------------------- committing
-
         private void Commit(HotkeyRow row, ModifierKeys modifiers, int vk)
         {
             if (!HotkeyGesture.TryFromVirtualKey(modifiers, vk, out string text))
@@ -278,7 +256,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
                 return;
             }
 
-            // one shortcut, one action: take it away from whichever row had it
             string? movedFrom = null;
             foreach (HotkeyRow other in _viewModel.Hotkeys)
             {
@@ -293,9 +270,10 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             row.GestureText = text;
 
             FinishListening(row, movedFrom is null ? null : $"Moved here from \"{movedFrom}\".");
+
+            _viewModel.RefreshKeyboard();
         }
 
-        // Explains what the row's current binding will do; `prefix` is put in front when given.
         private static void DescribeBinding(HotkeyRow row, string? prefix)
         {
             if (!HotkeyGesture.TryParse(row.GestureText, out ModifierKeys modifiers, out Key key))
@@ -321,9 +299,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             row.SetStatus(prefix ?? "");
         }
 
-        // RegisterHotKey fails when some other program (or Windows) already owns the combination.
-        // PhasmaStrap itself never registers hotkeys this way any more, so a failure is always
-        // somebody else.
         private static bool IsRegisteredElsewhere(ModifierKeys modifiers, Key key)
         {
             int vk = KeyInterop.VirtualKeyFromKey(key);

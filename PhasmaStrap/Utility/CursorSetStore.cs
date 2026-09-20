@@ -1,14 +1,5 @@
-namespace PhasmaStrap.Utility
+﻿namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Backing store for the "Custom Cursor Set" manager on ModsPage's Preset Mod tab. Unlike
-    /// <see cref="PhasmaStrap.Models.SettingTasks.CustomCursorModPresetTask"/> (which only tracks
-    /// one active folder at a time), this keeps a named library of cursor sets - each its own
-    /// subfolder under <see cref="Paths.CursorSetsRoot"/> - so a user can save several, switch
-    /// between them, and import/export them as a single .zip. Applying a set copies its files
-    /// straight into the same Modifications-relative targets CustomCursorModPresetTask uses, so
-    /// the two features share one on-disk result and never fight each other.
-    /// </summary>
     public sealed class CursorSetRecord
     {
         public string Id { get; set; } = string.Empty;
@@ -27,8 +18,6 @@ namespace PhasmaStrap.Utility
 
     public static class CursorSetStore
     {
-        // filename inside a set's folder -> path relative to Paths.Modifications that Apply/Fetch use.
-        // Kept in sync with CustomCursorModPresetTask.FileMap so both features target the same files.
         public static readonly Dictionary<string, string> FileMap = new(StringComparer.OrdinalIgnoreCase)
         {
             { "MouseLockedCursor.png", @"content\textures\MouseLockedCursor.png" },
@@ -88,25 +77,21 @@ namespace PhasmaStrap.Utility
             return GetFolderCore(id);
         }
 
-        /// <summary>Copies this set's saved images into the live cursor mod targets under Modifications.</summary>
         public static void Apply(string id)
         {
             string folder = GetFolder(id);
             foreach (var pair in FileMap)
             {
-                string source = Path.Combine(folder, pair.Key);
+                string? source = CursorImages.FindSource(folder, pair.Key);
                 string target = Path.Combine(Paths.Modifications, pair.Value);
 
-                if (!File.Exists(source))
+                if (source is null)
                     continue;
 
-                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-                Filesystem.AssertReadOnly(target);
-                File.Copy(source, target, true);
+                CursorImages.WritePng(source, target);
             }
         }
 
-        /// <summary>Copies whatever cursor files are currently applied under Modifications back into this set.</summary>
         public static int FetchFromCurrent(string id)
         {
             string folder = GetFolder(id);
@@ -124,7 +109,6 @@ namespace PhasmaStrap.Utility
             return copied;
         }
 
-        /// <summary>Exports this set's folder to a standalone .zip a user can share.</summary>
         public static void Export(string id, string destinationZipPath)
         {
             string folder = GetFolder(id);
@@ -134,7 +118,6 @@ namespace PhasmaStrap.Utility
             fastZip.CreateZip(destinationZipPath, folder, false, null);
         }
 
-        /// <summary>Imports a .zip (previously produced by Export, or any folder of the recognized cursor filenames zipped up) as a new named set.</summary>
         public static CursorSetRecord Import(string zipPath, string name)
         {
             lock (Sync)
@@ -152,10 +135,7 @@ namespace PhasmaStrap.Utility
                 var fastZip = new ICSharpCode.SharpZipLib.Zip.FastZip();
                 fastZip.ExtractZip(zipPath, folder, null);
 
-                // the zip may have nested a single subfolder instead of storing the images at its
-                // root (e.g. re-zipping a folder in Explorer) - if none of the recognized cursor
-                // files landed at the root but exactly one subfolder appeared, flatten it up
-                if (!FileMap.Keys.Any(fileName => File.Exists(Path.Combine(folder, fileName))))
+                if (!CursorImages.AnyIn(folder, FileMap.Keys))
                 {
                     string[] subdirectories = Directory.GetDirectories(folder);
                     if (subdirectories.Length == 1)
@@ -166,10 +146,10 @@ namespace PhasmaStrap.Utility
                     }
                 }
 
-                if (!FileMap.Keys.Any(fileName => File.Exists(Path.Combine(folder, fileName))))
+                if (!CursorImages.AnyIn(folder, FileMap.Keys))
                 {
                     Directory.Delete(folder, true);
-                    throw new InvalidDataException("That archive doesn't contain any recognized cursor images (ArrowCursor.png, ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png).");
+                    throw new InvalidDataException("That archive doesn't contain any recognized cursor images. It needs at least one of ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + ".");
                 }
 
                 records.Add(record);

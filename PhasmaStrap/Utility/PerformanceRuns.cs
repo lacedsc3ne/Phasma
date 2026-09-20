@@ -1,4 +1,4 @@
-using PhasmaStrap.Integrations;
+﻿using PhasmaStrap.Integrations;
 using PhasmaStrap.UI;
 
 namespace PhasmaStrap.Utility
@@ -8,7 +8,7 @@ namespace PhasmaStrap.Utility
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
         public string Label { get; set; } = "";
         public int Seconds { get; set; } = 60;
-        public int DelayAfterJoinSeconds { get; set; }      // let the world finish loading first
+        public int DelayAfterJoinSeconds { get; set; }
         public string Experiment { get; set; } = "";
         public string Variant { get; set; } = "";
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
@@ -17,16 +17,12 @@ namespace PhasmaStrap.Utility
     public sealed class MeasureStatus
     {
         public string RequestId { get; set; } = "";
-        public string State { get; set; } = "";             // waiting / measuring / done / failed
+        public string State { get; set; } = "";
         public double Progress { get; set; }
         public string Message { get; set; } = "";
         public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
     }
 
-    // Performance measurements have to run where the game session is (the Watcher), but are asked
-    // for and looked at in the settings window - a different process. They talk through three
-    // things under <base>\Diagnostics: request.json (one pending order), status.json (what the
-    // Watcher is doing about it) and Runs\*.json (finished reports).
     internal static class PerformanceRuns
     {
         private const string LOG_IDENT = "PerformanceRuns";
@@ -135,7 +131,6 @@ namespace PhasmaStrap.Utility
         }
     }
 
-    // The Watcher's half: picks up a request once a game is being played, measures, files the report.
     internal sealed class PerformanceMeasurer : IDisposable
     {
         private const string LOG_IDENT = "PerformanceMeasurer";
@@ -184,7 +179,6 @@ namespace PhasmaStrap.Utility
                 if (Interlocked.Exchange(ref _busy, 1) != 0)
                     return;
 
-                // taken: a second Watcher (multi-instance) must not measure the same order
                 PerformanceRuns.ClearRequest();
 
                 var thread = new Thread(() => Run(request)) { IsBackground = true, Name = "PerformanceMeasurer" };
@@ -205,7 +199,7 @@ namespace PhasmaStrap.Utility
                 long placeId = _activityWatcher.Data.PlaceId;
                 long universeId = _activityWatcher.Data.UniverseId;
 
-                NotificationCenter.Notify("Measuring performance", $"Keep playing normally for {request.Seconds} seconds. Only time with Roblox in front counts.", NotificationCategory.General, 5);
+                NotificationCenter.Notify("Measuring performance", $"Keep playing normally for {request.Seconds} seconds. Only time with Roblox in front counts.", NotificationCategory.General, 5, kind: NotificationKindId.PerformanceRun);
                 App.Logger.WriteLine(LOG_IDENT, $"Measuring {request.Seconds}s (label '{request.Label}', experiment '{request.Experiment}', variant '{request.Variant}')");
 
                 var probe = new FrameTimeProbe(App.RobloxPlayerAppName);
@@ -220,7 +214,7 @@ namespace PhasmaStrap.Utility
                 if (report is null)
                 {
                     PerformanceRuns.WriteStatus(new MeasureStatus { RequestId = request.Id, State = "failed", Message = "Roblox was not the window in front long enough to measure anything." });
-                    NotificationCenter.Notify("Nothing measured", "Roblox has to be the window in front while measuring.", NotificationCategory.General);
+                    NotificationCenter.Notify("Nothing measured", "Roblox has to be the window in front while measuring.", NotificationCategory.General, kind: NotificationKindId.PerformanceRun);
                     return;
                 }
 
@@ -241,7 +235,8 @@ namespace PhasmaStrap.Utility
                 PerformanceRuns.WriteStatus(new MeasureStatus { RequestId = request.Id, State = "done", Progress = 1, Message = report.Verdict });
 
                 NotificationCenter.Notify("Performance measured", report.Verdict, NotificationCategory.General, 10,
-                    onClick: () => { try { Process.Start(Paths.Process, "-settings"); } catch { } });
+                    onClick: () => { try { Process.Start(Paths.Process, "-settings"); } catch { } },
+                    kind: NotificationKindId.PerformanceRun);
             }
             catch (OperationCanceledException)
             {

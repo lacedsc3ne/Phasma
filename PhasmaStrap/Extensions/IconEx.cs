@@ -10,9 +10,6 @@ namespace PhasmaStrap.Extensions
     {
         public static Icon GetSized(this Icon icon, int width, int height) => new(icon, new Size(width, height));
 
-        // multi-resolution .ico files decode to several frames; BitmapFrame.Create alone returns
-        // whichever one the decoder defaults to (often the smallest), which then renders blurry
-        // when displayed larger, so explicitly pick the highest-resolution frame available
         private static ImageSource GetLargestFrame(Stream stream)
         {
             var decoder = new IconBitmapDecoder(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);

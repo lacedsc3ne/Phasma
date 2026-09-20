@@ -11,12 +11,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         Base64Nip,
     }
 
-    // Lets the user pick how the currently-configured NVIDIA driver settings (from
-    // NvidiaPage/NvidiaViewModel) get copied to the clipboard - a full NVIDIA Profile
-    // Inspector-compatible .nip document, a plain "name = value" listing, or the .nip
-    // document Base64-encoded for pasting somewhere that mangles raw XML.
-    //
-    // Ported from Voidstrap's UI/Elements/Dialogs/CopyNvidiaSettingsDialog.xaml.cs.
     public partial class CopyNvidiaSettingsDialog
     {
         private sealed class FormatOption

@@ -1,8 +1,5 @@
-﻿namespace PhasmaStrap.Models.APIs.Roblox
+namespace PhasmaStrap.Models.APIs.Roblox
 {
-    /// <summary>
-    /// Roblox.Web.WebAPI.Models.ApiArrayResponse
-    /// </summary>
     public class ApiArrayResponse<T>
     {
         [JsonPropertyName("data")]

@@ -1,10 +1,5 @@
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// Keeps avatar headshots on disk (LocalAppData\PhasmaStrap\Avatars\{userId}.png) so the
-    /// Friends/Accounts lists don't re-download every picture on every visit. Entries are
-    /// refreshed after a few days so avatar changes still show up.
-    /// </summary>
     public static class AvatarCache
     {
         private const string LOG_IDENT = "AvatarCache";
@@ -15,7 +10,6 @@ namespace PhasmaStrap.Integrations
 
         public static string Folder => Path.Combine(Paths.LocalAppData, "PhasmaStrap", "Avatars");
 
-        /// <summary>Returns the cached file for a user if it exists and is fresh, else null.</summary>
         public static string? TryGetFresh(long userId)
         {
             try
@@ -31,7 +25,6 @@ namespace PhasmaStrap.Integrations
             return null;
         }
 
-        /// <summary>Downloads a headshot into the cache and returns the local path (null on failure).</summary>
         public static async Task<string?> DownloadAsync(long userId, string url, CancellationToken ct = default)
         {
             if (string.IsNullOrEmpty(url))

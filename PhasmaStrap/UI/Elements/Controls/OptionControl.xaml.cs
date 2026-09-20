@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +16,6 @@ using System.Windows.Shapes;
 
 namespace PhasmaStrap.UI.Elements.Controls
 {
-    /// <summary>
-    /// Interaction logic for OptionControl.xaml
-    /// </summary
     [ContentProperty(nameof(InnerContent))]
     public partial class OptionControl : UserControl
     {
@@ -61,11 +58,6 @@ namespace PhasmaStrap.UI.Elements.Controls
         public static readonly DependencyProperty FlatProperty =
             DependencyProperty.Register(nameof(Flat), typeof(bool), typeof(OptionControl), new PropertyMetadata(false));
 
-        /// <summary>
-        /// Renders as a borderless row instead of a standalone card. Set automatically when the
-        /// control is placed inside a CardExpander/Card (so groups don't show nested card borders);
-        /// can be set explicitly in XAML to force either look.
-        /// </summary>
         public bool Flat
         {
             get { return (bool)GetValue(FlatProperty); }
@@ -97,7 +89,6 @@ namespace PhasmaStrap.UI.Elements.Controls
                     return;
                 }
 
-                // stop at the page boundary - anything above it is window chrome
                 if (parent is Page)
                     return;
 

@@ -3,13 +3,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.Integrations
 {
-    // Lives in the Watcher for the length of one Roblox run and writes it down (SessionStore):
-    // every server joined, its region, an FPS reading every few seconds when something is
-    // measuring (FpsFeed), and - only if switched on, since it means asking Roblox where your
-    // friends are with your login - which friends were on the same server.
-    //
-    // Saved when a server is joined or left and once a minute in between, so a crash or a power
-    // cut loses a minute, not the session.
     public sealed class SessionTracker : IDisposable
     {
         private const string LOG_IDENT = "SessionTracker";
@@ -77,7 +70,6 @@ namespace PhasmaStrap.Integrations
             Save();
         }
 
-        // under _lock
         private void CloseVisit()
         {
             if (_visit is null)
@@ -139,7 +131,6 @@ namespace PhasmaStrap.Integrations
 
                     save = _ticks % (SaveSeconds / SessionStore.FpsSampleSeconds) == 0;
 
-                    // first look a few seconds after joining, then every FriendPollSeconds
                     pollFriends = App.Settings.Prop.SessionTrackFriends
                         && (_ticks == 2 || _ticks % (FriendPollSeconds / SessionStore.FpsSampleSeconds) == 0);
                 }
@@ -188,7 +179,6 @@ namespace PhasmaStrap.Integrations
 
                     foreach (FriendPresence friend in presence.Values)
                     {
-                        // the server's job ID is only visible for friends whose "who can join me" allows it
                         if (friend.Type != FriendPresenceType.InGame || !string.Equals(friend.GameId, visit.JobId, StringComparison.OrdinalIgnoreCase))
                             continue;
 

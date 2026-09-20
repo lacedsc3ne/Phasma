@@ -11,29 +11,8 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // A searchable browser over the public FastFlag trackers maintained by MaximumADHD
-    // (Roblox-FFlag-Tracker / Roblox-Client-Tracker on GitHub), plus a bulk-validation tool
-    // for checking whether a block of flags a user already has actually exist. Selecting a
-    // result and clicking "Add to Flags" reuses FastFlagEditorPage's own AddSingle/validation
-    // logic via the callback passed into the constructor, rather than duplicating it here.
-    //
-    // Ported from Voidstrap's UI/Elements/Dialogs/FFlagSearchDialog.xaml.cs. See the class
-    // remarks below for what was simplified relative to the original.
     public partial class FFlagSearchDialog : WpfUiWindow
     {
-        // Voidstrap's original dialog also fabricated fake "date added" timestamps
-        // (Random.Shared over the last 24h) for a "Recent Flags (24h)" tab, even though the
-        // underlying trackers don't expose real modification times. That's misleading, so
-        // this port renames the tab to "Browse All" and drops the fake dates - it's a plain
-        // sample of the loaded flag database instead of a false claim about recency.
-        //
-        // Voidstrap's HTTP layer used a custom VpnHttpClient with its own network-change-aware
-        // retry handler. That's not Voidstrap-owned infrastructure (no proxy/endpoint of
-        // theirs is involved - it only wraps the same MaximumADHD/Roblox first-party URLs),
-        // but PhasmaStrap already has an equivalent shared App.HttpClient + bounded-read
-        // helper (PhasmaStrap.Utility.Http.ReadStringBoundedAsync) used elsewhere (e.g.
-        // GameChat), so this port reuses that instead of introducing a second HTTP stack.
-
         private const int MaximumValidationFileBytes = 4 * 1024 * 1024;
         private const int MaximumFlagsPerSource = 100_000;
         private const int MaximumTotalFlags = 250_000;
@@ -80,11 +59,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private int _searchGeneration;
 
-        // adds one flag to wherever the editor is pointed; returns null when it was added,
-        // otherwise why not (already there, invalid value)
         private readonly Func<string, string, string?>? _addFlagCallback;
 
-        // "your flags" or "profile \"X\"" - shown on the Add buttons and in the result line
         private readonly string _targetName;
 
         public FFlagSearchDialog(Func<string, string, string?>? addFlagCallback = null, string targetName = "your flags")
@@ -691,9 +667,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private void BrowseResultsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e) => AddSelected(BrowseResultsDataGrid);
 
-        // Adds every selected row (Ctrl/Shift+click for several). With nothing selected but only
-        // one result, that one is meant. Always says what happened - it used to add nothing,
-        // silently, unless a row had been clicked first.
         private void AddSelected(DataGrid grid)
         {
             if (_addFlagCallback is null)

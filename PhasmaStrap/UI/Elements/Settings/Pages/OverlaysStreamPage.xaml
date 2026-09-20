@@ -1,0 +1,48 @@
+<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.OverlaysStreamPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      mc:Ignorable="d"
+      Title="OverlaysStreamPage"
+      Scrollable="True">
+
+    <StackPanel Margin="0,0,14,14">
+        <TextBlock Text="{x:Static resources:Strings.Menu_Rendering_StreamSafeMode}" FontSize="20" FontWeight="Medium" />
+
+        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_HideChatNamesStream}" Description="{x:Static resources:Strings.Menu_Rendering_GivesOBSItsOwnCopyGame}">
+            <ui:ToggleSwitch IsChecked="{Binding StreamSafeEnabled, Mode=TwoWay}" />
+        </controls:OptionControl>
+
+        <StackPanel IsEnabled="{Binding StreamSafeEnabled}">
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_HiddenAreas}" Description="{Binding StreamSafeSummary}">
+                <ui:Button Content="{x:Static resources:Strings.Menu_Rendering_EditAreas}" Icon="SelectObject24" Command="{Binding OpenStreamSafeEditorCommand, Mode=OneTime}" />
+            </controls:OptionControl>
+
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_HowHiddenAreasLook}" Description="{x:Static resources:Strings.Menu_Rendering_PixelatedKeepsColoursButMakesText}">
+                <ComboBox Width="160" Padding="10,5,10,5" SelectedIndex="{Binding StreamSafeStyleIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="{x:Static resources:Strings.Menu_Rendering_Pixelated}" />
+                    <ComboBoxItem Content="{x:Static resources:Strings.Menu_Rendering_Black}" />
+                </ComboBox>
+            </controls:OptionControl>
+
+            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Rendering_ShowCrosshairStream}" Description="{x:Static resources:Strings.Menu_Rendering_DrawsCrosshairIntoStreamPictureAs}">
+                <ui:ToggleSwitch IsChecked="{Binding StreamSafeCrosshair, Mode=TwoWay}" />
+            </controls:OptionControl>
+
+            <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <StackPanel>
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Rendering_SettingUpOBS}" />
+                    <TextBlock Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_N1JoinGameSwitchedSaved}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_N2OBSAddWindowCaptureSource}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_N3SetItsCaptureMethodWindows}" />
+                    <TextBlock Margin="0,6,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Rendering_StreamViewSitsBehindOtherWindows}" />
+                    <ui:Button Margin="0,10,0,0" Content="{x:Static resources:Strings.Menu_Rendering_CopyWindowName}" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyStreamViewNameCommand, Mode=OneTime}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</ui:UiPage>

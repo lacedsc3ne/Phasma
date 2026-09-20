@@ -5,13 +5,6 @@ using System.Windows.Threading;
 
 namespace PhasmaStrap.Integrations.GameChat
 {
-    /// <summary>
-    /// Installs a global WH_KEYBOARD_LL hook so the chat overlay can be toggled/typed into while Roblox
-    /// (not this process) has focus. The hook is only ever installed while <see cref="SetEnabled"/> has
-    /// been called with true (i.e. while in an active game session and the master GameChatEnabled setting
-    /// is on), and is always uninstalled via <see cref="Dispose"/>. Every keystroke that isn't specifically
-    /// consumed is passed on to <see cref="CallNextHookEx"/> so we never black-hole the user's input.
-    /// </summary>
     public class GameChatKeyboardHook : IDisposable
     {
         private const int WH_KEYBOARD_LL = 13;

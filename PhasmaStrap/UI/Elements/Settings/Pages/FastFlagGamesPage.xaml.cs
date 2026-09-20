@@ -5,9 +5,6 @@ using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// The FastFlag "Per-game flags" tab - see FastFlagGamesViewModel
-    /// </summary>
     public partial class FastFlagGamesPage
     {
         private readonly FastFlagGamesViewModel _viewModel = new();
@@ -25,7 +22,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             App.FlagProfiles.Edited -= OnProfilesEdited;
             App.FlagProfiles.Edited += OnProfilesEdited;
 
-            // profiles may have been added, renamed or deleted on the editor tab
             _viewModel.Reload();
         }
 
@@ -33,8 +29,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
         private void OnProfilesEdited(object? sender, EventArgs e)
         {
-            // this page's own edits refresh it directly; only outside changes need a reload, and
-            // reloading while a row's ComboBox is committing would fight it
             if (!IsKeyboardFocusWithin)
                 _viewModel.Reload();
             else

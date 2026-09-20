@@ -1,4 +1,4 @@
-﻿using System.Media;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -11,11 +11,6 @@ using PhasmaStrap.UI.Utility;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // wpfui does have its own messagebox control but it SUCKS so heres this instead
-
-    /// <summary>
-    /// Interaction logic for FluentMessageBox.xaml
-    /// </summary>
     public partial class FluentMessageBox
     {
         public MessageBoxResult Result = MessageBoxResult.None;
@@ -89,8 +84,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                     break;
             }
 
-            // we're doing the width manually for this because ye
-
             if (ButtonThree.Visibility == Visibility.Visible)
                 Width = 356;
             else if (ButtonTwo.Visibility == Visibility.Visible)
@@ -98,10 +91,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             double textWidth = Math.Ceiling(Rendering.GetTextWidth(MessageTextBlock));
 
-            // offset to account for box size
             textWidth += 40;
 
-            // offset to account for icon
             if (image != MessageBoxImage.None)
                 textWidth += 50;
 
@@ -119,7 +110,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             };
         }
 
-        // reuse existing strings
         private static string GetTextForResult(MessageBoxResult result)
         {
             switch (result)

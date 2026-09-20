@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
@@ -12,7 +12,7 @@ namespace PhasmaStrap.UI.ViewModels.Installer
 
         public EventHandler<bool>? SetCanContinueEvent;
 
-        public string InstallLocation 
+        public string InstallLocation
         {
             get => installer.InstallLocation;
             set
@@ -39,7 +39,7 @@ namespace PhasmaStrap.UI.ViewModels.Installer
             get => installer.CreateDesktopShortcuts;
             set => installer.CreateDesktopShortcuts = value;
         }
-        
+
         public bool CreateStartMenuShortcuts
         {
             get => installer.CreateStartMenuShortcuts;

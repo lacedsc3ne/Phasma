@@ -39,7 +39,6 @@
                 <ColumnDefinition Width="340" />
             </Grid.ColumnDefinitions>
 
-            <!-- ============================================================ live preview -->
             <Grid Grid.Column="0" Margin="0,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -51,7 +50,6 @@
                 <TextBlock x:Name="InfoText" Grid.Row="1" Margin="2,8,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
             </Grid>
 
-            <!-- ============================================================ settings -->
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Pictures" />

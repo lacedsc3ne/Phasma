@@ -10,9 +10,6 @@ namespace PhasmaStrap
             set => _prop = value;
         }
 
-        /// <summary>
-        /// The file hash when last retrieved from disk
-        /// </summary>
         public string? LastFileHash { get; private set; }
 
         public bool Loaded { get; protected set; } = false;
@@ -84,7 +81,6 @@ namespace PhasmaStrap
 
                     try
                     {
-                        // Create a backup of loaded file
                         File.Copy(FileLocation, FileLocation + ".bak", true);
                     }
                     catch (Exception copyEx)
@@ -103,10 +99,6 @@ namespace PhasmaStrap
 
         private System.Threading.Timer? _deferredSaveTimer;
 
-        /// <summary>
-        /// Coalesces a burst of saves (a TextBox bound with UpdateSourceTrigger=PropertyChanged
-        /// fires once per keystroke) into a single write shortly after the last one.
-        /// </summary>
         public void SaveDeferred(int delayMs = 500)
         {
             lock (this)
@@ -130,7 +122,7 @@ namespace PhasmaStrap
         public virtual void Save()
         {
             string LOG_IDENT = $"{LOG_IDENT_CLASS}::Save";
-            
+
             App.Logger.WriteLine(LOG_IDENT, $"Saving to {FileLocation}...");
 
             Directory.CreateDirectory(Path.GetDirectoryName(FileLocation)!);
@@ -139,7 +131,6 @@ namespace PhasmaStrap
             {
                 string contents = JsonSerializer.Serialize(Prop, new JsonSerializerOptions { WriteIndented = true });
 
-                // keep what is about to be replaced (Settings / FastFlags only, see SettingsBackups)
                 if (Utility.SettingsBackups.IsTracked(FileLocation))
                 {
                     Utility.SettingsBackups.Log ??= message => App.Logger.WriteLine("SettingsBackups", message);
@@ -186,17 +177,11 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, "Failed to delete");
                 App.Logger.WriteException(LOG_IDENT, ex);
-
-                // should we notify?
             }
         }
 
-        /// <summary>
-        /// Is the file on disk different to the one deserialised during this session?
-        /// </summary>
         public bool HasFileOnDiskChanged()
         {
-            // check if a file has been created since launch
             if (string.IsNullOrEmpty(LastFileHash) && File.Exists(FileLocation))
                 return true;
 
@@ -204,10 +189,6 @@ namespace PhasmaStrap
         }
     }
 
-    /// <summary>
-    /// <see cref="JsonManager{T}"/> that will automatically load in the JSON if it has not been already
-    /// </summary>
-    /// <typeparam name="T">Class</typeparam>
     public class LazyJsonManager<T> : JsonManager<T> where T : class, new()
     {
         public override T Prop

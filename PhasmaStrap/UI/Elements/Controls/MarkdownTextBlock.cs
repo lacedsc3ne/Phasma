@@ -12,17 +12,12 @@ using FontFamily = System.Windows.Media.FontFamily;
 
 namespace PhasmaStrap.UI.Elements.Controls
 {
-    /// <summary>
-    /// TextBlock with markdown support: paragraphs, headings, bullet and numbered lists, quotes,
-    /// code, emphasis and links. (It used to show paragraphs only, so a changelog - headings and
-    /// bullets - came out empty.)
-    /// </summary>
     [ContentProperty("MarkdownText")]
     [Localizability(LocalizationCategory.Text)]
     class MarkdownTextBlock : TextBlock
     {
         private static readonly MarkdownPipeline _markdownPipeline = new MarkdownPipelineBuilder()
-                .UseEmphasisExtras(Markdig.Extensions.EmphasisExtras.EmphasisExtraOptions.Marked) // enable '==' support
+                .UseEmphasisExtras(Markdig.Extensions.EmphasisExtras.EmphasisExtraOptions.Marked)
                 .UseSoftlineBreakAsHardlineBreak()
                 .Build();
 
@@ -39,7 +34,6 @@ namespace PhasmaStrap.UI.Elements.Controls
 
         private static readonly FontFamily CodeFont = new("Consolas");
 
-        // all of an inline container's children, in order
         private static Span Children(ContainerInline container)
         {
             var span = new Span();
@@ -68,7 +62,7 @@ namespace PhasmaStrap.UI.Elements.Controls
                                 ? new Italic(Children(emphasisInline))
                                 : new Bold(Children(emphasisInline));
 
-                        case '=': // marked
+                        case '=':
                             {
                                 var span = Children(emphasisInline);
                                 span.Background = new SolidColorBrush(Color.FromArgb(50, 255, 255, 255));
@@ -130,7 +124,6 @@ namespace PhasmaStrap.UI.Elements.Controls
 
         private bool _anything;
 
-        // a gap before every block but the first
         private void BlockGap(bool tight)
         {
             if (!_anything)
@@ -203,7 +196,7 @@ namespace PhasmaStrap.UI.Elements.Controls
                         AddBlock(child, indent + "│ ", tight);
                     break;
 
-                case CodeBlock code: // fenced or indented
+                case CodeBlock code:
                     BlockGap(tight);
                     Inlines.Add(new Run(code.Lines.ToString().TrimEnd())
                     {

@@ -3,16 +3,12 @@ using PhasmaStrap.Resources;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    // backs the "Asset Warp" tab on FastFlagSettingsPage. Deliberately separate from
-    // NetworkingViewModel (which also surfaces these same App.Settings.Prop.AssetWarp*
-    // properties on the Networking page) so this tab can behave as a self-contained
-    // feature - flipping the master switch here also brings up PhasmaStrap's local proxy
-    // if it isn't already running, rather than requiring the user to separately visit the
-    // Networking page first. Turning the master switch off only turns AssetWarp itself off;
-    // it deliberately leaves the shared proxy running, since other features (presence/Robux/
-    // username spoofing on the Networking page) may still depend on it.
     public class AssetWarpViewModel : NotifyPropertyChangedViewModel
     {
+        private static AssetWarpViewModel? _shared;
+
+        public static AssetWarpViewModel Shared => _shared ??= new();
+
         public bool AssetWarpEnabled
         {
             get => App.Settings.Prop.AssetWarpEnabled;
@@ -68,11 +64,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.AssetWarpDisableAllMeshes = value; App.Settings.Save(); OnPropertyChanged(nameof(DisableAllMeshes)); OnPropertyChanged(nameof(StatusText)); }
         }
 
-        // every spoofer below only does anything while the local proxy is routing Roblox's
-        // traffic - so switching one ON brings the proxy up (one UAC prompt for the hosts file
-        // the first time), exactly like the Asset Warp master switch does. Previously these
-        // just saved the setting, which is why "none of the spoof settings work" when the
-        // proxy had never been enabled from the Networking page.
         private bool EnsureProxyForSpoofer(bool turningOn)
         {
             if (!turningOn || NetworkingController.IsActive)
@@ -105,8 +96,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // --- presence spoofer (same underlying Settings.PresenceSpoofMode the Networking page exposes) ---
-
         public IEnumerable<PresenceSpoofMode> PresenceSpoofModes { get; } = Enum.GetValues(typeof(PresenceSpoofMode)).Cast<PresenceSpoofMode>();
 
         public PresenceSpoofMode SelectedPresenceSpoofMode
@@ -125,8 +114,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(SelectedPresenceSpoofMode));
             }
         }
-
-        // --- preloading ---
 
         public bool PreloadEnabled
         {
@@ -153,8 +140,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.AssetWarpPreloadCrossGame;
             set { App.Settings.Prop.AssetWarpPreloadCrossGame = value; App.Settings.Save(); }
         }
-
-        // --- client spoofer (self vs. others) ---
 
         public string SpoofOthersName
         {
@@ -210,8 +195,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.Settings.Save();
             OnPropertyChanged(propertyName);
         }
-
-        // --- Robux adjuster (same underlying Settings.RobuxSpoofAmount the Networking page exposes) ---
 
         public string RobuxSpoofAmount
         {

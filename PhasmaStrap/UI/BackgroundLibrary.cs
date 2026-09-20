@@ -2,32 +2,21 @@ using System.Security.Cryptography;
 
 namespace PhasmaStrap.UI
 {
-    // The settings-window backgrounds the user has added, kept as copies in <install>\Backgrounds.
-    // Copies rather than links to wherever the file came from, because a linked background
-    // silently disappears the moment the original is moved, renamed or cleaned out of Downloads,
-    // and because every copy gets a name derived from its content - two different pictures can
-    // never end up sharing a path (and with it a cache entry).
     internal static class BackgroundLibrary
     {
         private const string LOG_IDENT = "BackgroundLibrary";
 
         public static readonly string[] ImageExtensions = { ".gif", ".png", ".jpg", ".jpeg", ".bmp" };
 
-        // what Windows Media Foundation (and with it WPF's MediaElement) can play without extra
-        // codecs. WebM / MKV only work when the codec is installed, which Import checks by opening
-        // the file.
         public static readonly string[] VideoExtensions = { ".mp4", ".m4v", ".mov", ".wmv", ".webm", ".mkv" };
 
         public static readonly string[] Extensions = ImageExtensions.Concat(VideoExtensions).ToArray();
 
-        // above this a background is more likely a whole film than a loop - still allowed, but the
-        // copy takes a while and the user is told
         public const long LargeVideoBytes = 300L * 1024 * 1024;
 
         public static bool IsVideo(string? path) =>
             !string.IsNullOrEmpty(path) && VideoExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
-        // a still for the gallery: the picture itself, or a frame one second into a video
         public static System.Windows.Media.Imaging.BitmapSource? LoadThumbnail(string path, int width)
         {
             if (!IsVideo(path))
@@ -52,7 +41,6 @@ namespace PhasmaStrap.UI
                     result = new System.Windows.Media.Imaging.TransformedBitmap(frame, new System.Windows.Media.ScaleTransform(scale, scale));
                 }
 
-                // materialise it, so the full-size frame is not kept alive behind the scaled view
                 var copy = new System.Windows.Media.Imaging.WriteableBitmap(result);
                 copy.Freeze();
                 return copy;
@@ -83,7 +71,6 @@ namespace PhasmaStrap.UI
             }
         }
 
-        // newest first
         public static List<string> List()
         {
             try
@@ -104,11 +91,8 @@ namespace PhasmaStrap.UI
             }
         }
 
-        // Copies `source` into the library and returns the copy's path. Adding the same picture
-        // twice returns the existing copy.
         public static string Import(string source)
         {
-            // a video Windows cannot decode would only ever show as a black window
             if (IsVideo(source))
             {
                 PhasmaStrap.Utility.ClipInfo info;
@@ -166,7 +150,6 @@ namespace PhasmaStrap.UI
             }
         }
 
-        // "sunset-1a2b3c4d5e.gif" -> "sunset"
         public static string DisplayName(string path)
         {
             string stem = Path.GetFileNameWithoutExtension(path);

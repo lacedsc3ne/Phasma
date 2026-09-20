@@ -11,118 +11,218 @@
       Scrollable="True">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Networking}" FontSize="20" FontWeight="Medium" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificateTrustPresenceSpoofing}" />
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_EnableLocalProxy}" Description="{Binding StatusText, Mode=OneWay}">
-            <ui:ToggleSwitch IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_Certificate}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ProxyNeedsCertificateTrustedByAccount}" />
-
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificate}" Description="{Binding CertificateStatusText, Mode=OneWay}">
-            <StackPanel Orientation="Horizontal">
-                <ui:Button Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ShieldCheckmark24" Margin="0,0,8,0" Command="{Binding InstallCertificateCommand, Mode=OneTime}" />
-                <ui:Button Content="{x:Static resources:Strings.Menu_Mods_Remove}" Icon="Delete24" Appearance="Secondary" Command="{Binding RemoveCertificateCommand, Mode=OneTime}" />
-            </StackPanel>
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_Presence}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ChangesWhatSessionTypeRobloxS}" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_PresenceMode}">
-            <ComboBox Width="160" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_RobuxBalance}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ShowsDifferentBalanceOwnScreenOnly}" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayedBalance}">
-            <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealBalance}" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_DisplayName}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_OverridesNameShownGameAnyProfile}" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayNameOverride}">
-            <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealName}" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlags_Section_Telemetry}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_BlackholesRobloxSOwnTelemetryCrash}" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_BlockRobloxTelemetry}" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
-            <ui:ToggleSwitch IsChecked="{Binding BlockRobloxTelemetry, Mode=TwoWay}" />
-        </controls:OptionControl>
-
-        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_Tab_AssetWarp}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_AssetBlockingPreloadingClientSpoofersLive}" />
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_AssetWarpSettings}" Description="{x:Static resources:Strings.Menu_Networking_BlockTexturesDecalsMeshesPreloadAssets}">
-            <ui:Button Content="{x:Static resources:Strings.Menu_Networking_OpenAssetWarp}" Icon="PaintBrush24" Command="{Binding OpenAssetWarpCommand, Mode=OneTime}" />
-        </controls:OptionControl>
-
-        <ui:CardExpander Margin="0,8,0,0" Icon="Folder24">
-            <ui:CardExpander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_PreloadCache}" />
-                        <TextBlock FontSize="12" Text="{Binding PreloadCacheSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+        <TabControl Margin="0,12,0,0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Globe24" Margin="0,0,6,0" />
+                        <TextBlock Text="Proxy" />
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshPreloadCacheCommand, Mode=OneTime}" />
-                        <ui:Button Content="{x:Static resources:Strings.Menu_Networking_ClearAll}" Icon="Delete24" Appearance="Danger" Command="{Binding ClearPreloadCacheCommand, Mode=OneTime}" />
-                    </StackPanel>
-                </Grid>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <TextBlock Text="{x:Static resources:Strings.Menu_Networking_EachEntryCachedAssetResolutionResponse}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
-                <ItemsControl ItemsSource="{Binding PreloadCacheEntries, Mode=OneWay}" MaxHeight="240">
-                    <ItemsControl.Template>
-                        <ControlTemplate TargetType="ItemsControl">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" controls:ScrollBubbling.Enabled="True">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,0,0,4" Padding="8,6" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                </TabItem.Header>
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="Local proxy" FontSize="20" FontWeight="Medium" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificateTrustPresenceSpoofing}" />
+
+                    <Border Margin="0,12,0,0" Padding="14,12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_EnableLocalProxy}" />
+                                    <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding StatusText, Mode=OneWay}" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding ProxyEnabled, Mode=TwoWay}" />
+                            </Grid>
+
+                            <Border Margin="0,12,0,0" Padding="0,12,0,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" FontSize="11" FontFamily="Consolas" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="8,0" VerticalAlignment="Center">
-                                        <Run Text="{Binding SizeDisplay, Mode=OneWay}" /><Run Text=" • " /><Run Text="{Binding LastAccessedDisplay, Mode=OneWay}" />
-                                    </TextBlock>
-                                    <ui:Button Grid.Column="2" Padding="4" Appearance="Transparent" Icon="Delete16"
-                                               Command="{Binding DataContext.DeletePreloadCacheEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                               CommandParameter="{Binding}" />
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_LocalProxyCertificate}" />
+                                        <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding CertificateStatusText, Mode=OneWay}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <ui:Button Content="{x:Static resources:Strings.Installer_Install_Title}" Icon="ShieldCheckmark24" Margin="0,0,8,0" Command="{Binding InstallCertificateCommand, Mode=OneTime}" />
+                                        <ui:Button Content="{x:Static resources:Strings.Menu_Mods_Remove}" Icon="Delete24" Appearance="Secondary" Command="{Binding RemoveCertificateCommand, Mode=OneTime}" />
+                                    </StackPanel>
                                 </Grid>
                             </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ui:CardExpander>
+                        </StackPanel>
+                    </Border>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_Networking_PanicWipe}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ImmediatelySignsYouOutRobloxClears}" />
+                    <TextBlock Text="What the proxy changes" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="These change what your own client is told, and need the local proxy above to be running. The telemetry blocker is the exception: it works at the hosts file level." />
 
-        <ui:Card Margin="0,8,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_WipeEverythingNow}" />
-                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding WipeStatus, Mode=OneWay}" />
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_PresenceMode}" Description="{x:Static resources:Strings.Menu_Networking_ChangesWhatSessionTypeRobloxS}">
+                        <ComboBox Width="160" ItemsSource="{Binding PresenceSpoofModes, Mode=OneTime}" SelectedItem="{Binding SelectedPresenceSpoofMode, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayedBalance}" Description="{x:Static resources:Strings.Menu_Networking_ShowsDifferentBalanceOwnScreenOnly}">
+                        <ui:TextBox Width="160" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealBalance}" Text="{Binding RobuxSpoofAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_DisplayNameOverride}" Description="{x:Static resources:Strings.Menu_Networking_OverridesNameShownGameAnyProfile}">
+                        <ui:TextBox Width="200" PlaceholderText="{x:Static resources:Strings.Menu_Networking_RealName}" Text="{Binding UsernameSpoofName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </controls:OptionControl>
+
+                    <controls:OptionControl Header="{x:Static resources:Strings.Menu_Networking_BlockRobloxTelemetry}" Description="{Binding TelemetryBlockerStatusText, Mode=OneWay}">
+                        <ui:ToggleSwitch IsChecked="{Binding BlockRobloxTelemetry, Mode=TwoWay}" />
+                    </controls:OptionControl>
+
+                    <StackPanel DataContext="{Binding Spoofer, Mode=OneTime}">
+                        <ui:CardExpander Margin="0,8,0,0">
+                            <ui:CardExpander.Header>
+                                <StackPanel>
+                                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_SpoofOtherPlayers}" />
+                                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_OverridesWhatYouSeeOtherPlayers}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                </StackPanel>
+                            </ui:CardExpander.Header>
+                            <StackPanel>
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersName_Description}">
+                                    <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofOthersName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </controls:OptionControl>
+
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersApplyIngame_Description}">
+                                    <ui:ToggleSwitch IsChecked="{Binding SpoofOthersApplyIngame, Mode=TwoWay}" />
+                                </controls:OptionControl>
+
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofOthersVerified_Description}">
+                                    <ui:ToggleSwitch IsChecked="{Binding SpoofOthersVerified, Mode=TwoWay}" />
+                                </controls:OptionControl>
+                            </StackPanel>
+                        </ui:CardExpander>
+
+                        <ui:CardExpander Margin="0,8,0,0">
+                            <ui:CardExpander.Header>
+                                <StackPanel>
+                                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_FastFlagSettings_SpoofYourself}" />
+                                    <TextBlock FontSize="12" Text="{x:Static resources:Strings.Menu_FastFlagSettings_OverridesOwnDisplayedNameVerificationRobux}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                </StackPanel>
+                            </ui:CardExpander.Header>
+                            <StackPanel>
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfName_Description}">
+                                    <ui:TextBox Width="200" Padding="10,5,10,5" Text="{Binding SpoofSelfName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </controls:OptionControl>
+
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfApplyIngame_Description}">
+                                    <ui:ToggleSwitch IsChecked="{Binding SpoofSelfApplyIngame, Mode=TwoWay}" />
+                                </controls:OptionControl>
+
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfVerified_Description}">
+                                    <ui:ToggleSwitch IsChecked="{Binding SpoofSelfVerified, Mode=TwoWay}" />
+                                </controls:OptionControl>
+
+                                <controls:OptionControl
+                                    Header="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Title}"
+                                    Description="{x:Static resources:Strings.Menu_AssetWarp_SpoofSelfGameCreator_Description}">
+                                    <ui:ToggleSwitch IsChecked="{Binding SpoofSelfGameCreator, Mode=TwoWay}" />
+                                </controls:OptionControl>
+                            </StackPanel>
+                        </ui:CardExpander>
+                    </StackPanel>
+
+                    <TextBlock Text="Cache and cleanup" FontSize="20" FontWeight="Medium" Margin="0,20,0,0" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="What the proxy has kept on disk, and a single action that clears everything PhasmaStrap and Roblox have stored." />
+
+                    <ui:CardExpander Margin="0,8,0,0" Icon="Folder24">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_PreloadCache}" />
+                                    <TextBlock FontSize="12" Text="{Binding PreloadCacheSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <ui:Button Margin="0,0,8,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshPreloadCacheCommand, Mode=OneTime}" />
+                                    <ui:Button Content="{x:Static resources:Strings.Menu_Networking_ClearAll}" Icon="Delete24" Appearance="Danger" Command="{Binding ClearPreloadCacheCommand, Mode=OneTime}" />
+                                </StackPanel>
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <TextBlock Text="{x:Static resources:Strings.Menu_Networking_EachEntryCachedAssetResolutionResponse}" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                            <ItemsControl ItemsSource="{Binding PreloadCacheEntries, Mode=OneWay}" MaxHeight="240">
+                                <ItemsControl.Template>
+                                    <ControlTemplate TargetType="ItemsControl">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" controls:ScrollBubbling.Enabled="True">
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    </ControlTemplate>
+                                </ItemsControl.Template>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,4" Padding="8,6" CornerRadius="6" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" FontSize="11" FontFamily="Consolas" Text="{Binding FileName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="8,0" VerticalAlignment="Center">
+                                                    <Run Text="{Binding SizeDisplay, Mode=OneWay}" /><Run Text=" • " /><Run Text="{Binding LastAccessedDisplay, Mode=OneWay}" />
+                                                </TextBlock>
+                                                <ui:Button Grid.Column="2" Padding="4" Appearance="Transparent" Icon="Delete16"
+                                                           Command="{Binding DataContext.DeletePreloadCacheEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                           CommandParameter="{Binding}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:Card Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Networking_PanicWipe}" />
+                                <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Networking_ImmediatelySignsYouOutRobloxClears}" />
+                                <TextBlock Margin="0,2,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding WipeStatus, Mode=OneWay}" />
+                            </StackPanel>
+                            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Networking_Wipe}" Icon="Delete24" Appearance="Danger" Command="{Binding WipeAllCommand, Mode=OneTime}" />
+                        </Grid>
+                    </ui:Card>
                 </StackPanel>
-                <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Networking_Wipe}" Icon="Delete24" Appearance="Danger" Command="{Binding WipeAllCommand, Mode=OneTime}" />
-            </Grid>
-        </ui:Card>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="BoxMultiple24" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Static resources:Strings.Menu_FastFlagSettings_AssetEngine}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Frame Margin="0,10,0,0"
+                       Source="AssetEnginePage.xaml"
+                       NavigationUIVisibility="Hidden"
+                       JournalOwnership="OwnsJournal"
+                       Background="Transparent" />
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </ui:UiPage>

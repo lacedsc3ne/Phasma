@@ -37,8 +37,7 @@
 
             <ListBox x:Name="ServerList" Visibility="Collapsed" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Stretch"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" MouseDoubleClick="ServerList_MouseDoubleClick" SelectionChanged="ServerList_SelectionChanged">
-                <!-- own selection look: the stock one fills the row with the accent colour, and with a
-                     light accent (custom themes) the text inside disappears -->
+
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

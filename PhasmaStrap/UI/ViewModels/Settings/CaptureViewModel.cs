@@ -16,8 +16,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private System.Windows.Media.Imaging.BitmapImage? _thumbnail;
 
-        // binding the raw path made WPF decode every full-resolution screenshot (tens of MB each)
-        // just to draw a 140px card; decode at card size instead, once, and keep the file unlocked
         public System.Windows.Media.Imaging.BitmapImage? Thumbnail
         {
             get
@@ -54,7 +52,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public long Bytes { get; init; }
         public string TakenDisplay => $"{Taken:g}  ·  {Bytes / 1048576.0:0.0} MB";
 
-        // GIFs exported from the clip editor are listed with the clips; only videos can be edited
         public bool IsGif => Path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
         public System.Windows.Visibility EditVisibility => IsGif ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
         public Wpf.Ui.Common.SymbolRegular Symbol => IsGif ? Wpf.Ui.Common.SymbolRegular.Gif24 : Wpf.Ui.Common.SymbolRegular.VideoClip24;
@@ -62,7 +59,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private System.Windows.Media.Imaging.BitmapSource? _thumbnail;
         private bool _thumbnailRequested;
 
-        // made in the background the first time the list asks for it (Utility/ClipThumbnails)
         public System.Windows.Media.Imaging.BitmapSource? Thumbnail
         {
             get
@@ -87,15 +83,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
     public class CaptureViewModel : NotifyPropertyChangedViewModel
     {
+        private static CaptureViewModel? _shared;
+
+        public static CaptureViewModel Shared => _shared ??= new();
+
         public ObservableCollection<ScreenshotItem> Screenshots { get; } = new();
-
-        // --- Instant Replay settings (the actual recorder only runs in the Watcher/Bootstrapper
-        // process during a live game session - same process-separation limitation as everything
-        // else in this app that needs a live Roblox session, see HomeViewModel/IntegrationsViewModel's
-        // similar notes. This page only edits Settings.Prop; InstantReplayRecorder itself lives
-        // in Watcher.cs.) ---
-
-        // --- "no hotkey bound" hint: the most common reason screenshots/replays "don't work" ---
 
         public System.Windows.Visibility HotkeyHintVisibility => string.IsNullOrEmpty(HotkeyHintText) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
 
@@ -117,6 +109,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public HotkeyRow? ScreenshotHotkey => HotkeysViewModel.Shared.Row(PhasmaStrap.Utility.HotkeyActions.TakeScreenshot);
+
+        public HotkeyRow? ReplayHotkey => HotkeysViewModel.Shared.Row(PhasmaStrap.Utility.HotkeyActions.SaveInstantReplay);
+
         public ICommand OpenHotkeysCommand => new RelayCommand(() =>
         {
             var window = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault();
@@ -129,8 +125,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(HotkeyHintVisibility));
         }
 
-        // saved immediately (not just on the Save button) so the running game session's watcher
-        // picks it up through SettingsHotReload and starts/stops buffering without a relaunch
         public bool InstantReplayEnabled
         {
             get => App.Settings.Prop.InstantReplayEnabled;
@@ -142,8 +136,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // every replay setting saves straight away: the recorder lives in the game-session process,
-        // which follows Settings.json (SettingsHotReload) and re-reads these values live
         public int InstantReplayClipSeconds
         {
             get => App.Settings.Prop.InstantReplayClipSeconds;
@@ -152,7 +144,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public int MaxClipSeconds => InstantReplayRecorder.MaxClipSeconds;
 
-        // "45s" under a minute, "2:30" from there
         public string ClipLengthText
         {
             get
@@ -224,6 +215,91 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.InstantReplayGpuEncoding = value; ReplaySettingChanged(nameof(GpuEncoding)); OnPropertyChanged(nameof(SoundAvailable)); OnPropertyChanged(nameof(MicrophonePickerEnabled)); }
         }
 
+        public string GpuEncodingText => App.Settings.Prop.InstantReplayGpuEncoding ? "On" : "Off";
+
+        private static readonly (int Fps, int MaxHeight, int Quality, bool Gpu)[] PresetValues =
+        {
+            (30, 720, 0, true),
+            (60, 1080, 1, true),
+            (60, 0, 2, true),
+        };
+
+        public string[] PresetOptions { get; } = { "Small file", "Balanced", "Best looking", "Custom" };
+
+        private bool _customPreset;
+
+        public string SelectedPreset
+        {
+            get
+            {
+                if (_customPreset)
+                    return PresetOptions[^1];
+
+                var prop = App.Settings.Prop;
+
+                for (int i = 0; i < PresetValues.Length; i++)
+                {
+                    var preset = PresetValues[i];
+
+                    if (prop.InstantReplayFps == preset.Fps && prop.InstantReplayMaxHeight == preset.MaxHeight
+                        && prop.InstantReplayQuality == preset.Quality && prop.InstantReplayGpuEncoding == preset.Gpu)
+                        return PresetOptions[i];
+                }
+
+                return PresetOptions[^1];
+            }
+            set
+            {
+                int index = Array.IndexOf(PresetOptions, value);
+                if (index < 0)
+                    return;
+
+                if (index >= PresetValues.Length)
+                {
+                    _customPreset = true;
+                    PresetChanged();
+                    return;
+                }
+
+                _customPreset = false;
+
+                var preset = PresetValues[index];
+                var prop = App.Settings.Prop;
+
+                prop.InstantReplayFps = preset.Fps;
+                prop.InstantReplayMaxHeight = preset.MaxHeight;
+                prop.InstantReplayQuality = preset.Quality;
+                prop.InstantReplayGpuEncoding = preset.Gpu;
+
+                App.Settings.SaveDeferred();
+
+                OnPropertyChanged(nameof(SelectedFps));
+                OnPropertyChanged(nameof(SelectedResolution));
+                OnPropertyChanged(nameof(SelectedQuality));
+                OnPropertyChanged(nameof(GpuEncoding));
+                OnPropertyChanged(nameof(SoundAvailable));
+                OnPropertyChanged(nameof(MicrophonePickerEnabled));
+                OnPropertyChanged(nameof(ReplayEstimateText));
+
+                PresetChanged();
+            }
+        }
+
+        public bool IsCustomPreset => SelectedPreset == PresetOptions[^1];
+
+        public System.Windows.Visibility PresetCustomVisibility => IsCustomPreset ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+        public System.Windows.Visibility PresetSummaryVisibility => IsCustomPreset ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+
+        private void PresetChanged()
+        {
+            OnPropertyChanged(nameof(GpuEncodingText));
+            OnPropertyChanged(nameof(SelectedPreset));
+            OnPropertyChanged(nameof(IsCustomPreset));
+            OnPropertyChanged(nameof(PresetCustomVisibility));
+            OnPropertyChanged(nameof(PresetSummaryVisibility));
+        }
+
         public bool SoundAvailable => App.Settings.Prop.InstantReplayGpuEncoding;
 
         public bool RecordSound
@@ -247,7 +323,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private List<MicrophoneOption>? _microphones;
 
-        // Windows' default first, then every recording device that's plugged in
         public List<MicrophoneOption> MicrophoneOptions
         {
             get
@@ -278,7 +353,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // what the current choices cost, worked out for this PC's main screen
         public string ReplayEstimateText
         {
             get
@@ -303,7 +377,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                 if (App.Settings.Prop.InstantReplayGpuEncoding)
                 {
-                    // the buffer IS the finished video (plus one spare segment), and sound as plain PCM
                     double videoMb = clipMb * (seconds + GpuReplayRecorder.SegmentSeconds) / seconds;
                     double soundMb = App.Settings.Prop.InstantReplayAudio ? (seconds + GpuReplayRecorder.SegmentSeconds + 2) * 48000 * 4 / 1048576.0 * (App.Settings.Prop.InstantReplayMicrophone ? 2 : 1) : 0;
 
@@ -333,8 +406,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.CaptureCopyReplayToClipboard;
             set { App.Settings.Prop.CaptureCopyReplayToClipboard = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(CopyReplayToClipboard)); }
         }
-
-        // --- storage limits (CaptureStorage) ---
 
         private static readonly int[] LimitValuesMb = { 0, 1024, 2048, 5120, 10240, 25600, 51200 };
         public string[] StorageLimitOptions { get; } = { "No limit", "1 GB", "2 GB", "5 GB", "10 GB", "25 GB", "50 GB" };
@@ -395,8 +466,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // --- sharing: the buttons and right-click menus on the gallery cards ---
-
         private void Copy(string path, bool image)
         {
             if (!File.Exists(path))
@@ -419,7 +488,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Report(image, ClipboardShare.CopyText(path) ? "Copied the file path." : "Could not reach the clipboard - another program is holding it. Try again.");
         }
 
-        // screenshots and clips each report next to their own list - the page is long
         private void Report(bool screenshot, string message)
         {
             if (screenshot)
@@ -448,11 +516,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.Settings.SaveDeferred();
             OnPropertyChanged(property);
             OnPropertyChanged(nameof(ReplayEstimateText));
+            PresetChanged();
         }
 
         public ObservableCollection<ReplayClipItem> Replays { get; } = new();
 
-        // the page shows only the newest few; everything else is in the Captures window
         private const int RecentCount = 3;
         public ObservableCollection<ScreenshotItem> RecentScreenshots { get; } = new();
         public ObservableCollection<ReplayClipItem> RecentReplays { get; } = new();
@@ -535,7 +603,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (editor.Saved)
             {
                 RefreshReplays();
-                RefreshGallery(); // "Save frame" drops a PNG into the screenshots gallery
+                RefreshGallery();
             }
         });
 
@@ -557,7 +625,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void RefreshReplays()
         {
-            // clips that haven't changed keep their item, so their thumbnail isn't made again
             var known = Replays.ToDictionary(r => r.Path, StringComparer.OrdinalIgnoreCase);
             var fresh = new List<ReplayClipItem>();
 
@@ -645,9 +712,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             WatchFolders();
         }
 
-        // ---- new clips and screenshots show up by themselves. They're saved by the Watcher (the
-        // process that runs while you play), so this page watches the folders instead of being told.
-
         private readonly List<FileSystemWatcher> _watchers = new();
         private System.Windows.Threading.DispatcherTimer? _clipsDebounce;
         private System.Windows.Threading.DispatcherTimer? _screenshotsDebounce;
@@ -660,7 +724,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Watch(ScreenshotCapture.ScreenshotsDir, _screenshotsDebounce);
         }
 
-        // a clip is written over a moment - refresh once it has been quiet for a second
         private static System.Windows.Threading.DispatcherTimer Debouncer(Action refresh)
         {
             var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -705,10 +768,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void TakeScreenshot()
         {
-            // Manual capture from Settings itself - only useful for testing this page, since
-            // Settings has no live Roblox session most of the time; the real everyday path is
-            // the Take Screenshot hotkey, which runs in the Watcher process during actual
-            // gameplay (see Watcher.cs's HotkeyActions.TakeScreenshot registration).
             string? path = ScreenshotCapture.Capture();
 
             Status = path is not null
@@ -720,7 +779,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void RefreshGallery()
         {
-            // unchanged screenshots keep their item (and decoded thumbnail)
             var known = Screenshots.ToDictionary(s => s.Path, StringComparer.OrdinalIgnoreCase);
             var fresh = new List<ScreenshotItem>();
 

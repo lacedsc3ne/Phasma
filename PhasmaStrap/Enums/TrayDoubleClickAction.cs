@@ -1,7 +1,5 @@
 namespace PhasmaStrap.Enums
 {
-    // what double-clicking the tray icon does while Roblox runs (NotifyIconWrapper). Stored as a
-    // number in Settings.json - only ever add values at the end.
     public enum TrayDoubleClickAction
     {
         [EnumName(StaticName = "Do nothing")]

@@ -36,7 +36,6 @@
 
         <ui:TitleBar Grid.Row="0" Padding="8" x:Name="RootTitleBar" Title="Edit clip" Icon="pack://application:,,,/PhasmaStrap.ico" />
 
-        <!-- video -->
         <Border Grid.Row="1" Margin="12,4,12,0" CornerRadius="8" Background="#FF000000" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" ClipToBounds="True">
             <Grid>
                 <Viewbox Stretch="Uniform" Margin="4">
@@ -52,7 +51,6 @@
             </Grid>
         </Border>
 
-        <!-- timeline -->
         <Grid Grid.Row="2" Margin="12,10,12,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -82,7 +80,6 @@
             <TextBlock x:Name="DurationText" Grid.Column="2" Text="0:00.00" VerticalAlignment="Center" Width="62" TextAlignment="Right" FontFamily="Consolas" />
         </Grid>
 
-        <!-- transport + tools -->
         <Border Grid.Row="3" Margin="12,8,12,0" Padding="10,8" CornerRadius="8" Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
             <WrapPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Margin="0,0,14,0">
@@ -137,7 +134,6 @@
             </WrapPanel>
         </Border>
 
-        <!-- footer -->
         <Grid Grid.Row="4" Margin="12,10,12,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

@@ -1,4 +1,4 @@
-﻿<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.CrosshairEditorWindow"
+<base:WpfUiWindow x:Class="PhasmaStrap.UI.Elements.Dialogs.CrosshairEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -35,7 +35,7 @@
         </Style>
 
         <DataTemplate x:Key="ChoiceTemplate">
-            <!-- a real button, so the keyboard and screen readers can pick a design too -->
+
             <Button Margin="0,0,6,6" Cursor="Hand" ToolTip="{Binding Name}" AutomationProperties.Name="{Binding Name}"
                     Command="{Binding DataContext.UseChoiceCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
                 <Button.Template>
@@ -84,7 +84,6 @@
                 <ColumnDefinition Width="420" />
             </Grid.ColumnDefinitions>
 
-            <!-- ============================================================ preview -->
             <Grid Grid.Column="0" Margin="0,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -109,7 +108,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- ============================================================ controls -->
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Start from" />
@@ -131,7 +129,6 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
-                    <!-- arms -->
                     <CheckBox Margin="0,16,0,4" IsChecked="{Binding Arms, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Arms" /></CheckBox>
                     <StackPanel IsEnabled="{Binding Arms}">
                         <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -157,7 +154,6 @@
                         <CheckBox Margin="110,2,0,0" Content="T-shape (no top arm)" IsChecked="{Binding TStyle, Mode=TwoWay}" />
                     </StackPanel>
 
-                    <!-- dot -->
                     <CheckBox Margin="0,16,0,4" IsChecked="{Binding Dot, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Centre dot" /></CheckBox>
                     <StackPanel IsEnabled="{Binding Dot}">
                         <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -168,7 +164,6 @@
                         <CheckBox Margin="110,2,0,0" Content="Round" IsChecked="{Binding DotRound, Mode=TwoWay}" />
                     </StackPanel>
 
-                    <!-- ring -->
                     <CheckBox Margin="0,16,0,4" IsChecked="{Binding Ring, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Ring" /></CheckBox>
                     <StackPanel IsEnabled="{Binding Ring}">
                         <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -183,7 +178,6 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- colour -->
                     <TextBlock Style="{StaticResource Section}" Text="Colour" />
                     <StackPanel Orientation="Horizontal" Margin="0,2">
                         <Border Width="26" Height="26" CornerRadius="4" Margin="0,0,8,0" Background="{Binding ColorBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" />
@@ -211,7 +205,6 @@
                         <TextBlock Style="{StaticResource Value}" Text="{Binding Opacity, StringFormat={}{0:P0}}" Width="44" />
                     </StackPanel>
 
-                    <!-- outline -->
                     <CheckBox Margin="0,16,0,4" IsChecked="{Binding Outline, Mode=TwoWay}"><TextBlock FontSize="15" FontWeight="SemiBold" Text="Outline" /></CheckBox>
                     <StackPanel IsEnabled="{Binding Outline}">
                         <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -241,7 +234,6 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- save + share -->
                     <TextBlock Style="{StaticResource Section}" Text="Save and share" />
                     <StackPanel Orientation="Horizontal">
                         <ui:TextBox Width="240" PlaceholderText="Name of this design" Text="{Binding DesignName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

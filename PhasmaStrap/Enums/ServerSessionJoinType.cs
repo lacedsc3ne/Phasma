@@ -1,4 +1,4 @@
-﻿namespace PhasmaStrap.Enums
+namespace PhasmaStrap.Enums
 {
     public enum ServerSessionJoinType
     {

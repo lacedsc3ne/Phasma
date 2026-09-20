@@ -4,9 +4,6 @@ using System.IO.Compression;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    // One crosshair design. Built from parts that can be combined freely - four arms, a centre dot,
-    // a ring - so a classic cross, a dot, a circle-dot, a T or an X are all the same thing with
-    // different parts switched on.
     public sealed class CrosshairStyle
     {
         public string Name { get; set; } = "";
@@ -15,8 +12,8 @@ namespace PhasmaStrap.Integrations.Overlays
         public int ArmLength { get; set; } = 8;
         public int ArmThickness { get; set; } = 2;
         public int Gap { get; set; } = 4;
-        public bool TStyle { get; set; }            // no top arm
-        public int Rotation { get; set; }           // degrees, 45 = an X
+        public bool TStyle { get; set; }
+        public int Rotation { get; set; }
 
         public bool Dot { get; set; }
         public int DotSize { get; set; } = 2;
@@ -33,7 +30,6 @@ namespace PhasmaStrap.Integrations.Overlays
         public int OutlineThickness { get; set; } = 1;
         public string OutlineColor { get; set; } = "#000000";
 
-        // every value inside what the renderer can draw
         public CrosshairStyle Clamped() => new()
         {
             Name = (Name ?? "").Trim(),
@@ -61,8 +57,6 @@ namespace PhasmaStrap.Integrations.Overlays
         [System.Text.Json.Serialization.JsonIgnore]
         public bool HasVisibleParts => Arms || Dot || Ring;
 
-        // compared to decide whether the overlay texture needs redrawing. JsonIgnore: serialising
-        // the design must not ask for its own signature - that recursed until the stack overflowed.
         [System.Text.Json.Serialization.JsonIgnore]
         public string Signature => JsonSerializer.Serialize(Clamped());
 
@@ -82,15 +76,6 @@ namespace PhasmaStrap.Integrations.Overlays
             int r = (int)((value >> 16) & 0xFF), g = (int)((value >> 8) & 0xFF), b = (int)(value & 0xFF);
             return System.Drawing.Color.FromArgb(Math.Clamp((int)Math.Round(a * opacity), 0, 255), r, g, b);
         }
-
-        // ------------------------------------------------------------------ sharing
-        //
-        // A code carries the whole design. Two formats:
-        //   PHX2-  (written now) the design packed into ~25 bytes, URL-safe base64:
-        //          [1 = format] [part switches] [arm length, thickness, gap+10, rotation,
-        //          dot size, ring radius, ring thickness, outline thickness] [opacity x10000, 2 bytes]
-        //          [colour ARGB] [outline colour ARGB] [name, UTF-8, rest of the bytes]
-        //   PHX1-  (older codes, still read) the design as deflated JSON.
 
         private const string CodePrefix = "PHX1-";
         private const string ShortPrefix = "PHX2-";
@@ -118,7 +103,6 @@ namespace PhasmaStrap.Integrations.Overlays
             AddColor(bytes, style.Color);
             AddColor(bytes, style.OutlineColor);
 
-            // a long name would make the code long - 40 characters is plenty to recognise it by
             string name = style.Name.Length > 40 ? style.Name[..40] : style.Name;
             bytes.AddRange(Encoding.UTF8.GetBytes(name));
 
@@ -142,8 +126,6 @@ namespace PhasmaStrap.Integrations.Overlays
             ? $"#{bytes[at + 1]:X2}{bytes[at + 2]:X2}{bytes[at + 3]:X2}"
             : $"#{bytes[at]:X2}{bytes[at + 1]:X2}{bytes[at + 2]:X2}{bytes[at + 3]:X2}";
 
-        // the code is found inside whatever was pasted (backticks, quotes, a sentence) - see
-        // FlagLayers.FindCodes
         public static CrosshairStyle? FromShareCode(string? pasted)
         {
             foreach (string code in PhasmaStrap.Utility.FlagLayers.FindCodes(pasted, ShortPrefix, CodePrefix))
@@ -219,8 +201,6 @@ namespace PhasmaStrap.Integrations.Overlays
             }
         }
 
-        // ------------------------------------------------------------------ ready-made designs
-
         public static List<CrosshairStyle> BuiltIn() => new()
         {
             new() { Name = "Classic", Arms = true, ArmLength = 8, ArmThickness = 2, Gap = 4, Color = "#00FF00" },
@@ -234,11 +214,8 @@ namespace PhasmaStrap.Integrations.Overlays
         };
     }
 
-    // Draws a CrosshairStyle with GDI+. The in-game overlay and the editor's preview both use this,
-    // so what the editor shows is exactly what appears in the game.
     public static class CrosshairRenderer
     {
-        // the biggest design (60 px arms beyond a 40 px gap, plus outline) fits inside this radius
         public const int MaxRadius = 110;
 
         public static void Draw(Graphics graphics, CrosshairStyle source, float centreX, float centreY)
@@ -253,10 +230,8 @@ namespace PhasmaStrap.Integrations.Overlays
 
             try
             {
-                // straight, unrotated bars are drawn pixel-exact; anything round or turned is smoothed
                 bool crisp = style.Rotation == 0;
 
-                // an odd thickness centred on a pixel boundary would smear across two pixels
                 float half = style.ArmThickness / 2f;
                 float cx = centreX + (style.ArmThickness % 2 == 1 ? 0.5f : 0f);
                 float cy = centreY + (style.ArmThickness % 2 == 1 ? 0.5f : 0f);
@@ -270,17 +245,16 @@ namespace PhasmaStrap.Integrations.Overlays
                 {
                     float inner = style.Gap, length = style.ArmLength, t = style.ArmThickness;
 
-                    arms.Add(new RectangleF(inner, -half, length, t));              // right
-                    arms.Add(new RectangleF(-inner - length, -half, length, t));    // left
-                    arms.Add(new RectangleF(-half, inner, t, length));              // bottom
+                    arms.Add(new RectangleF(inner, -half, length, t));
+                    arms.Add(new RectangleF(-inner - length, -half, length, t));
+                    arms.Add(new RectangleF(-half, inner, t, length));
                     if (!style.TStyle)
-                        arms.Add(new RectangleF(-half, -inner - length, t, length)); // top
+                        arms.Add(new RectangleF(-half, -inner - length, t, length));
                 }
 
                 float dot = style.DotSize;
                 RectangleF dotRect = new(-dot / 2f, -dot / 2f, dot, dot);
 
-                // ---- outline pass, underneath everything
                 if (o > 0)
                 {
                     graphics.SmoothingMode = crisp ? SmoothingMode.None : SmoothingMode.AntiAlias;
@@ -307,7 +281,6 @@ namespace PhasmaStrap.Integrations.Overlays
                     }
                 }
 
-                // ---- the crosshair itself
                 using var fillBrush = new SolidBrush(fill);
 
                 graphics.SmoothingMode = crisp ? SmoothingMode.None : SmoothingMode.AntiAlias;
@@ -341,7 +314,6 @@ namespace PhasmaStrap.Integrations.Overlays
             }
         }
 
-        // a transparent square image of the design, `size` pixels, drawn at 1:1 around its centre
         public static Bitmap Render(CrosshairStyle style, int size)
         {
             var bitmap = new Bitmap(size, size, System.Drawing.Imaging.PixelFormat.Format32bppArgb);

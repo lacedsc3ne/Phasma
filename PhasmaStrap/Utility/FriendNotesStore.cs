@@ -1,12 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    // Your own notes and favourites for Roblox friends. Purely local (<base>\FriendNotes.json) -
-    // Roblox has no such thing, and nothing here is ever sent anywhere.
-    //
-    // Read by the Friends page and by FriendActivityMonitor ("alerts for favourites only"), which
-    // live in different processes, so every read goes back to the file when it has changed.
-    //
-    // The file path is a parameter, so it can be exercised from a console harness.
     public sealed class FriendNotesStore
     {
         public sealed class Entry
@@ -34,7 +27,6 @@ namespace PhasmaStrap.Utility
         {
             _path = path;
 
-            // a note typed just before the window is closed is still inside the save delay
             AppDomain.CurrentDomain.ProcessExit += (_, _) =>
             {
                 if (_dirty)
@@ -63,7 +55,6 @@ namespace PhasmaStrap.Utility
             }
             catch (Exception ex)
             {
-                // keep what is in memory - a half-written file must not wipe the notes
                 Log?.Invoke($"Could not read {_path}: {ex.Message}");
             }
         }
@@ -104,7 +95,6 @@ namespace PhasmaStrap.Utility
 
                 _dirty = true;
 
-                // typing a note calls this once per pause - one write shortly after the last change
                 _saveTimer ??= new System.Threading.Timer(_ => Flush(), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
                 _saveTimer.Change(400, System.Threading.Timeout.Infinite);
             }

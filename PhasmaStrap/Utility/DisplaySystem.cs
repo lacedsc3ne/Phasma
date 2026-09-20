@@ -42,11 +42,6 @@ namespace PhasmaStrap.Utility
         public int Number { get; set; }
     }
 
-    // Monitor enumeration and display-mode (resolution/refresh rate) querying and switching, plus
-    // a "press a number to find your monitor" identify overlay. Ported from Voidstrap, trimmed to
-    // the Windows-only EnumDisplayDevices/EnumDisplaySettings/ChangeDisplaySettingsEx path since
-    // PhasmaStrap doesn't target Linux/macOS (Voidstrap's non-Windows fallbacks through
-    // ScreenMetrics/xrandr were dropped).
     public static class DisplaySystem
     {
         public const int Success = 0;
@@ -186,8 +181,7 @@ namespace PhasmaStrap.Utility
                     {
                         continue;
                     }
-                    // the monitor's own name when Windows knows it (the device string is almost
-                    // always "Generic PnP Monitor")
+
                     string name = adapter.DeviceString;
                     DISPLAY_DEVICE monitor = NewDisplayDevice();
                     if (EnumDisplayDevices(adapter.DeviceName, 0, ref monitor, 0) && !string.IsNullOrWhiteSpace(monitor.DeviceString))
@@ -199,7 +193,6 @@ namespace PhasmaStrap.Utility
                         name = realName;
                     }
 
-                    // Windows' own display number (\.\DISPLAY2 -> 2), as in Settings > Display
                     int number = int.TryParse(new string(adapter.DeviceName.Reverse().TakeWhile(char.IsDigit).Reverse().ToArray()), out int n) ? n : list.Count + 1;
                     bool primary = (adapter.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0;
 

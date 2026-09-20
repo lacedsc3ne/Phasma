@@ -3,9 +3,6 @@ using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for RPCWindow.xaml
-    /// </summary>
     public partial class RPCWindow
     {
         private readonly RPCWindowViewModel _viewModel;

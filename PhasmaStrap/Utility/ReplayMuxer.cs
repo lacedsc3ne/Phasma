@@ -3,15 +3,6 @@ using Vortice.MediaFoundation;
 
 namespace PhasmaStrap.Utility
 {
-    // Turns the newest in-memory segments of GpuReplayRecorder into one MP4.
-    //
-    // The video is NOT re-encoded: every segment is read back as the H.264 it already is and
-    // written on with shifted timestamps, which is why saving takes a fraction of a second. Sound
-    // is different - it is kept as plain PCM (ReplayAudio) exactly so that it can be encoded here
-    // in one pass; AAC encoded per segment would click at every join.
-    //
-    // Segments are laid end to end. Where the game was out of sight between two of them, the clip
-    // simply cuts - and the sound is taken per segment too, so it cuts in the same places.
     internal static class ReplayMuxer
     {
         public static Action<string>? Log;
@@ -21,9 +12,8 @@ namespace PhasmaStrap.Utility
 
         public const int AudioRate = 48000;
         public const int AudioChannels = 2;
-        public const int AudioBytesPerFrame = AudioChannels * 2; // 16 bit
+        public const int AudioBytesPerFrame = AudioChannels * 2;
 
-        // pcm(startTicks, endTicks) -> interleaved 16-bit 48 kHz stereo covering exactly that span, or null for a silent clip
         public static void Mux(GpuReplayRecorder.Cut cut, string path, Func<long, long, byte[]?>? pcm)
         {
             MediaFactory.MFStartup(false);
@@ -49,7 +39,6 @@ namespace PhasmaStrap.Utility
 
                     if (videoStream < 0)
                     {
-                        // same type in and out = the sink writer passes the H.264 through untouched
                         using IMFMediaType native = reader.GetNativeMediaType(FirstVideoStream, 0);
                         videoStream = writer.AddStream(native);
                         writer.SetInputMediaType(videoStream, native, null);
@@ -113,7 +102,7 @@ namespace PhasmaStrap.Utility
             MfInterop.SetUInt32(output, MediaTypeAttributeKeys.AudioSamplesPerSecond, AudioRate);
             MfInterop.SetUInt32(output, MediaTypeAttributeKeys.AudioNumChannels, AudioChannels);
             MfInterop.SetUInt32(output, MediaTypeAttributeKeys.AudioBitsPerSample, 16);
-            MfInterop.SetUInt32(output, MediaTypeAttributeKeys.AudioAvgBytesPerSecond, 24000); // 192 kbps
+            MfInterop.SetUInt32(output, MediaTypeAttributeKeys.AudioAvgBytesPerSecond, 24000);
 
             using IMFMediaType input = MediaFactory.MFCreateMediaType();
             input.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Audio);
@@ -134,7 +123,7 @@ namespace PhasmaStrap.Utility
             if (pcm is null || pcm.Length < AudioBytesPerFrame)
                 return;
 
-            const int ChunkFrames = AudioRate / 10; // 100 ms
+            const int ChunkFrames = AudioRate / 10;
             int totalFrames = pcm.Length / AudioBytesPerFrame;
 
             for (int frame = 0; frame < totalFrames; frame += ChunkFrames)

@@ -34,7 +34,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ServerBrowserViewModel()
         {
+            foreach (DatacenterExclusion exclusion in DatacenterExclusions)
+                exclusion.PropertyChanged += (_, _) => OnPropertyChanged(nameof(ExcludedDatacenterSummary));
+
             _ = LoadDatacenterDistancesAsync();
+        }
+
+        public string ExcludedDatacenterSummary
+        {
+            get
+            {
+                int count = App.Settings.Prop.MatchmakerDisabledDatacenters.Count;
+
+                if (count == 0)
+                    return "No datacenters are excluded.";
+
+                return count == 1
+                    ? "1 datacenter is excluded."
+                    : $"{count} datacenters are excluded.";
+            }
         }
 
         public bool MatchmakerEnabled
@@ -51,7 +69,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public sealed record DatacenterChoice(string Display, string Key);
 
-        // "" represents no preference (closest available)
         public IEnumerable<DatacenterChoice> DatacenterChoices { get; } =
             new[] { new DatacenterChoice(Strings.Menu_ServerBrowser_ClosestAvailable, "") }
                 .Concat(RobloxDatacenterMap.AllDatacenters()
@@ -136,10 +153,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // per-datacenter allow/block grid, with an estimated distance/ping column filled in
-        // once the user's own location resolves (see LoadDatacenterDistancesAsync) - the
-        // estimate uses the same haversine-distance heuristic the matchmaker itself scores
-        // candidates with (Matchmaker.HaversineKm/EstimatePingMs), not a live network probe.
         public ObservableCollection<DatacenterExclusion> DatacenterExclusions { get; } = new(
             RobloxDatacenterMap.AllDatacenters()
                 .OrderBy(dc => dc.City)
@@ -165,12 +178,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
             catch
             {
-                // best-effort only - the grid still works for allow/block without distances
             }
         }
 
-        // which Roblox gamejoin API version the matchmaker uses to resolve/join candidate
-        // servers (see Matchmaker.BuildJoinRequest) - change only if joins stop resolving
         public sealed record GamejoinApiOption(string Display, int Value);
 
         public IEnumerable<GamejoinApiOption> GamejoinApiOptions { get; } = new[]
@@ -226,10 +236,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ServerBrowser.JoinServer(placeId, server.JobId);
         });
 
-        // Roblox's own server-list API already reports a real per-server ping (ServerBrowser.cs
-        // parses it straight from the response, verified against a live call - it isn't a
-        // placeholder/zero field), so this just joins whichever of the current search results has
-        // the lowest one, instead of making the user scan the list by eye.
         public ICommand JoinFastestCommand => new RelayCommand(() =>
         {
             if (!long.TryParse(PlaceId.Trim(), out long placeId))
@@ -243,9 +249,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         });
 
         public bool HasPingedServers => Servers.Any(s => s.Ping > 0);
-
-        // --- auto-rejoin on crash (see Watcher.Run/TryAutoRejoinAsync for the actual heuristic
-        // and relaunch logic - this tab only edits the 3 Settings.Prop fields it reads) ---
 
         public bool AutoRejoinOnCrash
         {

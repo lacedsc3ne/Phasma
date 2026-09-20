@@ -6,8 +6,6 @@ namespace PhasmaStrap.Utility
 
     public sealed record CaptureFile(string Path, CaptureKind Kind, DateTime Taken, long Bytes);
 
-    // The saved screenshots and clips, which game each one came from, and renaming. Shared by the
-    // Capture page and the Captures window.
     public static class CaptureLibrary
     {
         private const string LOG_IDENT = "CaptureLibrary";
@@ -38,10 +36,6 @@ namespace PhasmaStrap.Utility
                 .ToList();
         }
 
-        // ------------------------------------------------------------------ which game
-
-        // The game being played when a capture was saved, from the Activity page's session history.
-        // Captures from before that history started (or with it switched off) have no game.
         public sealed class GameIndex
         {
             private readonly List<(DateTime From, DateTime To, string Game)> _visits;
@@ -53,8 +47,7 @@ namespace PhasmaStrap.Utility
                     _visits = SessionStore.Shared.Load().Sessions
                         .SelectMany(s => s.Visits)
                         .Where(v => v.GameName.Length > 0 && v.JoinedUtc != default)
-                        // a clip is saved at its end, and a session is saved about once a minute -
-                        // allow a little either side of the visit
+
                         .Select(v => (v.JoinedUtc.AddSeconds(-30), (v.LeftUtc > v.JoinedUtc ? v.LeftUtc : v.JoinedUtc).AddMinutes(2), v.GameName))
                         .OrderBy(v => v.Item1)
                         .ToList();
@@ -71,7 +64,6 @@ namespace PhasmaStrap.Utility
                 DateTime utc = local.ToUniversalTime();
                 string? found = null;
 
-                // the latest visit that covers the moment (visits can overlap by the grace above)
                 foreach (var (from, to, game) in _visits)
                 {
                     if (from > utc)
@@ -84,18 +76,14 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ rename / delete
-
         private static readonly char[] Invalid = Path.GetInvalidFileNameChars();
 
-        // Renames a capture, keeping its extension. Returns the new path, or null with a reason.
         public static string? Rename(string path, string newName, out string? error)
         {
             error = null;
             string extension = Path.GetExtension(path);
             string name = newName.Trim();
 
-            // someone typing "clip.mp4" means "clip"
             if (name.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
                 name = name[..^extension.Length].TrimEnd();
 
@@ -122,7 +110,6 @@ namespace PhasmaStrap.Utility
             if (string.Equals(target, path, StringComparison.Ordinal))
                 return path;
 
-            // only a change of capital letters: File.Move to the "same" file is fine on Windows
             bool caseOnly = string.Equals(target, path, StringComparison.OrdinalIgnoreCase);
 
             if (!caseOnly && File.Exists(target))
@@ -144,7 +131,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // to the Recycle Bin, so a wrong click can be undone
         public static bool Recycle(string path, out string? error)
         {
             error = null;
@@ -162,14 +148,10 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ opening an editor
-
-        // from the notification's Edit button (Watcher) or a list (settings)
         public static void OpenEditor(string path, System.Windows.Window? owner = null)
         {
             try
             {
-                // GIFs can't be edited
                 if (!File.Exists(path) || path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
                     return;
 

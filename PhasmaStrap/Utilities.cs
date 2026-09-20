@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.AppData;
+using PhasmaStrap.AppData;
 using System.ComponentModel;
 
 namespace PhasmaStrap
@@ -9,16 +9,14 @@ namespace PhasmaStrap
         {
             try
             {
-                Process.Start(new ProcessStartInfo 
-                { 
-                    FileName = website, 
-                    UseShellExecute = true 
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = website,
+                    UseShellExecute = true
                 });
             }
             catch (Win32Exception ex)
             {
-                // lmfao
-
                 if (ex.NativeErrorCode != (int)ErrorCode.CO_E_APPNOTFOUND)
                     throw;
 
@@ -35,24 +33,13 @@ namespace PhasmaStrap
             if (version.StartsWith('v'))
                 version = version[1..];
 
-            int idx = version.IndexOf('+'); // commit info
+            int idx = version.IndexOf('+');
             if (idx != -1)
                 version = version[..idx];
 
             return new Version(version);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="versionStr1"></param>
-        /// <param name="versionStr2"></param>
-        /// <returns>
-        /// Result of System.Version.CompareTo <br />
-        /// -1: version1 &lt; version2 <br />
-        ///  0: version1 == version2 <br />
-        ///  1: version1 &gt; version2
-        /// </returns>
         public static VersionComparison CompareVersions(string versionStr1, string versionStr2)
         {
             try
@@ -64,10 +51,6 @@ namespace PhasmaStrap
             }
             catch (Exception)
             {
-                // temporary diagnostic log for the issue described here:
-                // https://github.com/bloxstraplabs/bloxstrap/issues/3193
-                // the problem is that this happens only on upgrade, so my only hope of catching this is bug reports following the next release
-
                 App.Logger.WriteLine("Utilities::CompareVersions", "An exception occurred when comparing versions");
                 App.Logger.WriteLine("Utilities::CompareVersions", $"versionStr1={versionStr1} versionStr2={versionStr2}");
 
@@ -75,9 +58,6 @@ namespace PhasmaStrap
             }
         }
 
-        /// <summary>
-        /// Parses the input version string and prints if fails
-        /// </summary>
         public static Version? ParseVersionSafe(string versionStr)
         {
             const string LOG_IDENT = "Utilities::ParseVersionSafe";
@@ -127,11 +107,11 @@ namespace PhasmaStrap
             {
                 return Process.GetProcesses();
             }
-            catch (ArithmeticException ex) // thanks microsoft
+            catch (ArithmeticException ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Unable to fetch processes!");
                 App.Logger.WriteException(LOG_IDENT, ex);
-                return Array.Empty<Process>(); // can we retry?
+                return Array.Empty<Process>();
             }
         }
 

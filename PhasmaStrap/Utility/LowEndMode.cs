@@ -21,13 +21,6 @@ namespace PhasmaStrap.Utility
 
     public sealed record LowEndChange(string Area, string What);
 
-    // One-click low-end mode: picks a strength from the PC's hardware, then applies the FastFlags,
-    // Roblox process tuning and PhasmaStrap extras that matter on a weak PC - together. Everything
-    // it changes is remembered (Settings.LowEndBackup*), so turning it off puts back exactly what
-    // was there. Like every other setting, the changes are kept when Save is pressed.
-    //
-    // Only flags that are in Roblox's executable (checked against version-4310300497aa4917) and
-    // that are known to work as local flags are used.
     public static class LowEndMode
     {
         private const string LOG_IDENT = "LowEndMode";
@@ -36,8 +29,6 @@ namespace PhasmaStrap.Utility
         public const string Strong = "Strong";
 
         public static string Active => App.Settings.Prop.LowEndModeLevel;
-
-        // ------------------------------------------------------------------ what each strength sets
 
         private static Dictionary<string, string> Flags(string level)
         {
@@ -68,7 +59,6 @@ namespace PhasmaStrap.Utility
         {
             var settings = new Dictionary<string, object>
             {
-                // Roblox process tuning (Behaviour > Advanced)
                 [nameof(Models.Persistable.Settings.OptimizeRoblox)] = true,
                 [nameof(Models.Persistable.Settings.RobloxEfficiencyMode)] = false,
                 [nameof(Models.Persistable.Settings.ReduceMemoryOutOfFocus)] = hardware.LowRam,
@@ -77,13 +67,11 @@ namespace PhasmaStrap.Utility
 
             if (level == Strong)
             {
-                // PhasmaStrap's own extras that cost a lot while playing
                 settings[nameof(Models.Persistable.Settings.RiShadeEnabled)] = false;
                 settings[nameof(Models.Persistable.Settings.AntiAliasingEnabled)] = false;
                 settings[nameof(Models.Persistable.Settings.FrameGenModeIndex)] = 0;
                 settings[nameof(Models.Persistable.Settings.InstantReplayEnabled)] = false;
 
-                // smaller textures through the Asset Engine - only when its proxy is already set up
                 if (App.Settings.Prop.NetworkingProxyEnabled)
                 {
                     settings[nameof(Models.Persistable.Settings.AssetRouteEnabled)] = true;
@@ -95,7 +83,6 @@ namespace PhasmaStrap.Utility
             return settings;
         }
 
-        // the list shown before applying, in words
         public static List<LowEndChange> Describe(string level)
         {
             var list = new List<LowEndChange>
@@ -129,8 +116,6 @@ namespace PhasmaStrap.Utility
             return list;
         }
 
-        // ------------------------------------------------------------------ apply / undo
-
         private static PropertyInfo? SettingProperty(string name) => typeof(Models.Persistable.Settings).GetProperty(name);
 
         public static void Apply(string level)
@@ -163,7 +148,6 @@ namespace PhasmaStrap.Utility
             App.Logger.WriteLine(LOG_IDENT, $"{level} low-end mode set ({settings.LowEndBackupSettings.Count} settings, {settings.LowEndBackupFlags.Count} flags) - kept on Save");
         }
 
-        // puts back exactly what low-end mode replaced
         public static void Undo()
         {
             var settings = App.Settings.Prop;
@@ -194,8 +178,6 @@ namespace PhasmaStrap.Utility
             settings.LowEndModeLevel = "";
         }
 
-        // ------------------------------------------------------------------ the PC
-
         private static LowEndHardware? _hardware;
 
         public static LowEndHardware DetectHardware()
@@ -213,7 +195,6 @@ namespace PhasmaStrap.Utility
                 {
                     using (factory)
                     {
-                        // the adapter with the most dedicated memory is the one games use
                         for (int index = 0; index < 16; index++)
                         {
                             if (factory.EnumAdapters1(index, out Vortice.DXGI.IDXGIAdapter1? adapter).Failure || adapter is null)
@@ -230,7 +211,7 @@ namespace PhasmaStrap.Utility
                                 {
                                     gpuMb = mb;
                                     gpuName = description.Description;
-                                    // integrated graphics report a token amount (or none) of their own memory
+
                                     integrated = mb < 512;
                                 }
                             }

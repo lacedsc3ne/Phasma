@@ -6,20 +6,12 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace PhasmaStrap.Integrations
 {
-    // strips the Roblox game window's border/titlebar and resizes it to exactly cover its
-    // monitor while a game is running, for lower input latency than Roblox's own windowed
-    // fullscreen mode. Simplified from Voidstrap's version: that one cooperates with its
-    // Overlays compositor (a backdrop window, DWM thumbnail mirroring, live z-order
-    // tracking) that PhasmaStrap doesn't have; this just resizes the real window directly,
-    // triggered on game join/leave like IntegrationWatcher and StudioRichPresence are.
     public static class FakeExclusiveFullscreen
     {
         private const string LOG_IDENT = "FakeExclusiveFullscreen";
 
-        // WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_BORDER | WS_DLGFRAME
         private const int StyleMask = 0x00C00000 | 0x00040000 | 0x00020000 | 0x00010000 | 0x00080000 | 0x00800000 | 0x00400000;
 
-        // WS_POPUP
         private const int WS_POPUP = unchecked((int)0x80000000);
 
         private static readonly object _sync = new();

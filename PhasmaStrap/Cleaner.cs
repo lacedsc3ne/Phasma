@@ -1,8 +1,5 @@
 namespace PhasmaStrap
 {
-    // deletes old files from PhasmaStrap's own logs/downloads and Roblox's logs/cache, on a
-    // schedule the user picks, running after Roblox closes and before PhasmaStrap exits.
-    // Ported from Voidstrap.
     public static class Cleaner
     {
         private const string LOG_IDENT = "Cleaner";
@@ -87,8 +84,6 @@ namespace PhasmaStrap
             App.Logger.WriteLine(LOG_IDENT, "Cleaner finished");
         }
 
-        // only ever deletes files under a directory this class was explicitly told to clean,
-        // so this is a defensive invariant check rather than a meaningful access boundary
         private static bool ShouldDelete(string file, DateTime threshold, string containingDirectory)
         {
             if (!File.Exists(file))

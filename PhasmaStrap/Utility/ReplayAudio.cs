@@ -2,20 +2,6 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility
 {
-    // Sound for Instant Replay.
-    //
-    // The game's audio is captured with WASAPI *process* loopback: only what Roblox itself plays,
-    // not Discord, music or anything else coming out of the speakers (Windows 10 2004 and later;
-    // older systems fall back to loopback of the whole default output). Optionally the default
-    // microphone is captured as well and mixed in.
-    //
-    // Everything is kept as 48 kHz 16-bit stereo PCM in a ring that only ever holds the last
-    // clip's worth (about 11 MB per minute) and is laid out on the same clock GpuReplayRecorder
-    // stamps its frames with, so "the sound between tick A and tick B" is an exact slice. Loopback
-    // delivers nothing at all while the game is silent; those stretches are zeros in the ring.
-    // It is encoded to AAC only when a clip is saved (ReplayMuxer).
-    //
-    // No App dependencies, so it can be exercised from a console harness.
     public sealed class ReplayAudio : IDisposable
     {
         public static Action<string>? Log;
@@ -30,7 +16,6 @@ namespace PhasmaStrap.Utility
         private readonly List<Source> _sources = new();
         private volatile bool _running;
 
-        // microphoneId: a recording device's endpoint ID from ListMicrophones, or "" for Windows' default
         public ReplayAudio(Func<int> bufferSeconds, string processName, bool microphone = false, string microphoneId = "")
         {
             _seconds = bufferSeconds;
@@ -64,7 +49,6 @@ namespace PhasmaStrap.Utility
             _sources.Clear();
         }
 
-        // interleaved 16-bit 48 kHz stereo for exactly [startTicks, endTicks) on GpuReplayRecorder.Now()'s clock
         public byte[]? Read(long startTicks, long endTicks)
         {
             long frames = (endTicks - startTicks) * Rate / 10_000_000L;
@@ -101,8 +85,6 @@ namespace PhasmaStrap.Utility
 
         private enum SourceKind { Game, Microphone }
 
-        // ------------------------------------------------------------------ one capture stream + its ring
-
         private sealed class Source
         {
             private readonly ReplayAudio _owner;
@@ -112,8 +94,8 @@ namespace PhasmaStrap.Utility
 
             private readonly object _lock = new();
             private byte[] _ring = Array.Empty<byte>();
-            private long _ringFrames;     // capacity in frames
-            private long _headFrame;      // absolute frame index (on the ticks clock) one past the newest sample
+            private long _ringFrames;
+            private long _headFrame;
             private bool _hasData;
 
             public Source(ReplayAudio owner, string name, SourceKind kind)
@@ -158,7 +140,6 @@ namespace PhasmaStrap.Utility
                     }
                     else if (start > _headFrame + Rate / 25)
                     {
-                        // a silent stretch (nothing was delivered): zeros up to where this packet belongs
                         long gap = Math.Min(start - _headFrame, _ringFrames);
                         long from = start - gap;
                         for (long f = from; f < start; f++)
@@ -170,11 +151,9 @@ namespace PhasmaStrap.Utility
                     }
                     else if (start < _headFrame - Rate / 25)
                     {
-                        // the audio clock has crept ahead of the system clock - step back onto it
                         _headFrame = start;
                     }
 
-                    // (small differences are jitter: the packet simply follows on from the last)
                     unsafe
                     {
                         byte* source = (byte*)data;
@@ -200,7 +179,6 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            // fills `destination` (zeros where nothing was captured)
             public void Read(long startTicks, byte[] destination)
             {
                 lock (_lock)
@@ -241,7 +219,6 @@ namespace PhasmaStrap.Utility
                         Log?.Invoke($"{_name} capture stopped: {ex.Message}");
                     }
 
-                    // the device went away, the game restarted... try again in a moment
                     for (int i = 0; i < 30 && _owner._running; i++)
                         Thread.Sleep(100);
                 }
@@ -264,8 +241,6 @@ namespace PhasmaStrap.Utility
                     {
                         client = ActivateEndpoint(capture: true, _owner._microphoneId, out string device);
 
-                        // RAW: the microphone exactly as it is - none of Windows' or the driver's
-                        // noise suppression, echo cancelling, automatic gain or voice effects
                         raw = TryRaw(client);
                         how = $"{device}, {(raw ? "raw (no noise suppression or other processing)" : "this device can't turn off Windows' sound processing")}";
                     }
@@ -275,7 +250,7 @@ namespace PhasmaStrap.Utility
 
                         int pid = FindProcess(_owner._processName);
                         if (pid == 0)
-                            return; // no game yet - Run() retries
+                            return;
 
                         try
                         {
@@ -291,15 +266,15 @@ namespace PhasmaStrap.Utility
                     }
 
                     format = Marshal.AllocHGlobal(18);
-                    Marshal.WriteInt16(format, 0, 1);               // WAVE_FORMAT_PCM
-                    Marshal.WriteInt16(format, 2, 2);               // channels
+                    Marshal.WriteInt16(format, 0, 1);
+                    Marshal.WriteInt16(format, 2, 2);
                     Marshal.WriteInt32(format, 4, Rate);
                     Marshal.WriteInt32(format, 8, Rate * BytesPerFrame);
-                    Marshal.WriteInt16(format, 12, BytesPerFrame);  // block align
-                    Marshal.WriteInt16(format, 14, 16);             // bits
+                    Marshal.WriteInt16(format, 12, BytesPerFrame);
+                    Marshal.WriteInt16(format, 14, 16);
                     Marshal.WriteInt16(format, 16, 0);
 
-                    int initialized = client.Initialize(0 /* shared */, flags, 2_000_000 /* 200 ms */, 0, format, IntPtr.Zero);
+                    int initialized = client.Initialize(0 , flags, 2_000_000 , 0, format, IntPtr.Zero);
                     if (initialized < 0 && raw)
                     {
                         Log?.Invoke($"The microphone wouldn't open unprocessed (0x{initialized:X8}) - recording it with Windows' processing");
@@ -324,7 +299,6 @@ namespace PhasmaStrap.Utility
                     {
                         if (WaitForSingleObject(ready, 200) != 0)
                         {
-                            // process loopback of a process that has gone never signals again
                             if (_kind == SourceKind.Game && ++idle % 25 == 0 && FindProcess(_owner._processName) == 0)
                                 return;
                             continue;
@@ -342,7 +316,6 @@ namespace PhasmaStrap.Utility
 
                             long duration = frames * 10_000_000L / Rate;
 
-                            // the packet's own capture time when the driver gives one; else "it just ended"
                             long start = qpc != 0 ? (long)qpc : GpuReplayRecorder.Now() - duration;
 
                             Write(start, data, (int)frames, (bufferFlags & AUDCLNT_BUFFERFLAGS_SILENT) != 0);
@@ -362,8 +335,6 @@ namespace PhasmaStrap.Utility
                 }
             }
         }
-
-        // ------------------------------------------------------------------ activation
 
         private static int FindProcess(string name)
         {
@@ -393,8 +364,6 @@ namespace PhasmaStrap.Utility
 
         private static IAudioClient ActivateEndpoint(bool capture) => ActivateEndpoint(capture, "", out _);
 
-        // a chosen device by its endpoint ID, or Windows' default device (the "Default Device" in
-        // Sound settings) when none is chosen or the chosen one isn't plugged in
         private static IAudioClient ActivateEndpoint(bool capture, string deviceId, out string description)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorClass();
@@ -417,12 +386,12 @@ namespace PhasmaStrap.Utility
                 }
 
                 if (device is null)
-                    Check(enumerator.GetDefaultAudioEndpoint(capture ? 1 : 0, 0 /* console */, out device), "GetDefaultAudioEndpoint");
+                    Check(enumerator.GetDefaultAudioEndpoint(capture ? 1 : 0, 0 , out device), "GetDefaultAudioEndpoint");
 
                 try
                 {
                     Guid iid = typeof(IAudioClient).GUID;
-                    Check(device.Activate(ref iid, 23 /* CLSCTX_ALL */, IntPtr.Zero, out object client), "IMMDevice.Activate");
+                    Check(device.Activate(ref iid, 23 , IntPtr.Zero, out object client), "IMMDevice.Activate");
                     return (IAudioClient)client;
                 }
                 finally
@@ -436,7 +405,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // asks for the unprocessed stream; false when the device (or Windows) doesn't offer one
         private static bool TryRaw(IAudioClient client)
         {
             try
@@ -448,7 +416,7 @@ namespace PhasmaStrap.Utility
                 {
                     cbSize = (uint)Marshal.SizeOf<AudioClientProperties>(),
                     bIsOffload = 0,
-                    eCategory = 0, // AudioCategory_Other - not "communications", which invites voice processing
+                    eCategory = 0,
                     Options = AUDCLNT_STREAMOPTIONS_RAW,
                 };
 
@@ -460,17 +428,15 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Unprocessed: the device lets apps skip Windows' and its driver's sound processing
         public sealed record Microphone(string Id, string Name, bool Unprocessed);
 
-        // the recording devices that are plugged in, for the microphone picker
         public static List<Microphone> ListMicrophones()
         {
             var result = new List<Microphone>();
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorClass();
             try
             {
-                if (enumerator.EnumAudioEndpoints(1 /* capture */, DEVICE_STATE_ACTIVE, out IMMDeviceCollection devices) < 0)
+                if (enumerator.EnumAudioEndpoints(1 , DEVICE_STATE_ACTIVE, out IMMDeviceCollection devices) < 0)
                     return result;
 
                 try
@@ -509,7 +475,6 @@ namespace PhasmaStrap.Utility
             return result.OrderBy(m => m.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        // PKEY_Devices_AudioDevice_RawProcessingSupported
         private static bool RawSupported(IMMDevice device)
         {
             if (device.OpenPropertyStore(0, out IPropertyStore store) < 0)
@@ -523,7 +488,7 @@ namespace PhasmaStrap.Utility
 
                 try
                 {
-                    return value.vt == 11 /* VT_BOOL */ && (short)value.pointer.ToInt64() != 0;
+                    return value.vt == 11  && (short)value.pointer.ToInt64() != 0;
                 }
                 finally
                 {
@@ -538,18 +503,18 @@ namespace PhasmaStrap.Utility
 
         private static string? FriendlyName(IMMDevice device)
         {
-            if (device.OpenPropertyStore(0 /* STGM_READ */, out IPropertyStore store) < 0)
+            if (device.OpenPropertyStore(0 , out IPropertyStore store) < 0)
                 return null;
 
             try
             {
-                var key = new PROPERTYKEY { fmtid = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), pid = 14 }; // PKEY_Device_FriendlyName
+                var key = new PROPERTYKEY { fmtid = new Guid("a45c254e-df1c-4efd-8020-67d146a850e0"), pid = 14 };
                 if (store.GetValue(ref key, out PROPVARIANT value) < 0)
                     return null;
 
                 try
                 {
-                    return value.vt == 31 /* VT_LPWSTR */ ? Marshal.PtrToStringUni(value.pointer) : null;
+                    return value.vt == 31  ? Marshal.PtrToStringUni(value.pointer) : null;
                 }
                 finally
                 {
@@ -575,9 +540,8 @@ namespace PhasmaStrap.Utility
 
         private static IAudioClient ActivateProcessLoopback(int processId)
         {
-            // AUDIOCLIENT_ACTIVATION_PARAMS { PROCESS_LOOPBACK, { pid, INCLUDE_TARGET_PROCESS_TREE } }
             IntPtr parameters = Marshal.AllocHGlobal(12);
-            // PROPVARIANT { vt = VT_BLOB, blob = { 12, parameters } }
+
             IntPtr variant = Marshal.AllocHGlobal(24);
 
             try
@@ -618,8 +582,6 @@ namespace PhasmaStrap.Utility
                 Marshal.FreeHGlobal(parameters);
             }
         }
-
-        // ------------------------------------------------------------------ interop
 
         private const uint AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000;
         private const uint AUDCLNT_STREAMFLAGS_EVENTCALLBACK = 0x00040000;
@@ -704,7 +666,6 @@ namespace PhasmaStrap.Utility
             [PreserveSig] int GetValue(ref PROPERTYKEY key, out PROPVARIANT value);
         }
 
-        // IAudioClient's methods first (same vtable), then the one used here
         [ComImport, Guid("726778CD-F60A-4eda-82DE-E47610CD78AA"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IAudioClient2
         {

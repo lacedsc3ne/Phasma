@@ -1,12 +1,8 @@
-using PhasmaStrap.Integrations;
+﻿using PhasmaStrap.Integrations;
 using PhasmaStrap.UI;
 
 namespace PhasmaStrap.Utility
 {
-    // Polls friends.roblox.com/presence.roblox.com for changes in friends' online status and toasts
-    // when one comes online or starts a game - see App.xaml.cs's startup path for where this is
-    // started (same "runs for the lifetime of any normal PhasmaStrap process" pattern as
-    // AutoRamCleaner, since friends can come online whether or not Roblox itself is running).
     internal static class FriendActivityMonitor
     {
         private const string LOG_IDENT = "FriendActivityMonitor";
@@ -113,14 +109,16 @@ namespace PhasmaStrap.Utility
                     NotificationCenter.Notify(
                         $"{name} is now online",
                         string.IsNullOrEmpty(now.LastLocation) ? "Online" : now.LastLocation,
-                        NotificationCategory.General);
+                        NotificationCategory.General,
+                        kind: NotificationKindId.FriendOnline);
                 }
                 else if (wasType != FriendPresenceType.InGame && now.Type == FriendPresenceType.InGame)
                 {
                     NotificationCenter.Notify(
                         $"{name} started playing",
                         string.IsNullOrEmpty(now.LastLocation) ? "In a game" : now.LastLocation,
-                        NotificationCategory.General);
+                        NotificationCategory.General,
+                        kind: NotificationKindId.FriendPlaying);
                 }
             }
         }

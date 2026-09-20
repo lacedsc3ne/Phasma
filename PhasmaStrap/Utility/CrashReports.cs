@@ -1,7 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    // Where the Watcher's crash analyses are kept for the Diagnostics page (<base>\CrashReports),
-    // and the glue between the app and CrashAnalyzer (which knows nothing about PhasmaStrap).
     internal static class CrashReports
     {
         private const string LOG_IDENT = "CrashReports";
@@ -88,8 +86,6 @@ namespace PhasmaStrap.Utility
             return result;
         }
 
-        // the log of the last session that has ENDED: while Roblox runs, its own log is still being
-        // written and naturally has no shutdown lines yet - that is not a crash
         public static string? NewestLog()
         {
             try

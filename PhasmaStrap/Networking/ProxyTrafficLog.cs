@@ -14,9 +14,6 @@ namespace PhasmaStrap.Networking
         public string OutcomeDisplay => ServedFromCache ? $"{StatusCode} (cache)" : StatusCode.ToString();
     }
 
-    // In-memory only, capped ring buffer of every request AssetProxyServer actually handles - see
-    // its call site in HandleClientAsync. Exists purely for DeveloperToolsPage's live traffic
-    // view; nothing else reads this, and it's never persisted to disk.
     public static class ProxyTrafficLog
     {
         private const int MaxEntries = 200;

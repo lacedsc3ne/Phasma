@@ -1,8 +1,5 @@
 namespace PhasmaStrap.Integrations
 {
-    // country-name/code normalization used by the datacenter map and matchmaker. Simplified
-    // from Voidstrap's version: drops its flag-icon downloading, keeping just the name
-    // canonicalization matchmaking needs.
     internal static class CountryFlag
     {
         private static readonly Dictionary<string, string> _aliases = new(StringComparer.OrdinalIgnoreCase)

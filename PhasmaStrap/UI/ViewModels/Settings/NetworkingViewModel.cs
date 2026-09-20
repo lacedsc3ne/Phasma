@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -9,10 +9,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class NetworkingViewModel : NotifyPropertyChangedViewModel
     {
-        // --- panic wipe: signs out + clears every cache/log directory the Cleanup feature
-        // already knows about (Cleaner.Directories), plus AssetWarp's preload cache. A single,
-        // immediate, synchronous action - not the scheduled Cleaner, which only runs after
-        // Roblox closes and only for whichever directories the user opted into. ---
+        public AssetWarpViewModel Spoofer => AssetWarpViewModel.Shared;
 
         private string _wipeStatus = "";
 
@@ -127,7 +124,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (!AssetProxyCA.IsRobloxTrustBundlePatched())
                     return "Running - Roblox's own certificate bundle will be patched on the next launch";
 
-                // the files being right isn't the same as Roblox using them
                 return ProxyHealth.RobloxVerdict()
                     ?? "Ready - hosts entries and certificates are in place; open a game to see whether Roblox connects through it";
             }
@@ -171,8 +167,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set { App.Settings.Prop.UsernameSpoofName = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(UsernameSpoofName)); }
         }
 
-        // the Asset Warp controls themselves live on FastFlag Settings > Asset Warp; this just
-        // jumps there (and switches to that tab) so the Networking page isn't a second copy of them
         public ICommand OpenAssetWarpCommand => new RelayCommand(() =>
         {
             var window = System.Windows.Application.Current.Windows.OfType<UI.Elements.Settings.MainWindow>().FirstOrDefault();
@@ -224,80 +218,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(CertificateStatusText));
             OnPropertyChanged(nameof(StatusText));
         });
-
-        public bool AssetWarpEnabled
-        {
-            get => App.Settings.Prop.AssetWarpEnabled;
-            set
-            {
-                App.Settings.Prop.AssetWarpEnabled = value;
-                OnPropertyChanged(nameof(AssetWarpEnabled));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public bool AssetWarpDisableAllTextures
-        {
-            get => App.Settings.Prop.AssetWarpDisableAllTextures;
-            set
-            {
-                App.Settings.Prop.AssetWarpDisableAllTextures = value;
-                OnPropertyChanged(nameof(AssetWarpDisableAllTextures));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public bool AssetWarpDisableAllDecals
-        {
-            get => App.Settings.Prop.AssetWarpDisableAllDecals;
-            set
-            {
-                App.Settings.Prop.AssetWarpDisableAllDecals = value;
-                OnPropertyChanged(nameof(AssetWarpDisableAllDecals));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public bool AssetWarpDisableAllImages
-        {
-            get => App.Settings.Prop.AssetWarpDisableAllImages;
-            set
-            {
-                App.Settings.Prop.AssetWarpDisableAllImages = value;
-                OnPropertyChanged(nameof(AssetWarpDisableAllImages));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public bool AssetWarpDisableAllAnimations
-        {
-            get => App.Settings.Prop.AssetWarpDisableAllAnimations;
-            set
-            {
-                App.Settings.Prop.AssetWarpDisableAllAnimations = value;
-                OnPropertyChanged(nameof(AssetWarpDisableAllAnimations));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public bool AssetWarpDisableAllMeshes
-        {
-            get => App.Settings.Prop.AssetWarpDisableAllMeshes;
-            set
-            {
-                App.Settings.Prop.AssetWarpDisableAllMeshes = value;
-                OnPropertyChanged(nameof(AssetWarpDisableAllMeshes));
-                OnPropertyChanged(nameof(AssetWarpStatusText));
-            }
-        }
-
-        public string AssetWarpStatusText => AssetWarpPolicy.IsEnabled
-            ? "Blocking selected asset type(s) through the local proxy"
-            : (App.Settings.Prop.AssetWarpEnabled ? "On, but no asset types selected below - nothing is blocked yet" : "Off");
-
-        // --- preload cache browser (AssetPreloadCache) - entries are hashed request keys, not
-        // asset names (see AssetCacheEntry's doc comment), so this is a size/age view, not a
-        // content browser: see how much space preloading is using, clear stale entries. ---
 
         public ObservableCollection<AssetCacheEntry> PreloadCacheEntries { get; } = new();
 

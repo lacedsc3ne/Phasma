@@ -22,6 +22,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private const int MaxContinuePlaying = 6;
 
+        public const string FilterRecent = "recent";
+        public const string FilterAll = "all";
+        public const string FilterPrivate = "private";
+
+        public const string SectionCatalog = "catalog";
+        public const string SectionServers = "servers";
+        public const string SectionPrivateServers = "privateservers";
+        public const string SectionHistory = "history";
+
         private string _statusText = "";
 
         public ObservableCollection<PlayTimeEntry> ContinuePlaying { get; } = new();
@@ -43,8 +52,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand CopyLinkCommand => new RelayCommand<PlayTimeEntry>(CopyLink);
 
         public ICommand LaunchRobloxCommand => new RelayCommand(LaunchRoblox);
-
-        // --- launch by link ---
 
         private string _linkInput = "";
         public string LinkInput
@@ -86,6 +93,269 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand LaunchPlaceCommand => new RelayCommand<PlaceRow>(LaunchPlace);
 
+        private PlayTimeEntry? _selectedGame;
+        public PlayTimeEntry? SelectedGame
+        {
+            get => _selectedGame;
+            set
+            {
+                if (ReferenceEquals(_selectedGame, value))
+                    return;
+
+                _selectedGame = value;
+
+                if (value is not null)
+                    Section = "";
+
+                Servers.Clear();
+                ServerStatus = value is null
+                    ? "Pick a game on the left to see its servers."
+                    : "Nothing looked up yet. Find servers asks Roblox which public servers are running right now.";
+
+                OnPropertyChanged(nameof(SelectedGame));
+                OnPropertyChanged(nameof(HasSelection));
+                OnPropertyChanged(nameof(SelectionVisibility));
+                OnPropertyChanged(nameof(NoSelectionVisibility));
+                OnPropertyChanged(nameof(PlaceIdText));
+                OnPropertyChanged(nameof(ProfileSummary));
+                OnPropertyChanged(nameof(OverlaySummary));
+                OnPropertyChanged(nameof(ResolutionSummary));
+            }
+        }
+
+        public bool HasSelection => _selectedGame is not null;
+
+        public Visibility SelectionVisibility => HasSelection ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility NoSelectionVisibility => HasSelection ? Visibility.Collapsed : Visibility.Visible;
+
+        public string PlaceIdText => _selectedGame is null ? "" : $"Place ID {_selectedGame.PlaceId}";
+
+        public string ProfileSummary
+        {
+            get
+            {
+                if (_selectedGame is null)
+                    return "";
+
+                FlagProfile? profile = FlagLayers.ProfileFor(App.FlagProfiles.Prop, _selectedGame.PlaceId, _selectedGame.UniverseId);
+
+                if (profile is null)
+                    return "None, this place starts with your usual flags.";
+
+                return profile.ChangeCount == 0
+                    ? $"{profile.Name}, empty so far."
+                    : $"{profile.Name}  ·  {profile.ChangeCount} flag(s)";
+            }
+        }
+
+        public string OverlaySummary
+        {
+            get
+            {
+                if (_selectedGame is null)
+                    return "";
+
+                if (!App.Settings.Prop.OverlayPlaceProfiles.TryGetValue(_selectedGame.PlaceId.ToString(), out var profile))
+                    return "None, this place uses your usual overlay settings.";
+
+                return $"HUD {(profile.HudEnabled ? "on" : "off")}  ·  crosshair {(profile.CrosshairEnabled ? "on" : "off")}";
+            }
+        }
+
+        public string ResolutionSummary
+        {
+            get
+            {
+                if (_selectedGame is null)
+                    return "";
+
+                if (!App.Settings.Prop.InGameResolutionPlaceProfiles.TryGetValue(_selectedGame.PlaceId.ToString(), out var profile))
+                    return "None, this place uses your usual resolution.";
+
+                string text = $"{profile.Width} × {profile.Height}";
+
+                if (profile.RefreshRate > 0)
+                    text += $" at {profile.RefreshRate} Hz";
+
+                if (!string.IsNullOrEmpty(profile.Monitor))
+                    text += $" on {profile.Monitor}";
+
+                return text;
+            }
+        }
+
+        private string _gamesFilter = FilterRecent;
+        public string GamesFilter
+        {
+            get => _gamesFilter;
+            private set { _gamesFilter = value; OnPropertyChanged(nameof(GamesFilter)); }
+        }
+
+        public ICommand FilterCommand => new RelayCommand<string>(ApplyFilter);
+
+        private void ApplyFilter(string? filter)
+        {
+            if (string.IsNullOrEmpty(filter))
+                return;
+
+            Section = "";
+
+            if (filter == GamesFilter)
+                return;
+
+            GamesFilter = filter;
+
+            if (filter == FilterPrivate && _privatePlaceIds is null)
+            {
+                _ = LoadPrivatePlacesAsync();
+                return;
+            }
+
+            LoadEntries();
+        }
+
+        private HashSet<long>? _privatePlaceIds;
+        private HashSet<long>? _privateUniverseIds;
+
+        private async Task LoadPrivatePlacesAsync()
+        {
+            StatusText = "Checking which games you have a private server in...";
+
+            try
+            {
+                List<PrivateServerInfo> servers = await PrivateServers.ListAsync();
+
+                _privatePlaceIds = servers.Where(s => s.PlaceId > 0).Select(s => s.PlaceId).ToHashSet();
+                _privateUniverseIds = servers.Where(s => s.UniverseId > 0).Select(s => s.UniverseId).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not list private servers: {ex.Message}");
+
+                _privatePlaceIds = new HashSet<long>();
+                _privateUniverseIds = new HashSet<long>();
+
+                ContinuePlaying.Clear();
+                OnPropertyChanged(nameof(IsEmpty));
+                StatusText = "Couldn't read your private servers. Sign in to Roblox in your browser, then try again.";
+                return;
+            }
+
+            LoadEntries();
+        }
+
+        private string _section = "";
+        public string Section
+        {
+            get => _section;
+            private set
+            {
+                _section = value;
+                OnPropertyChanged(nameof(Section));
+                OnPropertyChanged(nameof(SectionVisibility));
+                OnPropertyChanged(nameof(DetailVisibility));
+            }
+        }
+
+        private Uri? _sectionSource;
+        public Uri? SectionSource
+        {
+            get => _sectionSource;
+            private set { _sectionSource = value; OnPropertyChanged(nameof(SectionSource)); }
+        }
+
+        public Visibility SectionVisibility => _section.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility DetailVisibility => _section.Length > 0 ? Visibility.Collapsed : Visibility.Visible;
+
+        public ICommand ShowSectionCommand => new RelayCommand<string>(ShowSection);
+
+        private void ShowSection(string? section)
+        {
+            if (string.IsNullOrEmpty(section) || section == Section)
+            {
+                Section = "";
+                return;
+            }
+
+            string? page = section switch
+            {
+                SectionCatalog => "FastFlagGamesPage.xaml",
+                SectionServers => "ServerBrowserPage.xaml",
+                SectionPrivateServers => "PrivateServersPage.xaml",
+                SectionHistory => "HistoryPage.xaml",
+                _ => null,
+            };
+
+            if (page is null)
+                return;
+
+            SectionSource = new Uri($"/UI/Elements/Settings/Pages/{page}", UriKind.Relative);
+            Section = section;
+        }
+
+        public ObservableCollection<ServerListItem> Servers { get; } = new();
+
+        private string _serverStatus = "Pick a game on the left to see its servers.";
+        public string ServerStatus
+        {
+            get => _serverStatus;
+            private set { _serverStatus = value; OnPropertyChanged(nameof(ServerStatus)); }
+        }
+
+        private bool _serversBusy;
+        public bool ServersBusy
+        {
+            get => _serversBusy;
+            private set { _serversBusy = value; OnPropertyChanged(nameof(ServersBusy)); OnPropertyChanged(nameof(ServersNotBusy)); }
+        }
+
+        public bool ServersNotBusy => !_serversBusy;
+
+        public ICommand FindServersCommand => new AsyncRelayCommand(FindServersAsync);
+
+        public ICommand JoinServerCommand => new RelayCommand<ServerListItem>(JoinServer);
+
+        private async Task FindServersAsync()
+        {
+            if (ServersBusy || _selectedGame is null || _selectedGame.PlaceId <= 0)
+                return;
+
+            ServersBusy = true;
+            Servers.Clear();
+            ServerStatus = "Looking for servers...";
+
+            try
+            {
+                List<ServerListItem> servers = await PhasmaStrap.Integrations.ServerBrowser.ListPublicServersAsync(PhasmaStrap.Utility.PlaceNames.StartPlaceOf(_selectedGame.PlaceId));
+
+                foreach (ServerListItem server in servers)
+                    Servers.Add(server);
+
+                ServerStatus = servers.Count == 0
+                    ? "No public servers are running for this place right now."
+                    : $"{servers.Count} public server(s) running right now.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Server lookup failed: {ex.Message}");
+                ServerStatus = $"Server lookup failed: {ex.Message}";
+            }
+            finally
+            {
+                ServersBusy = false;
+            }
+        }
+
+        private void JoinServer(ServerListItem? server)
+        {
+            if (server is null || _selectedGame is null || _selectedGame.PlaceId <= 0)
+                return;
+
+            PhasmaStrap.Integrations.ServerBrowser.JoinServer(PhasmaStrap.Utility.PlaceNames.StartPlaceOf(_selectedGame.PlaceId), server.JobId);
+        }
+
         public HomeViewModel()
         {
             LoadEntries();
@@ -93,21 +363,44 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void LoadEntries()
         {
+            long previous = _selectedGame?.PlaceId ?? 0;
+
+            List<PlayTimeEntry> entries = PlayTimeStore.GetAll().OrderByDescending(x => x.LastPlayed).ToList();
+
+            if (GamesFilter == FilterRecent)
+                entries = entries.Take(MaxContinuePlaying).ToList();
+            else if (GamesFilter == FilterPrivate)
+                entries = _privatePlaceIds is null
+                    ? new List<PlayTimeEntry>()
+                    : entries.Where(e => _privatePlaceIds.Contains(e.PlaceId) || (e.UniverseId > 0 && _privateUniverseIds!.Contains(e.UniverseId))).ToList();
+
             ContinuePlaying.Clear();
 
-            foreach (PlayTimeEntry entry in PlayTimeStore.GetAll().OrderByDescending(x => x.LastPlayed).Take(MaxContinuePlaying))
+            foreach (PlayTimeEntry entry in entries)
                 ContinuePlaying.Add(entry);
 
             _ = FillPlaceNamesAsync();
 
-            StatusText = ContinuePlaying.Count == 0
-                ? "No games played yet - games you play will show up here."
-                : $"Showing your {ContinuePlaying.Count} most recently played game(s).";
+            StatusText = ContinuePlaying.Count == 0 ? EmptyStatus() : FilledStatus();
 
             OnPropertyChanged(nameof(IsEmpty));
+
+            SelectedGame = previous == 0 ? null : ContinuePlaying.FirstOrDefault(e => e.PlaceId == previous);
         }
 
-        // names the places of games that show up more than once, then shows the list again
+        private string EmptyStatus() => GamesFilter switch
+        {
+            FilterPrivate => "None of the games you have played have a private server of yours in them.",
+            _ => "No games played yet, games you play will show up here.",
+        };
+
+        private string FilledStatus() => GamesFilter switch
+        {
+            FilterPrivate => $"{ContinuePlaying.Count} played game(s) you have a private server in.",
+            FilterAll => $"All {ContinuePlaying.Count} game(s) you have played.",
+            _ => $"Your {ContinuePlaying.Count} most recently played game(s).",
+        };
+
         private async Task FillPlaceNamesAsync()
         {
             if (await PhasmaStrap.Utility.PlaceNames.FillAsync(ContinuePlaying.ToList()))

@@ -92,7 +92,6 @@
             </DoubleAnimation>
         </Storyboard>
 
-        <!--  continuous "still working" motion while Roblox loads: logo breathes, glow pulses, ring spins  -->
         <Storyboard x:Key="LogoBreathe" Timeline.DesiredFrameRate="30" BeginTime="0:0:0.95" RepeatBehavior="Forever" AutoReverse="True">
             <DoubleAnimation
                 Storyboard.TargetName="LogoBreathScale"
@@ -123,7 +122,6 @@
             </DoubleAnimation>
         </Storyboard>
 
-        <!--  slow-drifting red mist blobs behind the glass, three independent loops so it never looks mechanical  -->
         <Storyboard x:Key="MistDrift" Timeline.DesiredFrameRate="30" RepeatBehavior="Forever">
             <DoubleAnimation
                 Storyboard.TargetName="MistTranslate1"
@@ -191,7 +189,6 @@
         <TaskbarItemInfo ProgressState="{Binding Path=TaskbarProgressState}" ProgressValue="{Binding Path=TaskbarProgressValue}" />
     </Window.TaskbarItemInfo>
 
-    <!--  Background is for Aero theme only  -->
     <Grid x:Name="RootGrid" Background="{Binding Path=BackgroundColourBrush, Mode=OneTime}" Opacity="0">
         <Grid.RenderTransform>
             <TransformGroup>
@@ -200,7 +197,6 @@
             </TransformGroup>
         </Grid.RenderTransform>
 
-        <!--  drifting red mist, clipped to the window bounds, sits behind the frosted glass tint  -->
         <Canvas ClipToBounds="True">
             <Ellipse x:Name="Mist1" Width="320" Height="320" Canvas.Left="-100" Canvas.Top="-120" Opacity="0.25" Effect="{StaticResource MistBlur}" Fill="{DynamicResource BackgroundGlowPrimaryBrush}">
                 <Ellipse.RenderTransform>
@@ -228,7 +224,7 @@
                 <Ellipse.RenderTransform>
                     <TranslateTransform x:Name="MistTranslate3" X="-40" Y="0" />
                 </Ellipse.RenderTransform>
-                <!-- the colour comes from the theme (Fill); the mask gives it the soft round falloff -->
+
                 <Ellipse.OpacityMask>
                     <RadialGradientBrush>
                         <GradientStop Color="#66000000" Offset="0" />
@@ -238,7 +234,6 @@
             </Ellipse>
         </Canvas>
 
-        <!--  Allow for drag  -->
         <ui:TitleBar
             VerticalAlignment="Top"
             CanMaximize="False"

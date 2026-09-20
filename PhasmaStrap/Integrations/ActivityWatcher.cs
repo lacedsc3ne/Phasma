@@ -5,10 +5,6 @@ namespace PhasmaStrap.Integrations
         private const string GameMessageEntry                = "[FLog::CreatorOutput] [BloxstrapRPC]";
         private const string GameJoiningEntry                = "[FLog::Output] ! Joining game";
 
-        // these entries are technically volatile!
-        // they only get printed depending on their configured FLog level, which could change at any time
-        // while levels being changed is fairly rare, please limit the number of varying number of FLog types you have to use, if possible
-
         private const string GameTeleportingEntry            = "[FLog::UgcExperienceController] UgcExperienceController: doTeleport: joinScriptUrl";
         private const string GameJoiningUniverseEntry        = "[FLog::GameJoinLoadTime] Report game_join_loadtime:";
         private const string GameJoiningUDMUXEntry           = "[FLog::Network] UDMUX Address = ";
@@ -28,14 +24,8 @@ namespace PhasmaStrap.Integrations
         private bool _teleportMarker = false;
         private bool _reservedTeleportMarker = false;
 
-        // The next server's join lines, when Roblox logged them BEFORE the current server's
-        // disconnect line. On a server switch the order of "! Joining game" and "Time to disconnect
-        // replication data" is a race between two Roblox threads; when the join won, it used to be
-        // ignored (we were still "in game"), then the late disconnect wiped the state, and the
-        // following "Replicator created" had nothing to confirm - the watcher sat at "not in a
-        // game" for the whole session (no tray info, no presence, no replay, no overlays).
         private ActivityData? _pendingJoin;
-        
+
         public event EventHandler<string>? OnLogEntry;
         public event EventHandler? OnGameJoin;
         public event EventHandler? OnGameLeave;
@@ -48,12 +38,9 @@ namespace PhasmaStrap.Integrations
         public string LogLocation = null!;
 
         public bool InGame = false;
-        
+
         public ActivityData Data { get; private set; } = new();
 
-        /// <summary>
-        /// Ordered by newest to oldest
-        /// </summary>
         public List<ActivityData> History = new();
 
         public bool IsDisposed = false;
@@ -68,17 +55,6 @@ namespace PhasmaStrap.Integrations
         {
             const string LOG_IDENT = "ActivityWatcher::Start";
 
-            // okay, here's the process:
-            //
-            // - tail the latest log file from %localappdata%\roblox\logs
-            // - check for specific lines to determine player's game activity as shown below:
-            //
-            // - get the place id, job id and machine address from '! Joining game '{{JOBID}}' place {{PLACEID}} at {{MACHINEADDRESS}}' entry
-            // - confirm place join with 'serverId: {{MACHINEADDRESS}}|{{MACHINEPORT}}' entry
-            // - check for leaves/disconnects with 'Time to disconnect replication data: {{TIME}}' entry
-            //
-            // we'll tail the log file continuously, monitoring for any log entries that we need to determine the current game activity
-            
             FileInfo logFileInfo;
 
             if (String.IsNullOrEmpty(LogLocation))
@@ -87,10 +63,6 @@ namespace PhasmaStrap.Integrations
 
                 if (!Directory.Exists(logDirectory))
                     return;
-
-                // we need to make sure we're fetching the absolute latest log file
-                // if roblox doesn't start quickly enough, we can wind up fetching the previous log file
-                // good rule of thumb is to find a log file that was created in the last 15 seconds or so
 
                 App.Logger.WriteLine(LOG_IDENT, "Opening Roblox log file...");
 
@@ -117,7 +89,7 @@ namespace PhasmaStrap.Integrations
             }
 
             OnLogOpen?.Invoke(this, EventArgs.Empty);
-            
+
             var logFileStream = logFileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             App.Logger.WriteLine(LOG_IDENT, $"Opened {LogLocation}");
@@ -143,18 +115,14 @@ namespace PhasmaStrap.Integrations
 
             _logEntriesRead += 1;
 
-            // debug stats to ensure that the log reader is working correctly
-            // if more than 1000 log entries have been read, only log per 100 to save on spam
             if (_logEntriesRead <= 1000 && _logEntriesRead % 50 == 0)
                 App.Logger.WriteLine(LOG_IDENT, $"Read {_logEntriesRead} log entries");
             else if (_logEntriesRead % 100 == 0)
                 App.Logger.WriteLine(LOG_IDENT, $"Read {_logEntriesRead} log entries");
 
-            // get the log message from the read line
             int logMessageIdx = entry.IndexOf(' ');
             if (logMessageIdx == -1)
             {
-                // likely a log message that spanned multiple lines
                 return;
             }
 
@@ -163,10 +131,9 @@ namespace PhasmaStrap.Integrations
             if (logMessage.StartsWith(GameLeavingEntry))
             {
                 App.Logger.WriteLine(LOG_IDENT, "User is back into the desktop app");
-                
+
                 OnAppClose?.Invoke(this, EventArgs.Empty);
 
-                // back on the app's home screen - whatever server was queued up is not happening
                 _pendingJoin = null;
 
                 if (Data.PlaceId != 0 && !InGame)
@@ -180,8 +147,6 @@ namespace PhasmaStrap.Integrations
 
             if (!InGame && Data.PlaceId == 0)
             {
-                // We are not in a game, nor are in the process of joining one
-                
                 if (logMessage.StartsWith(GameJoiningEntry))
                 {
                     ActivityData? joining = ParseJoining(logMessage);
@@ -196,8 +161,6 @@ namespace PhasmaStrap.Integrations
             }
             else if (!InGame && Data.PlaceId != 0)
             {
-                // We are not confirmed to be in a game, but we are in the process of joining one
-
                 if (logMessage.StartsWith(GameJoiningUniverseEntry))
                 {
                     ApplyUniverse(Data, logMessage, previous: History.FirstOrDefault());
@@ -208,8 +171,6 @@ namespace PhasmaStrap.Integrations
                 }
                 else if (logMessage.StartsWith(GameJoiningEntry))
                 {
-                    // a second join before the first was confirmed (the first one failed or was
-                    // redirected) - the newest one is the one that can still happen
                     ActivityData? joining = ParseJoining(logMessage);
                     if (joining is not null && joining.JobId != Data.JobId)
                     {
@@ -230,13 +191,10 @@ namespace PhasmaStrap.Integrations
             }
             else if (InGame && Data.PlaceId != 0)
             {
-                // We are confirmed to be in a game
-
                 if (logMessage.StartsWith(GameDisconnectedEntry))
                 {
                     LeaveCurrentGame(LOG_IDENT);
 
-                    // the next server was already announced (see _pendingJoin) - carry on joining it
                     if (_pendingJoin is not null)
                     {
                         Data = _pendingJoin;
@@ -255,7 +213,6 @@ namespace PhasmaStrap.Integrations
                 }
                 else if (_pendingJoin is not null && logMessage.StartsWith(GameJoiningUniverseEntry))
                 {
-                    // the game being left is what the next one is compared against
                     ApplyUniverse(_pendingJoin, logMessage, previous: Data);
                 }
                 else if (_pendingJoin is not null && logMessage.StartsWith(GameJoiningUDMUXEntry))
@@ -264,7 +221,6 @@ namespace PhasmaStrap.Integrations
                 }
                 else if (_pendingJoin is not null && logMessage.StartsWith(GameJoinedEntry))
                 {
-                    // the new server is up and the old one never logged its disconnect
                     LeaveCurrentGame(LOG_IDENT);
 
                     Data = _pendingJoin;
@@ -388,8 +344,6 @@ namespace PhasmaStrap.Integrations
             OnGameLeave?.Invoke(this, EventArgs.Empty);
         }
 
-        // "! Joining game '<job>' place <id> at <address>" -> a fresh ActivityData, or null if the
-        // line doesn't have that shape. Consumes the teleport markers set by a preceding doTeleport.
         private ActivityData? ParseJoining(string logMessage)
         {
             const string LOG_IDENT = "ActivityWatcher::ParseJoining";

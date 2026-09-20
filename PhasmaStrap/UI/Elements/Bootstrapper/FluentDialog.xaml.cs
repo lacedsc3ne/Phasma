@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.UI.Elements.Bootstrapper.Base;
+using PhasmaStrap.UI.Elements.Bootstrapper.Base;
 using PhasmaStrap.UI.ViewModels.Bootstrapper;
 using System;
 using System.Collections.Generic;
@@ -22,9 +22,6 @@ using System.Windows.Threading;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
-    /// <summary>
-    /// Interaction logic for FluentDialog.xaml
-    /// </summary>
     public partial class FluentDialog : IBootstrapperDialog
     {
         private readonly FluentDialogViewModel _viewModel;
@@ -33,7 +30,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         private bool _isClosing;
 
-        // this dialog has its own elastic entrance + mist storyboard, defined in FluentDialog.xaml
         protected override bool UseDefaultEntranceAnimation => false;
 
         #region UI Elements
@@ -119,7 +115,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             Title = App.Settings.Prop.BootstrapperTitle;
             Icon = App.Settings.Prop.BootstrapperIcon.GetIcon().GetImageSource();
 
-            // setting this to true for mica results in the window being undraggable
             if (aero)
                 AllowsTransparency = true;
         }

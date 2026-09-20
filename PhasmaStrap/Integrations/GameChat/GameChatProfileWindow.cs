@@ -6,15 +6,6 @@ using System.Windows.Media.Imaging;
 
 namespace PhasmaStrap.Integrations.GameChat
 {
-    /// <summary>
-    /// A small popup shown when clicking a name in the chat overlay.
-    ///
-    /// Voidstrap's original GameChatProfileWindow rendered a full social profile (banner, gradient,
-    /// avatar border, badges, friend/follow counts, an "add friend" button) sourced from Voidstrap's
-    /// own website API. PhasmaStrap has no equivalent backend, so this port only shows what's available
-    /// directly from Roblox: headshot, username/user id, a link to the user's Roblox profile, and a
-    /// "Report" button that goes through the same optional chat server as the rest of GameChat.
-    /// </summary>
     public class GameChatProfileWindow : Window
     {
         private readonly long _robloxId;

@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using PhasmaStrap.Integrations;
 using CommunityToolkit.Mvvm.Input;
 
@@ -15,7 +15,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
         public string Error { get; private set; } = String.Empty;
 
         public ICommand CloseWindowCommand => new RelayCommand(RequestClose);
-        
+
         public EventHandler? RequestCloseEvent;
 
         public ServerHistoryViewModel(ActivityWatcher activityWatcher)
@@ -45,7 +45,7 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
                 catch (Exception ex)
                 {
                     App.Logger.WriteException("ServerHistoryViewModel::LoadData", ex);
-                    
+
                     Error = ex.Message;
                     OnPropertyChanged(nameof(Error));
 
@@ -63,9 +63,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             var consolidatedJobIds = new List<ActivityData>();
 
-            // consolidate activity entries from in-universe teleports
-            // the time left of the latest activity gets moved to the root activity
-            // the job id of the latest public server activity gets moved to the root activity
             foreach (var entry in _activityWatcher.History)
             {
                 if (entry.RootActivity is not null)

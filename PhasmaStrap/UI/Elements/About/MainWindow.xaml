@@ -61,7 +61,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  drifting red mist behind the glass, matches the bootstrapper splash's style  -->
         <Canvas Grid.RowSpan="2" ClipToBounds="True" IsHitTestVisible="False">
             <Ellipse x:Name="Mist1" Width="420" Height="420" Canvas.Left="-140" Canvas.Top="-160" Opacity="0.12" Effect="{StaticResource MistBlurLarge}" Fill="{DynamicResource BackgroundGlowPrimaryBrush}">
                 <Ellipse.RenderTransform>

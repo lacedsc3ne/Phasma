@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,15 +17,12 @@ using Wpf.Ui.Common;
 
 namespace PhasmaStrap.UI.Elements.Controls
 {
-  /// <summary>
-  /// Interaction logic for Expander.xaml
-  /// </summary>
   [ContentProperty(nameof(InnerContent))]
   public partial class Expander : UserControl
   {
     public static readonly DependencyProperty IsExpandedProperty =
         DependencyProperty.Register(nameof(IsExpanded), typeof(bool), typeof(Expander));
-        
+
     public static readonly DependencyProperty HeaderIconProperty =
         DependencyProperty.Register(nameof(HeaderIcon), typeof(SymbolRegular), typeof(Expander));
 

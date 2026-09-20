@@ -2,12 +2,6 @@ using System.ComponentModel;
 
 namespace PhasmaStrap.Networking
 {
-    /// <summary>
-    /// Both hosts-file features (the local proxy redirect and the telemetry block) used to
-    /// relaunch their own elevated helper, so enabling both - or starting up with both out of
-    /// sync - meant two UAC prompts. This writes BOTH blocks to match the desired state in one
-    /// elevated run (-applyhosts "proxy=on;telemetry=off"), so any flow costs at most one prompt.
-    /// </summary>
     public static class HostsElevation
     {
         private const string LOG_IDENT = "HostsElevation";
@@ -19,10 +13,6 @@ namespace PhasmaStrap.Networking
             return RunElevated("-applyhosts", data);
         }
 
-        /// <summary>
-        /// Startup reconciliation for both blocks at once: compares what's in the hosts file with
-        /// what the settings say, and asks for elevation only if something actually differs.
-        /// </summary>
         public static void ReconcileOnStartup()
         {
             bool proxyWanted = App.Settings.Prop.NetworkingProxyEnabled;
@@ -38,7 +28,6 @@ namespace PhasmaStrap.Networking
             Apply(proxyWanted, telemetryWanted);
         }
 
-        // runs inside the short-lived elevated relaunch
         public static bool ApplyElevated(string? data)
         {
             bool proxy = false, telemetry = false;

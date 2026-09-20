@@ -1,12 +1,9 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
 using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Interaction logic for IntegrationsPage.xaml
-    /// </summary>
     public partial class IntegrationsPage
     {
         public IntegrationsPage()

@@ -6,9 +6,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // The join-time server picker's window (see Networking.JoinPickerPolicy). The game's join
-    // request is on hold while this is open, so it closes by itself when the time is up -
-    // ChosenJobId stays null then, which means "let Roblox choose".
     public partial class ServerPickerWindow
     {
         private sealed class Row
@@ -30,7 +27,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         {
             InitializeComponent();
 
-            // a little less than the policy's own limit: the answer still has to reach Roblox
             _limit = limit - TimeSpan.FromSeconds(3);
 
             _timer.Tick += (_, _) =>
@@ -69,7 +65,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             if (servers.Count == 0)
             {
-                // nothing to choose from - no reason to keep the game waiting
                 HeadlineText.Text = "No servers could be listed";
                 DetailText.Text = "Roblox will choose one. (The picker needs you to be signed in, and the game to have public servers.)";
                 await Task.Delay(1800);

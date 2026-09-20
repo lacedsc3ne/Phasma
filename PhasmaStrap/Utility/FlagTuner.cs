@@ -3,7 +3,7 @@ namespace PhasmaStrap.Utility
     public sealed class TunerVariant
     {
         public string Name { get; set; } = "";
-        public string Kind { get; set; } = "";       // "current", "none", "snapshot"
+        public string Kind { get; set; } = "";
         public string Snapshot { get; set; } = "";
     }
 
@@ -18,17 +18,6 @@ namespace PhasmaStrap.Utility
         public string AppliedVariant { get; set; } = "";
     }
 
-    // The FastFlag auto-tuner: an A/B test of whole flag sets that the PLAYER drives.
-    //
-    // Roblox reads its flags once, when it starts, so comparing sets means one game launch per run.
-    // PhasmaStrap never starts or restarts Roblox for this. A step only (1) puts that set's flags in
-    // place and (2) leaves an order for the Watcher to measure the next game session; the player
-    // joins the same game as always, plays, and gets a toast when the run is in. Sets are taken in
-    // rounds (A B C, A B C) rather than back to back, so that a server getting fuller or the PC
-    // warming up does not land on one set only.
-    //
-    // The flags in place when the experiment started are saved as a snapshot first and can be put
-    // back at any point.
     internal static class FlagTuner
     {
         private const string LOG_IDENT = "FlagTuner";
@@ -66,7 +55,6 @@ namespace PhasmaStrap.Utility
             return experiment;
         }
 
-        // every run the experiment wants, in the order they should be done
         public static List<(TunerVariant Variant, int Round)> Plan(TunerExperiment experiment)
         {
             var plan = new List<(TunerVariant, int)>();
@@ -81,7 +69,6 @@ namespace PhasmaStrap.Utility
         public static List<PerformanceReport> RunsOf(TunerExperiment experiment) =>
             PerformanceRuns.List().Where(r => r.Experiment == experiment.Id).ToList();
 
-        // the next run that has not been measured yet, or null when the plan is complete
         public static (TunerVariant Variant, int Round)? Next(TunerExperiment experiment)
         {
             Dictionary<string, int> done = RunsOf(experiment).GroupBy(r => r.Variant).ToDictionary(g => g.Key, g => g.Count());
@@ -105,7 +92,6 @@ namespace PhasmaStrap.Utility
             };
         }
 
-        // puts the variant's flags in place and orders the measurement of the next game session
         public static void Arm(TunerExperiment experiment, TunerVariant variant, int round)
         {
             FastFlagSnapshot snapshot = Resolve(experiment, variant)
@@ -128,7 +114,6 @@ namespace PhasmaStrap.Utility
             App.Logger.WriteLine(LOG_IDENT, $"Armed '{variant.Name}' round {round}: {snapshot.Flags.Count} flag(s) in place, measurement ordered");
         }
 
-        // ends the experiment with the given flags in place (null = the ones from before it started)
         public static void Finish(TunerExperiment experiment, TunerVariant? keep)
         {
             FastFlagSnapshot? snapshot = keep is null

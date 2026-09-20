@@ -2,22 +2,6 @@ using System.Text.Json.Nodes;
 
 namespace PhasmaStrap.Networking
 {
-    // rewrites display-name/verified-badge fields in Roblox's profile-lookup response, changing
-    // what name/badge shows for whoever that profile lookup was about. Two independent paths:
-    //  - the older, simpler Settings.UsernameSpoofName (NetworkingPage) rewrites every profile in
-    //    a response uniformly, no self/others distinction.
-    //  - the newer Settings.Spoof{Self,Others}* fields (AssetWarp tab, matching Voidstrap's
-    //    Client Spoofer) distinguish "your own profile" from other players', each independently
-    //    gated by its own "apply ingame" toggle - a name typed in the box does nothing until that
-    //    toggle is on, matching Voidstrap's own control descriptions. Self/others wins over the
-    //    uniform field when either is actively configured; the uniform field is the fallback.
-    //
-    // Response shape (apis.roblox.com/user-profile-api/v1/user/profiles/get-profiles):
-    //   { "profileDetails": [ { "userId": 123, "names": { "username": "...", "displayName": "...",
-    //     "combinedName": "...", ... }, "isVerified": false }, ... ] }
-    // - the name fields are NESTED under "names" and the badge is "isVerified"; the previous
-    // version of this file looked for top-level "username"/"hasVerifiedBadge" keys that this
-    // endpoint doesn't return, so it never rewrote anything.
     public static class UsernameSpoofer
     {
         private const string LOG_IDENT = "UsernameSpoofer";
@@ -32,8 +16,6 @@ namespace PhasmaStrap.Networking
 
         private static readonly string[] NameKeys = { "username", "displayName", "combinedName", "inExperienceCombinedName", "contactName", "platformName", "alias" };
 
-        // a name box left empty with "apply ingame" on means "hide the name" - Roblox collapses a
-        // truly empty string back to the real name client-side, a zero-width space doesn't
         private const string EmptyNameSentinel = "​";
 
         private static long? _cachedSelfId;
@@ -119,7 +101,6 @@ namespace PhasmaStrap.Networking
             if (selfId.HasValue && TryReadInt64(profile["userId"], out long profileUserId))
                 return profileUserId == selfId.Value;
 
-            // older shape used "id"
             if (selfId.HasValue && TryReadInt64(profile["id"], out long legacyId))
                 return legacyId == selfId.Value;
 
@@ -151,7 +132,6 @@ namespace PhasmaStrap.Networking
                 count++;
             }
 
-            // some older/alternate shapes put the fields at the top level too
             foreach (string key in NameKeys)
             {
                 if (profile[key] is JsonValue)
@@ -204,11 +184,6 @@ namespace PhasmaStrap.Networking
             return false;
         }
 
-        // synchronous read of whatever's cached, kicking off a background refresh if stale/missing
-        // - the proxy's response pipeline is synchronous, so this never blocks on the network. The
-        // first response after (re)enabling the spoofer may go out un-rewritten while the identity
-        // is still resolving; every one after that uses the freshly cached ID. Public so
-        // GameCreatorSpoofer can reuse the same cached identity instead of resolving it twice.
         public static long? TryGetCachedSelfId()
         {
             if (_cachedSelfId.HasValue && DateTime.UtcNow < _selfIdExpiresUtc)
@@ -227,8 +202,6 @@ namespace PhasmaStrap.Networking
             return _cachedSelfName;
         }
 
-        // called when the proxy is (re)enabled so the identity is already resolved by the time
-        // the first profile lookup comes through, instead of that one going out un-rewritten
         public static void WarmUpIdentity() => RefreshSelfIdentity();
 
         private static void RefreshSelfIdentity()

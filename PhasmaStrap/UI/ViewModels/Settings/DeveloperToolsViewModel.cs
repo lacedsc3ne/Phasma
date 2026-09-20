@@ -17,10 +17,55 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public int FlagCount => Snapshot.Flags.Count;
     }
 
+    public sealed class DeveloperToolItem
+    {
+        public string Key { get; init; } = "";
+        public string Label { get; init; } = "";
+        public Wpf.Ui.Common.SymbolRegular Symbol { get; init; }
+    }
+
     public class DeveloperToolsViewModel : NotifyPropertyChangedViewModel
     {
-        // --- FastFlag snapshots: live A/B toggle + diff viewer, both built on the same
-        // save/apply/diff primitives in FastFlagSnapshotManager ---
+        public IReadOnlyList<DeveloperToolItem> Tools { get; } = new[]
+        {
+            new DeveloperToolItem { Key = "snapshots", Label = Strings.Menu_DeveloperTools_FastFlagSnapshots, Symbol = Wpf.Ui.Common.SymbolRegular.Flag24 },
+            new DeveloperToolItem { Key = "proxy", Label = Strings.Menu_DeveloperTools_LiveProxyTraffic, Symbol = Wpf.Ui.Common.SymbolRegular.ArrowSwap24 },
+            new DeveloperToolItem { Key = "logs", Label = Strings.Menu_DeveloperTools_LogViewer, Symbol = Wpf.Ui.Common.SymbolRegular.DocumentText24 },
+            new DeveloperToolItem { Key = "plugins", Label = Strings.Menu_DeveloperTools_StudioPluginInstaller, Symbol = Wpf.Ui.Common.SymbolRegular.PuzzleCube24 },
+            new DeveloperToolItem { Key = "diagnostics", Label = Strings.Menu_PhasmaStrap_Section_Diagnostics_Header, Symbol = Wpf.Ui.Common.SymbolRegular.Stethoscope24 },
+        };
+
+        private DeveloperToolItem? _selectedTool;
+        public DeveloperToolItem? SelectedTool
+        {
+            get => _selectedTool;
+            set
+            {
+                if (value is null)
+                    return;
+
+                _selectedTool = value;
+                OnPropertyChanged(nameof(SelectedTool));
+                OnPropertyChanged(nameof(SnapshotsVisibility));
+                OnPropertyChanged(nameof(ProxyVisibility));
+                OnPropertyChanged(nameof(LogsVisibility));
+                OnPropertyChanged(nameof(PluginsVisibility));
+                OnPropertyChanged(nameof(DiagnosticsVisibility));
+                OnPropertyChanged(nameof(ScrollableToolVisibility));
+
+                if (value.Key == "proxy")
+                    RefreshProxyTraffic();
+            }
+        }
+
+        private Visibility VisibleWhen(string key) => _selectedTool?.Key == key ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility SnapshotsVisibility => VisibleWhen("snapshots");
+        public Visibility ProxyVisibility => VisibleWhen("proxy");
+        public Visibility LogsVisibility => VisibleWhen("logs");
+        public Visibility PluginsVisibility => VisibleWhen("plugins");
+        public Visibility DiagnosticsVisibility => VisibleWhen("diagnostics");
+        public Visibility ScrollableToolVisibility => _selectedTool?.Key == "diagnostics" ? Visibility.Collapsed : Visibility.Visible;
 
         public ObservableCollection<SnapshotRow> Snapshots { get; } = new();
 
@@ -29,6 +74,13 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             get => _newSnapshotName;
             set { _newSnapshotName = value; OnPropertyChanged(nameof(NewSnapshotName)); }
+        }
+
+        private string _snapshotStatus = "";
+        public string SnapshotStatus
+        {
+            get => _snapshotStatus;
+            private set { _snapshotStatus = value; OnPropertyChanged(nameof(SnapshotStatus)); }
         }
 
         private SnapshotRow? _selectedSnapshotA;
@@ -50,8 +102,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string DiffSummary => (SelectedSnapshotA, SelectedSnapshotB) switch
         {
             (null, _) or (_, null) => "Pick two snapshots above to compare them.",
-            _ when DiffEntries.Count == 0 => "No differences - these two snapshots have identical flags.",
-            _ => $"{DiffEntries.Count} difference(s).",
+            _ when ReferenceEquals(SelectedSnapshotA, SelectedSnapshotB) => "Those are the same snapshot, so there is nothing to compare.",
+            _ when DiffEntries.Count == 0 => "No differences, these two snapshots have identical flags.",
+            _ => $"{DiffEntries.Count} difference(s): {DiffEntries.Count(e => e.ChangeType == "Added")} added, {DiffEntries.Count(e => e.ChangeType == "Removed")} removed, {DiffEntries.Count(e => e.ChangeType == "Changed")} changed.",
         };
 
         public ICommand SaveSnapshotCommand => new RelayCommand(SaveSnapshot);
@@ -60,12 +113,31 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void SaveSnapshot()
         {
-            if (string.IsNullOrWhiteSpace(NewSnapshotName))
-                return;
+            string name = NewSnapshotName.Trim();
 
-            FastFlagSnapshotManager.Save(NewSnapshotName.Trim());
+            if (string.IsNullOrEmpty(name))
+            {
+                SnapshotStatus = "Give the snapshot a name first.";
+                return;
+            }
+
+            bool replacing = Snapshots.Any(row => string.Equals(row.Name, name, StringComparison.OrdinalIgnoreCase));
+            int count = App.FastFlags.Prop.Count;
+
+            try
+            {
+                FastFlagSnapshotManager.Save(name);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Saving snapshot '{name}' failed: {ex.Message}");
+                SnapshotStatus = $"Could not save that snapshot: {ex.Message}";
+                return;
+            }
+
             NewSnapshotName = "";
             RefreshSnapshots();
+            SnapshotStatus = $"{(replacing ? "Replaced" : "Saved")} '{name}' with {count} flag(s).";
         }
 
         private void ApplySnapshot(SnapshotRow? row)
@@ -80,7 +152,16 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (confirm != MessageBoxResult.Yes)
                 return;
 
-            FastFlagSnapshotManager.Apply(row.Snapshot);
+            try
+            {
+                FastFlagSnapshotManager.Apply(row.Snapshot);
+                SnapshotStatus = $"Applied '{row.Name}'. {App.FastFlags.Prop.Count} flag(s) are set and saved to ClientAppSettings.json.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Applying snapshot '{row.Name}' failed: {ex.Message}");
+                SnapshotStatus = $"Could not apply that snapshot: {ex.Message}";
+            }
         }
 
         private void DeleteSnapshot(SnapshotRow? row)
@@ -88,24 +169,44 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (row is null)
                 return;
 
-            FastFlagSnapshotManager.Delete(row.Name);
+            try
+            {
+                FastFlagSnapshotManager.Delete(row.Name);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Deleting snapshot '{row.Name}' failed: {ex.Message}");
+                SnapshotStatus = $"Could not delete that snapshot: {ex.Message}";
+                return;
+            }
+
             RefreshSnapshots();
+            SnapshotStatus = $"Deleted '{row.Name}'.";
         }
 
         private void RefreshSnapshots()
         {
+            string? keptA = _selectedSnapshotA?.Name;
+            string? keptB = _selectedSnapshotB?.Name;
+
             Snapshots.Clear();
             foreach (FastFlagSnapshot snapshot in FastFlagSnapshotManager.List())
                 Snapshots.Add(new SnapshotRow { Snapshot = snapshot });
 
             OnPropertyChanged(nameof(Snapshots));
+
+            _selectedSnapshotA = Snapshots.FirstOrDefault(row => row.Name == keptA);
+            _selectedSnapshotB = Snapshots.FirstOrDefault(row => row.Name == keptB);
+            OnPropertyChanged(nameof(SelectedSnapshotA));
+            OnPropertyChanged(nameof(SelectedSnapshotB));
+            RefreshDiff();
         }
 
         private void RefreshDiff()
         {
             DiffEntries.Clear();
 
-            if (SelectedSnapshotA is not null && SelectedSnapshotB is not null)
+            if (SelectedSnapshotA is not null && SelectedSnapshotB is not null && !ReferenceEquals(SelectedSnapshotA, SelectedSnapshotB))
             {
                 foreach (FastFlagDiffEntry entry in FastFlagSnapshotManager.Diff(SelectedSnapshotA.Snapshot.Flags, SelectedSnapshotB.Snapshot.Flags))
                     DiffEntries.Add(entry);
@@ -114,9 +215,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(DiffSummary));
         }
 
-        // --- live proxy traffic log ---
-
         public ObservableCollection<ProxyTrafficEntry> ProxyTraffic { get; } = new();
+
+        private string _proxyStatus = "";
+        public string ProxyStatus
+        {
+            get => _proxyStatus;
+            private set { _proxyStatus = value; OnPropertyChanged(nameof(ProxyStatus)); }
+        }
 
         public ICommand RefreshProxyTrafficCommand => new RelayCommand(RefreshProxyTraffic);
         public ICommand ClearProxyTrafficCommand => new RelayCommand(() => { ProxyTrafficLog.Clear(); RefreshProxyTraffic(); });
@@ -126,10 +232,39 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ProxyTraffic.Clear();
             foreach (ProxyTrafficEntry entry in ProxyTrafficLog.Recent)
                 ProxyTraffic.Add(entry);
+
+            RefreshProxyStatus();
         }
 
-        // the proxy raises Changed for every single request; rebuilding a 200-row list per request
-        // stalled the window during gameplay, so refreshes are coalesced to a few per second
+        private void RefreshProxyStatus()
+        {
+            try
+            {
+                if (AssetProxyServer.IsRunning)
+                {
+                    ProxyStatus = ProxyTraffic.Count == 0
+                        ? "This window is hosting the proxy. Nothing has gone through it yet."
+                        : $"This window is hosting the proxy. {ProxyTraffic.Count} request(s) recorded.";
+                    return;
+                }
+
+                if (!App.Settings.Prop.NetworkingProxyEnabled)
+                {
+                    ProxyStatus = "The networking proxy is turned off, so no requests are being intercepted.";
+                    return;
+                }
+
+                ProxyStatus = ProxyHealth.IsHostedAnywhere()
+                    ? "Another PhasmaStrap process is hosting the proxy, so its requests cannot be read from this window."
+                    : "The proxy is turned on but is not listening at the moment.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Could not read proxy state: {ex.Message}");
+                ProxyStatus = "Could not work out where the proxy is running.";
+            }
+        }
+
         private readonly System.Windows.Threading.DispatcherTimer _trafficRefreshTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
         private bool _trafficRefreshHooked;
 
@@ -152,8 +287,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }));
         }
 
-        // --- unified log viewer ---
-
         private string _logText = "";
         public string LogText
         {
@@ -161,22 +294,51 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             private set { _logText = value; OnPropertyChanged(nameof(LogText)); }
         }
 
-        public ICommand RefreshLogsCommand => new RelayCommand(RefreshLogs);
-        public ICommand CopyLogsCommand => new RelayCommand(() =>
+        public string LogDescription => "The tail of the four newest PhasmaStrap logs and of the newest Roblox log, joined together.";
+
+        private string _logStatus = "";
+        public string LogStatus
         {
+            get => _logStatus;
+            private set { _logStatus = value; OnPropertyChanged(nameof(LogStatus)); }
+        }
+
+        public ICommand RefreshLogsCommand => new RelayCommand(RefreshLogs);
+        public ICommand CopyLogsCommand => new RelayCommand(CopyLogs);
+
+        private void CopyLogs()
+        {
+            if (string.IsNullOrEmpty(LogText))
+            {
+                LogStatus = "There is nothing to copy yet.";
+                return;
+            }
+
             try
             {
                 Clipboard.SetText(LogText);
+                LogStatus = $"Copied {LogText.Length:N0} characters to the clipboard.";
             }
             catch (Exception ex)
             {
                 App.Logger.WriteLine("DeveloperToolsViewModel", $"Copy logs failed: {ex.Message}");
+                LogStatus = $"Could not copy to the clipboard: {ex.Message}";
             }
-        });
+        }
 
         private void RefreshLogs()
         {
-            LogText = BuildLogText();
+            LogStatus = "Reading the logs...";
+
+            _ = Task.Run(() =>
+            {
+                string text = BuildLogText();
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LogText = text;
+                    LogStatus = $"Read at {DateTime.Now:HH:mm:ss}.";
+                }));
+            });
         }
 
         private static string BuildLogText()
@@ -184,10 +346,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             const int MaxCharsPerLog = 100_000;
             var sb = new System.Text.StringBuilder();
 
-            // every PhasmaStrap process (this settings window, each Bootstrapper/Watcher game
-            // session, elevated helpers) writes its own log file - showing only this process's
-            // log hid everything that actually matters for diagnosing gameplay features
-            // (overlays, hotkeys, replay, proxy), since those run in the Watcher process
             try
             {
                 var recentLogs = Directory.Exists(Paths.Logs)
@@ -219,13 +377,15 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 if (Directory.Exists(Paths.RobloxLogs))
                 {
-                    // FileInfo already carries the timestamp from the enumeration - the Roblox log
-                    // folder routinely holds thousands of files, so no per-file stat calls here
                     string? latest = new DirectoryInfo(Paths.RobloxLogs).GetFiles()
                         .OrderByDescending(f => f.LastWriteTimeUtc)
                         .FirstOrDefault()?.FullName;
 
                     AppendTail(sb, latest, MaxCharsPerLog);
+                }
+                else
+                {
+                    sb.AppendLine("(not found)");
                 }
             }
             catch (Exception ex)
@@ -248,13 +408,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 using FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-                // only read the tail - these logs are routinely multi-megabyte
                 long start = Math.Max(0, stream.Length - (long)maxChars * 2);
                 stream.Seek(start, SeekOrigin.Begin);
 
                 using var reader = new StreamReader(stream);
                 if (start > 0)
-                    reader.ReadLine(); // drop the partial first line
+                    reader.ReadLine();
 
                 string content = reader.ReadToEnd();
                 sb.AppendLine(content.Length > maxChars ? content[^maxChars..] : content);
@@ -264,9 +423,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 sb.AppendLine($"(could not read '{path}': {ex.Message})");
             }
         }
-
-        // --- Studio plugin installer (by asset ID - see RobloxAssetDownloader's doc comment for
-        // why this doesn't curate/endorse a specific plugin list) ---
 
         private string _pluginAssetId = "";
         public string PluginAssetId
@@ -282,12 +438,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             private set { _pluginInstallStatus = value; OnPropertyChanged(nameof(PluginInstallStatus)); }
         }
 
+        private static string PluginsFolder => Path.Combine(Paths.LocalAppData, "Roblox", "Plugins");
+
         public ICommand InstallPluginCommand => new AsyncRelayCommand(InstallPluginAsync);
-        public ICommand OpenPluginsFolderCommand => new RelayCommand(() =>
+        public ICommand OpenPluginsFolderCommand => new RelayCommand(OpenPluginsFolder);
+
+        private void OpenPluginsFolder()
         {
-            Directory.CreateDirectory(Paths.LocalAppData + @"\Roblox\Plugins");
-            Process.Start("explorer.exe", Path.Combine(Paths.LocalAppData, "Roblox", "Plugins"));
-        });
+            try
+            {
+                Directory.CreateDirectory(PluginsFolder);
+                Process.Start(new ProcessStartInfo { FileName = PluginsFolder, UseShellExecute = true });
+                PluginInstallStatus = $"Opened {PluginsFolder}.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Opening the plugins folder failed: {ex.Message}");
+                PluginInstallStatus = $"Could not open {PluginsFolder}: {ex.Message}";
+            }
+        }
 
         private async Task InstallPluginAsync()
         {
@@ -306,40 +475,66 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 return;
             }
 
+            if (!LooksLikeRobloxModel(result.Bytes))
+            {
+                PluginInstallStatus = "That asset is not a Studio model file, so it cannot be a plugin. Check the ID.";
+                return;
+            }
+
             try
             {
-                string pluginsFolder = Path.Combine(Paths.LocalAppData, "Roblox", "Plugins");
-                Directory.CreateDirectory(pluginsFolder);
+                Directory.CreateDirectory(PluginsFolder);
 
-                string destination = Path.Combine(pluginsFolder, $"Plugin_{assetId}.rbxm");
+                string destination = Path.Combine(PluginsFolder, $"Plugin_{assetId}.rbxm");
                 File.WriteAllBytes(destination, result.Bytes);
 
                 PluginInstallStatus = $"Installed to {destination}. Restart Studio to load it.";
             }
             catch (Exception ex)
             {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Installing plugin {assetId} failed: {ex.Message}");
                 PluginInstallStatus = $"Install failed: {ex.Message}";
             }
         }
 
+        private static bool LooksLikeRobloxModel(byte[] bytes)
+        {
+            byte[] signature = System.Text.Encoding.ASCII.GetBytes("<roblox");
+
+            if (bytes.Length < signature.Length)
+                return false;
+
+            for (int i = 0; i < signature.Length; i++)
+            {
+                if (bytes[i] != signature[i])
+                    return false;
+            }
+
+            return true;
+        }
+
         public DeveloperToolsViewModel()
         {
+            _selectedTool = Tools[0];
+
             RefreshSnapshots();
             RefreshProxyTraffic();
 
-            // the log tails are the slow part (several files, disk reads) - keep them off the
-            // UI thread so opening the page doesn't hang the window
             LogText = "Loading logs...";
+            LogStatus = "Reading the logs...";
             _ = Task.Run(() =>
             {
                 string text = BuildLogText();
-                Application.Current?.Dispatcher.BeginInvoke(new Action(() => LogText = text));
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LogText = text;
+                    LogStatus = $"Read at {DateTime.Now:HH:mm:ss}.";
+                }));
             });
 
             ProxyTrafficLog.Changed += OnProxyTrafficChanged;
         }
 
-        // the page instance is cached by the navigation, so Detach/Attach bracket each visit
         public void Attach()
         {
             ProxyTrafficLog.Changed -= OnProxyTrafficChanged;
@@ -350,6 +545,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public void Detach()
         {
             ProxyTrafficLog.Changed -= OnProxyTrafficChanged;
+            _trafficRefreshTimer.Stop();
         }
     }
 }

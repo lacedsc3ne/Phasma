@@ -4,19 +4,6 @@ using Microsoft.Win32;
 
 namespace PhasmaStrap.Integrations
 {
-    // Reads (and, for the account switcher below, backs up/restores) the .ROBLOSECURITY session
-    // cookie Roblox's own client keeps on this machine, DPAPI-encrypted under your Windows account
-    // inside RobloxCookies.dat. Ported from Voidstrap.
-    //
-    // Security note: neither PhasmaStrap nor Voidstrap re-encrypts the cookie itself with its own
-    // DPAPI call for storage. Instead, RobloxCookies.dat's "CookiesData" field is ALREADY a
-    // DataProtectionScope.CurrentUser-protected blob written by Roblox's own client - so every
-    // backup made by the account switcher (see AccountSwitcherViewModel) is just a byte-for-byte
-    // copy of that already-encrypted container, decryptable only by the same Windows account that
-    // created it. This file only calls ProtectedData.Unprotect/Protect directly when synthesizing a
-    // brand new dat from a pasted cookie (SynthesizeDatWithCookie), where an existing dat is used as
-    // a template and just has its cookie value swapped inside the decrypted blob before
-    // re-protecting it the same way Roblox does.
     public static class RobloxCookie
     {
         public sealed class RobloxAccount
@@ -31,9 +18,6 @@ namespace PhasmaStrap.Integrations
         private static readonly Regex WarningRegex = new(@"(_\|WARNING:-DO-NOT-SHARE[^\s;,""']+)", RegexOptions.Compiled);
         private static readonly Regex NamedRegex = new(@"\.ROBLOSECURITY[\s=]+([^\s;,""']+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        // dedicated client (cookies disabled) so an explicit Cookie header we set per-request for a
-        // candidate/saved account is never mixed with whichever account App.HttpClient's own cookie
-        // container might otherwise be tracking
         private static readonly HttpClient AuthClient = new(new HttpClientHandler { UseCookies = false })
         {
             Timeout = TimeSpan.FromSeconds(12)
@@ -41,11 +25,6 @@ namespace PhasmaStrap.Integrations
 
         private static string CookiesDatPath => Path.Combine(Paths.LocalAppData, "Roblox", "LocalStorage", "RobloxCookies.dat");
 
-        /// <summary>
-        /// Full path to Roblox's own live cookie store. Whatever's in this file when Roblox next
-        /// starts is the account it launches as - this is the entire integration point the account
-        /// switcher needs, no launch-path hook required.
-        /// </summary>
         public static string LiveCookiesDatPath => CookiesDatPath;
 
         public static string? Get()
@@ -57,11 +36,6 @@ namespace PhasmaStrap.Integrations
             return ReadFromRegistry();
         }
 
-        /// <summary>
-        /// Calls the authenticated users.roblox.com endpoint with the given .ROBLOSECURITY cookie to
-        /// verify it's live and resolve which account it belongs to. Returns null if the cookie is
-        /// missing, expired, or invalid.
-        /// </summary>
         public static async Task<RobloxAccount?> GetAccountAsync(string cookie, CancellationToken ct = default)
         {
             if (string.IsNullOrEmpty(cookie))
@@ -99,23 +73,11 @@ namespace PhasmaStrap.Integrations
 
         public static Task<RobloxAccount?> GetAccountAsync(CancellationToken ct = default) => GetAccountAsync(Get() ?? "", ct);
 
-        /// <summary>
-        /// Decrypts and returns the .ROBLOSECURITY cookie stored inside an arbitrary RobloxCookies.dat
-        /// file (e.g. one of the account switcher's own backups), rather than the live one.
-        /// </summary>
         public static string? ExtractCookieFromDat(string datPath)
         {
             return ReadFromDat(datPath);
         }
 
-        /// <summary>
-        /// Builds a new RobloxCookies.dat at <paramref name="outputDatPath"/> by taking an existing,
-        /// valid dat file as a template (its JSON shape/other fields are preserved verbatim) and
-        /// swapping only the cookie value inside its decrypted "CookiesData" blob for
-        /// <paramref name="newCookie"/>, then re-encrypting with the same DPAPI call Roblox itself
-        /// uses (DataProtectionScope.CurrentUser). This is how a raw pasted cookie gets turned into a
-        /// dat file the Roblox client will actually accept, without needing to know its full format.
-        /// </summary>
         public static bool SynthesizeDatWithCookie(string templateDatPath, string newCookie, string outputDatPath)
         {
             try
@@ -123,7 +85,6 @@ namespace PhasmaStrap.Integrations
                 if (string.IsNullOrEmpty(newCookie) || string.IsNullOrEmpty(templateDatPath) || !File.Exists(templateDatPath))
                     return false;
 
-                // the account guard ignores PhasmaStrap's own opens of the sign-in file
                 Utility.AccountGuard.MarkOwnAccess();
 
                 using JsonDocument doc = JsonDocument.Parse(File.ReadAllText(templateDatPath));
@@ -164,7 +125,6 @@ namespace PhasmaStrap.Integrations
                 Directory.CreateDirectory(Path.GetDirectoryName(outputDatPath)!);
                 File.WriteAllBytes(outputDatPath, stream.ToArray());
 
-                // verify the write actually took by reading it back
                 return string.Equals(ExtractCookieFromDat(outputDatPath), newCookie, StringComparison.Ordinal);
             }
             catch (Exception ex)
@@ -181,7 +141,6 @@ namespace PhasmaStrap.Integrations
                 if (!File.Exists(datPath))
                     return null;
 
-                // the account guard ignores PhasmaStrap's own opens of the sign-in file
                 Utility.AccountGuard.MarkOwnAccess();
 
                 using JsonDocument doc = JsonDocument.Parse(File.ReadAllText(datPath));

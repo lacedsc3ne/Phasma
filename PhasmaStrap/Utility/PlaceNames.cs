@@ -2,10 +2,6 @@ using PhasmaStrap.Integrations;
 
 namespace PhasmaStrap.Utility
 {
-    // Names of the places inside games made of several places (Blade Ball: lobby, ranked, duels...),
-    // so the recently played lists can tell them apart - playtime is kept per place. Also knows each
-    // place's start place, because the other places often can't be joined directly.
-    // Cached in Cache\PlaceNames.json (its own file: the Watcher writes the playtime file).
     public static class PlaceNames
     {
         private const string LOG_IDENT = "PlaceNames";
@@ -46,7 +42,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // "" for a start place (or one not looked up) - those just show the game's name
         public static string NameOf(long placeId)
         {
             lock (_lock)
@@ -59,7 +54,6 @@ namespace PhasmaStrap.Utility
                 return Places.TryGetValue(placeId, out PlaceInfo? info) && info.StartPlaceId > 0 ? info.StartPlaceId : placeId;
         }
 
-        // "Blade Ball" + "Blade Ball Ranked" -> "Blade Ball · Ranked"
         public static string Display(string gameName, long placeId)
         {
             string place = NameOf(placeId).Trim();
@@ -76,7 +70,6 @@ namespace PhasmaStrap.Utility
             return gameName.Length > 0 ? $"{gameName} · {place}" : place;
         }
 
-        // Looks up the games that appear with more than one place. True when something new was learned.
         public static async Task<bool> FillAsync(IEnumerable<PlayTimeEntry> entries)
         {
             List<IGrouping<long, PlayTimeEntry>> games;
@@ -106,7 +99,6 @@ namespace PhasmaStrap.Utility
                         foreach (UniversePlace place in places)
                             Places[place.PlaceId] = new PlaceInfo { Name = place.IsRootPlace ? "" : place.Name, StartPlaceId = summary.RootPlaceId };
 
-                        // places Roblox no longer lists (removed or private) - don't ask again every time
                         foreach (PlayTimeEntry entry in game)
                             Places.TryAdd(entry.PlaceId, new PlaceInfo { StartPlaceId = summary.RootPlaceId });
                     }

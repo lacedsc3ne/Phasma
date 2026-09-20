@@ -8,10 +8,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    // Rojo is auto-installed/managed by PhasmaStrap rather than "browse to an existing
-    // install" like the rest of ExtensionManager's entries, so it gets its own small
-    // view model driving a dedicated card on the Extensions page instead of slotting into
-    // the generic ExtensionEntry template (whose Browse/Clear actions don't apply to it).
     public class RojoViewModel : NotifyPropertyChangedViewModel
     {
         private bool _isBusy;
@@ -63,13 +59,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string InstallOrUpdateButtonText => IsInstalled ? "Update" : "Install";
         public string ServeButtonText => IsServing ? "Stop serve" : "Start serve";
 
-        // CanExecute is intentionally not used here - like the rest of this page
-        // (see BrowseCommand/ClearCommand above), enabled state is driven directly from
-        // XAML IsEnabled bindings against these computed booleans instead, since
-        // CommunityToolkit's RelayCommand doesn't auto-requery on its own. Likewise the
-        // page has no BoolToVisibility converter registered in App.xaml, so instead of
-        // toggling button visibility, Install/Update and Start/Stop serve are each a
-        // single button whose text and behavior swap based on current state.
         public bool CanInstallOrUpdate => !IsBusy && !IsServing;
         public bool CanToggleServe => IsServing || (!IsBusy && IsInstalled && CanServe);
         public bool CanUninstall => !IsBusy && IsInstalled && !IsServing;
@@ -78,9 +67,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand ToggleServeCommand => new RelayCommand(ToggleServe);
         public ICommand UninstallCommand => new AsyncRelayCommand(UninstallAsync);
 
-        // marshals progress text from RojoManager's background download/extract work back
-        // onto the UI thread - see Frontend.ShowMessageBox for the same Dispatcher.Invoke
-        // convention used elsewhere in this codebase
         private void ReportProgress(string message) =>
             Application.Current.Dispatcher.Invoke(() => StatusText = message);
 

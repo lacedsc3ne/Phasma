@@ -13,7 +13,7 @@
       Scrollable="True"
       Unloaded="Page_Unloaded">
     <StackPanel Margin="0,0,14,14">
-        <TextBlock Text="{x:Static resources:Strings.Menu_Accounts_Accounts}" FontSize="20" FontWeight="Medium" />
+        <TextBlock Text="Roblox accounts" FontSize="20" FontWeight="Medium" />
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Accounts_SaveMultipleRobloxLoginsSwitchBetween}" />
 
         <Border Margin="0,12,0,0" Padding="14" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
@@ -61,10 +61,15 @@
             <ui:Button Grid.Column="3" Content="{x:Static resources:Strings.Menu_Accounts_Folder}" Icon="Folder24" Appearance="Secondary" Margin="8,0,0,0" Command="{Binding OpenFolderCommand}" />
         </Grid>
 
-        <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}" Visibility="{Binding ImportVisibility}">
+        <ui:CardExpander Margin="0,10,0,0" Icon="PersonAdd24" IsExpanded="{Binding ImportVisible, Mode=TwoWay}">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Add an account" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{x:Static resources:Strings.Menu_Accounts_ImportAccountFromItsROBLOSECURITYCookie}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
             <StackPanel>
-                <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Accounts_ImportAccountFromItsROBLOSECURITYCookie}" />
-                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteFullROBLOSECURITYValueOnlyPaste}" />
+                <TextBlock Margin="0,0,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteFullROBLOSECURITYValueOnlyPaste}" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -74,17 +79,17 @@
                     <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Common_Import}" Icon="ArrowImport24" Appearance="Primary" Margin="8,0,0,0" Command="{Binding ImportCookieCommand}" />
                 </Grid>
                 <ui:Button Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Accounts_ImportSeveralAtOnceInstead}" Appearance="Transparent" HorizontalAlignment="Left" Padding="0" Command="{Binding ToggleBulkImportCommand}" />
-            </StackPanel>
-        </Border>
 
-        <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}" Visibility="{Binding BulkImportVisibility}">
-            <StackPanel>
-                <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Accounts_BulkImportFromCookies}" />
-                <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteOneROBLOSECURITYValuePerLine}" />
-                <ui:TextBox Text="{Binding BulkCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="10" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11" />
-                <ui:Button Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Accounts_ImportAll}" Icon="ArrowImport24" Appearance="Primary" HorizontalAlignment="Left" Command="{Binding BulkImportCookiesCommand, Mode=OneTime}" />
+                <Border Margin="0,10,0,0" Padding="12" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorSecondaryBrush}" Visibility="{Binding BulkImportVisibility}">
+                    <StackPanel>
+                        <TextBlock FontWeight="SemiBold" Text="{x:Static resources:Strings.Menu_Accounts_BulkImportFromCookies}" />
+                        <TextBlock Margin="0,2,0,8" FontSize="11" Opacity="0.7" TextWrapping="Wrap" Text="{x:Static resources:Strings.Menu_Accounts_PasteOneROBLOSECURITYValuePerLine}" />
+                        <ui:TextBox Text="{Binding BulkCookieText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="10" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11" />
+                        <ui:Button Margin="0,8,0,0" Content="{x:Static resources:Strings.Menu_Accounts_ImportAll}" Icon="ArrowImport24" Appearance="Primary" HorizontalAlignment="Left" Command="{Binding BulkImportCookiesCommand, Mode=OneTime}" />
+                    </StackPanel>
+                </Border>
             </StackPanel>
-        </Border>
+        </ui:CardExpander>
 
         <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding FilteredAccounts}">
             <ItemsControl.ItemTemplate>
@@ -139,8 +144,8 @@
         </Border>
 
         <TextBlock Margin="0,10,0,0" FontSize="12" Opacity="0.7" Text="{Binding Accounts.Count, StringFormat=Saved accounts: {0}}" />
-        <!-- ============================================================ account guard (own view model) -->
-        <StackPanel x:Name="GuardRoot" Margin="0,24,0,0">
+
+        <StackPanel x:Name="GuardRoot" Margin="0,26,0,0">
             <TextBlock Text="{x:Static resources:Strings.Menu_Accounts_AccountGuard}" FontSize="20" FontWeight="Medium" />
             <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                        Text="{x:Static resources:Strings.Menu_Accounts_WarnsYouAboutWhatLoginStealers}" />

@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Models.Entities;
+using PhasmaStrap.Models.Entities;
 using PhasmaStrap.Models.SettingTasks.Base;
 
 namespace PhasmaStrap.Models.SettingTasks
@@ -6,7 +6,7 @@ namespace PhasmaStrap.Models.SettingTasks
     public class ModPresetTask : BoolBaseTask
     {
         private Dictionary<string, ModPresetFileData> _fileDataMap = new();
-        
+
         private Dictionary<string, string> _pathMap;
 
         public ModPresetTask(string name, string path, string resource) : this(name, new() {{ path, resource }}) { }

@@ -6,9 +6,6 @@ using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
-    /// <summary>
-    /// Interaction logic for OutputConsole.xaml
-    /// </summary>
     public partial class OutputConsole
     {
         private readonly OutputConsoleViewModel _viewModel;
@@ -24,8 +21,6 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
             Closed += OnClosed;
         }
 
-        // keeps the view pinned to the newest line as the console text grows, so the reader doesn't
-        // have to manually scroll down every time new output arrives
         private void ConsoleTextBox_TextChanged(object sender, TextChangedEventArgs e) => ConsoleTextBox.ScrollToEnd();
 
         private void OnRequestClose(object? sender, EventArgs e) => Close();

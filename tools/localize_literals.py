@@ -1,19 +1,3 @@
-#!/usr/bin/env python3
-"""
-Moves hard-coded English UI text out of the settings pages' XAML into Strings.resx.
-
-    python tools/localize_literals.py --list     # just report what would move
-    python tools/localize_literals.py            # apply
-
-For every literal Header/Description/Text/Content/PlaceholderText/ToolTip/Title/Message attribute
-in PhasmaStrap/UI/Elements/Settings/Pages/*.xaml (and MainWindow.xaml) it:
-  1. reuses an existing resx entry when one already has exactly that text,
-  2. otherwise adds `Menu.<Page>.<Slug>` to Strings.resx and the matching property to
-     Strings.Designer.cs,
-  3. rewrites the attribute to {x:Static resources:Strings.Menu_<Page>_<Slug>}.
-
-Re-run tools/gen_settings_search_index.py afterwards.
-"""
 from __future__ import annotations
 
 import html
@@ -33,23 +17,20 @@ ATTRS = ("Header", "Description", "Text", "Content", "PlaceholderText", "ToolTip
 ATTR_RE = re.compile(r'\s(' + "|".join(ATTRS) + r')="([^"{}]*)"')
 RESOURCES_NS = 'xmlns:resources="clr-namespace:PhasmaStrap.Resources"'
 
-
 def read(p): return open(p, encoding="utf-8-sig").read()
 def write(p, s): open(p, "w", encoding="utf-8", newline="").write(s)
-
 
 def worth_localizing(value: str) -> bool:
     v = html.unescape(value).strip()
     if len(v) < 2:
         return False
     if not re.search(r"[A-Za-z]{2,}", v):
-        return False  # numbers, units, glyphs
+        return False
     if re.fullmatch(r"[A-Za-z0-9_.\-]+\.(png|jpg|xaml|json|exe|dll)", v):
-        return False  # file names
+        return False
     if v.startswith("http"):
         return False
     return True
-
 
 def slug(text: str) -> str:
     words = re.findall(r"[A-Za-z0-9]+", html.unescape(text))
@@ -61,9 +42,7 @@ def slug(text: str) -> str:
         s = "N" + s
     return s[:60]
 
-
 def existing_resx() -> tuple[dict[str, str], set[str]]:
-    """value -> key (first wins), plus all keys."""
     text = read(RESX)
     by_value: dict[str, str] = {}
     keys: set[str] = set()
@@ -73,14 +52,13 @@ def existing_resx() -> tuple[dict[str, str], set[str]]:
         by_value.setdefault(value.strip(), key)
     return by_value, keys
 
-
 def main() -> int:
     dry = "--list" in sys.argv
     by_value, keys = existing_resx()
     designer_props = set(re.findall(r"public static string (\w+) \{", read(DESIGNER)))
 
     files = sorted(os.path.join(PAGES, f) for f in os.listdir(PAGES) if f.endswith(".xaml")) + EXTRA
-    new_entries: list[tuple[str, str]] = []  # (key, text)
+    new_entries: list[tuple[str, str]] = []
     total_replaced = 0
     per_file: list[tuple[str, int]] = []
 
@@ -88,7 +66,6 @@ def main() -> int:
         xaml = read(path)
         root_class = re.search(r'x:Class="[\w.]+\.(\w+)"', xaml)
         page = (root_class.group(1) if root_class else os.path.splitext(os.path.basename(path))[0]).replace("Page", "") or "Window"
-        # never touch the root element's own attributes (Title="XPage" etc.)
         root_end = xaml.find(">", xaml.find("<ui:UiPage") if "<ui:UiPage" in xaml else xaml.find("<"))
         head, body = xaml[: root_end + 1], xaml[root_end + 1:]
 
@@ -139,12 +116,8 @@ def main() -> int:
     designer = read(DESIGNER)
     props = ""
     for k, t in new_entries:
-        comment = re.sub(r"\s+", " ", t).replace("*/", "* /")[:120]
         props += (
             "        \n"
-            "        /// <summary>\n"
-            f"        ///   Looks up a localized string similar to {comment}.\n"
-            "        /// </summary>\n"
             f"        public static string {k.replace('.', '_')} {{\n"
             "            get {\n"
             f"                return ResourceManager.GetString(\"{k}\", resourceCulture);\n"
@@ -157,7 +130,6 @@ def main() -> int:
     write(DESIGNER, designer[:idx] + props + designer[idx:])
     print("resx + Designer.cs updated")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

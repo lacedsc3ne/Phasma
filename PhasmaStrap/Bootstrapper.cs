@@ -1,13 +1,4 @@
-// To debug the automatic updater:
-// - Uncomment the definition below
-// - Publish the executable
-// - Launch the executable (click no when it asks you to upgrade)
-// - Launch Roblox (for testing web launches, run it from the command prompt)
-// - To re-test the same executable, delete it from the installation folder
-
-// #define DEBUG_UPDATER
-
-#if DEBUG_UPDATER
+﻿#if DEBUG_UPDATER
 #warning "Automatic updater debugging is enabled"
 #endif
 
@@ -38,7 +29,7 @@ namespace PhasmaStrap
         #region Properties
         private const int ProgressBarMaximum = 10000;
 
-        private const double TaskbarProgressMaximumWpf = 1; // this can not be changed. keep it at 1.
+        private const double TaskbarProgressMaximumWpf = 1;
         private const int TaskbarProgressMaximumWinForms = WinFormsDialogBase.TaskbarProgressMaximum;
 
         private const string AppSettings =
@@ -60,7 +51,6 @@ namespace PhasmaStrap
         private string _latestVersionDirectory = null!;
         private PackageManifest _versionPackageManifest = null!;
 
-        // version manager: this launch uses a held/pinned version from disk instead of the latest
         private bool _usingKeptVersion;
         private string _versionManifestText = "";
         private bool _channelFetched = false;
@@ -72,10 +62,6 @@ namespace PhasmaStrap
         private long _totalDownloadedBytes = 0;
         private bool _packageExtractionSuccess = true;
 
-        // shared cap on concurrent in-flight HTTP GET/range requests across every package/segment
-        // being downloaded at once (see DownloadConfiguration.NormalizeConcurrent/NormalizeSegments) -
-        // set up once per UpgradeRoblox call so the two settings can't multiply into an unbounded
-        // number of simultaneous connections to Roblox's CDN
         private SemaphoreSlim? _downloadRequestThrottle;
 
         private bool _mustUpgrade => App.LaunchSettings.ForceFlag.Active || App.State.Prop.ForceReinstall || String.IsNullOrEmpty(AppData.DistributionState.VersionGuid) || !File.Exists(AppData.ExecutablePath);
@@ -101,11 +87,8 @@ namespace PhasmaStrap
         {
             _launchMode = launchMode;
 
-            // https://github.com/icsharpcode/SharpZipLib/blob/master/src/ICSharpCode.SharpZipLib/Zip/FastZip.cs/#L669-L680
-            // exceptions don't get thrown if we define events without actually binding to the failure events. probably a bug. ¯\_(ツ)_/¯
             _fastZipEvents.FileFailure += (_, e) =>
             {
-                // only give a pass to font files (no idea whats wrong with them)
                 if (!e.Name.EndsWith(".ttf"))
                     throw e.Exception;
 
@@ -139,25 +122,18 @@ namespace PhasmaStrap
             if (Dialog is null)
                 return;
 
-            // downloads can now run concurrently (see MaxConcurrentDownloads/MaxDownloadSegments),
-            // so this can be called from background threads - the WPF-based dialogs' ProgressValue
-            // setters aren't self-marshaling like WinFormsDialogBase's, so bounce onto the UI thread
             if (System.Windows.Application.Current is not null && !System.Windows.Application.Current.Dispatcher.CheckAccess())
             {
                 System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(UpdateProgressBar));
                 return;
             }
 
-            // UI progress
             int progressValue = (int)Math.Floor(_progressIncrement * _totalDownloadedBytes);
 
-            // bugcheck: if we're restoring a file from a package, it'll incorrectly increment the progress beyond 100
-            // too lazy to fix properly so lol
             progressValue = Math.Clamp(progressValue, 0, ProgressBarMaximum);
 
             Dialog.ProgressValue = progressValue;
 
-            // taskbar progress
             double taskbarProgressValue = _taskbarProgressIncrement * _totalDownloadedBytes;
             taskbarProgressValue = Math.Clamp(taskbarProgressValue, 0, _taskbarProgressMaximum);
 
@@ -178,7 +154,6 @@ namespace PhasmaStrap
             if (exception is AggregateException)
                 exception = exception.InnerException!;
 
-            // https://gist.github.com/pizzaboxer/4b58303589ee5b14cc64397460a8f386
             if (exception is HttpRequestException && exception.InnerException is null)
                 message = String.Format(Strings.Dialog_Connectivity_RobloxDown, "[status.roblox.com](https://status.roblox.com)");
 
@@ -188,22 +163,21 @@ namespace PhasmaStrap
                 message += $"\n\n{Strings.Dialog_Connectivity_RobloxUpgradeSkip}";
 
             Frontend.ShowConnectivityDialog(
-                String.Format(Strings.Dialog_Connectivity_UnableToConnect, "Roblox"), 
-                message, 
+                String.Format(Strings.Dialog_Connectivity_UnableToConnect, "Roblox"),
+                message,
                 _mustUpgrade ? MessageBoxImage.Error : MessageBoxImage.Warning,
                 exception);
 
             if (_mustUpgrade)
                 App.Terminate(ErrorCode.ERROR_CANCELLED);
         }
-        
+
         public async Task Run()
         {
             const string LOG_IDENT = "Bootstrapper::Run";
 
             App.Logger.WriteLine(LOG_IDENT, "Running bootstrapper");
 
-            // this is now always enabled as of v2.8.0
             if (Dialog is not null)
                 Dialog.CancelEnabled = true;
 
@@ -215,12 +189,12 @@ namespace PhasmaStrap
 
             if (connectionResult is not null)
                 HandleConnectionError(connectionResult);
-            
+
 #if (!DEBUG || DEBUG_UPDATER) && !QA_BUILD
             if (App.Settings.Prop.CheckForUpdates && !App.LaunchSettings.UpgradeFlag.Active)
             {
                 bool updatePresent = await CheckForUpdates();
-                
+
                 if (updatePresent)
                     return;
             }
@@ -228,7 +202,6 @@ namespace PhasmaStrap
 
             App.AssertWindowsOSVersion();
 
-            // if we dont know our launch type, find out now!
             if (_launchMode == LaunchMode.Unknown)
             {
                 await SafeGetLatestVersionInfo();
@@ -236,9 +209,6 @@ namespace PhasmaStrap
                 if (_launchMode == LaunchMode.Unknown)
                     throw new ApplicationException("Failed to deduce launch type");
             }
-
-            // ensure only one instance of the bootstrapper is running at the time
-            // so that we don't have stuff like two updates happening simultaneously
 
             bool mutexExists = Utilities.DoesMutexExist(MutexName);
 
@@ -256,13 +226,11 @@ namespace PhasmaStrap
                 }
             }
 
-            // wait for mutex to be released if it's not yet
             await using var mutex = new AsyncMutex(false, MutexName);
             await mutex.AcquireAsync(_cancelTokenSource.Token);
 
             _mutex = mutex;
 
-            // reload our configs since they've likely changed by now
             if (mutexExists)
             {
                 App.Settings.Load();
@@ -272,13 +240,12 @@ namespace PhasmaStrap
 
             await SafeGetLatestVersionInfo();
 
-            CleanupVersionsFolder(); // cleanup after background updater
+            CleanupVersionsFolder();
 
             bool allModificationsApplied = true;
 
             if (!_noConnection)
             {
-                // a held/pinned version that's already on disk is switched to, not installed
                 if (_usingKeptVersion && AppData.DistributionState.VersionGuid != _latestVersionGuid)
                     SwitchToKeptVersion();
 
@@ -290,11 +257,10 @@ namespace PhasmaStrap
 
                     if (backgroundUpdaterMutexOpen && _mustUpgrade)
                     {
-                        // I am Forced Upgrade, killer of Background Updates
                         Utilities.KillBackgroundUpdater();
                         backgroundUpdaterMutexOpen = false;
                     }
-                   
+
                     if (!backgroundUpdaterMutexOpen)
                     {
                         if (IsEligibleForBackgroundUpdate())
@@ -307,12 +273,8 @@ namespace PhasmaStrap
                 if (_cancelTokenSource.IsCancellationRequested)
                     return;
 
-                // we require deployment details for applying modifications for a worst case scenario,
-                // where we'd need to restore files from a package that isn't present on disk and needs to be redownloaded
                 allModificationsApplied = await ApplyModifications();
 
-                // a fresh Roblox version ships a fresh ssl\cacert.pem - re-add the proxy CA to it
-                // or every intercepted request from the new client fails its TLS handshake
                 if (App.Settings.Prop.NetworkingProxyEnabled)
                 {
                     try
@@ -322,7 +284,7 @@ namespace PhasmaStrap
                         if (!Networking.AssetProxyCA.IsRobloxTrustBundlePatched())
                         {
                             App.Logger.WriteLine(LOG_IDENT, "Roblox's trust bundle does not contain the proxy certificate after patching - spoofers will not work this session");
-                            UI.NotificationCenter.Notify("Proxy certificate not accepted", "Roblox's certificate bundle could not be patched, so Asset Warp and the spoofers won't work this session. Check the Networking page.", UI.NotificationCategory.General);
+                            UI.NotificationCenter.Notify("Proxy certificate not accepted", "Roblox's certificate bundle could not be patched, so Asset Warp and the spoofers won't work this session. Check the Networking page.", UI.NotificationCategory.General, kind: UI.NotificationKindId.ProxyCertificate);
                         }
                     }
                     catch (Exception ex)
@@ -331,8 +293,6 @@ namespace PhasmaStrap
                     }
                 }
             }
-
-            // check registry entries for every launch, just in case the stock bootstrapper changes it back
 
             if (IsStudioLaunch)
                 WindowsRegistry.RegisterStudio();
@@ -346,7 +306,6 @@ namespace PhasmaStrap
             {
                 if (!App.LaunchSettings.QuietFlag.Active)
                 {
-                    // show some balloon tips
                     if (!_packageExtractionSuccess)
                         Frontend.ShowBalloonTip(Strings.Bootstrapper_ExtractionFailed_Title, Strings.Bootstrapper_ExtractionFailed_Message, ToolTipIcon.Warning);
                     else if (!allModificationsApplied)
@@ -358,24 +317,21 @@ namespace PhasmaStrap
                     if (App.Settings.Prop.MatchmakerEnabled)
                         await TryApplyMatchmakingAsync();
 
-                    // which game this is, and so which FastFlag profile it gets (if any)
                     LaunchGame game = App.Settings.Prop.UseFastFlagManager ? await ResolveLaunchGameAsync() : LaunchGame.Unknown;
                     Utility.FlagProfile? profile = game.Known ? Utility.FlagLayers.ProfileFor(App.FlagProfiles.Prop, game.PlaceId, game.UniverseId) : null;
+
+                    if (!game.Known && App.Settings.Prop.UseFastFlagManager)
+                        Utility.FlagProfileSession.NoteLaunchWithoutGame(App.FlagProfiles.Prop);
+
                     var wanted = Utility.FlagProfileSession.Wanted.Of(profile);
 
-                    // if Roblox is already open with different flags it has to go first - otherwise it
-                    // just takes this join over and never reads what is about to be written
                     bool startsNewClient = await Utility.FlagProfileSession.PrepareLaunchAsync(wanted, game.Known);
 
                     bool flagsWritten = await WriteLaunchFlagsAsync(profile);
 
-                    // the Watcher checks the running Roblox's own flags file at the join; this note
-                    // is its fallback when that file can't tell (see FlagProfileSession)
                     if (startsNewClient || flagsWritten)
                         Utility.FlagProfileSession.RecordLaunch(flagsWritten ? wanted : Utility.FlagProfileSession.Wanted.None);
 
-                    // fire-and-forget: warms the AssetWarp preload cache ahead of the game
-                    // actually asking, never something a launch should wait on or fail over
                     if (App.Settings.Prop.AssetWarpEnabled && App.Settings.Prop.AssetWarpPreloadEnabled)
                     {
                         _ = Networking.AssetPreloadCache.PreloadAvatarAsync();
@@ -481,17 +437,10 @@ namespace PhasmaStrap
             key.SetValueSafe("www.roblox.com", Deployment.IsDefaultChannel ? "" : Deployment.Channel);
         }
 
-        /// <summary>
-        /// Will throw whatever HttpClient can throw
-        /// </summary>
-        /// <returns></returns>
         private async Task GetLatestVersionInfo()
         {
             const string LOG_IDENT = "Bootstrapper::GetLatestVersionInfo";
 
-            // before we do anything, we need to query our channel
-            // if it's set in the launch uri, we need to use it and set the registry key for it
-            // else, check if the registry key for it exists, and use it
             FetchCurrentChannel();
 
             string? newVersionGuid = null;
@@ -522,7 +471,6 @@ namespace PhasmaStrap
                 {
                     Utility.RobloxVersions.RecordLatest(newVersionGuid, clientVersion.Version);
 
-                    // version manager: hold the installed version, or use a pinned one from disk
                     string? chosen = Utility.RobloxVersions.Choose(newVersionGuid, AppData.DistributionState.VersionGuid, out string? why);
 
                     if (why is not null)
@@ -541,7 +489,6 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Version set to {App.LaunchSettings.VersionFlag.Data} from arguments");
                 newVersionGuid = App.LaunchSettings.VersionFlag.Data;
-                // we can't determine the version
             }
 
             if (newVersionGuid != _latestVersionGuid)
@@ -551,8 +498,6 @@ namespace PhasmaStrap
 
                 _latestVersionDirectory = Path.Combine(Paths.Versions, _latestVersionGuid);
 
-                // Roblox stops serving a version's package list soon after a newer one ships, so a
-                // held or pinned version uses the copy kept in its own folder
                 string? pkgManifestData = _usingKeptVersion ? Utility.RobloxVersions.ReadManifestCopy(_latestVersionGuid) : null;
 
                 if (pkgManifestData is null)
@@ -560,7 +505,6 @@ namespace PhasmaStrap
                     string pkgManifestUrl = Deployment.GetLocation($"/{_latestVersionGuid}-rbxPkgManifest.txt");
                     pkgManifestData = await App.HttpClient.GetStringAsync(pkgManifestUrl);
 
-                    // the installed version keeps a copy while it can still be had
                     Utility.RobloxVersions.SaveManifestCopy(_latestVersionGuid, pkgManifestData);
                 }
 
@@ -568,7 +512,6 @@ namespace PhasmaStrap
                 _versionPackageManifest = new(pkgManifestData);
             }
 
-            // this can happen if version is set through arguments
             if (_launchMode == LaunchMode.Unknown)
             {
                 if (_versionPackageManifest.Count != 0)
@@ -580,9 +523,8 @@ namespace PhasmaStrap
 
                     _launchMode = isPlayer ? LaunchMode.Player : LaunchMode.Studio;
 
-                    SetupAppData(); // we need to set it up again
+                    SetupAppData();
 
-                    // lets set the registry now
                     UpdateChannelRegistry();
                 }
                 else
@@ -644,7 +586,6 @@ namespace PhasmaStrap
                 return false;
             }
 
-            // at least 5GB of free space
             const long minimumFreeSpace = 5_000_000_000;
             long space = Filesystem.GetFreeDiskSpace(Paths.Base);
             if (space < minimumFreeSpace)
@@ -666,16 +607,12 @@ namespace PhasmaStrap
                 return false;
             }
 
-            // always normally upgrade for downgrades
             if (currentVersion.Minor > _latestVersion.Minor)
             {
                 App.Logger.WriteLine(LOG_IDENT, "Not eligible: Downgrade");
                 return false;
             }
 
-            // only background update if we're:
-            // - one major update behind
-            // - the same major update
             int diff = _latestVersion.Minor - currentVersion.Minor;
             if (diff == 0 || diff == 1)
             {
@@ -689,11 +626,6 @@ namespace PhasmaStrap
             }
         }
 
-        // rewrites the launch URI to target a specific, better server, when the matchmaker is
-        // enabled. Handles the "roblox://experiences/start?placeId=X" deep link format (what the
-        // modern web Play button, and PhasmaStrap's own Server Browser, both use); falls back to
-        // TryApplyLegacyTicketMatchmakingAsync for the older ticket-based
-        // "roblox-player:...+placelauncherurl:..." format some browsers/embeds still emit.
         private async Task TryApplyMatchmakingAsync()
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyMatchmakingAsync";
@@ -745,10 +677,6 @@ namespace PhasmaStrap
             }
         }
 
-        // legacy ticket-based launch format: "roblox-player:1+launchmode:play+...+placelauncherurl:<url-encoded
-        // PlaceLauncher.ashx URL>+...". The place/server assignment lives inside that embedded, separately-encoded
-        // URL rather than in the outer command line, so it needs its own extraction/rewrite instead of the simple
-        // query-string patch TryApplyMatchmakingAsync does for the modern deep-link format.
         private async Task TryApplyLegacyTicketMatchmakingAsync()
         {
             const string LOG_IDENT = "Bootstrapper::TryApplyLegacyTicketMatchmakingAsync";
@@ -796,8 +724,6 @@ namespace PhasmaStrap
             App.Logger.WriteLine(LOG_IDENT, $"Redirecting to {winner.DatacenterName} (about {winner.EstimatedPingMs}ms), JobId {winner.JobId}");
         }
 
-        // the place this launch is for, from the "roblox://experiences/start?placeId=X" deep link
-        // or the legacy ticket format - independent of whether the matchmaker is enabled
         private long? TryResolveLaunchPlaceId()
         {
             Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
@@ -811,9 +737,6 @@ namespace PhasmaStrap
                 return null;
             }
 
-            // legacy ticket-based launch format - same extraction as TryApplyLegacyTicketMatchmakingAsync,
-            // since a real browser Play click just as often lands here as on the modern deep-link format
-            // above
             Match ticketMatch = Regex.Match(_launchCommandLine, @"placelauncherurl:([^\s""+]+)", RegexOptions.IgnoreCase);
             if (!ticketMatch.Success)
                 return null;
@@ -838,9 +761,6 @@ namespace PhasmaStrap
             public bool Known => PlaceId > 0;
         }
 
-        // Works out which game this launch is for. A normal launch names the place; a "join a
-        // friend" launch only names the friend, so their presence says where they are. The game
-        // (universe) a place belongs to is only looked up when a whole-game rule could match.
         private async Task<LaunchGame> ResolveLaunchGameAsync()
         {
             const string LOG_IDENT = "Bootstrapper::ResolveLaunchGameAsync";
@@ -876,8 +796,6 @@ namespace PhasmaStrap
             return new LaunchGame(placeId, universeId);
         }
 
-        // "join a friend" links: roblox://experiences/start?userId=X, or the legacy ticket format
-        // with request=RequestFollowUser&userId=X
         private long? TryResolveFollowedUserId()
         {
             Match uriMatch = Regex.Match(_launchCommandLine, @"roblox(?:-player)?://experiences/start\?([^\s""]+)", RegexOptions.IgnoreCase);
@@ -903,11 +821,6 @@ namespace PhasmaStrap
             return long.TryParse(ticketQuery["userId"], out long followed) && followed > 0 ? followed : null;
         }
 
-        // Writes the flags this launch starts with into the version folder: your flags, with the
-        // game's profile (if any) on top. Always written from scratch, so a profile from an earlier
-        // launch can never linger into a game that has none. The settings' own flag file is never
-        // touched. Returns false when no flags were written (manager off, mods not applied to the
-        // player, or the write failed).
         private async Task<bool> WriteLaunchFlagsAsync(Utility.FlagProfile? profile)
         {
             const string LOG_IDENT = "Bootstrapper::WriteLaunchFlagsAsync";
@@ -997,7 +910,6 @@ namespace PhasmaStrap
                 logCreatedEvent.Set();
             };
 
-            // v2.2.0 - byfron will trip if we keep a process handle open for over a minute, so we're doing this now
             try
             {
                 using var process = Process.Start(startInfo)!;
@@ -1005,12 +917,10 @@ namespace PhasmaStrap
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
             {
-                // 1223 = ERROR_CANCELLED, gets thrown if a UAC prompt is cancelled
                 return;
             }
             catch (Exception)
             {
-                // attempt a reinstall on next launch
                 File.Delete(AppData.ExecutablePath);
                 throw;
             }
@@ -1035,9 +945,6 @@ namespace PhasmaStrap
             if (IsStudioLaunch)
                 return;
 
-            // custom integrations are now launched/closed per-game by IntegrationWatcher
-            // (see Watcher.cs), which needs the watcher process running with activity
-            // tracking on - they no longer launch unconditionally alongside Roblox itself
             if (App.Settings.Prop.EnableActivityTracking || App.LaunchSettings.TestModeFlag.Active)
             {
                 using var ipl = new InterProcessLock("Watcher", TimeSpan.FromSeconds(5));
@@ -1060,13 +967,9 @@ namespace PhasmaStrap
                     Process.Start(Paths.Process, args);
             }
 
-            // allow for window to show, since the log is created pretty far beforehand
             Thread.Sleep(1000);
         }
 
-        // kills RobloxCrashHandler.exe shortly after launch when the user has opted in (Behaviour
-        // page, General tab) - it isn't needed for Roblox itself to run, and some users prefer it
-        // not sitting in the background. Ported from Voidstrap's DisableCrashHandlerIfNeeded.
         private async Task DisableCrashHandlerIfNeeded()
         {
             const string LOG_IDENT = "Bootstrapper::DisableCrashHandlerIfNeeded";
@@ -1140,7 +1043,6 @@ namespace PhasmaStrap
             {
                 try
                 {
-                    // clean up install
                     if (Directory.Exists(_latestVersionDirectory))
                         Directory.Delete(_latestVersionDirectory, true);
                 }
@@ -1170,11 +1072,7 @@ namespace PhasmaStrap
         private async Task<bool> CheckForUpdates()
         {
             const string LOG_IDENT = "Bootstrapper::CheckForUpdates";
-            
-            // Another PhasmaStrap running (the tray, the settings window, a game's watcher) used to
-            // skip the update altogether - and one is running most of the time, so updates silently
-            // never happened. The upgrade step now swaps the exe even while it's in use, so only
-            // an update that's already under way elsewhere is a reason to skip.
+
             using (var probe = new InterProcessLock("AutoUpdater"))
             {
                 if (!probe.IsAcquired)
@@ -1194,12 +1092,6 @@ namespace PhasmaStrap
 
             var versionComparison = Utilities.CompareVersions(App.Version, releaseInfo.TagName);
 
-            // versionComparison already accounts for whether we're on a deployed (production) build -
-            // equal or newer than the latest release always means no update is needed. The previous
-            // condition here was missing parentheses (`A && B || C` instead of `A && (B || C)`), which
-            // made a non-production build treat "equal version" as "needs updating" too, so a locally
-            // built dev exe would re-download and relaunch itself as the latest GitHub release on every
-            // single Roblox launch, even when nothing was actually newer.
             if (versionComparison == VersionComparison.Equal || versionComparison == VersionComparison.GreaterThan)
             {
                 App.Logger.WriteLine(LOG_IDENT, "No updates found");
@@ -1232,8 +1124,6 @@ namespace PhasmaStrap
 
                 Directory.CreateDirectory(Paths.TempUpdates);
 
-                // a download that failed or was cut off earlier used to be kept and started again on
-                // every launch (an HTML error page or half an exe) - only a complete, verified file counts
                 if (File.Exists(downloadLocation) && !IsCompleteDownload(downloadLocation, asset))
                 {
                     App.Logger.WriteLine(LOG_IDENT, $"Discarding an incomplete earlier download of {asset.Name}");
@@ -1284,7 +1174,7 @@ namespace PhasmaStrap
                 App.Settings.Save();
 
                 new InterProcessLock("AutoUpdater");
-                
+
                 Process.Start(startInfo);
 
                 return true;
@@ -1305,7 +1195,6 @@ namespace PhasmaStrap
             return false;
         }
 
-        // size, and the SHA-256 GitHub publishes for the asset when it has one
         private static bool IsCompleteDownload(string path, GithubReleaseAsset asset)
         {
             var info = new FileInfo(path);
@@ -1327,13 +1216,12 @@ namespace PhasmaStrap
         #region Roblox Install
         private static bool TryDeleteRobloxInDirectory(string dir)
         {
-            // check if the roblox executable is present in the directory
             string clientPath = Path.Combine(dir, "RobloxPlayerBeta.exe");
             if (!File.Exists(clientPath))
             {
                 clientPath = Path.Combine(dir, "RobloxStudioBeta.exe");
                 if (!File.Exists(clientPath))
-                    return true; // ok???
+                    return true;
             }
 
             try
@@ -1363,7 +1251,6 @@ namespace PhasmaStrap
                 return;
             }
 
-            // versions the version manager keeps (a pinned one, the previous one)
             HashSet<string> keep = Utility.RobloxVersions.FoldersToKeep(App.PlayerState.Prop.VersionGuid);
 
             foreach (string dir in Directory.GetDirectories(Paths.Versions))
@@ -1372,11 +1259,6 @@ namespace PhasmaStrap
 
                 if (dirName != App.PlayerState.Prop.VersionGuid && dirName != App.StudioState.Prop.VersionGuid && !keep.Contains(dirName))
                 {
-                    // TODO: this is too expensive
-                    //Filesystem.AssertReadOnlyDirectory(dir);
-
-                    // check if it's still being used first
-                    // we dont want to accidentally delete the files of a running roblox instance
                     if (!TryDeleteRobloxInDirectory(dir))
                         continue;
 
@@ -1400,7 +1282,6 @@ namespace PhasmaStrap
             string oldClientLocation = Path.Combine(Paths.Versions, AppData.DistributionState.VersionGuid, AppData.ExecutableName);
             string newClientLocation = Path.Combine(_latestVersionDirectory, AppData.ExecutableName);
 
-            // move old compatibility flags for the old location
             using RegistryKey appFlagsKey = Registry.CurrentUser.CreateSubKey($"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers");
             string? appFlags = appFlagsKey.GetValue(oldClientLocation) as string;
 
@@ -1418,7 +1299,7 @@ namespace PhasmaStrap
 
             List<Process> processes = new List<Process>();
             processes.AddRange(Process.GetProcessesByName(AppData.ProcessName));
-            processes.AddRange(Process.GetProcessesByName("RobloxCrashHandler")); // roblox studio doesnt depend on crash handler being open, so this should be fine
+            processes.AddRange(Process.GetProcessesByName("RobloxCrashHandler"));
 
             foreach (Process process in processes)
             {
@@ -1490,7 +1371,6 @@ namespace PhasmaStrap
                 if (_cancelTokenSource.IsCancellationRequested)
                     return;
 
-                // get a fully clean install
                 if (Directory.Exists(_latestVersionDirectory))
                 {
                     try
@@ -1514,13 +1394,11 @@ namespace PhasmaStrap
 
             var cachedPackageHashes = Directory.GetFiles(Paths.Downloads).Select(x => Path.GetFileName(x));
 
-            // package manifest states packed size and uncompressed size in exact bytes
             int totalSizeRequired = 0;
 
-            // packed size only matters if we don't already have the package cached on disk
             totalSizeRequired += _versionPackageManifest.Where(x => !cachedPackageHashes.Contains(x.Signature)).Sum(x => x.PackedSize);
             totalSizeRequired += _versionPackageManifest.Sum(x => x.Size);
-            
+
             if (Filesystem.GetFreeDiskSpace(Paths.Base) < totalSizeRequired)
             {
                 Frontend.ShowMessageBox(Strings.Bootstrapper_NotEnoughSpace, MessageBoxImage.Error);
@@ -1535,7 +1413,6 @@ namespace PhasmaStrap
 
                 Dialog.ProgressMaximum = ProgressBarMaximum;
 
-                // compute total bytes to download
                 int totalPackedSize = _versionPackageManifest.Sum(package => package.PackedSize);
                 _progressIncrement = (double)ProgressBarMaximum / totalPackedSize;
 
@@ -1549,9 +1426,6 @@ namespace PhasmaStrap
 
             var extractionTasks = new ConcurrentBag<Task>();
 
-            // MaxConcurrentDownloads/MaxDownloadSegments (Settings > Roblox > Installer) default to 1,
-            // which preserves the original one-package-at-a-time, unsegmented download behaviour exactly.
-            // Raising either is opt-in - see Utility/DownloadConfiguration.cs for the normalization/caps.
             int packageConcurrency = DownloadConfiguration.NormalizeConcurrent(App.Settings.Prop.MaxConcurrentDownloads);
             int downloadSegments = DownloadConfiguration.NormalizeSegments(App.Settings.Prop.MaxDownloadSegments);
 
@@ -1561,7 +1435,6 @@ namespace PhasmaStrap
             {
                 if (packageConcurrency <= 1)
                 {
-                    // download all the packages synchronously
                     foreach (var package in _versionPackageManifest)
                     {
                         if (_cancelTokenSource.IsCancellationRequested)
@@ -1569,17 +1442,14 @@ namespace PhasmaStrap
 
                         await DownloadPackage(package);
 
-                        // we'll extract the runtime installer later if we need to
                         if (package.Name == "WebView2RuntimeInstaller.zip")
                             continue;
 
-                        // extract the package async immediately after download
                         extractionTasks.Add(Task.Run(() => ExtractPackage(package), _cancelTokenSource.Token));
                     }
                 }
                 else
                 {
-                    // download up to packageConcurrency packages at once
                     using var packageThrottle = new SemaphoreSlim(packageConcurrency);
 
                     var downloadTasks = _versionPackageManifest.Select(async package =>
@@ -1623,7 +1493,7 @@ namespace PhasmaStrap
             }
 
             await Task.WhenAll(extractionTasks);
-            
+
             App.Logger.WriteLine(LOG_IDENT, "Writing AppSettings.xml...");
             await File.WriteAllTextAsync(Path.Combine(_latestVersionDirectory, "AppSettings.xml"), AppSettings);
 
@@ -1637,9 +1507,8 @@ namespace PhasmaStrap
 
                 if (hklmKey is not null || hkcuKey is not null)
                 {
-                    // reset prompt state if the user has it installed
                     App.State.Prop.PromptWebView2Install = true;
-                }   
+                }
                 else
                 {
                     var result = Frontend.ShowMessageBox(Strings.Bootstrapper_WebView2NotFound, MessageBoxImage.Warning, MessageBoxButton.YesNo, MessageBoxResult.Yes);
@@ -1682,15 +1551,11 @@ namespace PhasmaStrap
                 }
             }
 
-            // finishing and cleanup
-
             MigrateCompatibilityFlags();
 
             string previousVersionGuid = AppData.DistributionState.VersionGuid;
             AppData.DistributionState.VersionGuid = _latestVersionGuid;
 
-            // version manager: remember this version (and the one it replaced) so the clean-up
-            // below can keep the previous one, then see which of your flags it no longer has
             if (_launchMode == LaunchMode.Player)
             {
                 Utility.RobloxVersions.RecordInstall(_latestVersionGuid, _versionManifestText, previousVersionGuid);
@@ -1785,31 +1650,20 @@ namespace PhasmaStrap
 
             SetStatus(Strings.Bootstrapper_Status_ApplyingModifications);
 
-            // Preset Mod tab's "Mod apply target": skip applying mods entirely when this launch's
-            // executable isn't in scope for the configured target
             if (!ModsTargetThisLaunch)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Skipping mod application - ModApplyTarget is {App.Settings.Prop.ModApplyTarget} and this is a {(IsStudioLaunch ? "Studio" : "Player")} launch");
                 return true;
             }
 
-            // handle file mods
             App.Logger.WriteLine(LOG_IDENT, "Checking file mods...");
 
-            // manifest has been moved to State.json
             File.Delete(Path.Combine(Paths.Base, "ModManifest.txt"));
 
             List<string> modFolderFiles = new();
 
             Directory.CreateDirectory(Paths.Modifications);
 
-            // Mod Management tab: materialize files from enabled managed mod packages into the
-            // flat Modifications folder so the existing apply/restore pipeline below picks them up
-            // exactly like any manually placed mod. We only ever touch paths we previously wrote
-            // ourselves (tracked in DistributionState.ManagedModManifest) so a user's own manually
-            // placed mod at the same relative path is never deleted out from under them - it can
-            // still be overwritten by a managed mod occupying the same path, which is the same
-            // "last writer wins" behavior manually placed mods already have with each other.
             try
             {
                 var previousManagedManifest = new HashSet<string>(AppData.DistributionState.ManagedModManifest, StringComparer.OrdinalIgnoreCase);
@@ -1866,9 +1720,6 @@ namespace PhasmaStrap
                 App.Logger.WriteLine(LOG_IDENT, "Managed mods could not be applied: " + ex.Message);
             }
 
-            // check custom font mod
-            // instead of replacing the fonts themselves, we'll just alter the font family manifests
-
             string modFontFamiliesFolder = Path.Combine(Paths.Modifications, "content\\fonts\\families");
 
             if (File.Exists(Paths.CustomFont))
@@ -1879,7 +1730,6 @@ namespace PhasmaStrap
 
                 const string path = "rbxasset://fonts/CustomFont.ttf";
 
-                // lets make sure the content/fonts/families path exists in the version directory
                 string contentFolder = Path.Combine(_latestVersionDirectory, "content");
                 Directory.CreateDirectory(contentFolder);
 
@@ -1931,10 +1781,8 @@ namespace PhasmaStrap
                 if (_cancelTokenSource.IsCancellationRequested)
                     return true;
 
-                // get relative directory path
                 string relativeFile = file.Substring(Paths.Modifications.Length + 1);
 
-                // v1.7.0 - README has been moved to the preferences menu now
                 if (relativeFile == "README.txt")
                 {
                     File.Delete(file);
@@ -1960,8 +1808,6 @@ namespace PhasmaStrap
 
                 Directory.CreateDirectory(Path.GetDirectoryName(fileVersionFolder)!);
 
-                // the mod source file may itself be a OneDrive placeholder that hasn't been
-                // downloaded locally yet, which would otherwise make the copy below fail
                 CloudFiles.Hydrate(fileModFolder);
 
                 Filesystem.AssertReadOnly(fileVersionFolder);
@@ -1985,10 +1831,6 @@ namespace PhasmaStrap
                 }
             }
 
-            // PhasmaStrap logo on the in-game top bar. Patched straight into this version's own
-            // spritesheets (the sprite's position changes with every Roblox update, so it can't be a
-            // static mod file). Listing the files as mods means switching the option off restores the
-            // originals through the normal path below.
             if (_launchMode == LaunchMode.Player && App.Settings.Prop.TopBarPhasmaLogo)
             {
                 Utility.TopBarLogoPatcher.Log ??= message => App.Logger.WriteLine("TopBarLogoPatcher", message);
@@ -2003,10 +1845,6 @@ namespace PhasmaStrap
                 }
             }
 
-            // the manifest is primarily here to keep track of what files have been
-            // deleted from the modifications folder, so that we know when to restore the original files from the downloaded packages
-            // now check for files that have been deleted from the mod folder according to the manifest
-
             var fileRestoreMap = new Dictionary<string, List<string>>();
 
             foreach (string fileLocation in AppData.DistributionState.ModManifest)
@@ -2017,7 +1855,6 @@ namespace PhasmaStrap
                 var packageMapEntry = AppData.PackageDirectoryMap.SingleOrDefault(x => !String.IsNullOrEmpty(x.Value) && fileLocation.StartsWith(x.Value));
                 string packageName = packageMapEntry.Key;
 
-                // package doesn't exist, likely mistakenly placed file
                 if (String.IsNullOrEmpty(packageName))
                 {
                     App.Logger.WriteLine(LOG_IDENT, $"{fileLocation} was removed as a mod but does not belong to a package");
@@ -2054,8 +1891,6 @@ namespace PhasmaStrap
                 }
             }
 
-            // make sure we're not overwriting a new update
-            // if we're the background update process, always overwrite
             if (App.LaunchSettings.BackgroundUpdaterFlag.Active || !AppData.DistributionStateManager.HasFileOnDiskChanged())
             {
                 AppData.DistributionState.ModManifest = modFolderFiles;
@@ -2077,7 +1912,7 @@ namespace PhasmaStrap
         private async Task DownloadPackage(Package package)
         {
             string LOG_IDENT = $"Bootstrapper::DownloadPackage.{package.Name}";
-            
+
             if (_cancelTokenSource.IsCancellationRequested)
                 return;
 
@@ -2109,9 +1944,6 @@ namespace PhasmaStrap
             }
             else if (File.Exists(robloxPackageLocation))
             {
-                // let's cheat! if the stock bootstrapper already previously downloaded the file,
-                // then we can just copy the one from there
-
                 App.Logger.WriteLine(LOG_IDENT, $"Found existing copy at '{robloxPackageLocation}'! Copying to Downloads folder...");
                 File.Copy(robloxPackageLocation, package.DownloadPath);
 
@@ -2128,9 +1960,6 @@ namespace PhasmaStrap
 
             App.Logger.WriteLine(LOG_IDENT, "Downloading...");
 
-            // Settings > Roblox > Installer: "Download Buffer Size" / "Segments Per File" - both
-            // default to values that reproduce the original hardcoded behaviour (4KB buffer, no
-            // segmentation), so this only changes anything if the user has opted into larger values
             int bufferSize = DownloadConfiguration.NormalizeBufferKb(App.Settings.Prop.DownloadBufferKb) * 1024;
             int segmentCount = DownloadConfiguration.NormalizeSegments(App.Settings.Prop.MaxDownloadSegments);
 
@@ -2187,9 +2016,6 @@ namespace PhasmaStrap
                     Interlocked.Add(ref _totalDownloadedBytes, -totalBytesRead);
                     UpdateProgressBar();
 
-                    // attempt download over HTTP
-                    // this isn't actually that unsafe - signatures were fetched earlier over HTTPS
-                    // so we've already established that our signatures are legit, and that there's very likely no MITM anyway
                     if (ex.GetType() == typeof(IOException) && !packageUrl.StartsWith("http://"))
                     {
                         App.Logger.WriteLine(LOG_IDENT, "Retrying download over HTTP...");
@@ -2199,11 +2025,6 @@ namespace PhasmaStrap
             }
         }
 
-        /// <summary>
-        /// Original single-connection download path, parameterized on the configurable read buffer
-        /// size. Used whenever segmented downloading is disabled (the default) or unavailable for
-        /// this package (server doesn't support ranged requests, or it's too small to bother).
-        /// </summary>
         private async Task<long> DownloadPackageSingleStream(Package package, string packageUrl, int bufferSize)
         {
             long totalBytesRead = 0;
@@ -2240,13 +2061,6 @@ namespace PhasmaStrap
             return totalBytesRead;
         }
 
-        /// <summary>
-        /// Attempts a parallel, HTTP range-request based download of <paramref name="package"/> split
-        /// into <paramref name="segmentCount"/> pieces (Settings > Roblox > Installer > Segments Per
-        /// File). Returns false (having written nothing) if the server doesn't support ranged requests
-        /// or the package is too small to be worth segmenting, so the caller can fall back to
-        /// <see cref="DownloadPackageSingleStream"/> for this attempt.
-        /// </summary>
         private async Task<bool> TryDownloadPackageSegmented(Package package, string packageUrl, int segmentCount, int bufferSize, Action<long> onBytesRead)
         {
             string LOG_IDENT = $"Bootstrapper::DownloadPackageSegmented.{package.Name}";
@@ -2346,8 +2160,6 @@ namespace PhasmaStrap
             }
         }
 
-        // _downloadRequestThrottle is only non-null while UpgradeRoblox's package download phase is
-        // running (see there) - fall back to no throttling if something calls this outside that window
         private Task AcquireDownloadSlot() =>
             _downloadRequestThrottle?.WaitAsync(_cancelTokenSource.Token) ?? Task.CompletedTask;
 
@@ -2369,7 +2181,6 @@ namespace PhasmaStrap
             string packageFolder = Path.Combine(_latestVersionDirectory, packageDir);
             string? fileFilter = null;
 
-            // for sharpziplib, each file in the filter needs to be a regex
             if (files is not null)
             {
                 var regexList = new List<string>();

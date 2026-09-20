@@ -3,10 +3,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
-    // launches/closes custom integrations as you join/leave games, rather than only once
-    // when Roblox itself starts/exits: an integration can be scoped to a specific game (or
-    // left unscoped to run for any game) and optionally closed again the moment you leave
-    // that game (e.g. teleporting to a different place). Ported from Voidstrap.
     public sealed class IntegrationWatcher : IDisposable
     {
         private const string LOG_IDENT = "IntegrationWatcher";

@@ -1,4 +1,4 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -9,41 +9,20 @@ namespace PhasmaStrap.Networking
 
     public sealed record ProxiedResponse(int StatusCode, string StatusText, Dictionary<string, string> Headers, byte[] Body);
 
-    // a narrowly-scoped local TLS-terminating proxy: it only ever accepts connections for
-    // the exact hostnames explicitly registered via InterceptedHosts, and it only exists to
-    // let the spoofing policies below rewrite specific request/response bodies before
-    // relaying to the real Roblox servers. It is not a general-purpose traffic interceptor -
-    // any hostname outside the allowlist is refused.
     public static class AssetProxyServer
     {
         private const string LOG_IDENT = "AssetProxyServer";
 
-        // must be 443: the hosts-file block only redirects the IP for the intercepted
-        // hostnames, not the port, so this has to be where a real HTTPS client actually
-        // connects. Windows (unlike Linux) doesn't require elevation to bind low ports, and
-        // this only ever binds to loopback, so it can't be reached from outside this machine.
         public const int Port = 443;
 
-        // hostname -> optional request transform, optional response transform, optional cache
-        // short-circuit (checked before ever contacting the real server - if it returns a
-        // response, that's used directly and ForwardToUpstreamAsync is skipped entirely; this is
-        // what actually makes AssetWarp's "Preloading" serve cached assets without a network
-        // round-trip, rather than just rewriting a response that was already fetched)
         public static readonly Dictionary<string, (Func<ProxiedRequest, byte[]?>? RequestTransform, Func<ProxiedRequest, ProxiedResponse, byte[]?>? ResponseTransform, Func<ProxiedRequest, ProxiedResponse?>? TryServeFromCache)> InterceptedHosts
             = new(StringComparer.OrdinalIgnoreCase);
 
-        // hostname -> a handler that may answer a request entirely by itself (null = not mine, carry
-        // on with the transforms above). Asynchronous, because what it does is download and cache
-        // asset content (AssetContentService) - the synchronous cache hook is no place for that.
         public static readonly Dictionary<string, Func<ProxiedRequest, CancellationToken, Task<ProxiedResponse?>>> AsyncHandlers
             = new(StringComparer.OrdinalIgnoreCase);
 
-        // how long a kept-alive connection may sit idle before the proxy hangs up
         private const int KeepAliveIdleMs = 30_000;
 
-        // headers that describe THIS hop's connection rather than the request itself; forwarding
-        // them verbatim would either be meaningless upstream or (Accept-Encoding, Expect)
-        // actively break the body handling below
         private static readonly string[] HopByHopRequestHeaders =
         {
             "Connection", "Proxy-Connection", "Keep-Alive", "Transfer-Encoding", "Content-Length", "Expect", "Accept-Encoding", "Upgrade",
@@ -55,9 +34,6 @@ namespace PhasmaStrap.Networking
 
         private static readonly object Sync = new();
 
-        // another PhasmaStrap process (the settings window vs. the game-session watcher) may
-        // already be hosting the proxy on 443 - that's normal, not an error, so only the first
-        // "port busy" is logged and the keeper loop keeps retrying quietly until it frees up
         private static bool _loggedPortBusy;
 
         public static bool IsRunning
@@ -185,10 +161,6 @@ namespace PhasmaStrap.Networking
 
                 ProxyHealth.Accepted();
 
-                // One reader for the life of the connection: it may have read ahead into the next
-                // request. Ordinary (API) requests are answered and the connection closed, as
-                // always. Asset requests keep it open - a game loads thousands of small assets,
-                // and a fresh TLS handshake for each would cost more than the download.
                 var reader = new RawHttpReader(sslStream);
                 bool keepAlive;
                 bool first = true;
@@ -276,12 +248,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // --- certificate watch ---
-        // Roblox verifies the proxy's leaf cert against its own cacert.pem. If a Roblox update
-        // ships a fresh bundle (or Roblox ever starts checking the file), every handshake fails
-        // before a request is parsed - which from the user's side just looks like "spoofing
-        // stopped". A burst of handshake failures on an intercepted host triggers one re-patch
-        // attempt and one notification so it's visible instead of silent.
         private static readonly Queue<DateTime> HandshakeFailures = new();
         private static bool _certificateWarned;
 
@@ -318,7 +284,6 @@ namespace PhasmaStrap.Networking
                     bool ok = AssetProxyCA.IsRobloxTrustBundlePatched();
                     bool? running = AssetProxyCA.RunningRobloxTrustsProxy();
 
-                    // say only what is known: "re-added" only when something was actually re-added
                     string message;
                     if (!ok)
                         message = "PhasmaStrap could not add its certificate to Roblox's bundle - check the Networking page.";
@@ -330,7 +295,7 @@ namespace PhasmaStrap.Networking
                         message = "Roblox's bundle already has the certificate, but Roblox still refused it - the proxy isn't working this session. Check the log.";
 
                     App.Logger.WriteLine(LOG_IDENT, $"Certificate re-check: bundles patched now {patched}, all patched {ok}, running Roblox read it {running?.ToString() ?? "n/a"}");
-                    UI.NotificationCenter.Notify("Roblox rejected the proxy certificate", message, UI.NotificationCategory.General);
+                    UI.NotificationCenter.Notify("Roblox rejected the proxy certificate", message, UI.NotificationCategory.General, kind: UI.NotificationKindId.ProxyCertificate);
                 }
                 catch (Exception ex)
                 {
@@ -339,10 +304,6 @@ namespace PhasmaStrap.Networking
             });
         }
 
-        // minimal buffered reader that supports both line-based header reads and exact-length
-        // body reads against the SAME underlying buffer, so bytes read ahead while looking
-        // for a line ending are never lost when switching to a raw body read afterwards -
-        // unlike System.IO.StreamReader, whose internal buffer isn't accessible for this
         private sealed class RawHttpReader
         {
             private readonly Stream _stream;
@@ -431,10 +392,6 @@ namespace PhasmaStrap.Networking
                 return output.ToArray();
             }
 
-            // "Transfer-Encoding: chunked" - a sequence of <hex length>\r\n<bytes>\r\n, terminated
-            // by a zero-length chunk and optional trailer headers. Roblox's APIs frequently reply
-            // this way, and libcurl uses it for streamed POST bodies, so a proxy that only
-            // understands Content-Length sees those as empty and never rewrites them
             public async Task<byte[]> ReadChunkedAsync(CancellationToken token)
             {
                 using var output = new MemoryStream();
@@ -458,7 +415,6 @@ namespace PhasmaStrap.Networking
 
                     if (size == 0)
                     {
-                        // trailers, up to the blank line
                         while (!string.IsNullOrEmpty(await ReadLineAsync(token))) { }
                         break;
                     }
@@ -466,7 +422,6 @@ namespace PhasmaStrap.Networking
                     byte[] chunk = await ReadExactAsync(size, token);
                     output.Write(chunk, 0, chunk.Length);
 
-                    // CRLF after the chunk data
                     await ReadLineAsync(token);
                 }
 
@@ -498,9 +453,6 @@ namespace PhasmaStrap.Networking
                 headers[line[..colon].Trim()] = line[(colon + 1)..].Trim();
             }
 
-            // libcurl sends larger POST bodies with "Expect: 100-continue" and then WAITS for the
-            // interim response before transmitting the body; without answering it, the request
-            // hangs until curl's timeout and the body never arrives
             if (headers.TryGetValue("Expect", out string? expect) && expect.Contains("100-continue", StringComparison.OrdinalIgnoreCase))
             {
                 await clientStream.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 100 Continue\r\n\r\n"), token);
@@ -524,8 +476,6 @@ namespace PhasmaStrap.Networking
             return Array.Empty<byte>();
         }
 
-        // (internal: the asset prefetcher asks Roblox's real API through this too - the hosts file
-        // points the API's name at this very proxy, so an ordinary HttpClient would loop back here)
         internal static async Task<ProxiedResponse?> ForwardToUpstreamAsync(ProxiedRequest request, CancellationToken token)
         {
             string? ip = await DohResolver.ResolveAsync(request.Host, token);
@@ -555,8 +505,6 @@ namespace PhasmaStrap.Networking
                 requestBuilder.Append($"{header.Key}: {header.Value}\r\n");
             }
 
-            // ask for an uncompressed body so the JSON transforms can actually read it; if the
-            // server compresses anyway, DecodeBody below handles the common encodings
             requestBuilder.Append("Accept-Encoding: identity\r\n");
             requestBuilder.Append($"Content-Length: {request.Body.Length}\r\n");
             requestBuilder.Append("Connection: close\r\n\r\n");
@@ -573,7 +521,6 @@ namespace PhasmaStrap.Networking
             string statusText;
             Dictionary<string, string> headers;
 
-            // skip any 1xx interim responses (100 Continue, 103 Early Hints) to reach the real one
             while (true)
             {
                 string? statusLine = await reader.ReadLineAsync(token);
@@ -609,15 +556,13 @@ namespace PhasmaStrap.Networking
             else if (headers.TryGetValue("Content-Length", out string? lengthHeader) && int.TryParse(lengthHeader, out int length))
                 body = length > 0 ? await reader.ReadExactAsync(length, token) : Array.Empty<byte>();
             else
-                body = await reader.ReadToEndAsync(token); // "Connection: close" delimits the body
+                body = await reader.ReadToEndAsync(token);
 
             body = DecodeBody(headers, body);
 
             return new ProxiedResponse(statusCode, statusText, headers, body);
         }
 
-        // inflates gzip/deflate/br bodies in place so the transforms see plain JSON, and drops
-        // the Content-Encoding header so the client isn't told the (now plain) body is compressed
         private static byte[] DecodeBody(Dictionary<string, string> headers, byte[] body)
         {
             if (body.Length == 0 || !headers.TryGetValue("Content-Encoding", out string? encoding))
@@ -679,7 +624,6 @@ namespace PhasmaStrap.Networking
             if (!bodyless || response.StatusCode == 304)
                 builder.Append($"Content-Length: {response.Body.Length}\r\n");
 
-            // a kept-alive answer always has to say how long it is, even when that is "0"
             if (keepAlive && bodyless && response.StatusCode != 304)
                 builder.Append("Content-Length: 0\r\n");
 

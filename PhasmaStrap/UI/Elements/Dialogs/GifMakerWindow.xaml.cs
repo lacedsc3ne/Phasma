@@ -11,9 +11,6 @@ using PhasmaStrap.Utility;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Turns screenshots into a GIF (screenshot editor > Make GIF): one picture with a zoom or pan,
-    // or several as a slideshow with crossfades. The preview draws each frame exactly the way the
-    // saved GIF does (RenderFrame), so what plays here is what gets saved.
     public partial class GifMakerWindow
     {
         private const string LOG_IDENT = "GifMaker";
@@ -33,7 +30,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         private bool _saving;
         private string? _savedPath;
 
-        // current settings, read from the controls by ReadSettings
         private int _width = 640, _height = 360, _fps = 15, _motion = 1;
         private double _seconds = 2;
         private bool _crossfade = true, _dither;
@@ -46,10 +42,10 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             PictureList.ItemsSource = _pictures;
             PictureList.SelectedIndex = 0;
 
-            MotionBox.SelectedIndex = 1;       // zoom in
-            TransitionBox.SelectedIndex = 0;   // crossfade
-            WidthBox.SelectedIndex = 2;        // 640
-            FpsBox.SelectedIndex = 1;          // 15
+            MotionBox.SelectedIndex = 1;
+            TransitionBox.SelectedIndex = 0;
+            WidthBox.SelectedIndex = 2;
+            FpsBox.SelectedIndex = 1;
             SecondsSlider.Value = 3;
 
             _timer.Tick += (_, _) => ShowNextFrame();
@@ -60,8 +56,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Closed += (_, _) => _timer.Stop();
         }
 
-        // ------------------------------------------------------------------ settings
-
         private void ReadSettings()
         {
             _motion = Math.Max(0, MotionBox.SelectedIndex);
@@ -71,7 +65,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             _width = int.TryParse((WidthBox.SelectedItem as ComboBoxItem)?.Tag as string, out int width) ? width : 640;
             _dither = DitherBox.IsChecked == true;
 
-            // the first picture decides the shape; the others are fitted inside it
             BitmapSource shape = _pictures[0].Source;
             _height = Math.Clamp((int)Math.Round(_width * (double)shape.PixelHeight / shape.PixelWidth), 16, 1080);
 
@@ -82,7 +75,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         private int PerPicture => Math.Max(1, (int)Math.Round(_seconds * _fps));
         private int FadeFrames => _pictures.Count > 1 && _crossfade ? Math.Max(1, (int)Math.Round(0.4 * _fps)) : 0;
 
-        // one still picture is a one-frame GIF
         private int TotalFrames => _pictures.Count == 1 && _motion == 0
             ? 1
             : Math.Min(MaxFrames, _pictures.Count * PerPicture + (_pictures.Count - 1) * FadeFrames);
@@ -124,8 +116,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             _frame = (_frame + 1) % total;
         }
 
-        // ------------------------------------------------------------------ drawing a frame
-
         private readonly record struct Layer(int Picture, double Progress, double Opacity);
 
         private List<Layer> LayersAt(int frame)
@@ -138,7 +128,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             if (into < per)
                 return new() { new Layer(index, per == 1 ? 0 : into / (per - 1.0), 1) };
 
-            // crossfade: the picture at the end of its move, the next at the start of its own
             double t = (into - per + 1) / (fade + 1.0);
             return new() { new Layer(index, 1, 1), new Layer(Math.Min(n - 1, index + 1), 0, t) };
         }
@@ -163,7 +152,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private void DrawPicture(DrawingContext dc, BitmapSource source, double progress, double opacity)
         {
-            // fitted inside the frame, then moved: zoom about the centre, or a pan across
             double fit = Math.Min(_width / (double)source.PixelWidth, _height / (double)source.PixelHeight);
             double baseW = source.PixelWidth * fit, baseH = source.PixelHeight * fit;
 
@@ -185,8 +173,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             dc.DrawImage(source, new Rect(x, y, w, h));
             dc.Pop();
         }
-
-        // ------------------------------------------------------------------ pictures
 
         private void PictureList_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateButtons();
 
@@ -264,8 +250,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Restart();
         }
 
-        // ------------------------------------------------------------------ saving
-
         private string TargetPath()
         {
             Directory.CreateDirectory(InstantReplayRecorder.ClipsDir);
@@ -312,7 +296,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             {
                 for (int f = 0; f < total; f++)
                 {
-                    // drawing needs this thread; the encoder works through the frames behind it
                     BitmapSource image = RenderFrame(f);
                     byte[] pixels = new byte[width * height * 4];
                     image.CopyPixels(pixels, width * 4, 0);

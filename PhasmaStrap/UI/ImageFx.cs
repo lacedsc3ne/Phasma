@@ -4,9 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
-// Ported from Voidstrap (UI/ImageFx.cs): attached property that fades an Image in whenever its
-// Source changes, instead of the new bitmap popping in instantly once decoded. Opt-in per-Image
-// via ImageFx.SmoothLoad="True" in XAML - not wired to anything globally.
 namespace PhasmaStrap.UI
 {
     public static class ImageFx

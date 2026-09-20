@@ -2,8 +2,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
-// Ported from Voidstrap's UI/Elements/ContextMenu/ThemeColorItem.cs, retargeted at
-// PhasmaStrap.Utility.AppColorTheme (see that file for why it isn't named CustomTheme).
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
     public sealed class ThemeColorItem : INotifyPropertyChanged
@@ -18,10 +16,8 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
 
         public Color Color => _color;
 
-        /// <summary>Whether this row gets an opacity slider (see ThemeKeyInfo.AllowAlpha).</summary>
         public bool AllowAlpha { get; }
 
-        /// <summary>The colour's alpha as 0-100, for the opacity slider.</summary>
         public double OpacityPercent
         {
             get => Math.Round(_color.A / 255.0 * 100);

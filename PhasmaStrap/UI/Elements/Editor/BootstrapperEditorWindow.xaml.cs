@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml;
 
@@ -16,9 +16,6 @@ using System.Windows;
 
 namespace PhasmaStrap.UI.Elements.Editor
 {
-    /// <summary>
-    /// Interaction logic for BootstrapperEditorWindow.xaml
-    /// </summary>
     public partial class BootstrapperEditorWindow : WpfUiWindow
     {
         private static class CustomBootstrapperSchema
@@ -34,7 +31,6 @@ namespace PhasmaStrap.UI.Elements.Editor
                 public string? SuperClass { get; set; } = null;
                 public bool IsCreatable { get; set; } = false;
 
-                // [AttributeName] = [TypeName]
                 public Dictionary<string, string> Attributes { get; set; } = new Dictionary<string, string>();
             }
 
@@ -46,19 +42,10 @@ namespace PhasmaStrap.UI.Elements.Editor
 
             private static Schema? _schema;
 
-            /// <summary>
-            /// Elements and their attributes
-            /// </summary>
             public static SortedDictionary<string, SortedDictionary<string, string>> ElementInfo { get; set; } = new();
 
-            /// <summary>
-            /// Attributes of elements that can have property elements
-            /// </summary>
             public static Dictionary<string, List<string>> PropertyElements { get; set; } = new();
 
-            /// <summary>
-            /// All type info
-            /// </summary>
             public static SortedDictionary<string, Type> Types { get; set; } = new();
 
             public static void ParseSchema()
@@ -126,7 +113,6 @@ namespace PhasmaStrap.UI.Elements.Editor
                         toRemove.Add(element.Key);
                 }
 
-                // remove non-creatable from list now that everything is done
                 foreach (var name in toRemove)
                 {
                     ElementInfo.Remove(name);
@@ -137,14 +123,10 @@ namespace PhasmaStrap.UI.Elements.Editor
         private BootstrapperEditorWindowViewModel _viewModel;
         private CompletionWindow? _completionWindow = null;
 
-        // line-diff highlighting (ported from Voidstrap's LineDiff + TextMarkerService): shades
-        // lines that differ from the last-saved baseline so unsaved edits stand out in the gutter.
         private TextMarkerService? _diffMarkerService;
         private DispatcherTimer? _diffTimer;
         private string _baselineCode = "";
 
-        // external editor integration (ported from Voidstrap's ExternalEditor/ExternalEditorPickerDialog):
-        // launches a locally installed editor on Theme.xml and reloads it here when that editor saves.
         private ExternalEditorInfo? _externalEditor;
         private FileSystemWatcher? _externalWatcher;
         private DispatcherTimer? _externalReloadTimer;
@@ -156,7 +138,7 @@ namespace PhasmaStrap.UI.Elements.Editor
             string directory = Path.Combine(Paths.CustomThemes, name);
 
             string themeContents = File.ReadAllText(Path.Combine(directory, "Theme.xml"));
-            themeContents = ToCRLF(themeContents); // make sure the theme is in CRLF. a function expects CRLF.
+            themeContents = ToCRLF(themeContents);
 
             _viewModel = new BootstrapperEditorWindowViewModel();
             _viewModel.ThemeSavedCallback = ThemeSavedCallback;
@@ -341,7 +323,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
         private void LaunchExternal(ExternalEditorInfo editor)
         {
-            // make sure the file on disk matches what's in the buffer before handing it off
             _viewModel.SaveCommand.Execute(null);
 
             string themePath = Path.Combine(_viewModel.Directory, "Theme.xml");
@@ -487,7 +468,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
         private (string, int) GetLineAndPosAtCaretPosition()
         {
-            // this assumes the file was saved as CSLF (\r\n newlines)
             int offset = UIXML.CaretOffset - 1;
             int lineStartIdx = UIXML.Text.LastIndexOf('\n', offset);
             int lineEndIdx = UIXML.Text.IndexOf('\n', offset);
@@ -518,12 +498,6 @@ namespace PhasmaStrap.UI.Elements.Editor
             return (line, pos);
         }
 
-        /// <summary>
-        /// Source: https://xsemmel.codeplex.com
-        /// </summary>
-        /// <param name="xml"></param>
-        /// <param name="offset"></param>
-        /// <returns></returns>
         public static string? GetElementAtCursor(string xml, int offset, bool onlyAllowInside = false)
         {
             if (offset == xml.Length)
@@ -539,17 +513,17 @@ namespace PhasmaStrap.UI.Elements.Editor
             }
 
             int endIdx1 = xml.IndexOf(' ', startIdx);
-            if (endIdx1 == -1 /*|| endIdx1 > offset*/) endIdx1 = int.MaxValue;
+            if (endIdx1 == -1 ) endIdx1 = int.MaxValue;
 
             int endIdx2 = xml.IndexOf('>', startIdx);
-            if (endIdx2 == -1 /*|| endIdx2 > offset*/)
+            if (endIdx2 == -1 )
             {
                 endIdx2 = int.MaxValue;
             }
             else
             {
                 if (onlyAllowInside && endIdx2 < offset)
-                    return null; // we dont want attribute auto complete to show outside of elements
+                    return null;
 
                 if (endIdx2 < xml.Length && xml[endIdx2 - 1] == '/')
                 {
@@ -561,7 +535,7 @@ namespace PhasmaStrap.UI.Elements.Editor
             if (endIdx2 > 0 && endIdx2 < int.MaxValue && endIdx > startIdx)
             {
                 string element = xml.Substring(startIdx + 1, endIdx - startIdx - 1);
-                return element == "!--" ? null : element; // dont treat comments as elements
+                return element == "!--" ? null : element;
             }
             else
             {
@@ -569,9 +543,6 @@ namespace PhasmaStrap.UI.Elements.Editor
             }
         }
 
-        /// <summary>
-        /// A space between the cursor and the element will completely cancel this function
-        /// </summary>
         private string? GetElementAtCursorNoSpaces(string xml, int offset)
         {
             (string line, int pos) = GetLineAndPosAtCaretPosition();
@@ -591,20 +562,13 @@ namespace PhasmaStrap.UI.Elements.Editor
             return null;
         }
 
-        /// <summary>
-        /// Returns null if not eligible to auto complete there.
-        /// Returns the name of the element to show the attributes for
-        /// </summary>
-        /// <returns></returns>
         private string? ShowAttributesForElementName()
         {
             (string line, int pos) = GetLineAndPosAtCaretPosition();
 
-            // check if theres an even number of speech marks on the line
             int numSpeech = line.Count(x => x == '"');
             if (numSpeech % 2 == 0)
             {
-                // we have an equal number, let's check if pos is in between the speech marks
                 int count = -1;
                 int idx = pos;
                 int size = line.Length - 1;
@@ -620,8 +584,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
                 if (count % 2 != 0)
                 {
-                    // odd number of speech marks means we're inside a string right now
-                    // we dont want to display attribute auto complete while we're inside a string
                     return null;
                 }
             }
@@ -646,7 +608,7 @@ namespace PhasmaStrap.UI.Elements.Editor
                 if (UIXML.Text.Length > UIXML.CaretOffset && UIXML.Text[UIXML.CaretOffset] == '>')
                     return;
 
-                var elementName = ShowAttributesForElementName(); // re-using functions :)
+                var elementName = ShowAttributesForElementName();
                 if (elementName != null)
                     UIXML.TextArea.Document.Insert(UIXML.CaretOffset, ">");
             }
@@ -764,7 +726,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
         public string Text { get; private set; }
 
-        // Use this property if you want to show a fancy UIElement in the list.
         public object Content => Text;
 
         public object? Description => null;
@@ -792,7 +753,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
         public string Text { get; private set; }
 
-        // Use this property if you want to show a fancy UIElement in the list.
         public object Content => Text;
 
         public object? Description => null;
@@ -819,7 +779,6 @@ namespace PhasmaStrap.UI.Elements.Editor
 
         public string Text { get; private set; }
 
-        // Use this property if you want to show a fancy UIElement in the list.
         public object Content => Text;
 
         public object? Description => null;

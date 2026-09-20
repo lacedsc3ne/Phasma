@@ -1,13 +1,9 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Media;
 
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-// Ported from Voidstrap's UI/Elements/ContextMenu/TextMarkerService.cs.
-// An AvalonEdit background renderer + line colorizer that draws a background/foreground over
-// arbitrary text ranges. BootstrapperEditorWindow uses it to highlight the lines that differ
-// from the last-saved baseline (see LineDiff).
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
     public class TextMarkerService : DocumentColorizingTransformer, IBackgroundRenderer, ITextMarkerService

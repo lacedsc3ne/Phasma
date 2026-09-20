@@ -6,19 +6,6 @@ using PhasmaStrap.AppData;
 
 namespace PhasmaStrap.Integrations
 {
-    // System-level Roblox FPS tweaks that don't touch a single FastFlag - all four are things
-    // various Bloxstrap-family forks and community "boost Roblox FPS" guides do at the OS level
-    // instead: force RobloxPlayerBeta.exe onto the discrete/high-performance GPU on hybrid-graphics
-    // laptops, stop the Xbox Game Bar/Game DVR capture hook from attaching to it (background capture
-    // overhead + input latency), raise the system multimedia timer resolution for smoother frame
-    // pacing while a session is active, and switch to the "High performance" power plan while
-    // playing so a Balanced-plan laptop doesn't clock the CPU down mid-game.
-    //
-    // The GPU preference and Game DVR tweaks are persistent per-user registry associations (keyed
-    // by the exe path, or global), so they're applied/reverted whenever the matching setting is
-    // toggled rather than being tied to a game session. Timer resolution and the power plan are
-    // genuinely session-scoped, so those hook into ActivityWatcher.OnGameJoin/OnGameLeave the same
-    // way RobloxProcessOptimizer does.
     internal static class SystemPerformanceBoost
     {
         private const string LOG_IDENT = "SystemPerformanceBoost";
@@ -44,8 +31,6 @@ namespace PhasmaStrap.Integrations
 
         private static Guid? _previousPowerScheme;
 
-        // --- persistent, exe-scoped: high-performance GPU preference ---
-
         public static void ApplyGpuPreference()
         {
             try
@@ -69,8 +54,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // --- persistent, global: Xbox Game Bar / Game DVR background capture ---
-
         public static void ApplyGameDvr()
         {
             bool disable = App.Settings.Prop.DisableGameDVR;
@@ -89,8 +72,6 @@ namespace PhasmaStrap.Integrations
                 App.Logger.WriteException(LOG_IDENT, ex);
             }
         }
-
-        // --- session-scoped: timer resolution + power plan ---
 
         public static void OnGameJoin()
         {

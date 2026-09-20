@@ -4,14 +4,6 @@ using NAudio.Wave;
 
 namespace PhasmaStrap.Integrations
 {
-    // applies a real-time dynamics compressor to Roblox's own render-audio session so quiet
-    // sounds (footsteps, distant cues) get boosted without loud moments blowing out your ears -
-    // handy for headset listening. Captures Roblox's loopback stream via the Windows 10+
-    // per-process loopback API, measures its RMS level, and nudges the session's own volume
-    // control up or down to compensate, restoring the original volume on stop. Simplified from
-    // Voidstrap's version: that one also had a "duck audio while Roblox is unfocused" feature
-    // (a distinct concern, ported separately as AudioDucker), so this only carries the
-    // loudness-evening compressor. Ported from Voidstrap.
     public static class HeadsetAudio
     {
         private const string LOG_IDENT = "HeadsetAudio";

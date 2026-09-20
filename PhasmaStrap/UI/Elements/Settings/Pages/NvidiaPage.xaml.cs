@@ -10,15 +10,8 @@ using PhasmaStrap.UI.ViewModels.Settings;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Interaction logic for NvidiaPage.xaml
-    /// </summary>
     public partial class NvidiaPage
     {
-        // Grid view's filtered copy of _viewModel.CustomSettings, same code-behind-only DataGrid
-        // idiom as FastFlagEditorPage (see the comment at the top of that file) - kept in sync
-        // with the viewmodel's collection via CollectionChanged rather than an XAML binding, so
-        // the search box can filter it without touching the underlying data.
         private readonly ObservableCollection<NvidiaSetting> _gridSettings = new();
 
         private readonly NvidiaViewModel _viewModel;
@@ -76,26 +69,17 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             }
         }
 
-        // "Advanced Editor" row on the card view - flips to the raw grid view in place (same
-        // page/DataContext, see the DataTriggers in NvidiaPage.xaml), rather than opening a new
-        // window/page.
         private void AdvancedEditor_Click(object sender, RoutedEventArgs e)
         {
             ReloadGridList();
             _viewModel.NvidiaEditorViewMode = true;
         }
 
-        // "Back" button in the grid view - flips back to the card view.
         private void AdvancedEditorBack_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.NvidiaEditorViewMode = false;
         }
 
-        // "NVIDIA Setup" row. PhasmaStrap's NVIDIA integration talks to the driver directly via
-        // NVAPI (see NvidiaProfileInspector.cs) - there's no separate "NVIDIA Profile Inspector"
-        // tool to install or point PhasmaStrap at like Voidstrap needs, so there's nothing to
-        // walk the user through installing. This just explains that in place, rather than
-        // linking out to a wiki page that doesn't exist for this feature.
         private void NvidiaSetup_Click(object sender, RoutedEventArgs e)
         {
             Frontend.ShowMessageBox(Strings.Menu_Nvidia_Setup_HelpText, MessageBoxImage.Information);
@@ -107,10 +91,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             ReloadGridList();
         }
 
-        // Rebuilds the grid's filtered list from _viewModel.CustomSettings, filtering by Name or
-        // Setting ID (decimal or hex) the same way FastFlagEditorPage's ReloadList filters by
-        // flag name. Preserves the current selection across a refresh so deleting a filtered
-        // subset or adding a new setting doesn't surprise-clear what's selected.
         private void ReloadGridList()
         {
             HashSet<uint> selected = new HashSet<uint>();

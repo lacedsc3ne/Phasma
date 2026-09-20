@@ -1,11 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 using PhasmaStrap.UI.ViewModels.Installer;
 
 namespace PhasmaStrap.UI.Elements.Installer.Pages
 {
-    /// <summary>
-    /// Interaction logic for WelcomePage.xaml
-    /// </summary>
     public partial class WelcomePage
     {
         private readonly WelcomeViewModel _viewModel = new();

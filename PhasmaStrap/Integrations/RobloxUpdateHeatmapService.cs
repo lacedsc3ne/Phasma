@@ -1,14 +1,5 @@
 namespace PhasmaStrap.Integrations
 {
-    // fetches a Roblox experience's public "created"/"updated" timestamps plus its badge-award
-    // dates, then buckets those events by day of week to show which days it typically ships
-    // updates on. Ported from Voidstrap's RobloxUpdateHeatmapService, which returned a full
-    // per-calendar-day heatmap (keyed by "yyyy-MM-dd") meant to be rendered inside Voidstrap's
-    // embedded in-game browser overlay. PhasmaStrap has no equivalent embedded browser surface,
-    // so this is simplified down to a day-of-week frequency summary - the part of the data that's
-    // actually useful as a standalone settings-page widget - and dropped the bounded-stream
-    // reader / retry-with-backoff plumbing in favor of App.HttpClient, which already applies
-    // sane timeouts app-wide.
     public sealed record RobloxUpdateHeatmapResult(
         bool Success,
         string? ErrorMessage,

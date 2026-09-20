@@ -1,4 +1,4 @@
-﻿using PhasmaStrap.Models.RobloxApi;
+using PhasmaStrap.Models.RobloxApi;
 
 namespace PhasmaStrap.Models.Entities
 {
@@ -22,7 +22,6 @@ namespace PhasmaStrap.Models.Entities
             if (userResponse is null)
                 throw new InvalidHTTPResponseException("Roblox API for User Details returned invalid data");
 
-            // we can remove '-headshot' from the url if we want a full avatar picture
             var thumbnailResponse = await Http.GetJson<ApiArrayResponse<ThumbnailResponse>>($"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={id}&size=180x180&format=Png&isCircular=false");
 
             if (thumbnailResponse is null || !thumbnailResponse.Data.Any())

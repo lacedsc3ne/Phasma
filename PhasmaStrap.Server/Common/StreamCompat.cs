@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace PhasmaStrap.Server.Common;
 
-// Polyfills for Stream.ReadExactly/ReadExactlyAsync (introduced in .NET 7), since
-// PhasmaStrap.Server intentionally targets net6.0 to match PhasmaStrap's TFM major version.
 internal static class StreamCompat
 {
 	public static void ReadExactly(this Stream stream, byte[] buffer)

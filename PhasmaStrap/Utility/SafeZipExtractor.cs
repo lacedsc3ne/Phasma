@@ -3,15 +3,6 @@ using System.IO.Compression;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Ported from Voidstrap's Voidstrap.Utility.SafeZipExtractor (src/Voidstrap.App/Utility/SafeZipExtractor.cs).
-    /// Extracts a zip archive while defending against zip-slip (path traversal via "../" entry names or absolute
-    /// paths), symlink entries (both the archive's own symlink entries and a pre-existing symlink at the
-    /// destination), duplicate entry paths, entry-count bombs, and decompression bombs (checked against both the
-    /// declared and actual expanded size). Used by <see cref="PhasmaStrap.Integrations.ClassicClients"/> to extract
-    /// downloaded classic-client/engine archives - do not replace with a plain <see cref="ZipFile.ExtractToDirectory"/>
-    /// call, it has none of these protections.
-    /// </summary>
     public static class SafeZipExtractor
     {
         public static void ExtractToDirectory(string archivePath, string destinationPath, bool overwrite = true, long maxExpandedBytes = 2147483648L, int maxEntries = 100000)

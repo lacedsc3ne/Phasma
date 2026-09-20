@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ namespace PhasmaStrap.Models.SettingTasks.Base
         public abstract bool Changed { get; }
 
         public BaseTask(string prefix, string name) : this($"{prefix}.{name}") { }
-        
+
         public BaseTask(string name) => Name = name;
 
         public override string ToString() => Name;

@@ -8,7 +8,7 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="ChannelPage"
-      Scrollable="False">
+      Scrollable="True">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Margin="0,4,0,0" Text="{x:Static resources:Strings.Menu_Channel_ChooseWhichRobloxDeploymentChannelPhasmaStrap}" FontSize="14" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 

@@ -15,56 +15,130 @@
         <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_General_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <ui:CardExpander Margin="0,14,0,0">
+            <ui:CardExpander.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Notifications_General_Title}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding SummaryText, Mode=OneWay}" />
+                </StackPanel>
+            </ui:CardExpander.Header>
+            <StackPanel>
+                <controls:OptionControl
+                    Header="{x:Static resources:Strings.Menu_Notifications_Enabled_Title}"
+                    Description="{x:Static resources:Strings.Menu_Notifications_Enabled_Description}"
+                    x:Name="EnabledOption">
+                    <ui:ToggleSwitch IsChecked="{Binding NotificationsEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Notifications_Enabled_Title}"
-            Description="{x:Static resources:Strings.Menu_Notifications_Enabled_Description}"
-            x:Name="EnabledOption">
-            <ui:ToggleSwitch IsChecked="{Binding NotificationsEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <controls:OptionControl
+                    Header="{x:Static resources:Strings.Menu_Notifications_DoNotDisturb}"
+                    Description="{x:Static resources:Strings.Menu_Notifications_SuppressesScreenToastPopupRestSession}"
+                    IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
+                    <ui:ToggleSwitch IsChecked="{Binding DoNotDisturbEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Notifications_JoinToast_Title}"
-            Description="{x:Static resources:Strings.Menu_Notifications_JoinToast_Description}"
-            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
-            <ui:ToggleSwitch IsChecked="{Binding NotificationsJoinToastEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                <ui:CardExpander Margin="0,8,0,0" Icon="Comment24" IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
+                    <ui:CardExpander.Header>
+                        <StackPanel>
+                            <TextBlock FontSize="14" Text="Popup placement and size" />
+                            <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                       Text="Where the toasts sit and how wide they are. They follow the screen Roblox is on." />
+                            <TextBlock FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       Text="{Binding PlacementSummary, Mode=OneWay}" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <controls:OptionControl Header="Corner to start from" Description="The anchor the offsets below are measured from.">
+                            <ComboBox Width="180" Padding="10,5,10,5" ItemsSource="{Binding NotificationPositionOptions, Mode=OneTime}" SelectedIndex="{Binding NotificationPositionIndex, Mode=TwoWay}" />
+                        </controls:OptionControl>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Notifications_LeaveToast_Title}"
-            Description="{x:Static resources:Strings.Menu_Notifications_LeaveToast_Description}"
-            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
-            <ui:ToggleSwitch IsChecked="{Binding NotificationsLeaveToastEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                        <controls:OptionControl Header="Distance from the side" Description="In pixels. For the middle positions this shifts it right.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="0" Maximum="1200" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding NotificationOffsetX, Mode=TwoWay}" />
+                                <TextBlock Width="48" Margin="8,0,0,0" VerticalAlignment="Center" FontFamily="Consolas" Text="{Binding NotificationOffsetX}" />
+                            </StackPanel>
+                        </controls:OptionControl>
 
-        <controls:OptionControl
-            Header="{x:Static resources:Strings.Menu_Notifications_DoNotDisturb}"
-            Description="{x:Static resources:Strings.Menu_Notifications_SuppressesScreenToastPopupRestSession}"
-            IsEnabled="{Binding InnerContent.IsChecked, ElementName=EnabledOption, Mode=OneWay}">
-            <ui:ToggleSwitch IsChecked="{Binding DoNotDisturbEnabled, Mode=TwoWay}" />
-        </controls:OptionControl>
+                        <controls:OptionControl Header="Distance from the top or bottom" Description="In pixels, measured from whichever edge you picked above.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="0" Maximum="1200" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding NotificationOffsetY, Mode=TwoWay}" />
+                                <TextBlock Width="48" Margin="8,0,0,0" VerticalAlignment="Center" FontFamily="Consolas" Text="{Binding NotificationOffsetY}" />
+                            </StackPanel>
+                        </controls:OptionControl>
 
-        <Grid Margin="0,12,0,0">
+                        <controls:OptionControl Header="Width" Description="How wide the popup itself is, in pixels.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider Width="220" Minimum="300" Maximum="700" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding NotificationWidth, Mode=TwoWay}" />
+                                <TextBlock Width="48" Margin="8,0,0,0" VerticalAlignment="Center" FontFamily="Consolas" Text="{Binding NotificationWidth}" />
+                            </StackPanel>
+                        </controls:OptionControl>
+
+                        <controls:OptionControl Header="Try it" Description="Sends a test popup so you can see where it lands.">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:Button Icon="Play24" Content="Send test" Command="{Binding SendTestNotificationCommand}" />
+                                <ui:Button Margin="8,0,0,0" Icon="ArrowReset24" Content="Reset" Command="{Binding ResetPlacementCommand}" />
+                            </StackPanel>
+                        </controls:OptionControl>
+                    </StackPanel>
+                </ui:CardExpander>
+
+                <TextBlock Margin="0,14,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                           Text="Everything PhasmaStrap can put on screen, and what sets it off. Only the ones with a switch can be turned off on their own." />
+
+                <ItemsControl Margin="0,10,0,0" ItemsSource="{Binding Catalogue, Mode=OneWay}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding Name}" />
+
+                                <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding Kinds, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,4,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Grid.Column="0" Width="26" Height="26" CornerRadius="13" Margin="0,1,10,0" VerticalAlignment="Top" Background="{Binding Tint, Mode=OneTime}">
+                                                    <ui:SymbolIcon Symbol="{Binding Symbol, Mode=OneTime}" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding Accent, Mode=OneTime}" />
+                                                </Border>
+
+                                                <StackPanel Grid.Column="1" Margin="0,0,16,0" VerticalAlignment="Center">
+                                                    <TextBlock FontSize="13" TextWrapping="Wrap" Text="{Binding Name}" />
+                                                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding Trigger}" />
+                                                </StackPanel>
+                                                <ui:ToggleSwitch Grid.Column="2" VerticalAlignment="Center"
+                                                                 IsChecked="{Binding IsOn, Mode=TwoWay}"
+                                                                 Visibility="{Binding HasToggle, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                 IsEnabled="{Binding DataContext.NotificationsEnabled, RelativeSource={RelativeSource AncestorType=ui:UiPage}, Mode=OneWay}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ui:CardExpander>
+
+        <Grid Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center"
-                       Text="{x:Static resources:Strings.Menu_Notifications_HistoryOnlyShowsNotificationsFiredBy}" />
-            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Notifications_SendTestNotification}" Icon="Alert24" Appearance="Secondary" Margin="12,0,0,0" Command="{Binding SendTestNotificationCommand, Mode=OneTime}" />
-        </Grid>
-
-        <Grid Margin="0,16,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{x:Static resources:Strings.Menu_Notifications_History_Title}" FontSize="20" FontWeight="Medium" VerticalAlignment="Center" />
-            <ui:Button Grid.Column="1" Margin="12,0,0,0" Content="{x:Static resources:Strings.Menu_Notifications_History_Clear}" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearHistoryCommand, Mode=OneTime}" IsEnabled="{Binding HasHistory}" />
+            <ui:Button Grid.Column="1" Content="{x:Static resources:Strings.Menu_Notifications_SendTestNotification}" Icon="Alert24" Appearance="Secondary" Margin="12,0,0,0" Command="{Binding SendTestNotificationCommand, Mode=OneTime}" />
+            <ui:Button Grid.Column="2" Margin="8,0,0,0" Content="{x:Static resources:Strings.Menu_Notifications_History_Clear}" Icon="Delete24" Appearance="Secondary" Command="{Binding ClearHistoryCommand, Mode=OneTime}" IsEnabled="{Binding HasHistory}" />
         </Grid>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Empty}" FontSize="13" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,8,0,0">
+        <TextBlock Margin="0,4,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap"
+                   Text="{x:Static resources:Strings.Menu_Notifications_HistoryOnlyShowsNotificationsFiredBy}" />
+
+        <TextBlock Text="{x:Static resources:Strings.Menu_Notifications_History_Empty}" FontSize="13" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,10,0,0">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -77,7 +151,7 @@
             </TextBlock.Style>
         </TextBlock>
 
-        <ItemsControl ItemsSource="{Binding History}" Margin="0,8,0,0">
+        <ItemsControl ItemsSource="{Binding History}" Margin="0,10,0,0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border Margin="0,0,0,6" Padding="12,8" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource ControlElevationBorderBrush}" Background="{DynamicResource ControlFillColorSecondaryBrush}">

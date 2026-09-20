@@ -2,13 +2,11 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility
 {
-    // The full exe path of another process. Process.MainModule needs rights a game process
-    // usually refuses; QueryFullProcessImageName only needs the limited query right.
     internal static class ProcessImage
     {
         public static string? PathOf(int pid)
         {
-            IntPtr handle = OpenProcess(0x1000 /* PROCESS_QUERY_LIMITED_INFORMATION */, false, pid);
+            IntPtr handle = OpenProcess(0x1000 , false, pid);
             if (handle == IntPtr.Zero)
                 return null;
 
@@ -24,7 +22,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // every running Roblox player: its version folder and when it started (UTC)
         public static List<(string Folder, DateTime StartedUtc)> RunningRoblox()
         {
             var list = new List<(string, DateTime)>();
@@ -41,7 +38,6 @@ namespace PhasmaStrap.Utility
                     }
                     catch (Exception)
                     {
-                        // exited meanwhile
                     }
                 }
             }

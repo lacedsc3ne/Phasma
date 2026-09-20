@@ -1,12 +1,5 @@
 namespace PhasmaStrap.Utility
 {
-    // Flag names that short share codes (PHF2-) refer to by position instead of spelling them
-    // out: the flags behind the Roblox FFlags toggles, which is what most shared profiles hold.
-    //
-    // APPEND ONLY. A code stores "#37" for the 38th name here, so removing or reordering an entry
-    // would make every code already shared decode to the wrong flag. New names go at the end.
-    // (Taken from FastFlagManager.PresetFlags on 2026-09-19; that dictionary may change freely,
-    // this list may not.)
     public static class FlagCodeNames
     {
         public static readonly string[] Names =

@@ -1,14 +1,5 @@
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>
-    /// Minimal HLSL used by OverlayCompositor: a full-screen triangle vertex shader plus
-    /// three pixel shaders (opaque pass-through blit, straight-alpha overlay blit for
-    /// HUD/crosshair, and a crop+sRGB-encode blit used when desktop duplication hands
-    /// back a non-8bpc-sRGB backbuffer format). This is a trimmed-down stand-in for
-    /// Voidstrap's FrameGenShaders.cs, which additionally carried bicubic sampling,
-    /// homepage-background composition and luma-difference passes needed only by
-    /// RiShade/Frame Generation - none of which are part of this port.
-    /// </summary>
     internal static class OverlayShaders
     {
         public const string Source = @"

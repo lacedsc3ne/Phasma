@@ -113,6 +113,37 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool FrameLimiterAvailable => Integrations.Nvidia.FrameLimiter.Available;
+
+        public string FrameLimitSteps
+        {
+            get => App.Settings.Prop.FrameLimitSteps;
+            set
+            {
+                App.Settings.Prop.FrameLimitSteps = value ?? "";
+                OnPropertyChanged(nameof(FrameLimitSteps));
+                OnPropertyChanged(nameof(FrameLimitStatus));
+            }
+        }
+
+        public string FrameLimitStatus
+        {
+            get
+            {
+                if (!Integrations.Nvidia.FrameLimiter.Available)
+                    return Integrations.Nvidia.FrameLimiter.UnavailableReason;
+
+                string order = string.Join(", ", Integrations.Nvidia.FrameLimiter.Steps);
+                return $"The driver is set to {Integrations.Nvidia.FrameLimiter.Describe(Integrations.Nvidia.FrameLimiter.Current())}. Stepping through {order}, then no limit.";
+            }
+        }
+
+        public ICommand RefreshFrameLimitCommand => new RelayCommand(() =>
+        {
+            OnPropertyChanged(nameof(FrameLimitStatus));
+            OnPropertyChanged(nameof(FrameLimiterAvailable));
+        });
+
         public int FrameGenQuality
         {
             get => FrameGenSettings.QualityIndex;
@@ -130,8 +161,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             2 => "Quality",
             _ => "Balanced",
         };
-
-        // --- system-level FPS tweaks that don't touch a single FastFlag (SystemPerformanceBoost) ---
 
         public bool ForceHighPerformanceGpu
         {
@@ -164,8 +193,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.UseHighPerformancePowerPlan;
             set => App.Settings.Prop.UseHighPerformancePowerPlan = value;
         }
-
-        // --- system RAM cleaner (Utility.SystemMemoryCleaner) - a manual one-shot action, not a toggle ---
 
         private bool _cleaningRam;
 
@@ -215,9 +242,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     PhasmaStrap.Utility.AutoRamCleaner.Stop();
             }
         }
-
-        // --- per-game engine overrides (which preset - from BehaviourViewModel's Deployment > Advanced
-        // tab now - applies to which place, or excludes it from optimization entirely) ---
 
         public string[] EnginePresetNames => Integrations.EnginePresets.PresetNames;
 
@@ -301,12 +325,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             App.Settings.Prop.EnginePlaceProfiles.Remove(assignment.PlaceId);
         });
 
-        // --- multi-monitor / forced in-game resolution (ported from Voidstrap DisplaySystem /
-        // InGameResolutionApplier) ---
-
-        // The lists are built once and the selections are always items OF those lists: a combo
-        // box only shows a selection that is one of its own items, and these used to be rebuilt
-        // on every read - so nothing could ever be selected.
         private List<DisplayInfo>? _monitorOptions;
         public List<DisplayInfo> MonitorOptions => _monitorOptions ??= DisplaySystem.GetDisplays();
 
@@ -361,14 +379,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // ---- per-game resolutions: the monitor + resolution chosen above, for one game
-
         public sealed record ResolutionGameChoice(string PlaceId, string Name)
         {
             public override string ToString() => Name;
         }
 
-        // games played recently, to pick from instead of typing a place ID
         public List<ResolutionGameChoice> ResolutionRecentGames { get; } = Integrations.PlayTimeStore.GetAll()
             .Where(e => e.PlaceId > 0)
             .Take(30)

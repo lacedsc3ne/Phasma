@@ -1,10 +1,5 @@
 namespace PhasmaStrap.UI.Elements.Settings.Search
 {
-    /// <summary>
-    /// The complete list of searchable settings. The entries themselves live in the generated
-    /// partial (SettingsSearchIndex.g.cs) - see tools/gen_settings_search_index.py, which scans
-    /// every page's XAML so nothing has to be kept in sync by hand.
-    /// </summary>
     internal static partial class SettingsSearchIndex
     {
         private static IReadOnlyList<SettingsSearchEntry>? _entries;
@@ -25,7 +20,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 return Array.Empty<SettingsSearchEntry>();
             }
 
-            // rows generated at runtime from data (not XAML) - the hotkey bindings list
             foreach (var action in PhasmaStrap.Utility.HotkeyActions.All)
                 generated.Add(new SettingsSearchEntry(SettingsSearchEntryKind.Option, action.DisplayName, action.Description, typeof(Pages.HotkeysPage), "Hotkeys", "", "", "", null));
 
@@ -37,8 +31,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
                 if (entry.Header.Length == 0 || entry.PageType is null)
                     continue;
 
-                // the same header can legitimately appear under different tabs/groups (e.g. "Enabled"),
-                // but an exact duplicate of kind+header+location is just noise
                 string key = $"{entry.Kind}|{entry.PageType.Name}|{entry.Tab}|{entry.Section}|{entry.Group}|{entry.Header}";
                 if (seen.Add(key))
                     result.Add(entry);

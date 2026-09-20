@@ -5,21 +5,6 @@ using PhasmaStrap.Models.Entities;
 
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// Applies user-chosen customization directly to the live Roblox game window: a custom
-    /// title (optionally appending the current game's name and live player count) and,
-    /// optionally, the current game's own icon instead of Roblox's. Backed by
-    /// Settings.RobloxTitle / CycleTitleWithGameName / ShowServerInfoInTitle /
-    /// UseGameIconForRobloxWindow (Behaviour page, Roblox tab).
-    ///
-    /// Ported from Voidstrap's WindowManipulation, adapted to reuse PhasmaStrap's existing
-    /// RobloxWindowTracker (WinEvent-hooked window discovery, already used by the overlay
-    /// subsystem) instead of re-polling for the window handle, and simplified: no fake
-    /// borderless-fullscreen or DWM backdrop handling here, since PhasmaStrap already has its
-    /// own fake-fullscreen implementation (Integrations/FakeExclusiveFullscreen.cs) and a DWM
-    /// backdrop applied to an externally-owned, fully self-rendered game window is unlikely to
-    /// be visible behind Roblox's own rendering.
-    /// </summary>
     public static class RobloxWindowCustomizer
     {
         private const string LOG_IDENT = "RobloxWindowCustomizer";

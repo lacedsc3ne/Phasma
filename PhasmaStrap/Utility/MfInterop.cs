@@ -3,12 +3,6 @@ using Vortice.MediaFoundation;
 
 namespace PhasmaStrap.Utility
 {
-    // Raw Media Foundation entry points for GpuReplayRecorder / ReplayMuxer.
-    //
-    // Vortice.MediaFoundation 2.1.0 cannot be trusted for these (see InstantReplayRecorder: its
-    // UINT64 attribute setters recurse forever, and its *FromURL factories are bound to the wrong
-    // DLL), so anything that is not a plain, already proven wrapper call goes through P/Invoke or
-    // the COM vtable here.
     internal static class MfInterop
     {
         public static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = new("a634a91c-822b-41b9-a494-4de4643612b0");
@@ -43,10 +37,6 @@ namespace PhasmaStrap.Utility
         private static T Slot<T>(IntPtr self, int slot) where T : Delegate =>
             Marshal.GetDelegateForFunctionPointer<T>(Marshal.ReadIntPtr(Marshal.ReadIntPtr(self), slot * IntPtr.Size));
 
-        // ---- IMFAttributes (IUnknown x3, 15 getters/comparers, SetItem 18, DeleteItem 19,
-        //      DeleteAllItems 20, SetUINT32 21, SetUINT64 22, SetDouble 23, SetGUID 24,
-        //      SetString 25, SetBlob 26, SetUnknown 27)
-
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int SetUInt32Fn(IntPtr self, ref Guid key, uint value);
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int SetUInt64Fn(IntPtr self, ref Guid key, ulong value);
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int SetGuidFn(IntPtr self, ref Guid key, ref Guid value);
@@ -66,12 +56,8 @@ namespace PhasmaStrap.Utility
 
         public static ulong Pack(uint high, uint low) => ((ulong)high << 32) | low;
 
-        // ---- IMFDXGIDeviceManager (IUnknown x3, CloseDeviceHandle 3, GetVideoService 4,
-        //      LockDevice 5, OpenDeviceHandle 6, ResetDevice 7)
-
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int ResetDeviceFn(IntPtr self, IntPtr device, uint token);
 
-        // returns an owned IMFDXGIDeviceManager pointer bound to `device` (Marshal.Release it)
         public static IntPtr CreateDeviceManager(IntPtr device)
         {
             Check(MFCreateDXGIDeviceManager(out uint token, out IntPtr manager));
@@ -95,20 +81,15 @@ namespace PhasmaStrap.Utility
             return new IMFMediaBuffer(buffer);
         }
 
-        // how many references a COM object has right now
         public static int RefCount(IntPtr unknown)
         {
             Marshal.AddRef(unknown);
             return Marshal.Release(unknown);
         }
 
-        // ---- in-memory byte streams (IMFByteStream: IUnknown x3, GetCapabilities 3, GetLength 4,
-        //      SetLength 5, GetCurrentPosition 6, SetCurrentPosition 7)
-
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int GetLengthFn(IntPtr self, out ulong length);
         [UnmanagedFunctionPointer(CallingConvention.StdCall)] private delegate int SetPositionFn(IntPtr self, ulong position);
 
-        // an owned IMFByteStream over managed memory (MemoryComStream) - nothing touches the disk
         public static IntPtr CreateMemoryByteStream()
         {
             IntPtr stream = Marshal.GetComInterfaceForObject(new MemoryComStream(), typeof(System.Runtime.InteropServices.ComTypes.IStream));
@@ -120,7 +101,7 @@ namespace PhasmaStrap.Utility
             }
             finally
             {
-                Marshal.Release(stream); // the byte stream holds its own reference
+                Marshal.Release(stream);
             }
         }
 
@@ -133,9 +114,6 @@ namespace PhasmaStrap.Utility
         public static void ByteStreamRewind(IntPtr byteStream) =>
             Check(Slot<SetPositionFn>(byteStream, 7)(byteStream, 0));
 
-        // ---- readers / writers
-
-        // url OR byteStream; `attributes` may be null
         public static IMFSinkWriter CreateSinkWriter(string? url, IntPtr byteStream, IMFAttributes? attributes)
         {
             Check(MFCreateSinkWriterFromURL(url, byteStream, attributes?.NativePointer ?? IntPtr.Zero, out IntPtr writer));

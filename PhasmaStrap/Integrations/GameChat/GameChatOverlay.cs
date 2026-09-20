@@ -11,18 +11,6 @@ using System.Windows.Threading;
 
 namespace PhasmaStrap.Integrations.GameChat
 {
-    /// <summary>
-    /// The chat overlay window itself. Renders on top of Roblox (WS_EX_TOOLWINDOW + WS_EX_NOACTIVATE, topmost,
-    /// click-through until the user opens chat mode) and tracks Roblox's window rectangle so it stays glued to
-    /// the game window.
-    ///
-    /// Voidstrap's original overlay positioned itself using a separate always-on "RobloxWindowTracker" overlay
-    /// subsystem and rendered three tabs (a per-server chat, a cross-server "Global" chat, and a "Bootstrappers"
-    /// tab bridged through a third-party community server). This port tracks the Roblox window itself (see
-    /// <see cref="OnTrackerTick"/>) and keeps the Chat/Global tabs, but drops the third-party bridge tab -
-    /// piping fork users' messages through an external community server without their explicit knowledge isn't
-    /// something this port should do silently.
-    /// </summary>
     public class GameChatOverlay : Window
     {
         private const string LogTag = "GameChatOverlay";
@@ -354,11 +342,7 @@ namespace PhasmaStrap.Integrations.GameChat
         public void LeaveGame()
         {
             if (!Dispatcher.CheckAccess()) { DispatchUi(LeaveGame); return; }
-            // Voidstrap's original overlay used an ActivityWatcher.IsTeleporting flag here to grant a
-            // grace period before hiding, so a teleport between servers wouldn't flicker the overlay off
-            // and back on. PhasmaStrap's ActivityWatcher doesn't expose a live "currently teleporting"
-            // flag (only a completed-join Data.IsTeleport marker), so we hide immediately instead - a
-            // teleport will briefly hide/reshow the overlay rather than staying up through the gap.
+
             HideOverlay();
         }
 
@@ -807,9 +791,6 @@ namespace PhasmaStrap.Integrations.GameChat
             nameLink.Click += (_, _) => ShowProfile(msg.SenderId, msg.Sender);
             p.Inlines.Add(nameLink);
 
-            // non-blocking: returns the original text immediately (and the already-cached
-            // translation on a later message, once the background translate lands) rather than
-            // ever stalling this UI-thread render path - see TranslationService.Translate.
             string displayText = App.Settings.Prop.AutoTranslate
                 ? TranslationService.Translate(msg.Text, App.Settings.Prop.AutoTranslateLanguage)
                 : msg.Text;

@@ -1,6 +1,5 @@
-﻿using System.Windows.Media;
+using System.Windows.Media;
 
-// Ported from Voidstrap's UI/Elements/ContextMenu/ITextMarker.cs.
 namespace PhasmaStrap.UI.Elements.ContextMenu
 {
     public interface ITextMarker

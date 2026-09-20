@@ -7,14 +7,6 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
-    /// <summary>
-    /// A single raw key stored in Roblox's GlobalBasicSettings file - unlike PerformanceViewModel,
-    /// which only surfaces a handful of named GBSEditor.KnownProperties, this exposes every key so it
-    /// can be viewed, added, edited and removed directly. Ported from Voidstrap's GBSEditorPage, but
-    /// adapted from Voidstrap's curated-toggles UI into a raw editor (the FastFlagEditorPage-style
-    /// counterpart to PerformancePage's curated GBS toggles), since PhasmaStrap's GBSEditor.cs backend
-    /// (kept as-is) only accepts writes to its own KnownProperties allowlist.
-    /// </summary>
     public sealed class GBSEntry : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -42,14 +34,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
     }
 
-    /// <summary>
-    /// Raw editor over every key in Roblox's GlobalBasicSettings_13.xml file, reusing PhasmaStrap's
-    /// existing <see cref="GBSEditor"/> backend for loading/saving/read-only handling. Because
-    /// GBSEditor.SetProperty refuses to write anything outside its own KnownProperties allowlist, add/
-    /// edit/remove here work directly against the loaded XDocument's Properties element (both of which
-    /// GBSEditor exposes publicly for exactly this kind of raw access) and then go through GBSEditor's
-    /// own Save() so the same atomic-write/read-only handling is used for every key, known or not.
-    /// </summary>
     public class GBSEditorViewModel : NotifyPropertyChangedViewModel
     {
         private readonly GBSEditor _gbs = new();
@@ -95,11 +79,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Load();
         }
 
-        // --- curated settings, matching Voidstrap's GBSEditorPage tabs - reuses the shared GBSEditor
-        // backend (same instance the raw Entries editor above already writes through), so both halves
-        // of this page stay consistent. Every key here is in GBSEditor.KnownProperties.
-
-        // Interface
         public float UITransparency
         {
             get => _gbs.GetFloat("PreferredTransparency", 1f);
@@ -118,8 +97,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("ReducedMotion", value, nameof(ReducedMotion));
         }
 
-        // Roblox stores "was the hide-HUD shortcut last used", not HUD visibility directly, so this is
-        // inverted the same way Voidstrap's HudVisible is.
         public bool HudVisible
         {
             get => !_gbs.GetBool("UsedHideHudShortcut");
@@ -144,11 +121,10 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("BadgeVisible", value, nameof(BadgeVisible));
         }
 
-        // Graphics
         public int FramerateCap
         {
             get => _gbs.GetInt("FramerateCap", 0);
-            // the number box writes its value back on load - don't turn "not set" into a real 0
+
             set
             {
                 if (value != FramerateCap)
@@ -168,7 +144,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("Fullscreen", value, nameof(Fullscreen));
         }
 
-        // Audio
         public float MasterVolume
         {
             get => _gbs.GetFloat("MasterVolume", 1f);
@@ -181,7 +156,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("PartyVoiceVolume", value, nameof(VoiceChatVolume));
         }
 
-        // Input
         public float MouseSensitivity
         {
             get => _gbs.GetFloat("MouseSensitivity", 1f);
@@ -200,24 +174,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("GamepadCameraSensitivity", value, nameof(GamepadSensitivity));
         }
 
-        // Roblox stores vibration strength as a float, not a bool - HapticStrength > 0 means enabled,
-        // same as Voidstrap's ControllerVibration.
         public bool ControllerVibration
         {
             get => _gbs.GetFloat("HapticStrength", 1f) > 0f;
             set => Write("HapticStrength", value ? 1f : 0f, nameof(ControllerVibration));
         }
 
-        // VR
         public bool VREnabled
         {
             get => _gbs.GetBool("VREnabled");
             set => Write("VREnabled", value, nameof(VREnabled));
         }
 
-        // GBSEditor.KnownProperties clamps VRComfortSetting to [0, 2] (three-value enum: Comfort/Normal/
-        // Intense), so this uses 0/1/2 rather than Voidstrap's XAML tags of 1/2/3 - those would silently
-        // clamp "Intense" (tag 3) down to 2 ("Normal") under the shared range both forks enforce.
         public int VRComfortSetting
         {
             get => _gbs.GetInt("VRComfortSetting", 1);
@@ -230,9 +198,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("VignetteEnabled", value, nameof(VignetteEnabled));
         }
 
-        // Network
-        // Same underlying GBS key as PerformancePage's "Show performance stats" toggle - Roblox only
-        // has one stats overlay setting, Voidstrap just surfaces it again under its Network tab.
         public bool NetworkStatsVisible
         {
             get => _gbs.GetBool("PerformanceStatsVisible");
@@ -245,7 +210,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("ChatTranslationEnabled", value, nameof(ChatTranslationEnabled));
         }
 
-        // Advanced
         public bool MicroProfilerWebServerEnabled
         {
             get => _gbs.GetBool("MicroProfilerWebServerEnabled");
@@ -258,11 +222,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => Write("OnScreenProfilerEnabled", value, nameof(OnScreenProfilerEnabled));
         }
 
-        /// <summary>
-        /// Writes and saves a single curated property, then keeps the raw Entries editor (which reads
-        /// from a materialized snapshot of the document, not a live view) in sync so switching to the
-        /// Raw Editor tab reflects what a curated tab just changed.
-        /// </summary>
         private void Write(string name, object value, string propertyName)
         {
             _gbs.SetProperty(name, value);
@@ -270,9 +229,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ScheduleFlush();
         }
 
-        // a TwoWay slider writes on every pixel of a drag; saving the XML (temp file + replace)
-        // and rebuilding the raw-editor grid per tick made the sliders stutter, so the write is
-        // coalesced into one flush shortly after the last change (and on page unload)
         private readonly System.Windows.Threading.DispatcherTimer _flushTimer = new() { Interval = TimeSpan.FromMilliseconds(350) };
         private bool _flushHooked;
         private bool _flushPending;
@@ -371,10 +327,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return Persist();
         }
 
-        /// <summary>
-        /// Writes the current Entries collection into the underlying document and saves it. Called
-        /// after every add/remove/edit, mirroring GBSEditor.Save()'s all-or-nothing semantics.
-        /// </summary>
         public bool Persist()
         {
             XElement? properties = GBSEditor.EnsureProperties(_gbs.Document);

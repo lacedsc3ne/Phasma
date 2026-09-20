@@ -4,11 +4,6 @@ namespace PhasmaStrap.Integrations
 
     public sealed record UniverseSummary(long UniverseId, long RootPlaceId, string Name, string Creator);
 
-    /// <summary>
-    /// Looks up the experience a place belongs to and every place inside it (the "subplaces" -
-    /// lobbies, maps, VIP areas) so Home's link launcher can offer them. Uses the signed-in
-    /// account's cookie when there is one, which is what makes private/unlisted places show up.
-    /// </summary>
     public static class UniversePlaces
     {
         private const string LOG_IDENT = "UniversePlaces";
@@ -94,7 +89,6 @@ namespace PhasmaStrap.Integrations
                 App.Logger.WriteLine(LOG_IDENT, $"Place listing for universe {universeId} failed: {ex.Message}");
             }
 
-            // root place first, then the rest alphabetically
             return places.OrderByDescending(p => p.IsRootPlace).ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
     }

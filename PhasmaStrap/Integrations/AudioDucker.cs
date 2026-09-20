@@ -4,15 +4,6 @@ using Windows.Win32.Foundation;
 
 namespace PhasmaStrap.Integrations
 {
-    // Ducks (lowers) Roblox's own audio session while its window is in the background during
-    // a game session, and fades it back to full volume the moment Roblox is refocused; any
-    // ducked session is restored to its original volume when the session ends. Runs only
-    // between OnGameJoin and OnGameLeave/Dispose, gated behind DuckRobloxAudioOnUnfocus.
-    // Simplified from Voidstrap's version: that one also supports a standalone always-on
-    // "duck on unfocus" mode independent of game sessions, a "reset Roblox audio on next
-    // launch" one-shot setting, and cooperates with Voidstrap's HeadsetAudio/Overlays
-    // integrations; this only runs for the duration of a tracked game session and talks to
-    // the Windows Core Audio session APIs directly. Ported from Voidstrap.
     public static class AudioDucker
     {
         private sealed class SessionSnapshot

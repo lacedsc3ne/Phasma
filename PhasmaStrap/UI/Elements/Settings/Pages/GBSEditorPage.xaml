@@ -26,7 +26,6 @@
 
         <TabControl>
 
-            <!-- Interface -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -96,12 +95,11 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- Graphics -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:SymbolIcon Symbol="Color24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Graphics}" />
+                        <TextBlock Text="Graphics and audio" />
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
@@ -174,19 +172,8 @@
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_Fullscreen_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_Fullscreen_Description}">
                         <ui:ToggleSwitch IsChecked="{Binding Fullscreen, Mode=TwoWay}" />
                     </controls:OptionControl>
-                </StackPanel>
-            </TabItem>
 
-            <!-- Audio -->
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="MusicNote224" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Audio}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel Margin="0,12,0,0">
-                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Audio_Header}" />
+                    <TextBlock Margin="0,20,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Audio_Header}" />
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MasterVolume_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MasterVolume_Description}">
                         <StackPanel Orientation="Horizontal">
@@ -204,12 +191,11 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- Input -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:SymbolIcon Symbol="Games24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Input}" />
+                        <TextBlock Text="Input and VR" />
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
@@ -246,19 +232,8 @@
                             </controls:OptionControl>
                         </StackPanel>
                     </ui:CardExpander>
-                </StackPanel>
-            </TabItem>
 
-            <!-- VR -->
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="Rocket24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_VR}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel Margin="0,12,0,0">
-                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_VR_Header}" />
+                    <TextBlock Margin="0,20,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_VR_Header}" />
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_VREnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_VREnabled_Description}">
                         <ui:ToggleSwitch IsChecked="{Binding VREnabled, Mode=TwoWay}" />
@@ -290,12 +265,11 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- Network -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:SymbolIcon Symbol="PlugConnected24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Network}" />
+                        <TextBlock Text="Network and advanced" />
                     </StackPanel>
                 </TabItem.Header>
                 <StackPanel Margin="0,12,0,0">
@@ -308,19 +282,8 @@
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_ChatTranslationEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_ChatTranslationEnabled_Description}">
                         <ui:ToggleSwitch IsChecked="{Binding ChatTranslationEnabled, Mode=TwoWay}" />
                     </controls:OptionControl>
-                </StackPanel>
-            </TabItem>
 
-            <!-- Advanced -->
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon Symbol="Wrench24" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Static resources:Strings.Menu_GBSEditor_Tab_Advanced}" />
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel Margin="0,12,0,0">
-                    <TextBlock Margin="0,0,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Advanced_Header}" />
+                    <TextBlock Margin="0,20,0,4" FontSize="20" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_GBSEditor_Section_Advanced_Header}" />
 
                     <controls:OptionControl Header="{x:Static resources:Strings.Menu_GBSEditor_MicroProfilerWebServerEnabled_Header}" Description="{x:Static resources:Strings.Menu_GBSEditor_MicroProfilerWebServerEnabled_Description}">
                         <ui:ToggleSwitch IsChecked="{Binding MicroProfilerWebServerEnabled, Mode=TwoWay}" />
@@ -336,9 +299,6 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- Raw Editor - the FastFlagEditorPage-style complete key/value/type editor, kept from before
-                 this page grew curated tabs. Everything here shares the same GBSEditor backend and the
-                 same in-memory document as the curated tabs above. -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +17,6 @@ using Wpf.Ui.Mvvm.Interfaces;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Interaction logic for UninstallerDialog.xaml
-    /// </summary>
     public partial class UninstallerDialog
     {
         public bool Confirmed { get; private set; } = false;

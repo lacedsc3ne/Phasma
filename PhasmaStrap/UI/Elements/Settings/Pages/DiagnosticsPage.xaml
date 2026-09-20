@@ -16,7 +16,7 @@
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_ToolsFindOutWhatWrongSay}" />
 
         <TabControl Margin="0,12,0,0" x:Name="Tabs">
-            <!-- ============================================================ health check -->
+
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -59,7 +59,6 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- ============================================================ connection -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -129,7 +128,7 @@
                     <TextBlock Margin="2,10,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_RobloxGameServersIgnorePingsSo}" />
                 </StackPanel>
             </TabItem>
-            <!-- ============================================================ crashes -->
+
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -197,7 +196,7 @@
                     </controls:OptionControl>
                 </StackPanel>
             </TabItem>
-            <!-- ============================================================ stutter -->
+
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -258,7 +257,6 @@
                 </StackPanel>
             </TabItem>
 
-            <!-- ============================================================ auto-tuner -->
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -269,7 +267,6 @@
                 <StackPanel Margin="0,12,0,0">
                     <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_FindsOutWhetherFastFlagSetReally}" />
 
-                    <!-- setup -->
                     <StackPanel Margin="0,12,0,0" Visibility="{Binding TunerSetupVisibility, Mode=OneWay}">
                         <TextBlock FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_Diagnostics_WhichFlagSetsShouldBeCompared}" />
                         <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Diagnostics_TwoFourOtherSetsHaveExist}" />
@@ -294,7 +291,6 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- running -->
                     <StackPanel Margin="0,12,0,0" Visibility="{Binding TunerRunningVisibility, Mode=OneWay}">
                         <ItemsControl ItemsSource="{Binding TunerSteps, Mode=OneWay}">
                             <ItemsControl.ItemTemplate>

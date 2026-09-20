@@ -61,7 +61,92 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (ClassicCatalogEntry entry in ClassicClients.Catalog)
                 AvailableClients.Add(entry);
 
+            RebuildInstalledClientCards();
+
             _ = RefreshCatalogAsync();
+        }
+
+        public sealed class InstalledClientItem : NotifyPropertyChangedViewModel
+        {
+            private bool _isRunning;
+
+            public string Code { get; init; } = "";
+
+            public string Name { get; init; } = "";
+
+            public string VersionDisplay { get; init; } = "";
+
+            public bool IsRunning
+            {
+                get => _isRunning;
+                set
+                {
+                    _isRunning = value;
+                    OnPropertyChanged(nameof(IsRunning));
+                    OnPropertyChanged(nameof(IsNotRunning));
+                }
+            }
+
+            public bool IsNotRunning => !_isRunning;
+        }
+
+        public ObservableCollection<InstalledClientItem> InstalledClientCards { get; } = new();
+
+        public bool HasInstalledClients => InstalledClientCards.Count > 0;
+
+        public bool HasNoInstalledClients => InstalledClientCards.Count == 0;
+
+        private string _runningClientCode = "";
+
+        public ICommand LaunchInstalledClientCommand => new RelayCommand<string>(LaunchInstalledClient);
+
+        private void RebuildInstalledClientCards()
+        {
+            InstalledClientCards.Clear();
+
+            foreach (string code in InstalledClients)
+            {
+                ClassicClients.ClassicClientConfig? config = ClassicClients.GetInstalledConfig(code);
+                ClassicCatalogEntry? entry = ClassicClients.Catalog.FirstOrDefault(item => String.Equals(item.Code, code, StringComparison.OrdinalIgnoreCase));
+
+                string name = !String.IsNullOrWhiteSpace(config?.Name)
+                    ? config!.Name
+                    : !String.IsNullOrWhiteSpace(entry?.Name) ? entry!.Name : code;
+
+                InstalledClientCards.Add(new InstalledClientItem
+                {
+                    Code = code,
+                    Name = name,
+                    VersionDisplay = $"Version {code}"
+                });
+            }
+
+            UpdateRunningClientCards();
+
+            OnPropertyChanged(nameof(HasInstalledClients));
+            OnPropertyChanged(nameof(HasNoInstalledClients));
+        }
+
+        private void UpdateRunningClientCards()
+        {
+            bool running = ClassicServerManager.IsRunning;
+
+            foreach (InstalledClientItem item in InstalledClientCards)
+                item.IsRunning = running && String.Equals(_runningClientCode, item.Code, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void LaunchInstalledClient(string? code)
+        {
+            if (String.IsNullOrWhiteSpace(code))
+                return;
+
+            SelectedClassicClient = code;
+            OnPropertyChanged(nameof(SelectedClassicClient));
+
+            LaunchClient();
+
+            _runningClientCode = ClassicServerManager.IsRunning ? code : "";
+            UpdateRunningClientCards();
         }
 
         private async Task RefreshCatalogAsync()
@@ -84,8 +169,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private void ReportProgress(double percent, string text)
         {
-            // InstallEngineAsync/InstallClientAsync run on a background thread, but these are UI-bound
-            // properties - App.Current.Dispatcher marshals the update back to the UI thread.
             System.Windows.Application.Current?.Dispatcher.Invoke(() =>
             {
                 ProgressValue = Math.Clamp(percent, 0, 100);
@@ -269,6 +352,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             foreach (string client in ClassicClients.ListInstalledClients())
                 InstalledClients.Add(client);
 
+            RebuildInstalledClientCards();
+
             OnPropertyChanged(nameof(EngineStatus));
             OnPropertyChanged(nameof(EngineDataStatus));
             OnPropertyChanged(nameof(RedirectStatus));
@@ -298,6 +383,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private void StopServer()
         {
             ClassicServerManager.Stop();
+            _runningClientCode = "";
+            UpdateRunningClientCards();
             OnPropertyChanged(nameof(IsServerRunning));
             OnPropertyChanged(nameof(RedirectStatus));
         }

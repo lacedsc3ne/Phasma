@@ -8,13 +8,8 @@ using MapFlags = Vortice.Direct3D11.MapFlags;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>
-    /// GDI+-rendered crosshair blitted as a GPU texture by OverlayCompositor.
-    /// Ported from Voidstrap's Overlays subsystem essentially verbatim.
-    /// </summary>
     internal sealed class OverlayCrosshair
     {
-        // room for the largest design the editor allows (CrosshairRenderer.MaxRadius)
         public const int TexWidth = 256;
         public const int TexHeight = 256;
 
@@ -73,7 +68,6 @@ namespace PhasmaStrap.Integrations.Overlays
                 return;
             _last = signature;
 
-            // the same drawing code as the editor's preview
             _graphics.Clear(Color.Transparent);
             CrosshairRenderer.Draw(_graphics, style, TexWidth / 2, TexHeight / 2);
 

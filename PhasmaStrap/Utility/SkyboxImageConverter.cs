@@ -4,24 +4,8 @@ using System.Windows.Media.Imaging;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Backing logic for the "Skybox Manager" on ModsPage's Preset Mod tab. Ported from
-    /// Voidstrap's SkyboxImageConverter, trimmed to the parts that don't need
-    /// SixLabors.ImageSharp (PhasmaStrap doesn't reference it) - image decode/resize/crop uses
-    /// WPF's own imaging APIs instead, which is exactly what Voidstrap's own converter already
-    /// fell back to for formats ImageSharp couldn't decode. Faces are written directly under
-    /// <see cref="Paths.CustomSkybox"/> (inside Modifications), so no separate apply/remove step
-    /// is needed in Bootstrapper - they flow through the existing flat mod-copy pipeline exactly
-    /// like the custom font or custom cursor set.
-    ///
-    /// Deliberately NOT ported: Voidstrap's remote "skybox pack" browser/downloader (a GitHub-hosted
-    /// asset repo it owns). PhasmaStrap has no equivalent hosted pack source, and faking a picker
-    /// with no real packs behind it would be decorative, so only the custom (user-supplied) skybox
-    /// path is implemented here.
-    /// </summary>
     public static class SkyboxImageConverter
     {
-        // sky512_<face>.tex, in the order Header/OptionControl rows are shown in the UI
         public static readonly (string FaceName, string FileName)[] Faces =
         {
             ("Back",  "sky512_bk.tex"),
@@ -55,7 +39,6 @@ namespace PhasmaStrap.Utility
             return file.Exists && file.Length > 0 && file.Length <= 16_777_216L;
         }
 
-        /// <summary>Uses one source image, cropped/resized to a square, for every face.</summary>
         public static void ImportSingleImage(string sourcePath)
         {
             byte[] converted = ConvertImage(sourcePath);
@@ -63,7 +46,6 @@ namespace PhasmaStrap.Utility
             ImportCore(sources, cachedBytes: converted);
         }
 
-        /// <summary>Uses a distinct source image per face. <paramref name="faceSources"/> is keyed by the face's .tex filename.</summary>
         public static void ImportPerFace(IReadOnlyDictionary<string, string> faceSources)
         {
             if (Faces.Any(face => !faceSources.TryGetValue(face.FileName, out string? source) || string.IsNullOrWhiteSpace(source)))
@@ -144,7 +126,6 @@ namespace PhasmaStrap.Utility
             if (source.PixelWidth <= 0 || source.PixelHeight <= 0)
                 throw new InvalidDataException("The selected image dimensions are invalid.");
 
-            // center-crop to a square, then resize to FaceSize x FaceSize
             int squareSide = Math.Min(source.PixelWidth, source.PixelHeight);
             int cropX = (source.PixelWidth - squareSide) / 2;
             int cropY = (source.PixelHeight - squareSide) / 2;

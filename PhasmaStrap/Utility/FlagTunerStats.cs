@@ -5,27 +5,18 @@ namespace PhasmaStrap.Utility
         public string Variant = "";
         public int Runs;
         public double AverageFps, Low1Fps, StuttersPerMinute;
-        public double SpreadPercent;        // how far this variant's own runs lie apart (1 % lows)
+        public double SpreadPercent;
         public bool Capped;
     }
 
     public sealed class TunerComparison
     {
-        public List<TunerVariantResult> Results = new();     // best first
-        public string Winner = "";                           // "" = no real difference
+        public List<TunerVariantResult> Results = new();
+        public string Winner = "";
         public string Verdict = "";
         public List<string> Notes = new();
     }
 
-    // The auto-tuner's arithmetic: which flag set really ran better, and is the difference bigger
-    // than what two runs of the SAME flags differ by anyway?
-    //
-    // Ranked by the 1 % lows, not the average: the average is what a frame cap pins, and the lows
-    // are what is felt. A winner is only declared when it beats the runner-up by more than the
-    // run-to-run noise measured in this very experiment (and at least 5 %) - otherwise the honest
-    // answer is "no real difference", which for most FastFlag sets it is.
-    //
-    // Pure functions, no App dependencies.
     public static class FlagTunerStats
     {
         public static TunerComparison Compare(IEnumerable<PerformanceReport> runs)
@@ -60,8 +51,6 @@ namespace PhasmaStrap.Utility
             List<double> spreads = comparison.Results.Where(r => r.SpreadPercent >= 0).Select(r => r.SpreadPercent).ToList();
             bool repeated = spreads.Count == comparison.Results.Count;
 
-            // 10 % is what identical runs of a live game typically differ by; only when EVERY set
-            // has been repeated is this experiment's own (possibly smaller) figure trusted instead
             double noise = repeated ? Math.Max(5, spreads.Max()) : Math.Max(10, spreads.Count > 0 ? spreads.Max() : 10);
 
             TunerVariantResult best = comparison.Results[0], second = comparison.Results[1];

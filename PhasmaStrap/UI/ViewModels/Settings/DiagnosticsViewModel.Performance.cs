@@ -57,14 +57,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             RefreshRuns();
             RefreshTuner();
 
-            // the Watcher reports through status.json; this is the only way to hear from it
             _measureTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
             _measureTimer.Tick += (_, _) => PollMeasurement();
             _measureTimer.Start();
             PollMeasurement();
         }
-
-        // ------------------------------------------------------------------ stutter
 
         public ObservableCollection<RunRow> Runs { get; } = new();
         public Visibility RunsEmptyVisibility => Runs.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -138,7 +135,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 MeasureStatusText = status?.Message ?? "";
             }
 
-            // a run came in since the last look
             string stamp = $"{status?.RequestId}|{status?.State}";
             if (stamp != _lastSeenStatus)
             {
@@ -174,7 +170,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(RunsEmptyVisibility));
         }
 
-        // worst frame time per quarter second, 0 at the bottom; clipped so one monster frame cannot flatten the rest
         private static PointCollection FrameGraph(PerformanceReport report, out string scale)
         {
             var points = new PointCollection();
@@ -195,8 +190,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             points.Freeze();
             return points;
         }
-
-        // ------------------------------------------------------------------ auto-tuner
 
         public ObservableCollection<TunerCandidate> TunerCandidates { get; } = new();
         public ObservableCollection<TunerStepRow> TunerSteps { get; } = new();
@@ -247,7 +240,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             if (_experiment is null)
             {
-                // keep ticks the user has set while the list is rebuilt
                 HashSet<string> chosen = TunerCandidates.Where(c => c.IsSelected).Select(c => c.Title).ToHashSet();
                 bool first = TunerCandidates.Count == 0;
 

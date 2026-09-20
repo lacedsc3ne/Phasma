@@ -42,12 +42,6 @@ namespace PhasmaStrap.Integrations.Overlays
         }
     }
 
-    /// <summary>
-    /// Tracks the live Roblox game client window (position, size, foreground state) via
-    /// WinEvent hooks with a slow discovery-poll fallback. Ported from Voidstrap's
-    /// Overlays subsystem; the Linux-specific measurement path was dropped since
-    /// PhasmaStrap is Windows-only.
-    /// </summary>
     public static class RobloxWindowTracker
     {
         private const uint EVENT_SYSTEM_FOREGROUND = 0x0003;

@@ -2,15 +2,6 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// A thin WH_KEYBOARD_LL wrapper shared by the hotkey listener (game-session process) and the
-    /// hotkey capture box (Settings process). The handler runs on the thread that installed the
-    /// hook, which must pump messages - both callers install from their UI thread.
-    ///
-    /// Low-level hooks see a key before RegisterHotKey-style hotkeys and before the focused
-    /// application, and can swallow it. The handler has to return quickly: Windows silently drops
-    /// a hook whose callback overruns LowLevelHooksTimeout, so do real work elsewhere.
-    /// </summary>
     public sealed class LowLevelKeyboardHook : IDisposable
     {
         public const int VK_SHIFT = 0x10, VK_CONTROL = 0x11, VK_MENU = 0x12;
@@ -20,7 +11,6 @@ namespace PhasmaStrap.Utility
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100, WM_SYSKEYDOWN = 0x0104;
 
-        // return true to swallow the key
         public delegate bool KeyHandler(int virtualKey, bool isDown);
 
         private delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
@@ -49,7 +39,7 @@ namespace PhasmaStrap.Utility
         private static extern IntPtr GetModuleHandle(string? lpModuleName);
 
         private readonly KeyHandler _handler;
-        private readonly HookProc _proc; // kept in a field: the native side holds the only other reference
+        private readonly HookProc _proc;
         private IntPtr _hook;
 
         public bool IsInstalled => _hook != IntPtr.Zero;
@@ -93,7 +83,6 @@ namespace PhasmaStrap.Utility
                 }
                 catch
                 {
-                    // never let an exception escape into the hook chain - the key just passes through
                 }
             }
 

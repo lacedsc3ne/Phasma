@@ -2,35 +2,18 @@ namespace PhasmaStrap.Utility
 {
     public sealed class GifExportOptions
     {
-        // the GIF is scaled down to this width (never up); 0 = keep the clip's size
         public int MaxWidth = 640;
 
         public int Fps = 15;
 
-        // ordered dithering: smoother skies and gradients, noticeably bigger file
         public bool Dither;
     }
 
-    // Animated GIF encoder for the clip editor's "Export GIF".
-    //
-    // WPF's GifBitmapEncoder cannot write frame delays or a loop count, so this writes the file
-    // itself. Two things keep the result small enough to share:
-    //   - every frame gets its own 255-colour palette (median cut over a 15-bit histogram), built
-    //     only from the pixels that frame actually draws;
-    //   - a pixel that has not visibly changed since the previous frame is written as transparent
-    //     and the frame is cut down to the rectangle that did change. LZW turns those long runs of
-    //     one index into almost nothing, which is most of the saving on footage with a HUD or a
-    //     still camera.
-    //
-    // Frames are top-down 32-bit BGRA, all of the size given to the constructor.
-    // No App/WPF dependencies, so it can be exercised from a console harness.
     public sealed class GifWriter : IDisposable
     {
         private const int TransparentIndex = 255;
         private const int MaxColors = 255;
 
-        // per channel: below this a pixel counts as "the same as last frame" (H.264 noise sits
-        // around 2-4); and how far what is on screen may drift from the source before it is redrawn
         private const int SameThreshold = 5;
         private const int DriftThreshold = 20;
 
@@ -50,13 +33,12 @@ namespace PhasmaStrap.Utility
         private readonly int _width, _height;
         private readonly bool _dither;
 
-        private readonly byte[] _previous;  // last source frame (BGRA)
-        private readonly byte[] _shown;     // what a viewer has on screen right now (BGRA)
+        private readonly byte[] _previous;
+        private readonly byte[] _shown;
         private readonly bool[] _changed;
         private readonly byte[] _indices;
         private bool _first = true;
 
-        // 15-bit histogram, reused between frames
         private readonly int[] _count = new int[32768];
         private readonly long[] _sumR = new long[32768], _sumG = new long[32768], _sumB = new long[32768];
         private readonly short[] _nearest = new short[32768];
@@ -81,7 +63,6 @@ namespace PhasmaStrap.Utility
             _changed = new bool[width * height];
             _indices = new byte[width * height];
 
-            // header + logical screen (no global colour table)
             Write(System.Text.Encoding.ASCII.GetBytes("GIF89a"));
             WriteU16(width);
             WriteU16(height);
@@ -89,7 +70,6 @@ namespace PhasmaStrap.Utility
             _output.WriteByte(0);
             _output.WriteByte(0);
 
-            // loop forever
             Write(new byte[] { 0x21, 0xFF, 0x0B });
             Write(System.Text.Encoding.ASCII.GetBytes("NETSCAPE2.0"));
             Write(new byte[] { 0x03, 0x01, 0x00, 0x00, 0x00 });
@@ -100,7 +80,6 @@ namespace PhasmaStrap.Utility
             if (bgra.Length < _width * _height * 4)
                 throw new ArgumentException("The frame is smaller than the GIF.", nameof(bgra));
 
-            // ---- which pixels need drawing, and the rectangle they sit in
             int left = _width, top = _height, right = -1, bottom = -1;
 
             for (int y = 0, p = 0, i = 0; y < _height; y++)
@@ -133,7 +112,6 @@ namespace PhasmaStrap.Utility
 
             if (right < 0)
             {
-                // nothing moved: a single transparent pixel just carries the delay
                 left = top = right = bottom = 0;
                 _indices[0] = TransparentIndex;
             }
@@ -145,14 +123,11 @@ namespace PhasmaStrap.Utility
 
             int w = right - left + 1, h = bottom - top + 1;
 
-            // graphic control: leave the frame in place, index 255 is transparent (the first frame
-            // has nothing under it, so it draws everything)
             Write(new byte[] { 0x21, 0xF9, 0x04, (byte)(_first ? 0x04 : 0x05) });
             WriteU16(Math.Clamp(delayCentiseconds, 2, 65535));
             _output.WriteByte(TransparentIndex);
             _output.WriteByte(0);
 
-            // image descriptor with a 256 entry local colour table
             _output.WriteByte(0x2C);
             WriteU16(left);
             WriteU16(top);
@@ -173,11 +148,9 @@ namespace PhasmaStrap.Utility
             _output.Flush();
         }
 
-        // ------------------------------------------------------------------ palette
-
         private sealed class Box
         {
-            public int Start, Length;          // range in _usedBins
+            public int Start, Length;
             public int MinR, MaxR, MinG, MaxG, MinB, MaxB;
             public long Pixels;
         }
@@ -211,7 +184,6 @@ namespace PhasmaStrap.Utility
 
             while (boxes.Count < MaxColors)
             {
-                // split the box that matters most: many pixels spread over a wide range
                 Box? target = null;
                 double best = 0;
                 foreach (Box box in boxes)
@@ -279,12 +251,10 @@ namespace PhasmaStrap.Utility
             return box;
         }
 
-        // cuts `box` at the pixel-count median of its longest axis; returns the new upper half
         private Box Split(Box box)
         {
             int rangeR = box.MaxR - box.MinR, rangeG = box.MaxG - box.MinG, rangeB = box.MaxB - box.MinB;
 
-            // green first on ties: the eye is most sensitive to it
             int shift = rangeG >= rangeR && rangeG >= rangeB ? 5 : rangeR >= rangeB ? 10 : 0;
 
             _usedBins.Sort(box.Start, box.Length, Comparer<int>.Create((a, b) => ((a >> shift) & 31) - ((b >> shift) & 31)));
@@ -328,7 +298,6 @@ namespace PhasmaStrap.Utility
 
                     if (_dither)
                     {
-                        // +-8: about the distance between neighbouring palette entries in a gradient
                         int nudge = (Bayer8[((y & 7) << 3) | (x & 7)] >> 2) - 8;
                         r = Math.Clamp(r + nudge, 0, 255);
                         g = Math.Clamp(g + nudge, 0, 255);
@@ -365,8 +334,6 @@ namespace PhasmaStrap.Utility
                 }
             }
         }
-
-        // ------------------------------------------------------------------ LZW
 
         private readonly byte[] _block = new byte[255];
         private int _blockLength;
@@ -406,7 +373,6 @@ namespace PhasmaStrap.Utility
 
                 Emit(prefix, codeSize);
 
-                // the decoder is one table entry behind, so it widens its codes exactly here too
                 if (next >= (1 << codeSize) && codeSize < 12)
                     codeSize++;
 

@@ -14,34 +14,10 @@ namespace PhasmaStrap.Utility
         public string DisplayName => string.IsNullOrWhiteSpace(Category) ? Family : Family + ", " + Category;
     }
 
-    /// <summary>
-    /// Fetches a Google Fonts catalog and lets the user browse/preview/download a font, ported
-    /// from Voidstrap's GoogleFontsService.
-    ///
-    /// Voidstrap's original implementation fetched its catalog from a Voidstrap-owned proxy
-    /// (voidstrapp.pages.dev). PhasmaStrap does not run or depend on that infrastructure, so this
-    /// port is repointed at "https://fonts.google.com/metadata/fonts" instead - the public,
-    /// unofficial Google Fonts metadata endpoint that fonts.google.com's own web UI calls. It
-    /// requires no API key, has been stable for years, and is relied on directly by many other
-    /// open-source projects. Its response shape is different from Voidstrap's catalog envelope
-    /// (it's { "familyMetadataList": [ { "family", "category", ... }, ... ] } rather than
-    /// { "fonts": [ { "family", "category", "file" }, ... ] }), and it doesn't hand back a
-    /// downloadable file URL directly - that's still resolved lazily per-family via the css2
-    /// endpoint in ResolveFileUrlAsync below, exactly as Voidstrap did whenever a catalog entry's
-    /// File was already empty.
-    ///
-    /// This endpoint also has a long-standing quirk: it sometimes prefixes its JSON body with an
-    /// XSSI-protection line (e.g. ")]}'") before the actual JSON object starts. StripXssiPrefix
-    /// defensively strips anything before the first '{' before handing the bytes to
-    /// JsonSerializer, without assuming the prefix is always present.
-    /// </summary>
     internal static class GoogleFontsService
     {
-        // see the class-level comment above for why this specific endpoint was chosen
         private const string CatalogUrl = "https://fonts.google.com/metadata/fonts";
 
-        // the metadata endpoint's payload is considerably larger than Voidstrap's proxied
-        // catalog (it carries subsets/axes/etc. for every family), so the guard is generous
         private const int MaximumCatalogBytes = 16777216;
 
         internal const int MaximumFontBytes = 33554432;
@@ -60,8 +36,6 @@ namespace PhasmaStrap.Utility
 
         private static readonly Regex FontUrlPattern = new(@"https://fonts\.gstatic\.com/[^)'""\s]+\.ttf", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
-        // net6.0 doesn't have C# 11 UTF-8 string literals ("tag"u8), so the sfnt table tags this
-        // file compares against are plain byte arrays instead
         private static readonly byte[] SfntTag = new byte[] { 0, 1, 0, 0 };
 
         private static readonly byte[] OttoTag = Encoding.ASCII.GetBytes("OTTO");
@@ -139,11 +113,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        /// <summary>
-        /// Strips a leading XSSI-protection line (commonly ")]}'") that some Google endpoints,
-        /// including this metadata endpoint, sometimes prepend before the actual JSON body.
-        /// Defensive: if no such prefix is present, the input is returned unchanged.
-        /// </summary>
         private static string StripXssiPrefix(string body)
         {
             int braceIndex = body.IndexOf('{');
@@ -437,8 +406,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // net6.0's Stream doesn't have the .NET 7+ ReadExactly helper, so this fills the whole
-        // span or throws, the same contract ReadExactly provides
         private static void ReadExactlyCompat(Stream stream, Span<byte> buffer)
         {
             int total = 0;

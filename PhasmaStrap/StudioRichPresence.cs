@@ -4,10 +4,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap
 {
-    // shows a separate Discord Rich Presence while Roblox Studio is running, distinct from
-    // the player-side presence in Integrations/DiscordRichPresence.cs. Reads what place/script
-    // is open from the Studio companion plugin (via StudioBridge) when available, falling back
-    // to the Studio window title and its own log file. Ported from Voidstrap.
     public sealed class StudioRichPresence : IDisposable
     {
         private const string LOG_IDENT = "StudioRichPresence";

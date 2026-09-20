@@ -5,14 +5,8 @@ using PhasmaStrap.UI.ViewModels.Dialogs;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Interaction logic for ChannelListsDialog.xaml
-    /// </summary>
     public partial class ChannelListsDialog : WpfUiWindow
     {
-        /// <summary>
-        /// The channel name the user picked, or null if the dialog was closed without a selection.
-        /// </summary>
         public string? Result { get; private set; }
 
         public ChannelListsDialog()

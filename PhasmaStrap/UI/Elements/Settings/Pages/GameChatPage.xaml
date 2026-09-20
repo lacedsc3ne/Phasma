@@ -8,7 +8,7 @@
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
       mc:Ignorable="d"
       Title="GameChatPage"
-      Scrollable="False">
+      Scrollable="True">
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_Description}" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
         <TextBlock Text="{x:Static resources:Strings.Menu_GameChat_KeyboardHookNotice}" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
@@ -37,8 +37,5 @@
             <ComboBox Width="220" ItemsSource="{Binding AutoTranslateLanguages, Mode=OneTime}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding AutoTranslateLanguage, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <controls:OptionControl Header="{x:Static resources:Strings.Menu_GameChat_Translation_RpcEnable_Title}" Description="{x:Static resources:Strings.Menu_GameChat_Translation_RpcEnable_Description}">
-            <ui:ToggleSwitch IsChecked="{Binding RpcAutoTranslate, Mode=TwoWay}" />
-        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

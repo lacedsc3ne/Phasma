@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace PhasmaStrap.Utility
 {
-    // Tiered memory-pressure management for PhasmaStrap's own launcher process (not Roblox's) -
-    // when the launcher window is backgrounded (or no window is focused) it escalates through
-    // increasingly aggressive tiers (a light GC pass, then a blocking GC + working-set trim +
-    // Windows' PROCESS_MODE_BACKGROUND_BEGIN, then the same at a deeper interval) so an idle
-    // PhasmaStrap sits smaller in the task list; the moment gameplay is active or the window is
-    // refocused it snaps straight back to the Active tier. Ported from Voidstrap, with the
-    // DynamicRenderSystem image-cache trim call removed since PhasmaStrap has no equivalent cache.
     public static class MemoryManager
     {
         public enum MemoryTier

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 namespace PhasmaStrap
 {
@@ -16,68 +16,68 @@ namespace PhasmaStrap
             { "en", "English" },
             { "en-US", "English (United States)" },
 #if QA_BUILD
-            { "sq", "Albanian" }, // Albanian (TODO: translate string)
+            { "sq", "Albanian" },
 #endif
-            { "ar", "العربية" }, // Arabic
-            { "bg", "Български" }, // Bulgarian
+            { "ar", "العربية" },
+            { "bg", "Български" },
 #if QA_BUILD
-            { "bn", "বাংলা" }, // Bengali
-            { "bs", "Bosanski" }, // Bosnian
+            { "bn", "বাংলা" },
+            { "bs", "Bosanski" },
 #endif
-            { "cs", "Čeština" }, // Czech
-            { "de", "Deutsch" }, // German
-            { "da", "Dansk" }, // Danish
-            { "es-ES", "Español" }, // Spanish
+            { "cs", "Čeština" },
+            { "de", "Deutsch" },
+            { "da", "Dansk" },
+            { "es-ES", "Español" },
 #if QA_BUILD
-            { "el", "Ελληνικά" }, // Greek
+            { "el", "Ελληνικά" },
 #endif
-            { "fa", "فارسی" }, // Persian
-            { "fi", "Suomi" }, // Finnish
-            { "fil", "Filipino" }, // Filipino
-            { "fr", "Français" }, // French
+            { "fa", "فارسی" },
+            { "fi", "Suomi" },
+            { "fil", "Filipino" },
+            { "fr", "Français" },
 #if QA_BUILD
-            { "he", "עברית‎" }, // Hebrew
+            { "he", "עברית‎" },
 #endif
-            { "hi", "Hindi (Latin)" }, // Hindi
-            { "hr", "Hrvatski" }, // Croatian
+            { "hi", "Hindi (Latin)" },
+            { "hr", "Hrvatski" },
 #if QA_BUILD
-            { "hu", "Magyar" }, // Hungarian
-            { "is", "Íslenska" }, // Icelandic
+            { "hu", "Magyar" },
+            { "is", "Íslenska" },
 #endif
-            { "id", "Bahasa Indonesia" }, // Indonesian
-            { "it", "Italiano" }, // Italian
-            { "ja", "日本語" }, // Japanese
-            { "ko", "한국어" }, // Korean
-            { "lv", "Latviešu" }, // Latvian
-            { "lt", "Lietuvių" }, // Lithuanian
+            { "id", "Bahasa Indonesia" },
+            { "it", "Italiano" },
+            { "ja", "日本語" },
+            { "ko", "한국어" },
+            { "lv", "Latviešu" },
+            { "lt", "Lietuvių" },
 #if QA_BUILD
-            { "ms", "Malay" }, // Malay
+            { "ms", "Malay" },
 #endif
-            { "nl", "Nederlands" }, // Dutch
+            { "nl", "Nederlands" },
 #if QA_BUILD
-            { "et", "Eesti Keel" }, // Estonian
-            { "no", "Bokmål" }, // Norwegian
+            { "et", "Eesti Keel" },
+            { "no", "Bokmål" },
 #endif
-            { "pl", "Polski" }, // Polish
+            { "pl", "Polski" },
 #if QA_BUILD
-            { "pt-PT", "Portugese (European)" }, // Portuguese (TODO: translate)
+            { "pt-PT", "Portugese (European)" },
 #endif
-            { "pt-BR", "Português (Brasil)" }, // Portuguese, Brazilian
-            { "ro", "Română" }, // Romanian
-            { "ru", "Русский" }, // Russian
+            { "pt-BR", "Português (Brasil)" },
+            { "ro", "Română" },
+            { "ru", "Русский" },
 #if QA_BUILD
-            { "sr-CS", "Serbian (Latin)" }, // Serbian (TODO: translate)
+            { "sr-CS", "Serbian (Latin)" },
 #endif
-            { "sv-SE", "Svenska" }, // Swedish
-            { "th", "ภาษาไทย" }, // Thai
-            { "tr", "Türkçe" }, // Turkish
+            { "sv-SE", "Svenska" },
+            { "th", "ภาษาไทย" },
+            { "tr", "Türkçe" },
 #if QA_BUILD
-            { "uk", "Українська" }, // Ukrainian
+            { "uk", "Українська" },
 #endif
-            { "vi", "Tiếng Việt" }, // Vietnamese
-            { "zh-Hans-CN", "中文 (简体)" }, // Chinese Simplified
-            { "zh-Hant-HK", "中文 (香港)" }, // Chinese Traditional, Hong Kong
-            { "zh-Hant-TW", "中文 (繁體)" } // Chinese Traditional
+            { "vi", "Tiếng Việt" },
+            { "zh-Hans-CN", "中文 (简体)" },
+            { "zh-Hant-HK", "中文 (香港)" },
+            { "zh-Hant-TW", "中文 (繁體)" }
         };
 
         public static string GetIdentifierFromName(string language) => SupportedLocales.FirstOrDefault(x => x.Value == language).Key ?? "nil";
@@ -85,10 +85,10 @@ namespace PhasmaStrap
         public static List<string> GetLanguages()
         {
             var languages = new List<string>();
-            
+
             languages.AddRange(SupportedLocales.Values.Take(3));
             languages.AddRange(SupportedLocales.Values.Where(x => !languages.Contains(x)).OrderBy(x => x));
-            languages[0] = Strings.Common_SystemDefault; // set again for any locale changes
+            languages[0] = Strings.Common_SystemDefault;
 
             return languages;
         }
@@ -117,7 +117,6 @@ namespace PhasmaStrap
         {
             Set("nil");
 
-            // https://supportcenter.devexpress.com/ticket/details/t905790/is-there-a-way-to-set-right-to-left-mode-in-wpf-for-the-whole-application
             EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, _) =>
             {
                 var window = (Window)sender;

@@ -109,7 +109,6 @@
             </TabItem>
         </TabControl>
 
-        <!-- filters -->
         <Grid Grid.Row="2" Margin="12,10,12,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="180" />
@@ -139,7 +138,6 @@
             </WrapPanel>
         </Grid>
 
-        <!-- the cards, virtualised by row -->
         <Grid Grid.Row="3" Margin="12,0,0,0">
             <ItemsControl x:Name="CardRows" ItemsSource="{Binding Rows}" SizeChanged="CardRows_SizeChanged"
                           VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">

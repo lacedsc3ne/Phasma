@@ -3,27 +3,6 @@ using System.Text.Json;
 
 namespace PhasmaStrap.Integrations
 {
-    // Port of Voidstrap's Voidstrap.Utility.ClassicClients (src/Voidstrap.App/Utility/ClassicClients.cs,
-    // ~2255 lines in the original). This port carries over path/layout conventions, install detection, client
-    // listing, process launching, AND (unlike the earlier revision of this file) the acquisition pipeline itself:
-    // GitHub-release resolution with digest/size verification, bounded downloads, safe zip extraction, archive
-    // staging with atomic commit, post-extraction helper-DLL/config-name normalization, and auto-update checking.
-    //
-    // The classic engine/client archives are fetched from a third-party GitHub release (see DefaultBaseUrl below) -
-    // PhasmaStrap did not build or vet that archive's contents. What IS verified before anything is written to disk:
-    // the release must live under github.com/<owner>/<repo>/releases/..., the resolved asset must come back from
-    // GitHub's own release-assets API with a sha256 digest and an https://github.com/... download URL, and the
-    // downloaded bytes are hashed and length-checked against that digest before extraction ever runs (see
-    // ResolveReleaseAssetAsync/DownloadOneAsync). That verification is the same shape Voidstrap uses, and is not
-    // weakened here.
-    //
-    // What this pipeline intentionally does NOT install is a WebServer executable: the archive was built to ship
-    // Voidstrap's own compiled web server, but PhasmaStrap has its own separately-built PhasmaStrap.Server project
-    // (see PhasmaStrap.Server.csproj / ServerExecutableName below). "Engine install" here therefore only fetches the
-    // shared data pack the server needs to run (PrivateKey.pem, scripts/assets under data/, and the maps pack) - it
-    // does not touch and is not gated on whether the user has already built/placed PhasmaStrap.Server.exe. See
-    // EngineDataInstalled vs ServerEngineInstalled below for that distinction, and ValidateEngine/ForeignServerExeName
-    // for how a foreign server binary from the archive (if present) is discarded rather than silently left on disk.
     public class ClassicCatalogEntry
     {
         public string Code { get; set; } = "";
@@ -47,29 +26,12 @@ namespace PhasmaStrap.Integrations
         public const string ServerExecutableName = "PhasmaStrap.Server.exe";
         public const string ConfigFileName = "PhasmaStrapClient_Config.json";
 
-        // The archive's client zips ship this config file name (matching Voidstrap's own branding, baked into the
-        // archive at build time) - it is renamed to ConfigFileName above immediately after extraction so the rest
-        // of this class (and PhasmaStrap.Server's WebServer/ClientPaths.cs, which looks for ConfigFileName) never
-        // has to know about the archive's original naming.
         private const string ArchiveConfigFileName = "VoidstrapClient_Config.json";
 
-        // The archive's engine.zip ships this web server executable. PhasmaStrap never runs it - it has its own
-        // PhasmaStrap.Server.exe (built from the separate PhasmaStrap.Server project). If this file ever shows up
-        // after extracting engine.zip it is deleted rather than left sitting in the install root unused.
         private const string ForeignServerExeName = "VoidstrapClient.WebServer.exe";
 
-        /// <summary>
-        /// Third-party GitHub release archive that classic client/engine binaries are downloaded from. This is NOT
-        /// a PhasmaStrap (or Bloxstrap) release feed and its contents are not built or reviewed by this project -
-        /// it is the same community archive Voidstrap points at. What IS verified before any of it is written to
-        /// disk is described in ResolveReleaseAssetAsync/DownloadOneAsync below (GitHub release API + per-asset
-        /// sha256 digest + size, checked against the actual downloaded bytes).
-        /// </summary>
         public const string DefaultBaseUrl = "https://github.com/Orc-Archive/Orc-Voidstrap/releases/tag/v1/";
 
-        /// <summary>Legacy raw-file fallback host for the same archive, kept only so an old saved setting pointing
-        /// at it gets silently upgraded to <see cref="DefaultBaseUrl"/> by <see cref="BaseUrl"/> rather than used
-        /// directly (raw-file hosting has no per-asset digest to verify against).</summary>
         public const string LegacyDefaultBaseUrl = "https://github.com/voidstrap/RobloxClients/raw/main/";
 
         private const long MaxArchiveBytes = 2147483648L;
@@ -121,10 +83,6 @@ namespace PhasmaStrap.Integrations
 
         private static HttpClient CreateHttpClient()
         {
-            // A dedicated client, not App.HttpClient: App.HttpClient's Timeout is fixed at 30 seconds (see
-            // App.xaml.cs), which is fine for small API calls but far too short for a multi-hundred-MB archive
-            // download. GitHub's API also wants an explicit User-Agent, which this sets independently of whatever
-            // App.HttpClient happens to be configured with.
             var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All };
             var http = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(30) };
             http.DefaultRequestHeaders.UserAgent.ParseAdd("PhasmaStrap");
@@ -160,14 +118,8 @@ namespace PhasmaStrap.Integrations
 
         public static string ServerPath => Path.Combine(Root, ServerExecutableName);
 
-        /// <summary>True if PhasmaStrap's own server executable has been built and placed at <see cref="ServerPath"/>.
-        /// Required to actually start a private server session (see ClassicServerManager) - installing engine data
-        /// via <see cref="InstallEngineAsync"/> does not affect this, since that data pack never contains our exe.</summary>
         public static bool ServerEngineInstalled => File.Exists(ServerPath);
 
-        /// <summary>True if the shared engine data pack (PrivateKey.pem, scripts/assets under data/) has been
-        /// downloaded and extracted. Used internally to decide whether a client install needs to pull the engine
-        /// data pack first - independent of whether the user has separately built/placed the server executable.</summary>
         public static bool EngineDataInstalled => File.Exists(Path.Combine(Root, "data", "PrivateKey.pem"));
 
         public static bool IsSupportedClientCode(string? code)
@@ -283,12 +235,6 @@ namespace PhasmaStrap.Integrations
             catch { }
             return total;
         }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Manifest: an optional remote manifest.json (fetched from the same archive) that lists which client
-        // codes are currently published and their expected sizes. Falls back to the built-in Catalog above if
-        // the manifest can't be fetched, so the client list still works even if the archive host is unreachable.
-        // ---------------------------------------------------------------------------------------------------
 
         public static string BaseUrl
         {
@@ -430,14 +376,6 @@ namespace PhasmaStrap.Integrations
             }
             return urls.Distinct().ToList();
         }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Release asset resolution + integrity verification. This is the security-relevant part of the
-        // pipeline: DownloadOneAsync will refuse to accept a download whose length or SHA-256 doesn't match what
-        // is resolved here, and this method itself refuses to resolve anything that isn't a real GitHub release
-        // asset (draft releases, non-uploaded assets, missing/malformed digests, and non-github.com download
-        // hosts are all rejected before a URL is ever returned).
-        // ---------------------------------------------------------------------------------------------------
 
         private static bool TryGetGitHubRelease(string baseUrl, out string owner, out string repo, out string? tag)
         {
@@ -584,12 +522,6 @@ namespace PhasmaStrap.Integrations
             return -1L;
         }
 
-        // ---------------------------------------------------------------------------------------------------
-        // Install index: tracks the size/sha256 that was actually installed for the engine, maps, and each
-        // client, so IsAssetUpdateAvailableAsync/IsClientUpdateAvailableAsync can tell whether the currently
-        // resolved remote release asset differs from what's on disk without re-downloading and re-hashing it.
-        // ---------------------------------------------------------------------------------------------------
-
         private static string InstalledIndexPath => Path.Combine(Root, "installed.json");
 
         private static Dictionary<string, InstalledAssetRecord> LoadIndex()
@@ -693,12 +625,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // ---------------------------------------------------------------------------------------------------
-        // Download + extract. Staged into a sibling temp directory and only swapped into place atomically
-        // (CommitDirectory) once extraction and post-extraction validation both succeed, so a crash or
-        // cancellation mid-install can never leave Root/ClientsDir/MapsDir in a half-written state.
-        // ---------------------------------------------------------------------------------------------------
-
         private static async Task DownloadOneAsync(ReleaseAssetIntegrity asset, string tempZip, Action<double, string>? progress, CancellationToken ct)
         {
             progress?.Invoke(0, "Connecting");
@@ -801,12 +727,9 @@ namespace PhasmaStrap.Integrations
 
         private static void ValidateEngine(string root)
         {
-            // Note: does NOT require ServerExecutableName - PhasmaStrap's own server exe is built/placed
-            // separately and is never part of this download. Only the shared data pack is required here.
             if (!File.Exists(Path.Combine(root, "data", "PrivateKey.pem")))
                 throw new InvalidDataException("The classic engine archive is incomplete");
 
-            // Discard the archive's own (foreign) web server binary if present - PhasmaStrap never runs it.
             string foreignExe = Path.Combine(root, ForeignServerExeName);
             if (File.Exists(foreignExe))
             {
@@ -900,16 +823,6 @@ namespace PhasmaStrap.Integrations
             return $"{size:0.#} {units[unit]}";
         }
 
-        // ---------------------------------------------------------------------------------------------------
-        // Post-extraction normalization. The archive ships helper DLLs and executables renamed/patched to avoid
-        // AV false-positives on the literal original Roblox helper DLL name, plus a config file name matching
-        // Voidstrap's own branding - both are restored/renamed here to what PhasmaStrap.Server and the rest of
-        // this class expect. The byte-level patches below operate on fixed-size buffers baked into the archive's
-        // own compiled binaries (a third-party classic Roblox client executable, not anything PhasmaStrap builds)
-        // so the replacement strings must be the exact same byte length as what they replace - they are NOT
-        // renamed to PhasmaStrap branding, since doing so would either overflow the buffer or fail to match.
-        // ---------------------------------------------------------------------------------------------------
-
         private const string OriginalHelperName = "OnlyRetroRobloxHereClientHelper.dll";
         private const string RenamedHelperName = "VoidstrapClientHelper.dll";
 
@@ -944,9 +857,6 @@ namespace PhasmaStrap.Integrations
                         FixHelperFolderString(helper);
                 }
 
-                // PhasmaStrap-specific: the archive's client config file is named for Voidstrap's own branding.
-                // Rename it to ConfigFileName so ListInstalledClients/IsClientInstalled/GetInstalledConfig (and
-                // PhasmaStrap.Server's WebServer/ClientPaths.cs) all find it under the name they expect.
                 string archiveConfig = Path.Combine(clientDir, ArchiveConfigFileName);
                 string expectedConfig = Path.Combine(clientDir, ConfigFileName);
                 if (File.Exists(archiveConfig) && !File.Exists(expectedConfig))
@@ -1029,11 +939,6 @@ namespace PhasmaStrap.Integrations
             }
             return -1;
         }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Public install/update entry points. All mutating operations serialize on MutationLock so an install
-        // and an update (or two installs) can never race each other over the same on-disk layout.
-        // ---------------------------------------------------------------------------------------------------
 
         public static async Task InstallEngineAsync(Action<double, string>? progress, CancellationToken ct)
         {
@@ -1203,10 +1108,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        /// <summary>
-        /// True if any process under an installed classic client's directory currently appears to be running.
-        /// Used by <see cref="ClassicHostRedirect"/> to decide whether it is safe to release the hosts redirect.
-        /// </summary>
         public static bool AnyClassicClientRunning()
         {
             try
@@ -1227,7 +1128,6 @@ namespace PhasmaStrap.Integrations
                     }
                     catch
                     {
-                        // access denied reading MainModule for processes we don't own - ignore
                     }
                     finally
                     {

@@ -5,30 +5,14 @@ namespace PhasmaStrap.Networking
 {
     public sealed class AssetRouteInfo
     {
-        public string OriginalUrl = "";     // "" for a swapped asset that had no location of its own
-        public string Key = "";             // what the content is cached under
+        public string OriginalUrl = "";
+        public string Key = "";
         public long AssetId;
         public int TypeId;
         public long PlaceId;
-        public string SwapPack = "";        // folder name of the pack that replaces this asset, "" = none
+        public string SwapPack = "";
     }
 
-    // How asset CONTENT gets to pass through PhasmaStrap without intercepting Roblox's CDN.
-    //
-    // The client never asks for an asset's bytes by ID. It POSTs a batch of IDs to
-    // assetdelivery.roblox.com (/v1/assets/batch - a host the proxy already terminates) and gets a
-    // signed CDN URL back per asset, which it then downloads. Rewriting those URLs in the batch
-    // RESPONSE to point back at assetdelivery.roblox.com/phasma-asset/... makes the client fetch
-    // the bytes from the proxy instead - same host, same certificate, no new hosts-file entries -
-    // and the proxy can then serve them from a disk cache, shrink textures, or hand out a swap
-    // pack's replacement. The original URL travels inside the rewritten one, so the proxy can
-    // always fall back to "302, go and get it there yourself".
-    //
-    // CDN paths end in the content's hash (https://fts.rbxcdn.com/sc1/<32 hex>?<signature>), so
-    // the hash is a permanent cache key: same hash, same bytes, in every game, forever - while the
-    // signature around it expires within days.
-    //
-    // Pure functions, no App dependencies.
     public static class AssetRoute
     {
         public const string PathPrefix = "/phasma-asset/v1/";
@@ -41,7 +25,6 @@ namespace PhasmaStrap.Networking
                 if (last.Length is >= 32 and <= 64 && last.All(Uri.IsHexDigit))
                     return last.ToLowerInvariant();
 
-                // not a hash-addressed URL: the address without its signature is the best there is
                 return "u" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(uri.Host + uri.AbsolutePath))).ToLowerInvariant()[..40];
             }
 
@@ -70,7 +53,6 @@ namespace PhasmaStrap.Networking
             return url.ToString();
         }
 
-        // null = not one of ours
         public static AssetRouteInfo? TryParse(string pathAndQuery)
         {
             if (!pathAndQuery.StartsWith(PathPrefix, StringComparison.OrdinalIgnoreCase))
@@ -105,8 +87,6 @@ namespace PhasmaStrap.Networking
                     }
                 }
 
-                // the original has to be a real https address at Roblox - this endpoint must not
-                // become a way to make PhasmaStrap fetch arbitrary URLs
                 if (info.OriginalUrl.Length > 0 && !IsRobloxContentUrl(info.OriginalUrl))
                     return null;
 
@@ -129,8 +109,6 @@ namespace PhasmaStrap.Networking
             public int Routed, Swapped, Untouched;
         }
 
-        // Rewrites the locations in a /v1/assets/batch response. `swapPackFor` names the pack that
-        // replaces an asset ID in this place ("" = none). null = nothing to change / not understood.
         public static RewriteResult? RewriteBatch(byte[] requestBody, byte[] responseBody, string host, long placeId, bool routeEverything, Func<long, string> swapPackFor)
         {
             JsonNode? request, response;
@@ -147,7 +125,6 @@ namespace PhasmaStrap.Networking
             if (request is not JsonArray asked || response is not JsonArray answered)
                 return null;
 
-            // the response echoes each entry's requestId; the asset ID is only in the request
             var ids = new Dictionary<string, long>();
             foreach (JsonNode? node in asked)
             {
@@ -193,7 +170,6 @@ namespace PhasmaStrap.Networking
             if (result.Routed == 0 && result.Swapped == 0)
                 return null;
 
-            // written the way Roblox wrote it: '&' and '+' as themselves, not as & escapes
             result.Body = Encoding.UTF8.GetBytes(answered.ToJsonString(new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
             return result;
         }

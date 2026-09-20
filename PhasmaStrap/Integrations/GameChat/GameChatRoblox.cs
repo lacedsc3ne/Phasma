@@ -4,12 +4,6 @@ using System.Windows.Media.Imaging;
 
 namespace PhasmaStrap.Integrations.GameChat
 {
-    /// <summary>
-    /// Roblox-facing helpers for the game chat overlay (headshots only).
-    /// Voidstrap's original GameChatRoblox also resolved "Voidstrap profile" data (banners, badges,
-    /// friend requests, avatar borders) from Voidstrap's own website API. That API doesn't exist for
-    /// PhasmaStrap, so this port only keeps what can be served directly from Roblox's public endpoints.
-    /// </summary>
     public static class GameChatRoblox
     {
         private const string Tag = "GameChatRoblox";
@@ -88,9 +82,6 @@ namespace PhasmaStrap.Integrations.GameChat
             }
         }
 
-        /// <summary>
-        /// Decodes an image from bytes with a bounded decode size, never throwing on malformed input.
-        /// </summary>
         private static ImageSource? DecodeImage(byte[] bytes, int decodePixelWidth)
         {
             try

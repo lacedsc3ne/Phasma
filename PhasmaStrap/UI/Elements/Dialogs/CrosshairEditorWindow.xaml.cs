@@ -5,8 +5,6 @@ using PhasmaStrap.UI.ViewModels.Dialogs;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Designs the in-game crosshair with a live preview drawn by the same code as the overlay
-    // (CrosshairRenderer), so the preview at 1x is exactly what appears in the game.
     public partial class CrosshairEditorWindow
     {
         private readonly CrosshairEditorViewModel _viewModel = new();

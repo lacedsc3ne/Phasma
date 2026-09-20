@@ -1,15 +1,13 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <SolidColorBrush x:Key="NewTextEditorBackground" Color="White" />
     <SolidColorBrush x:Key="NewTextEditorForeground" Color="Black" />
     <SolidColorBrush x:Key="NewTextEditorLink" Color="Blue" />
 
-    <!--  the two drifting glows behind the settings window (MainWindow.xaml); AppColorTheme can override them  -->
     <Color x:Key="BackgroundGlowPrimaryColor">#FFF4554B</Color>
     <SolidColorBrush x:Key="BackgroundGlowPrimaryBrush" Color="#FFF4554B" />
     <Color x:Key="BackgroundGlowSecondaryColor">#FFCF3B32</Color>
     <SolidColorBrush x:Key="BackgroundGlowSecondaryBrush" Color="#FFCF3B32" />
 
-    <!--  panel behind the settings window's sidebar - nothing by default, AppColorTheme can give it a colour  -->
     <Color x:Key="SidebarBackgroundColor">#002C2C38</Color>
     <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#002C2C38" />
 </ResourceDictionary>

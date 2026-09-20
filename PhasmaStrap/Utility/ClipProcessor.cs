@@ -17,25 +17,11 @@ namespace PhasmaStrap.Utility
         public TimeSpan Start = TimeSpan.Zero;
         public TimeSpan End = TimeSpan.MaxValue;
 
-        // crop rectangle in source pixels; Width/Height 0 = no crop
         public int CropX, CropY, CropWidth, CropHeight;
 
-        // 0.25 - 4; 0.5 = slow motion, 2 = double speed
         public double Speed = 1.0;
     }
 
-    // Trim / crop / re-time for the Capture page's replay clips. Everything goes through Media
-    // Foundation's source reader (decode to RGB32) and sink writer (H.264 encode) - the same
-    // writer path InstantReplayRecorder uses, so it needs nothing that isn't already in Windows.
-    // Re-encoding rather than stream-copying is deliberate: a stream copy can only cut on
-    // keyframes, which on a 10-20 second clip means the trim point can be seconds off, and crop
-    // is impossible without decoding anyway. Clips are short and low frame rate, so a full
-    // re-encode takes a second or two.
-    //
-    // Deliberately free of WPF/App dependencies so it can be exercised from a console harness.
-    // Carries the same Vortice.MediaFoundation 2.1.0 workarounds as InstantReplayRecorder: the
-    // UINT64 attribute accessors recurse forever, and the *FromURL factories are bound to
-    // Mfplat.dll when the exports live in mfreadwrite.dll - both go through raw COM / P/Invoke.
     public static class ClipProcessor
     {
         public static Action<string>? Log;
@@ -70,8 +56,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ public API
-
         public static ClipInfo Probe(string path)
         {
             Startup();
@@ -86,9 +70,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Returns the frame shown at `position` as top-down 32-bit BGRA, or null if the clip has no
-        // frame there. Reads forward from the start instead of seeking - clips are short, and it
-        // keeps the result frame-exact.
         public static byte[]? GrabFrame(string path, TimeSpan position, out int width, out int height)
         {
             width = height = 0;
@@ -136,8 +117,6 @@ namespace PhasmaStrap.Utility
             public int Height;
         }
 
-        // `count` evenly spaced, point-sampled thumbnails in a single forward pass - for the
-        // editor's timeline strip.
         public static List<Thumbnail> GrabThumbnails(string path, int count, int maxWidth, CancellationToken cancel = default)
         {
             var result = new List<Thumbnail>();
@@ -216,7 +195,6 @@ namespace PhasmaStrap.Utility
                     outH = Math.Clamp(options.CropHeight, 2, info.Height - cropY);
                 }
 
-                // H.264 wants even dimensions
                 outW &= ~1;
                 outH &= ~1;
                 if (outW < 64 || outH < 64)
@@ -225,22 +203,14 @@ namespace PhasmaStrap.Utility
                 double outFps = Math.Clamp(info.Fps * speed, 1, 240);
                 long sourceSpan = Math.Min(endTicks, info.Duration.Ticks) - startTicks;
 
-                // keep roughly the source's bits-per-pixel (plus headroom for the generation loss),
-                // scaled to the cropped area
                 double sourceBitrate = info.Duration.TotalSeconds > 0.1 ? info.FileBytes * 8 / info.Duration.TotalSeconds : 4_000_000;
                 double area = (double)(outW * outH) / (info.Width * info.Height);
                 uint bitrate = (uint)Math.Clamp(sourceBitrate * 1.3 * area * Math.Max(1.0, speed), 1_000_000, 20_000_000);
 
                 Log?.Invoke($"Export {source} -> {destination}: {startTicks / 1e7:0.00}s-{(endTicks == long.MaxValue ? info.Duration.TotalSeconds : endTicks / 1e7):0.00}s crop={cropX},{cropY} {outW}x{outH} speed={speed} fps={outFps:0.##} bitrate={bitrate}");
 
-                // Sound rides along unchanged for a trim / crop. A speed change would need the
-                // pitch corrected to be listenable, so a re-timed clip is saved without sound.
                 using AudioPass? audio = Math.Abs(speed - 1.0) < 0.001 ? AudioPass.TryOpen(source) : null;
 
-                // The graphics card's encoder first (several times faster), Microsoft's software one
-                // if it refuses. High-frame-rate 1080p is outside the H.264 levels some encoders
-                // enforce; the stream is then declared as 60fps - samples keep their real
-                // timestamps, so nothing is lost.
                 var attempts = new List<(bool Hardware, double Fps)> { (true, outFps), (false, outFps) };
                 if (outFps > 60)
                 {
@@ -315,7 +285,6 @@ namespace PhasmaStrap.Utility
                         writer.WriteSample(streamIndex, outSample);
                         written++;
 
-                        // keep the sound level with the picture, so the file stays interleaved
                         audio?.Pump(writer, ts, startTicks, endTicks);
 
                         if (sourceSpan > 0)
@@ -345,9 +314,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // Same trim / crop / speed as Export, written as an animated GIF (see GifWriter). Source
-        // frames are picked on a fixed grid of the GIF's frame rate; each one is held until the
-        // next picked frame really appears, so a clip with uneven timing keeps its pacing.
         public static void ExportGif(string source, string destination, ClipEditOptions options, GifExportOptions gif, Action<double>? progress = null, CancellationToken cancel = default)
         {
             Startup();
@@ -391,7 +357,7 @@ namespace PhasmaStrap.Utility
                 byte[] pending = new byte[outW * outH * 4];
                 long pendingTime = -1;
                 long nextPick = 0;
-                long writtenCs = 0; // centiseconds handed out so far - rounding never accumulates
+                long writtenCs = 0;
 
                 using (var file = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))
                 using (var writer = new GifWriter(file, outW, outH, gif.Dither))
@@ -443,7 +409,6 @@ namespace PhasmaStrap.Utility
                     if (pendingTime < 0)
                         throw new InvalidOperationException("There are no frames between the trim start and end.");
 
-                    // the last frame is held for one normal frame time
                     Flush(pendingTime + interval);
 
                     Log?.Invoke($"ExportGif wrote {writer.FrameCount} frame(s), {writtenCs / 100.0:0.00}s");
@@ -463,8 +428,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // area-average downscale of top-down BGRA (a plain point or bilinear sample shimmers on
-        // game footage when shrinking by 2-4x)
         private static void Downscale(byte[] source, int sw, int sh, byte[] destination, int dw, int dh)
         {
             int[] x0 = new int[dw + 1];
@@ -503,11 +466,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ sound
-
-        // The clip's sound track, decoded to PCM by a reader of its own and re-encoded to AAC by
-        // the export's writer. null when the clip is silent (or its sound is in a format the AAC
-        // encoder cannot take) - the export then simply has no sound either.
         private sealed class AudioPass : IDisposable
         {
             private const int FirstAudioStream = unchecked((int)0xFFFFFFFD);
@@ -544,7 +502,7 @@ namespace PhasmaStrap.Utility
 
                     reader = new IMFSourceReader(ptr);
                     reader.SetStreamSelection(AllStreams, false);
-                    reader.SetStreamSelection(FirstAudioStream, true); // throws when the clip has no sound
+                    reader.SetStreamSelection(FirstAudioStream, true);
 
                     using (IMFMediaType wanted = MediaFactory.MFCreateMediaType())
                     {
@@ -569,14 +527,12 @@ namespace PhasmaStrap.Utility
                 }
                 catch (Exception)
                 {
-                    // the ordinary case: a clip without a sound track
                     current?.Dispose();
                     reader?.Dispose();
                     return null;
                 }
             }
 
-            // before BeginWriting
             public void AddTo(IMFSinkWriter writer)
             {
                 using IMFMediaType output = MediaFactory.MFCreateMediaType();
@@ -591,7 +547,6 @@ namespace PhasmaStrap.Utility
                 writer.SetInputMediaType(_stream, _pcm, null);
             }
 
-            // writes the sound up to `untilTicks` (source time), keeping only [startTicks, endTicks)
             public void Pump(IMFSinkWriter writer, long untilTicks, long startTicks, long endTicks)
             {
                 while (!_done && _stream >= 0)
@@ -619,7 +574,7 @@ namespace PhasmaStrap.Utility
                     }
 
                     if (_pendingTime > untilTicks)
-                        return; // the picture has not got this far yet
+                        return;
 
                     long duration = 0;
                     try { duration = _pending.SampleDuration; } catch { }
@@ -644,12 +599,10 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ reader
-
         private sealed class Reader : IDisposable
         {
             private readonly IMFSourceReader _reader;
-            private readonly int _stride; // signed: negative = bottom-up when only a flat buffer is available
+            private readonly int _stride;
 
             public ClipInfo Info { get; }
 
@@ -696,7 +649,6 @@ namespace PhasmaStrap.Utility
                         width = (int)(uint)(size >> 32);
                         height = (int)(uint)size;
 
-                        // MF treats RGB as bottom-up unless the type says otherwise
                         stride = TryGetUInt32(current, MediaTypeAttributeKeys.DefaultStride, out uint s) ? unchecked((int)s) : -(width * 4);
                     }
 
@@ -730,7 +682,6 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            // false at end of stream; sample can be null on a stream gap
             public bool Read(out IMFSample? sample, out long timestamp)
             {
                 _reader.ReadSample(FirstVideoStream, 0, out int _, out int flags, out timestamp, out sample);
@@ -745,7 +696,6 @@ namespace PhasmaStrap.Utility
                 return true;
             }
 
-            // Copies the (x, y, w, h) region of the decoded frame into `destination` as top-down BGRA.
             public void CopyFrame(IMFSample sample, int x, int y, int w, int h, byte[] destination)
             {
                 using IMFMediaBuffer buffer = sample.ConvertToContiguousBuffer();
@@ -795,8 +745,6 @@ namespace PhasmaStrap.Utility
             public void Dispose() => _reader.Dispose();
         }
 
-        // ------------------------------------------------------------------ writer
-
         private static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = new("a634a91c-822b-41b9-a494-4de4643612b0");
 
         private static IMFSinkWriter CreateSinkWriter(string path, int width, int height, double fps, uint bitrate, bool hardware, out int streamIndex)
@@ -819,7 +767,7 @@ namespace PhasmaStrap.Utility
             SetUInt64(inputType, MediaTypeAttributeKeys.FrameSize, Pack((uint)width, (uint)height));
             SetUInt64(inputType, MediaTypeAttributeKeys.FrameRate, Pack(fpsNum, fpsDen));
             SetUInt64(inputType, MediaTypeAttributeKeys.PixelAspectRatio, Pack(1, 1));
-            // frames handed to the writer are top-down
+
             inputType.Set(MediaTypeAttributeKeys.DefaultStride, (uint)(width * 4));
 
             using IMFAttributes? attributes = hardware ? MediaFactory.MFCreateAttributes(1) : null;
@@ -845,8 +793,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // ------------------------------------------------------------------ raw COM helpers
-
         private static ulong Pack(uint high, uint low) => ((ulong)high << 32) | low;
 
         [DllImport("mfreadwrite.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
@@ -855,10 +801,6 @@ namespace PhasmaStrap.Utility
         [DllImport("mfreadwrite.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         private static extern int MFCreateSourceReaderFromURL(string pwszURL, IntPtr pAttributes, out IntPtr ppSourceReader);
 
-        // Vortice's IMFSourceReader.SetCurrentMediaType passes a real pointer for pdwReserved, which
-        // the API rejects with E_INVALIDARG - it has to be NULL. Vtable slot 7 (IUnknown 0-2,
-        // GetStreamSelection, SetStreamSelection, GetNativeMediaType, GetCurrentMediaType,
-        // SetCurrentMediaType).
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int SetCurrentMediaTypeFn(IntPtr self, int streamIndex, IntPtr reserved, IntPtr mediaType);
 
@@ -871,9 +813,6 @@ namespace PhasmaStrap.Utility
                 Marshal.ThrowExceptionForHR(hr);
         }
 
-        // IMFAttributes vtable: IUnknown 0-2, GetItem 3, GetItemType 4, CompareItem 5, Compare 6,
-        // GetUINT32 7, GetUINT64 8, ... GetUnknown 17, SetItem 18, DeleteItem 19,
-        // DeleteAllItems 20, SetUINT32 21, SetUINT64 22
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int GetUInt32Fn(IntPtr self, ref Guid key, out uint value);
 

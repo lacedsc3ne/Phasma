@@ -17,52 +17,6 @@ using Interop = PhasmaStrap.Integrations.Overlays.OverlayInterop;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    /// <summary>
-    /// Composites PhasmaStrap's own overlay content (a small FPS HUD and an optional
-    /// crosshair) on top of the live Roblox window, using a click-through, topmost,
-    /// DirectComposition-backed window plus a D3D11 device/DXGI swapchain-for-composition.
-    ///
-    /// This is a heavily trimmed port of Voidstrap's OverlayCompositor.cs (~3.5k lines), which
-    /// interleaved core compositor plumbing (window/device/swapchain/DirectComposition setup,
-    /// capture, resize, present, cleanup) with three additional subsystems: RiShade (a
-    /// post-processing shader pipeline), Anti Aliasing (a second shader pass), and Frame
-    /// Generation (frame interpolation). Those three now run as stages inside RenderFrame below
-    /// (RiShadeStage, AntiAliasingStage, FrameGenPipeline), lazily created and sized on first use
-    /// and chained through two ping-pong buffers - none of them own a device, window, or capture
-    /// of their own; this compositor is the only place any of that exists. Frame Generation's
-    /// presentation pacing/quality-auto-tuning/split-screen-compare and its own status HUD were
-    /// not ported (see FrameGenManager.cs's doc comments for the reasoning).
-    ///
-    /// Additional simplifications made for this port (documented in the porting agent's
-    /// final report, not just here):
-    ///  - Capture is desktop-duplication only. Voidstrap primarily used Windows.Graphics.Capture
-    ///    (window capture) with desktop duplication as a fallback; WGC needs the CsWinRT
-    ///    projection toolchain, which isn't wired into PhasmaStrap's net6.0-windows build and
-    ///    would be a substantial new dependency surface just for this port. Desktop duplication
-    ///    alone still delivers robust, resize/monitor-change-aware capture of whatever is on
-    ///    screen under the Roblox window.
-    ///  - No homepage-background compositing (HomepageBackgroundMedia.cs) - that drew a themed
-    ///    background (solid/gradient/video) behind Roblox's own loading/menu screens. It isn't
-    ///    part of the "overlay content the compositor renders on its own" (HUD/crosshair/
-    ///    diagnostics/display) and pulls in image/video decode dependencies PhasmaStrap doesn't
-    ///    have, so it was dropped rather than ported. Two things worth spelling out for anyone
-    ///    revisiting this: (1) everything this compositor draws - HUD, crosshair, RiShade,
-    ///    AntiAliasing, FrameGen - is layered ON TOP of a desktop-duplication capture of whatever
-    ///    Roblox already rendered; none of it draws "behind" Roblox's own pixels, so simply
-    ///    plugging a background in as another stage here would occlude Roblox's real home-menu UI
-    ///    (buttons, game tiles) rather than sit behind it - doing that "for real" needs a D3D
-    ///    present/draw hook injected into RobloxPlayerBeta.exe itself, which nothing in this
-    ///    codebase currently does (RiShade included - see RiShadeStage.cs, it's a post-process
-    ///    filter on the captured copy, not a hook into Roblox's own device). (2) Independent of
-    ///    that, OverlaySettings.AnyEnabled requires OverlayHub.InGame, so this compositor never
-    ///    even runs while Roblox is only showing its home/games menu - it only exists during
-    ///    actual gameplay, i.e. the opposite of when a homepage background would need to show.
-    ///  - No Roblox-FPS-cap-aware capture pacing (RobloxFpsCap.cs) or present-statistics-based
-    ///    "actual FPS" tracking (RobloxPresentTracer.cs) - both existed almost entirely to feed
-    ///    Frame Generation's capture cadence and quality decisions. Capture here is simply
-    ///    paced by desktop duplication's own AcquireNextFrame wait, and the HUD's FPS figure is
-    ///    the compositor's own local present rate.
-    /// </summary>
     internal sealed partial class OverlayCompositor
     {
         private const string ClassName = "PhasmaStrapOverlayCompositor";
@@ -110,17 +64,14 @@ namespace PhasmaStrap.Integrations.Overlays
         private bool _hudPainted;
         private double _hudLastMs;
         private long _hudFramesBase;
-        // the game's own frames, counted from the screen capture's AccumulatedFrames (every time
-        // the game shows a new picture) - not how often this overlay redraws
+
         private long _gameFrames, _gameFramesBase;
         private bool _countedGameFrames;
 
-        // HUD / crosshair only: a transparent overlay, redrawn when something on it changes
         private bool _overlayDirty = true;
         private double _lastOverlayPresentMs;
         private long _nextCountDuplicationMs;
 
-        // the Instant Replay recorder's picture of the game, when it holds the screen capture
         private ID3D11Texture2D? _sharedTex;
         private IDXGIKeyedMutex? _sharedMutex;
         private IntPtr _sharedHandle;
@@ -134,8 +85,6 @@ namespace PhasmaStrap.Integrations.Overlays
         private int _rawWidth, _rawHeight;
         private Vector4 _dims;
 
-        // Ping-pong chain buffers RiShade/AntiAliasing/FrameGen render through in sequence -
-        // see the "RiShade/FrameGen/AntiAliasing integration point" in RenderFrame below.
         private ID3D11Texture2D? _chainTexA;
         private ID3D11ShaderResourceView? _chainSrvA;
         private ID3D11RenderTargetView? _chainRtvA;
@@ -171,10 +120,6 @@ namespace PhasmaStrap.Integrations.Overlays
         private bool _firstCaptureLogged;
 
         private IDisposable? _trackerLease;
-
-        // RiShade (RiShadeStage), Anti-Aliasing (AntiAliasingStage), and Frame Generation
-        // (FrameGenPipeline) each run as a stage here, lazily created and sized on first use -
-        // see RenderFrame below for how they're chained between capture and the final blit.
 
         public void Run(CancellationToken token)
         {
@@ -224,6 +169,8 @@ namespace PhasmaStrap.Integrations.Overlays
                         break;
                     }
 
+                    SyncStreamWindow();
+
                     if (!UpdateVisibility(token))
                         continue;
 
@@ -267,8 +214,7 @@ namespace PhasmaStrap.Integrations.Overlays
                 _hwnd = Interop.CreateWindowExW(exStyle, new IntPtr(_classAtom), CaptureWindowName, Interop.WS_POPUP, _rectLeft, _rectTop, _width, _height, IntPtr.Zero, IntPtr.Zero, _hInstance, IntPtr.Zero);
 
                 Interop.SetLayeredWindowAttributes(_hwnd, 0, 255, Interop.LWA_ALPHA);
-                // Excluded from screen/desktop capture: since capture is desktop-duplication
-                // based, without this our own composited window would feed back into itself.
+
                 Interop.SetWindowDisplayAffinity(_hwnd, Interop.WDA_EXCLUDEFROMCAPTURE);
                 Interop.SetWindowPos(_hwnd, Interop.HWND_TOPMOST, _rectLeft, _rectTop, _width, _height, Interop.SWP_NOACTIVATE | Interop.SWP_SHOWWINDOW);
                 Interop.ShowWindow(_hwnd, Interop.SW_SHOWNOACTIVATE);
@@ -365,8 +311,6 @@ namespace PhasmaStrap.Integrations.Overlays
 
         private void CreateCapture()
         {
-            // Instant Replay holds the monitor's capture (its frames are used), and HUD / crosshair
-            // alone take one only to count frames, made on first use
             if (SharedGameFrame.RecorderActive || !OverlaySettings.NeedsCapture)
                 return;
 
@@ -691,7 +635,7 @@ namespace PhasmaStrap.Integrations.Overlays
                     _hiddenByFocus = false;
                     _overlayDirty = true;
                     App.Logger.WriteLine(LOG_IDENT, "Roblox is in the foreground again, the overlay is rendering");
-                    // stream-safe mode on its own keeps the overlay window hidden (SyncStreamView)
+
                     if (!_overlayHiddenForStream)
                     {
                         Interop.ShowWindow(_hwnd, Interop.SW_SHOWNOACTIVATE);
@@ -851,8 +795,6 @@ namespace PhasmaStrap.Integrations.Overlays
             if (_rawTex == null)
                 return false;
 
-            // the Instant Replay recorder owns the screen capture: read its picture instead of
-            // fighting it for one (Windows gives a process only one per monitor)
             if (SharedGameFrame.RecorderActive)
             {
                 ReleaseOwnDuplication();
@@ -1003,9 +945,6 @@ namespace PhasmaStrap.Integrations.Overlays
             }
         }
 
-        // HUD and crosshair only: nothing of the game is copied - the overlay is see-through and
-        // is redrawn when its content changes. A screen capture is still held (when Instant Replay
-        // isn't) just to count the game's frames for the FPS readout.
         private void RenderOverlayOnly(CancellationToken token)
         {
             bool counted = CountGameFrames();
@@ -1029,12 +968,10 @@ namespace PhasmaStrap.Integrations.Overlays
             _framesPresented++;
         }
 
-        // true when it waited on the capture (which then paces the loop)
         private bool CountGameFrames()
         {
             if (SharedGameFrame.RecorderActive)
             {
-                // the recorder counts them (FpsFeed) - and holds the only capture there can be
                 ReleaseOwnDuplication();
                 return false;
             }
@@ -1061,7 +998,7 @@ namespace PhasmaStrap.Integrations.Overlays
             }
             catch (SharpGenException ex) when (ex.ResultCode == Vortice.DXGI.ResultCode.WaitTimeout)
             {
-                _countedGameFrames = true; // nothing new on screen is a count too (zero)
+                _countedGameFrames = true;
                 return true;
             }
             catch (Exception)
@@ -1106,15 +1043,12 @@ namespace PhasmaStrap.Integrations.Overlays
 
             if (!_rawValid)
             {
-                // nothing captured yet at all - nothing to show
                 token.WaitHandle.WaitOne(4);
                 return;
             }
 
             if (!fresh && !frameGenOn)
             {
-                // nothing changed since last frame and we're not interpolating between
-                // captures, so there's no point redrawing/presenting again
                 token.WaitHandle.WaitOne(4);
                 return;
             }
@@ -1125,10 +1059,6 @@ namespace PhasmaStrap.Integrations.Overlays
                 App.Logger.WriteLine(LOG_IDENT, $"First frame captured at {_width}x{_height} via desktop duplication, compositor is live");
             }
 
-            // RiShade (RiShadeStage), Anti-Aliasing (AntiAliasingStage), and Frame Generation
-            // (FrameGenPipeline) each run as a stage here, lazily created and sized on first
-            // use, chained through the two ping-pong _chain buffers: whichever stage runs last
-            // hands its output SRV to the final pass-through blit onto the back buffer.
             ID3D11ShaderResourceView finalSrv = _rawSrv!;
             bool nextIsA = true;
 
@@ -1154,15 +1084,12 @@ namespace PhasmaStrap.Integrations.Overlays
                 nextIsA = !nextIsA;
             }
 
-            // stream-safe mode: the same picture, with the marked areas hidden, in the window OBS
-            // captures. When nothing needs the overlay itself, the stream view paces the loop.
             bool overlayShown = OverlaySettings.OverlayWindowNeeded;
             if (StreamLive)
                 RenderStream(finalSrv, overlayShown ? 0 : 1);
 
             if (!overlayShown)
             {
-                // nothing presented, so nothing paces the loop - don't spin
                 if (!StreamLive)
                     Thread.Sleep(16);
                 _framesPresented++;
@@ -1262,17 +1189,16 @@ namespace PhasmaStrap.Integrations.Overlays
             return targetSrv;
         }
 
-        // how many rows the HUD texture needs to be sized for - checked once at Init() time (see
-        // the comment on OverlayHud.TexWidth/TexHeight), matching the same row set UpdateHudIfDue
-        // builds below
         private static int CountHudRows()
         {
-            int rows = 1; // FPS is always the first row whenever the HUD is on at all
+            int rows = 1;
             if (App.Settings.Prop.OverlayHudShowFrameTime) rows++;
             if (App.Settings.Prop.OverlayHudShowCpu) rows++;
             if (App.Settings.Prop.OverlayHudShowRam) rows++;
             if (App.Settings.Prop.OverlayHudShowPing) rows++;
             if (App.Settings.Prop.OverlayHudShowRegion) rows++;
+            if (App.Settings.Prop.OverlayHudShowGame) rows++;
+            if (App.Settings.Prop.OverlayHudShowSessionTime) rows++;
             return rows;
         }
 
@@ -1303,8 +1229,6 @@ namespace PhasmaStrap.Integrations.Overlays
             if (window <= 0.0)
                 return;
 
-            // the game's frames as the screen shows them (so never above the monitor's refresh
-            // rate); while Instant Replay holds the capture, its own count of the same thing
             double fps = counted ? gameFrames / window : FpsFeed.Get(FpsFeed.Source.Recorder);
             if (counted)
                 FpsFeed.Report(FpsFeed.Source.Hud, fps);
@@ -1342,10 +1266,21 @@ namespace PhasmaStrap.Integrations.Overlays
 
                 if (App.Settings.Prop.OverlayHudShowRegion)
                 {
-                    // the value column holds 18 characters
                     string region = ServerRegion.Current;
                     labels.Add("REGION");
                     values.Add(region.Length > 0 ? ServerRegion.Shorten(region, 18) : "--");
+                }
+
+                if (App.Settings.Prop.OverlayHudShowGame)
+                {
+                    labels.Add("GAME");
+                    values.Add(NowPlaying.GameName());
+                }
+
+                if (App.Settings.Prop.OverlayHudShowSessionTime)
+                {
+                    labels.Add("TIME");
+                    values.Add(NowPlaying.SessionLength());
                 }
 
                 _hud.Update(_context!, labels.ToArray(), values.ToArray());

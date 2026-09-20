@@ -3,25 +3,6 @@ using System.Windows.Input;
 
 namespace PhasmaStrap.Utility
 {
-    // System-wide hotkey listener, one instance owned by Watcher for the lifetime of a game
-    // session. Bindings live in Settings.Prop.HotkeyBindings (actionId -> gesture text such as
-    // "Ctrl+Alt+R" or "F9", see HotkeyGesture), edited from HotkeysPage in the Settings process.
-    //
-    // This used to be RegisterHotKey, which turned out to be the wrong tool for a game:
-    //   - it only fires on an EXACT modifier match, so "F9" did nothing while Shift was held to
-    //     sprint, and "Ctrl+F" did nothing while Shift or Alt happened to be down as well;
-    //   - any combination another program had registered first simply failed to register;
-    //   - a bare letter or digit was swallowed system-wide, so it could no longer be typed.
-    // A low-level keyboard hook has none of those problems:
-    //   - a binding fires when its modifiers are held, even with Shift or Ctrl held as well; when two
-    //     bindings share a key, the one asking for the most modifiers wins (Ctrl+Shift+F beats
-    //     Ctrl+F while both are down);
-    //   - a combination, or a non-typing key like F9, is swallowed so the game doesn't also
-    //     react to it;
-    //   - a plain typing key (a letter, digit, Space... with nothing but Shift) is passed through
-    //     so chat still works, and only fires while Roblox is the active window - typing in
-    //     another program never triggers it.
-    // Must be created on a thread with a message loop (Watcher is built on the UI thread).
     public sealed class GlobalHotkeyManager : IDisposable
     {
         private const string LOG_IDENT = "GlobalHotkeyManager";
@@ -50,11 +31,8 @@ namespace PhasmaStrap.Utility
         private readonly System.Threading.Timer _keepAlive;
         private readonly System.Windows.Threading.Dispatcher _dispatcher;
 
-        // read by the hook callback, replaced wholesale by ApplyBindings - never mutated in place
         private volatile Binding[] _bindings = Array.Empty<Binding>();
 
-        // keys whose key-down fired an action: held-key auto-repeat must not fire again, and the
-        // repeats of a swallowed key have to be swallowed too
         private readonly Dictionary<int, bool> _heldSwallowed = new();
 
         private bool _disposed;
@@ -64,15 +42,11 @@ namespace PhasmaStrap.Utility
             _dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
             _hook = new LowLevelKeyboardHook(OnKey);
 
-            // Windows drops a low-level hook without telling anyone if a callback ever overruns its
-            // timeout (a long GC pause or a suspended process is enough). Re-installing is cheap, and
-            // means a dropped hook costs a couple of minutes of hotkeys at worst, not the whole session.
             _keepAlive = new System.Threading.Timer(_ => _dispatcher.BeginInvoke(new Action(Reinstall)), null, TimeSpan.FromMinutes(2), TimeSpan.FromMinutes(2));
         }
 
         public void RegisterAction(string actionId, Action callback) => _actions[actionId] = callback;
 
-        // (re)reads Settings.Prop.HotkeyBindings. Safe to call again whenever a binding changes.
         public void ApplyBindings()
         {
             if (_disposed)
@@ -109,7 +83,6 @@ namespace PhasmaStrap.Utility
                 });
             }
 
-            // most specific first, so the first match in OnKey is the right one
             list.Sort((a, b) => CountModifiers(b.Modifiers).CompareTo(CountModifiers(a.Modifiers)));
             _bindings = list.ToArray();
 
@@ -135,7 +108,6 @@ namespace PhasmaStrap.Utility
             _hook.Install();
         }
 
-        // Runs inside the hook chain on the UI thread - has to stay tiny. Returns true to swallow.
         private bool OnKey(int vk, bool isDown)
         {
             if (LowLevelKeyboardHook.IsModifier(vk))
@@ -145,7 +117,7 @@ namespace PhasmaStrap.Utility
                 return _heldSwallowed.Remove(vk, out bool wasSwallowed) && wasSwallowed;
 
             if (_heldSwallowed.TryGetValue(vk, out bool repeatSwallowed))
-                return repeatSwallowed; // auto-repeat of a key that already fired
+                return repeatSwallowed;
 
             Binding[] bindings = _bindings;
             if (bindings.Length == 0)
@@ -158,14 +130,11 @@ namespace PhasmaStrap.Utility
                 if (binding.VirtualKey != vk || (held & binding.Modifiers) != binding.Modifiers)
                     continue;
 
-                // Shift and Ctrl get held for sprinting and crouching, so extra ones are tolerated.
-                // An extra Alt or Win means a different shortcut altogether (Alt+F4 is not "F4").
                 if (((held & ~binding.Modifiers) & (ModifierKeys.Alt | ModifierKeys.Windows)) != 0)
                     continue;
 
                 if (binding.IsTypingKey)
                 {
-                    // Ctrl/Alt/Win + a letter is some other shortcut, not this bare-key binding
                     if ((held & (ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Windows)) != 0)
                         continue;
 
@@ -185,7 +154,6 @@ namespace PhasmaStrap.Utility
 
         private void Fire(Binding binding)
         {
-            // off the hook callback: actions take screenshots, encode video, touch the UI
             _dispatcher.BeginInvoke(new Action(() =>
             {
                 App.Logger.WriteLine(LOG_IDENT, $"'{binding.ActionId}' pressed ({binding.GestureText})");
@@ -221,7 +189,6 @@ namespace PhasmaStrap.Utility
             return count;
         }
 
-        // looked up once per foreground process, not per key press - this runs inside the hook
         private uint _foregroundPid;
         private bool _foregroundIsRoblox;
 
@@ -260,7 +227,6 @@ namespace PhasmaStrap.Utility
             _keepAlive.Dispose();
             _bindings = Array.Empty<Binding>();
 
-            // the hook belongs to the UI thread; Dispose is usually called from the watcher task
             if (_dispatcher.CheckAccess())
                 _hook.Uninstall();
             else

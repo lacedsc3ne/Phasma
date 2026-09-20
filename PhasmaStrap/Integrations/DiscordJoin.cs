@@ -6,16 +6,6 @@ using PhasmaStrap.Models.Entities;
 
 namespace PhasmaStrap.Integrations
 {
-    // Discord's own "Join" button for your Roblox server.
-    //
-    // Your presence carries a party and a join secret (the place and server). A friend who clicks
-    // Join has their Discord start the command registered under discord-<application id> - which
-    // is PhasmaStrap with -discordjoin - and hand the secret to whichever PhasmaStrap is connected
-    // to Discord for that application. That PhasmaStrap then launches Roblox into the server.
-    // So both of you need PhasmaStrap; the plain "Join server" link button works without it.
-    //
-    // Discord doesn't allow link buttons and a join secret together, so with this on the link
-    // buttons are left out.
     public static class DiscordJoin
     {
         private const string LOG_IDENT = "DiscordJoin";
@@ -23,8 +13,6 @@ namespace PhasmaStrap.Integrations
 
         public static bool Enabled => !App.Settings.Prop.HideRPCButtons && App.Settings.Prop.DiscordNativeJoin;
 
-        // only public servers: a private server's access code must not travel to everyone who can
-        // see the profile
         public static string? MakeSecret(ActivityData data)
         {
             if (data.ServerType != ServerType.Public || data.PlaceId <= 0 || string.IsNullOrEmpty(data.JobId))
@@ -43,14 +31,12 @@ namespace PhasmaStrap.Integrations
             if (parts.Length != 2 || !long.TryParse(parts[0], out long placeId) || placeId <= 0)
                 return null;
 
-            // a job id is a GUID - anything else is not ours
             if (!Guid.TryParse(parts[1], out Guid jobId))
                 return null;
 
             return (placeId, jobId.ToString());
         }
 
-        // adds the party and join secret to a presence (and drops its link buttons), or removes them
         public static void Apply(DiscordRPC.RichPresence presence, ActivityData data, int maxPlayers)
         {
             string? secret = Enabled ? MakeSecret(data) : null;
@@ -73,7 +59,6 @@ namespace PhasmaStrap.Integrations
             presence.Secrets = new Secrets { JoinSecret = secret };
         }
 
-        // a friend's Join arrived: start Roblox in that server through a normal PhasmaStrap launch
         public static bool Launch(string? secret)
         {
             if (ParseSecret(secret) is not (long placeId, string jobId))
@@ -87,8 +72,6 @@ namespace PhasmaStrap.Integrations
             return true;
         }
 
-        // What Discord runs when Join is clicked and no PhasmaStrap is connected yet. Done for both
-        // applications PhasmaStrap can show as, so a friend's Join works whichever one you use.
         public static void RegisterLaunchCommands()
         {
             foreach (string appId in new[] { DiscordRichPresence.PhasmaStrapApplicationId, DiscordRichPresence.RobloxApplicationId })
@@ -122,8 +105,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // Makes a Discord client able to receive joins. The library insists on doing its own
-        // registration first; ours is written over it straight after.
         public static void Subscribe(DiscordRpcClient client, string appId)
         {
             try
@@ -138,8 +119,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // -discordjoin <application id>: Discord started us because a friend's Join was clicked.
-        // Connect as that application, take the join secret Discord hands over, launch, exit.
         public static void RunJoinHandler(string? appId)
         {
             if (appId != DiscordRichPresence.PhasmaStrapApplicationId && appId != DiscordRichPresence.RobloxApplicationId)

@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Xml.Linq;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
@@ -13,7 +13,6 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
         private bool _initialised = false;
 
-        // prevent users from creating elements with the same name multiple times
         private List<string> UsedNames { get; } = new List<string>();
 
         private string ThemeDir { get; set; } = "";
@@ -71,7 +70,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
         private static void AddXml(CustomDialog dialog, XElement xmlElement)
         {
             if (xmlElement.Name.ToString().StartsWith($"{xmlElement.Parent!.Name}."))
-                return; // not an xml element
+                return;
 
             var uiElement = HandleXml<UIElement>(dialog, xmlElement);
             if (uiElement is not DummyFrameworkElement)
@@ -90,7 +89,7 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
             {
                 case Version:
                     break;
-                case 0: // Themes made between Oct 19, 2024 to Mar 11, 2025 (on the feature/custom-bootstrappers branch)
+                case 0:
                     throw new CustomThemeException("CustomTheme.Errors.VersionNotSupported", "PhasmaStrapCustomBootstrapper", version);
                 default:
                     throw new CustomThemeException("CustomTheme.Errors.VersionNotRecognised", "PhasmaStrapCustomBootstrapper", version);
@@ -112,10 +111,8 @@ namespace PhasmaStrap.UI.Elements.Bootstrapper
 
             _initialised = true;
 
-            // handle root
             HandleXmlElement_PhasmaStrapCustomBootstrapper(this, xml);
 
-            // handle everything else
             foreach (var child in xml.Elements())
                 AddXml(this, child);
         }

@@ -15,20 +15,6 @@ namespace PhasmaStrap.Networking
         public string LastAccessedDisplay => LastAccessedUtc.ToLocalTime().ToString("g");
     }
 
-
-    // AssetWarp "Preloading" - a disk cache for the batch asset-resolution/thumbnail-lookup
-    // responses that flow through AssetWarpPolicy/AssetWarpThumbnailPolicy.
-    //
-    // Scope note (read before assuming this caches actual textures/meshes): assetdelivery.roblox.com
-    // and thumbnails.roblox.com only ever return JSON resolving an asset ID to a CDN URL (or a
-    // thumbnail's image URL) - the real asset bytes are then fetched by Roblox's client directly
-    // from a separate, essentially unbounded set of CDN hostnames PhasmaStrap's proxy never sees
-    // (it isn't in the hosts-file redirect or InterceptedHosts, and adding open-ended CDN
-    // interception is a materially bigger, separate change). So what this actually caches and
-    // replays is the *resolution step* - which CDN URL a given asset ID maps to right now - not
-    // the asset content itself. That's still a real, measurable win on repeat launches of the same
-    // game (skips a network round-trip per batch instead of per byte), just a smaller one than
-    // "serves previously downloaded assets" might suggest at face value.
     internal static class AssetPreloadCache
     {
         private const string LOG_IDENT = "AssetPreloadCache";
@@ -72,9 +58,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // registered as an additional response-transform so every real resolution response that
-        // flows through also gets written to the cache for next time - returns null always (it
-        // never modifies the response itself, it just observes it on the way through)
         public static byte[]? CacheResponse(ProxiedRequest request, ProxiedResponse response)
         {
             if (!App.Settings.Prop.AssetWarpPreloadEnabled)
@@ -99,8 +82,6 @@ namespace PhasmaStrap.Networking
 
         private static string CacheFilePath(ProxiedRequest request)
         {
-            // keyed on host+path+body: a batch request's body IS the list of asset IDs being
-            // resolved, so two different batches never collide even on the same endpoint path
             using SHA256 sha = SHA256.Create();
             byte[] keyBytes = Encoding.UTF8.GetBytes($"{request.Host}{request.Path}").Concat(request.Body).ToArray();
             string hash = Convert.ToHexString(sha.ComputeHash(keyBytes));
@@ -130,7 +111,6 @@ namespace PhasmaStrap.Networking
                 if (totalBytes <= limitBytes)
                     return;
 
-                // delete least-recently-accessed first until back under the limit
                 foreach (FileInfo file in files.OrderBy(f => f.LastAccessTimeUtc))
                 {
                     if (totalBytes <= limitBytes)
@@ -169,10 +149,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // Entries are keyed on a SHA256 hash of host+path+body (see CacheFilePath), so there's no
-        // real asset/game name to show per entry - this is a size/age browser, not a content
-        // browser. Still genuinely useful: see how much space preloading is using and clear
-        // specific stale entries without wiping the whole cache.
         public static List<AssetCacheEntry> ListEntries()
         {
             if (!Directory.Exists(CacheDir))
@@ -198,12 +174,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // "Preload Avatar" / "Preload Recent Games" - proactively fire the same real, public
-        // resolution requests Roblox's own client would make (bypassing the local proxy entirely,
-        // straight to the real API), so by the time an actual game session asks, the answer is
-        // either already warm in this cache or the OS/TLS connection to Roblox's API is already
-        // established. Both are best-effort and swallow failures - this is a performance nicety,
-        // never something a launch should fail over.
         public static async Task PreloadAvatarAsync(CancellationToken token = default)
         {
             if (!App.Settings.Prop.AssetWarpPreloadAvatar)

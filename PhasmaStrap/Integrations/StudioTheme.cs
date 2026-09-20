@@ -2,10 +2,6 @@ using System.Windows.Media;
 
 namespace PhasmaStrap.Integrations
 {
-    // reads PhasmaStrap's own live theme colors so the Studio companion plugin can match
-    // them, instead of the fixed single-color palette StudioBridge previously sent. Ported
-    // from Voidstrap, with DWM accent-color detection dropped since PhasmaStrap always uses
-    // its own coral accent rather than following the Windows system accent.
     public static class StudioTheme
     {
         private const string AccentHex = "#F4554B";

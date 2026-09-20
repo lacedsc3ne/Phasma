@@ -19,7 +19,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private System.Windows.Media.Imaging.BitmapImage? _thumbnail;
 
-        // decoded small, once, without holding the file open
         public System.Windows.Media.Imaging.BitmapImage? Thumbnail
         {
             get
@@ -98,10 +97,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Together { get; init; } = "";
     }
 
-    /// <summary>
-    /// Backs the Activity page: the session timeline, the playtime charts and "played with" - all
-    /// three are views over SessionStore, which the Watcher fills while Roblox runs.
-    /// </summary>
     public sealed class ActivityViewModel : NotifyPropertyChangedViewModel
     {
         private const int MaxSessionsShown = 60;
@@ -126,8 +121,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Refresh();
         }
 
-        // ---- settings
-
         public bool HistoryEnabled
         {
             get => App.Settings.Prop.SessionHistoryEnabled;
@@ -139,8 +132,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.SessionTrackFriends;
             set { App.Settings.Prop.SessionTrackFriends = value; App.Settings.SaveDeferred(); OnPropertyChanged(nameof(TrackFriends)); OnPropertyChanged(nameof(CompanionsEmptyText)); }
         }
-
-        // ---- headline numbers
 
         private string _totalsText = "";
         public string TotalsText { get => _totalsText; private set { _totalsText = value; OnPropertyChanged(nameof(TotalsText)); } }
@@ -156,8 +147,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             ? "No friend has been seen on one of your servers yet. Only friends whose privacy settings let you join them can be recognised."
             : "Switch on \"Note which friends share my server\" above, then play - friends on the same server show up here.";
 
-        // ---- per-game range
-
         public string[] RangeOptions { get; } = { "This week", "Last 30 days", "All time" };
 
         private string _selectedRange = "Last 30 days";
@@ -168,8 +157,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         }
 
         private SessionData _data = new();
-
-        // ------------------------------------------------------------------ building
 
         private void Refresh()
         {
@@ -189,7 +176,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return local.Year == today.Year ? local.ToString("dddd d MMMM") : local.ToString("d MMMM yyyy");
         }
 
-        // inside a sentence: "today" / "yesterday" in lower case, a date as it is
         private static string DayInline(DateTime local)
         {
             string name = DayName(local);
@@ -200,7 +186,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             Sessions.Clear();
 
-            // every capture once, newest first; a visit takes the ones that fall inside it
             var captures = new List<(DateTime Time, string Path, bool Image)>();
             foreach ((string directory, bool image) in new[] { (ScreenshotCapture.ScreenshotsDir, true), (InstantReplayRecorder.ClipsDir, false) })
             {
@@ -244,7 +229,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                     (int Average, int Low)? fps = SessionStats.FpsSummary(visit);
 
-                    // a clip is written a moment after the hotkey, so the window runs a little past the leave
                     List<TimelineCapture> inside = captures
                         .Where(c => c.Time >= visit.JoinedUtc && c.Time <= visit.LeftUtc.AddSeconds(90))
                         .OrderBy(c => c.Time)
@@ -270,7 +254,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(TimelineEmptyVisibility));
         }
 
-        // 260 x 36 sparkline; stretches without a reading are simply not drawn
         private static PointCollection BuildSpark(List<int> readings)
         {
             var points = new PointCollection();
@@ -380,8 +363,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             OnPropertyChanged(nameof(CompanionsEmptyVisibility));
         }
-
-        // ------------------------------------------------------------------ actions
 
         private static void OpenCapture(TimelineCapture? capture)
         {

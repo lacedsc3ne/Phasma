@@ -3,10 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace PhasmaStrap.Integrations.Overlays
 {
-    // Hand-rolled Win32 interop for the overlay compositor's own click-through window,
-    // separate from CsWin32's generated surface since the small subset used here
-    // (layered/topmost window class, monitor + display-mode queries, display-affinity)
-    // is easiest to keep self-contained and easy to audit for COM/handle lifetime.
     internal static class OverlayInterop
     {
         public const uint WS_POPUP = 0x80000000;

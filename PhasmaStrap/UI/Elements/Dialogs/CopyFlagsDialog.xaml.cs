@@ -11,11 +11,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
         Base64,
     }
 
-    // Lets the user pick how the current FastFlag set gets copied to the clipboard from
-    // FastFlagEditorPage - plain JSON (the previous, only option), JSON grouped by flag
-    // prefix, or Base64-encoded JSON for pasting somewhere that mangles raw JSON.
-    //
-    // Ported from Voidstrap's UI/Elements/Dialogs/CopyFlagsDialog.xaml.cs.
     public partial class CopyFlagsDialog
     {
         private sealed class FormatOption

@@ -1,4 +1,4 @@
-﻿using System.Media;
+using System.Media;
 using System.Web;
 using System.Windows;
 using System.Windows.Interop;
@@ -8,12 +8,6 @@ using Windows.Win32.Foundation;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // hmm... do i use MVVM for this?
-    // this is entirely static, so i think im fine without it, and this way is just so much more efficient
-
-    /// <summary>
-    /// Interaction logic for ExceptionDialog.xaml
-    /// </summary>
     public partial class ExceptionDialog
     {
         const int MAX_GITHUB_URL_LENGTH = 8192;
@@ -36,17 +30,13 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             if (issueUrl.Length > MAX_GITHUB_URL_LENGTH)
             {
-                // url is way too long for github. remove the log parameter.
                 issueUrl = $"{repoUrl}/issues/new?template=bug_report.yaml&title={title}";
 
                 if (issueUrl.Length > MAX_GITHUB_URL_LENGTH)
-                    issueUrl = $"{repoUrl}/issues/new?template=bug_report.yaml"; // bruh
+                    issueUrl = $"{repoUrl}/issues/new?template=bug_report.yaml";
             }
 
             string helpMessage = String.Format(Strings.Dialog_Exception_Info_2, wikiUrl, issueUrl);
-
-            //if (!App.IsActionBuild && !App.BuildMetadata.Machine.Contains("pizzaboxer", StringComparison.Ordinal))
-                //helpMessage = String.Format(Strings.Dialog_Exception_Info_2_Alt, wikiUrl);
 
             HelpMessageMDTextBlock.MarkdownText = helpMessage;
             VersionText.Text = String.Format(Strings.Dialog_Exception_Version, App.Version);

@@ -2,18 +2,6 @@ using PhasmaStrap.Networking;
 
 namespace PhasmaStrap.Integrations
 {
-    /// <summary>
-    /// Ported from Voidstrap's Voidstrap.Integrations.ClassicHostRedirect. Redirects roblox.com/www.roblox.com
-    /// to 127.0.0.1 via the hosts file, so a classic/legacy Roblox client launched by PhasmaStrap talks to the
-    /// locally running <see cref="ClassicServerManager"/> process instead of the live Roblox servers. All hosts
-    /// file mutation goes through <see cref="Networking.ClassicHostsFile"/>.
-    ///
-    /// This is a significant behaviour change (spoofing name resolution for roblox.com itself), so it is gated
-    /// behind Settings.Prop.ClassicClientEnabled, which defaults to false, and the redirect is only ever applied
-    /// for the duration of a classic client session - see <see cref="RemoveWhenSessionEnds"/> and
-    /// <see cref="CleanStaleRedirect"/> for how it is guaranteed to be cleaned up even if PhasmaStrap crashes or
-    /// is killed.
-    /// </summary>
     public static class ClassicHostRedirect
     {
         private const string LOG_IDENT = "ClassicHostRedirect";
@@ -43,12 +31,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        /// <summary>
-        /// Applies or removes the redirect. If the current process is not elevated, relaunches PhasmaStrap
-        /// with the "-classicredirect on/off" flag under UAC elevation (see App.OnStartup handling of
-        /// LaunchSettings.ClassicRedirectFlag) to perform the actual hosts file write, then waits for it.
-        /// Returns null on success, or a user-facing error message on failure.
-        /// </summary>
         public static string? Set(bool enable)
         {
             if (!enable)
@@ -93,11 +75,6 @@ namespace PhasmaStrap.Integrations
             return ok;
         }
 
-        /// <summary>
-        /// Called once at startup (before any classic session begins). If a previous PhasmaStrap session
-        /// crashed or was killed while the redirect was applied, and no classic client is currently running,
-        /// clears the stale redirect so the user's normal Roblox access isn't broken.
-        /// </summary>
         public static void CleanStaleRedirect()
         {
             try
@@ -129,11 +106,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        /// <summary>
-        /// Blocks on a background thread until the classic client session ends (or never starts), then removes
-        /// the redirect. This is the mechanism that guarantees the hosts file is not left permanently pointing
-        /// roblox.com at localhost - it should be started right before/after a classic client is launched.
-        /// </summary>
         public static void RemoveWhenSessionEnds()
         {
             try

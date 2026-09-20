@@ -5,7 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:PhasmaStrap.UI.Elements.Controls"
+      xmlns:models="clr-namespace:PhasmaStrap.UI.ViewModels.Settings"
       xmlns:resources="clr-namespace:PhasmaStrap.Resources"
+      d:DataContext="{d:DesignInstance Type=models:ClassicClientViewModel}"
       mc:Ignorable="d"
       Title="ClassicClientPage"
       Scrollable="True">
@@ -15,7 +17,7 @@
     <StackPanel Margin="0,0,14,14">
         <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_Title}" FontSize="20" FontWeight="Medium" />
         <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                   Text="{x:Static resources:Strings.Menu_ClassicClient_Description}" />
+                   Text="Runs a private Roblox server on your own machine and points classic clients at it." />
 
         <controls:OptionControl
             Header="{x:Static resources:Strings.Menu_ClassicClient_Enabled_Title}"
@@ -24,86 +26,130 @@
             <ui:ToggleSwitch IsChecked="{Binding ClassicClientEnabled, Mode=TwoWay}" />
         </controls:OptionControl>
 
-        <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_Installation_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
+        <ui:InfoBar Margin="0,8,0,0" Padding="8" Severity="Warning" IsOpen="True" IsClosable="False"
+                    Title="Hosts file redirect"
+                    Message="{x:Static resources:Strings.Menu_ClassicClient_Description}" />
 
         <StackPanel IsEnabled="{Binding InnerContent.IsChecked, ElementName=ClassicClientEnabledOption, Mode=OneWay}">
-            <TextBlock Margin="0,4,0,0" Text="{x:Static resources:Strings.Menu_ClassicClient_InstallLocation_Label}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:TextBox Grid.Column="0" PlaceholderText="{x:Static resources:Strings.Menu_ClassicClient_InstallLocation_PlaceholderText}" Text="{Binding ClassicClientInstallLocation}" />
-                <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseInstallLocationCommand}" />
-            </Grid>
+            <Border Margin="0,14,0,0" Padding="14" CornerRadius="8" BorderThickness="1"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                <StackPanel>
+                    <TextBlock FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_ClassicClient_Installation_Title}" />
+                    <TextBlock Margin="0,8,0,0" FontSize="12" Text="{Binding EngineStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,3,0,0" FontSize="12" Text="{Binding EngineDataStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,3,0,0" FontSize="12" Text="{Binding RedirectStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
 
-            <TextBlock Margin="0,12,0,0" Text="{Binding EngineStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-            <TextBlock Margin="0,4,0,0" Text="{Binding EngineDataStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-            <TextBlock Margin="0,4,0,0" Text="{Binding RedirectStatus, Mode=OneWay}" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Static resources:Strings.Menu_ClassicClient_InstallLocation_Label}" />
+                        <ui:TextBox Grid.Column="1" PlaceholderText="{x:Static resources:Strings.Menu_ClassicClient_InstallLocation_PlaceholderText}" Text="{Binding ClassicClientInstallLocation}" />
+                        <ui:Button Grid.Column="2" Margin="8,0,0,0" Icon="Folder24" Content="{x:Static resources:Strings.Common_Browse}" Command="{Binding BrowseInstallLocationCommand}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
 
-            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                       Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_Description}" />
+            <Border Margin="0,10,0,0" Padding="14" CornerRadius="8" BorderThickness="1"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                <StackPanel>
+                    <TextBlock FontSize="14" FontWeight="Medium" Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_Title}" />
+                    <TextBlock Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_Description}" />
 
-            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_EngineData_Title}" FontSize="14" FontWeight="Medium" Margin="0,8,0,0" />
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_EngineData_Description}" />
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:Button Grid.Column="0" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_ClassicClient_InstallEngineDataPack}"
+                                   ToolTip="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_EngineData_Description}"
+                                   IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                                   Command="{Binding InstallEngineCommand}" />
+                        <ComboBox Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" ItemsSource="{Binding AvailableClients}" SelectedItem="{Binding SelectedAvailableClient, Mode=TwoWay}"
+                                  DisplayMemberPath="Name" IsEnabled="{Binding IsNotBusy, Mode=OneWay}" />
+                        <ui:Button Grid.Column="2" Margin="8,0,0,0" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_ClassicClient_Install}"
+                                   ToolTip="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_InstallUpdate_Description}"
+                                   IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                                   Command="{Binding InstallSelectedClientCommand}" />
+                    </Grid>
 
-            <ui:Button Margin="0,8,0,0" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_ClassicClient_InstallEngineDataPack}"
-                       HorizontalAlignment="Stretch" IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
-                       Command="{Binding InstallEngineCommand}" />
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                  ItemsSource="{Binding InstalledClients, Mode=OneWay}"
+                                  SelectedItem="{Binding SelectedClassicClient, Mode=TwoWay}"
+                                  IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                                  ToolTip="The client that Update all brings up to date" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="ArrowSync24" Content="{x:Static resources:Strings.Menu_ClassicClient_UpdateAll}"
+                                   IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
+                                   Command="{Binding UpdateAllCommand}" />
+                        <ui:Button Grid.Column="2" Margin="8,0,0,0" Icon="ArrowSync24" Content="{x:Static resources:Strings.Menu_ClassicClient_Refresh}" Command="{Binding RefreshClientsCommand}" />
+                        <ui:Button Grid.Column="3" Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_Cancel}" Appearance="Danger"
+                                   IsEnabled="{Binding IsBusy, Mode=OneWay}" Command="{Binding CancelOperationCommand}" />
+                    </Grid>
 
-            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_InstallUpdate_Title}" FontSize="14" FontWeight="Medium" Margin="0,12,0,0" />
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_ClassicClient_AcquireClients_InstallUpdate_Description}" />
+                    <ProgressBar Margin="0,10,0,0" Height="6" Minimum="0" Maximum="100"
+                                 Value="{Binding ProgressValue, Mode=OneWay}"
+                                 Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <TextBlock Margin="0,4,0,0" FontSize="12" Text="{Binding ProgressText, Mode=OneWay}" TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
+            </Border>
 
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableClients}" SelectedItem="{Binding SelectedAvailableClient, Mode=TwoWay}"
-                          DisplayMemberPath="Name" IsEnabled="{Binding IsNotBusy, Mode=OneWay}" />
-                <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="ArrowDownload24" Content="{x:Static resources:Strings.Menu_ClassicClient_Install}"
-                           IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
-                           Command="{Binding InstallSelectedClientCommand}" />
-            </Grid>
+            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_InstalledClients_Title}" FontSize="20" FontWeight="Medium" Margin="0,18,0,0" />
 
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:Button Grid.Column="0" Icon="ArrowSync24" Content="{x:Static resources:Strings.Menu_ClassicClient_UpdateAll}"
-                           HorizontalAlignment="Stretch" IsEnabled="{Binding IsNotBusy, Mode=OneWay}"
-                           Command="{Binding UpdateAllCommand}" />
-                <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Common_Cancel}" Appearance="Danger"
-                           IsEnabled="{Binding IsBusy, Mode=OneWay}" Command="{Binding CancelOperationCommand}" />
-            </Grid>
+            <Border Margin="0,8,0,0" Padding="24" CornerRadius="8" BorderThickness="1"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                    Visibility="{Binding HasNoInstalledClients, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           Text="No classic clients are installed yet. Install the engine data pack, then pick a client above." />
+            </Border>
 
-            <ProgressBar Margin="0,8,0,0" Height="6" Minimum="0" Maximum="100"
-                         Value="{Binding ProgressValue, Mode=OneWay}"
-                         Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
-            <TextBlock Margin="0,4,0,0" Text="{Binding ProgressText, Mode=OneWay}" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                       Visibility="{Binding IsBusy, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
-
-            <TextBlock Text="{x:Static resources:Strings.Menu_ClassicClient_InstalledClients_Title}" FontSize="20" FontWeight="Medium" Margin="0,16,0,0" />
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0" ItemsSource="{Binding InstalledClients}" SelectedItem="{Binding SelectedClassicClient, Mode=TwoWay}" />
-                <ui:Button Grid.Column="1" Margin="8,0,0,0" Icon="ArrowSync24" Content="{x:Static resources:Strings.Menu_ClassicClient_Refresh}" Command="{Binding RefreshClientsCommand}" />
-            </Grid>
-
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <ui:Button Grid.Column="0" Margin="0,0,4,0" Icon="Play24" Content="{x:Static resources:Strings.Menu_ClassicClient_LaunchSelectedClient}" Appearance="Primary" HorizontalAlignment="Stretch" Command="{Binding LaunchClientCommand}" />
-                <ui:Button Grid.Column="1" Margin="4,0,0,0" Icon="Stop24" Content="{x:Static resources:Strings.Menu_ClassicClient_StopPrivateServer}" HorizontalAlignment="Stretch" Appearance="Danger" IsEnabled="{Binding IsServerRunning, Mode=OneWay}" Command="{Binding StopServerCommand}" />
-            </Grid>
+            <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding InstalledClientCards, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,8" Padding="14" CornerRadius="8" BorderThickness="1"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,14,0" VerticalAlignment="Center">
+                                    <TextBlock FontSize="15" FontWeight="SemiBold" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" />
+                                    <TextBlock Margin="0,4,0,0" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding VersionDisplay, Mode=OneWay}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <ui:Button Icon="Play24" Appearance="Primary" HorizontalAlignment="Stretch"
+                                               Content="Launch"
+                                               ToolTip="{x:Static resources:Strings.Menu_ClassicClient_LaunchSelectedClient}"
+                                               Visibility="{Binding IsNotRunning, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               Command="{Binding DataContext.LaunchInstalledClientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                               CommandParameter="{Binding Code, Mode=OneWay}" />
+                                    <ui:Button Icon="Stop24" Appearance="Danger" HorizontalAlignment="Stretch"
+                                               Content="{x:Static resources:Strings.Menu_ClassicClient_StopPrivateServer}"
+                                               Visibility="{Binding IsRunning, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               Command="{Binding DataContext.StopServerCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </StackPanel>
 </ui:UiPage>

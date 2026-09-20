@@ -10,13 +10,8 @@ using PhasmaStrap.UI;
 
 namespace PhasmaStrap.UI.ViewModels.ContextMenu
 {
-    // Shows Roblox's own live log output (tailed from its log file via ActivityWatcher.OnLogEntry)
-    // in a scrollable console-style view. Purely a passive read-along - it never touches the log
-    // file itself, it just listens in on the lines ActivityWatcher already reads for activity tracking.
     internal class OutputConsoleViewModel : NotifyPropertyChangedViewModel, IDisposable
     {
-        // Roblox's log files can easily grow into the tens of thousands of lines over a long play
-        // session, so the buffer is capped to keep memory and text-rendering cost bounded.
         private const int MaxBufferedLines = 5000;
 
         private readonly ActivityWatcher _activityWatcher;
@@ -52,8 +47,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             _activityWatcher.OnLogEntry += OnLogEntry;
 
-            // batching updates on a timer (rather than pushing straight to the bound property on
-            // every line) keeps the UI thread from being hammered while Roblox is logging heavily
             _flushTimer = new DispatcherTimer(DispatcherPriority.Background)
             {
                 Interval = TimeSpan.FromMilliseconds(250)
@@ -89,8 +82,6 @@ namespace PhasmaStrap.UI.ViewModels.ContextMenu
 
             if (trimmed)
             {
-                // the buffer got trimmed from the front, which the StringBuilder can't cheaply do,
-                // so just rebuild the display text from whatever's left in the queue
                 _builder.Clear();
 
                 foreach (string line in _lines)

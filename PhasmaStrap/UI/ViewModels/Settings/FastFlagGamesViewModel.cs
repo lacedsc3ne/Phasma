@@ -16,7 +16,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Name { get; init; } = "";
     }
 
-    // a game that has a rule
     public sealed class GameRuleRow : NotifyPropertyChangedViewModel
     {
         private readonly FastFlagGamesViewModel _owner;
@@ -77,7 +76,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public void Refresh() => OnPropertyChanged(nameof(ProfileSummary));
     }
 
-    // a game that can be picked in "Add a game"
     public sealed class GameChoice
     {
         public long UniverseId { get; init; }
@@ -88,10 +86,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Tag { get; init; } = "";
     }
 
-    /// <summary>
-    /// The FastFlag "Per-game flags" tab: which games get which FastFlag profile. Like the rest
-    /// of the settings, changes are kept when the window's Save button is pressed.
-    /// </summary>
     public sealed class FastFlagGamesViewModel : NotifyPropertyChangedViewModel
     {
         public ObservableCollection<GameRuleRow> Rules { get; } = new();
@@ -104,10 +98,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<PhasmaStrap.Integrations.UniversePlace> Places { get; } = new();
 
-        // asks the page to show the editor tab with this profile
         public event Action<string>? OpenEditorRequested;
 
-        // place ID -> its game, for rules saved without a name (moved from the old system)
         private static readonly Dictionary<long, GameInfo> _lookedUp = new();
 
         public FastFlagGamesViewModel()
@@ -127,8 +119,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.FastFlagPresetCloseRunningRoblox;
             set { App.Settings.Prop.FastFlagPresetCloseRunningRoblox = value; OnPropertyChanged(nameof(CloseRunningRoblox)); }
         }
-
-        // ------------------------------------------------------------------ the list of games
 
         public void Reload()
         {
@@ -235,8 +225,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Status = $"{row.Title} goes back to just your flags. Press Save to keep this.";
         });
 
-        // ------------------------------------------------------------------ add a game
-
         private string _searchText = "";
         public string SearchText { get => _searchText; set { _searchText = value; OnPropertyChanged(nameof(SearchText)); } }
 
@@ -313,7 +301,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             try
             {
-                // a link or a place ID names one game exactly
                 RobloxLaunchTarget? target = RobloxLinkParser.TryParse(text, out RobloxLaunchTarget parsed) ? parsed
                     : text.Contains('.') ? await RobloxLinkParser.ResolveAsync(text, cts.Token) : null;
 
@@ -378,7 +365,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Places.Clear();
             SelectedPlace = null;
 
-            // a link to one particular place most likely means that place
             WholeGame = choice.LinkedPlaceId <= 0 || choice.LinkedPlaceId == choice.RootPlaceId;
             OnPropertyChanged(nameof(WholeGame));
             OnPropertyChanged(nameof(OnePlace));
@@ -389,22 +375,31 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             UpdateExisting();
         }
 
-        public bool WholeGame { get; set; } = true;
+        private bool _wholeGame = true;
 
-        public bool OnePlace
+        public bool WholeGame
         {
-            get => !WholeGame;
+            get => _wholeGame;
             set
             {
-                WholeGame = !value;
+                if (value == _wholeGame)
+                    return;
+
+                _wholeGame = value;
                 OnPropertyChanged(nameof(WholeGame));
                 OnPropertyChanged(nameof(OnePlace));
 
-                if (value && Places.Count == 0)
+                if (!value && Places.Count == 0)
                     _ = LoadPlacesAsync();
 
                 UpdateExisting();
             }
+        }
+
+        public bool OnePlace
+        {
+            get => !WholeGame;
+            set => WholeGame = !value;
         }
 
         private PhasmaStrap.Integrations.UniversePlace? _selectedPlace;
@@ -430,7 +425,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (Selected != game)
                 return;
 
-            // the API can refuse to list places; the linked/start place is still pickable
             if (places.Count == 0)
             {
                 if (game.LinkedPlaceId > 0 && game.LinkedPlaceId != game.RootPlaceId)

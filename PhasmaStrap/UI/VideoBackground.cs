@@ -5,18 +5,6 @@ using System.Windows.Media.Animation;
 
 namespace PhasmaStrap.UI
 {
-    // A looping, silent video behind the settings window (GlobalBackground builds it when the
-    // chosen background is a video).
-    //
-    // Played with MediaElement.Play / Pause and restarted at its end - not through a repeating
-    // MediaTimeline: a timeline is an animation clock, and while any clock is alive (paused or not)
-    // WPF ticks at the monitor's refresh rate and re-renders the window every time. On a 240 Hz
-    // screen that alone cost most of a CPU core. Decoding uses the graphics card where Windows can.
-    //
-    // It pauses while the window is minimised and - unless switched off - while another window is
-    // in front, and it lets go of the file and the decoder as soon as it leaves the window. Should
-    // the video not open after all (a codec removed since it was added), a still frame of it is
-    // shown instead of a black window.
     internal sealed class VideoBackground : Grid
     {
         private const string LOG_IDENT = "VideoBackground";
@@ -97,7 +85,6 @@ namespace PhasmaStrap.UI
                 _window.Closed += WindowClosed;
             }
 
-            // shows the first frame even when it starts out paused
             _media.Play();
             _paused = false;
             UpdatePlayState();
@@ -115,7 +102,7 @@ namespace PhasmaStrap.UI
                 return;
 
             bool hidden = _window.WindowState == System.Windows.WindowState.Minimized || !_window.IsVisible;
-            // (a background UI-test window is never active - it can ask to keep playing anyway)
+
             bool behind = App.Settings.Prop.GlobalBackgroundVideoPauseInactive && !_window.IsActive
                 && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_VIDEOPLAY") != "1";
             bool pause = hidden || behind;

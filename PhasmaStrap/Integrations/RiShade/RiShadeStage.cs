@@ -8,7 +8,6 @@ using Vortice.Mathematics;
 
 namespace PhasmaStrap.Integrations.RiShade
 {
-    // Cbuffer layout must exactly match "Params : register(b0)" in RiShadeShaders.cs.
     [StructLayout(LayoutKind.Sequential)]
     internal struct RiShadeParams
     {
@@ -34,14 +33,6 @@ namespace PhasmaStrap.Integrations.RiShade
         public Vector4 PT;
     }
 
-    /// <summary>
-    /// RiShade's shader post-processing pipeline as a stage that plugs into
-    /// <see cref="Overlays.OverlayCompositor"/>'s single shared D3D11 device/context, rather than
-    /// owning its own device/window/swapchain/capture. This is the render-pipeline half of the
-    /// original standalone RiShadeOverlay.cs (CreatePipeline/CreateSizedResources/RenderPasses/
-    /// DrawPass/LoadCustomEffects) with the window/device/composition/capture/message-loop half
-    /// removed, since the compositor already owns all of that.
-    /// </summary>
     internal sealed class RiShadeStage : IDisposable
     {
         private const string LOG_IDENT = "RiShade";
@@ -54,8 +45,8 @@ namespace PhasmaStrap.Integrations.RiShade
         private readonly ID3D11RenderTargetView?[] _workRtv = new ID3D11RenderTargetView?[13];
         private const int RtA = 0;
         private const int RtB = 1;
-        private const int RtDown0 = 2; // 5 slots: 2..6
-        private const int RtUp0 = 7;   // 4 slots: 7..10
+        private const int RtDown0 = 2;
+        private const int RtUp0 = 7;
         private const int RtSceneBlurA = 11;
         private const int RtSceneBlurB = 12;
 
@@ -202,10 +193,6 @@ namespace PhasmaStrap.Integrations.RiShade
             }
         }
 
-        /// <summary>
-        /// Called by the compositor whenever the Roblox window size (or the live render-scale
-        /// setting) changes. No-ops if neither actually changed since the last call.
-        /// </summary>
         public void EnsureSize(int width, int height)
         {
             width = Math.Max(16, width);
@@ -281,11 +268,6 @@ namespace PhasmaStrap.Integrations.RiShade
             _context.RSSetViewport(new Viewport(0, 0, w, h, 0, 1));
         }
 
-        /// <summary>
-        /// Renders RiShade's full effect chain from <paramref name="inputSrv"/> into
-        /// <paramref name="dst"/>, at the compositor's current display size. Call
-        /// <see cref="EnsureSize"/> first if the size may have changed since the last frame.
-        /// </summary>
         public void Render(ID3D11ShaderResourceView inputSrv, ID3D11RenderTargetView dst)
         {
             var s = App.Settings.Prop.RiShade;

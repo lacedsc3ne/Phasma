@@ -3,9 +3,6 @@ using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
-    // maps a Roblox game-server IP to the physical datacenter it's likely in, via a static
-    // table of known Roblox CIDR ranges (all publicly observable, not proprietary data),
-    // plus whatever gets learned at runtime through ServerFetchStore. Ported from Voidstrap.
     public static class RobloxDatacenterMap
     {
         private const int MaxCidrEntries = 8192;
@@ -174,7 +171,6 @@ namespace PhasmaStrap.Integrations
             return list;
         }
 
-        // known public Roblox datacenter CIDR ranges - publicly observable, not proprietary
         private static List<SeedCidrEntry> BuildSeedEntries() => new()
         {
             new SeedCidrEntry { Cidr = "128.116.115.0/24", City = "Seattle", Region = "Washington", Country = "USA", Lat = 47.6062, Lon = -122.3321 },

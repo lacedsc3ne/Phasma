@@ -3,17 +3,11 @@ using PhasmaStrap.Models.Entities;
 
 namespace PhasmaStrap.Integrations
 {
-    // Persists per-place total playtime and last-played timestamps across app restarts, so the
-    // History page can show a running total instead of only the current session. Simplified from
-    // Voidstrap's PlayTimeStore: no live in-session ticking (a completed session's join/leave times
-    // are already both known by the time ActivityWatcher reports a game leave, via its History
-    // list), no remote merge/replace API, and no separate per-session dedup bookkeeping - a session
-    // is only ever recorded once, right when it completes.
     public static class PlayTimeStore
     {
         private const string LOG_IDENT = "PlayTimeStore";
         private const int MaxEntries = 500;
-        private const double MaxSessionMinutes = 1440.0; // clamp against clock skew / sleep-resume weirdness
+        private const double MaxSessionMinutes = 1440.0;
 
         private static readonly object _lock = new();
         private static PlayTimeData _data = new();

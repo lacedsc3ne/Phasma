@@ -39,7 +39,6 @@
                 <ColumnDefinition Width="320" />
             </Grid.ColumnDefinitions>
 
-            <!-- ============================================================ the picture -->
             <Border x:Name="StageHost" Grid.Column="0" Margin="0,0,12,0" CornerRadius="8" ClipToBounds="True" Background="#FF15171B"
                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" SizeChanged="StageHost_SizeChanged">
                 <Canvas x:Name="Stage" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF24262C" ClipToBounds="True" Cursor="Cross"
@@ -50,7 +49,6 @@
                 </Canvas>
             </Border>
 
-            <!-- ============================================================ the list -->
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
                 <StackPanel>
                     <TextBlock Style="{StaticResource Section}" Margin="0,0,0,6" Text="Hidden areas" />

@@ -9,12 +9,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// A small image editor for the Capture page's screenshots: crop, pen, arrow, box, ellipse,
-    /// text and pixelate (to hide names/chat), with undo/redo, copy to clipboard, and save over
-    /// the original or as a new file. Annotations are kept as vector shapes on a canvas above the
-    /// bitmap until export, so everything stays editable through undo until you save.
-    /// </summary>
     public partial class ScreenshotEditorWindow : WpfUiWindow
     {
         private const string LOG_IDENT = "ScreenshotEditorWindow";
@@ -54,8 +48,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Loaded += (_, _) => ZoomToFit();
             App.Logger.WriteLine(LOG_IDENT, $"Opened {path} ({_bitmap.PixelWidth}x{_bitmap.PixelHeight})");
         }
-
-        // ---------------------------------------------------------------- state / rendering
 
         private sealed class EditorState
         {
@@ -224,7 +216,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             image.EndInit();
             image.Freeze();
 
-            // normalise to a plain 96-dpi Pbgra32 bitmap so pixel coordinates == layout coordinates
             _bitmap = NormalizeDpi(image);
             ApplyBitmap();
         }
@@ -279,7 +270,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private static Stack<EditorState> TrimStack(Stack<EditorState> stack)
         {
-            var items = stack.ToArray(); // top first
+            var items = stack.ToArray();
             var trimmed = new Stack<EditorState>();
             for (int i = Math.Min(items.Length, MaxUndo) - 1; i >= 0; i--)
                 trimmed.Push(items[i]);
@@ -299,8 +290,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             UndoButton.IsEnabled = _undo.Count > 0;
             RedoButton.IsEnabled = _redo.Count > 0;
         }
-
-        // ---------------------------------------------------------------- tools
 
         private void SelectTool(string tool)
         {
@@ -456,8 +445,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             Preview.Children.Add(_previewShape);
         }
 
-        // ---------------------------------------------------------------- crop
-
         private void ShowCropPreview(Rect rect)
         {
             Preview.Children.Clear();
@@ -512,8 +499,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             ZoomToFit();
         }
 
-        // ---------------------------------------------------------------- text
-
         private void BeginText(Point p)
         {
             TextInput.Text = "";
@@ -524,7 +509,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             TextLayer.IsHitTestVisible = true;
             TextInput.Visibility = Visibility.Visible;
 
-            // the box has only just become visible; focus it once layout has run so the caret actually lands in it
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (TextInput.Visibility == Visibility.Visible)
@@ -532,7 +516,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }), System.Windows.Threading.DispatcherPriority.Input);
         }
 
-        // scale with the image so text is legible on a 1080p/1440p capture, not just a small crop
         private double TextFontSize => 10 + Thickness * 3 + _bitmap.PixelWidth / 160.0;
 
         private void CommitText()
@@ -572,8 +555,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private void TextInput_LostFocus(object sender, KeyboardFocusChangedEventArgs e) => CommitText();
 
-        // ---------------------------------------------------------------- undo / redo
-
         private void Undo_Click(object sender, RoutedEventArgs e) => Undo();
 
         private void Redo_Click(object sender, RoutedEventArgs e) => Redo();
@@ -602,8 +583,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             ClearCrop();
             UpdateUndoButtons();
         }
-
-        // ---------------------------------------------------------------- zoom
 
         private void ZoomToFit()
         {
@@ -641,24 +620,18 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             e.Handled = true;
         }
 
-        // ---------------------------------------------------------------- export
-
         private BitmapSource RenderResult()
         {
             CommitText();
             Preview.Children.Clear();
             TextInput.Visibility = Visibility.Collapsed;
 
-            // render the surface at its natural pixel size, ignoring the on-screen zoom
             Transform? zoom = Surface.LayoutTransform;
             Surface.LayoutTransform = Transform.Identity;
             Surface.Measure(new Size(_bitmap.PixelWidth, _bitmap.PixelHeight));
             Surface.Arrange(new Rect(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight));
             Surface.UpdateLayout();
 
-            // through a VisualBrush: rendering Surface itself would include where it sits in the
-            // window (it's centred when the picture is smaller than the view), shifting the result
-            // off the bitmap - a small or cropped screenshot came out all black
             var sheet = new DrawingVisual();
             using (DrawingContext dc = sheet.RenderOpen())
                 dc.DrawRectangle(new VisualBrush(Surface) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top },
@@ -761,8 +734,6 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             DialogResult = Saved;
             Close();
         }
-
-        // ---------------------------------------------------------------- keyboard
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {

@@ -7,15 +7,6 @@ using System.Windows.Media;
 
 namespace PhasmaStrap.Utility
 {
-    // Toggles WPF's hardware/software render tier for every window the process opens, and strips
-    // GPU compositing flags from embedded browser control arguments when software rendering is
-    // forced. Ported from Voidstrap. PhasmaStrap already flips render mode per-window in
-    // WpfUiWindow.OnSourceInitialized based on the same Settings.WPFSoftwareRender/NoGPUFlag
-    // combination this class reads - that per-window path is left untouched, this class adds the
-    // process-wide RenderOptions.ProcessRenderMode toggle (so newly created visuals default to the
-    // right tier even before a window's OnSourceInitialized runs) plus a one-shot safety net: if a
-    // hardware-rendered session never draws its first frame (a bad GPU driver hanging on init), the
-    // next launch automatically falls back to software rendering.
     public static class RenderAcceleration
     {
         private static readonly object Sync = new();

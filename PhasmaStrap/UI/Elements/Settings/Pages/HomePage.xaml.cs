@@ -17,9 +17,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             Loaded += (_, _) => ApplyHomeBackground();
         }
 
-        // the "Home page background" group on Mods > Home page background: this is the one place
-        // that setting is actually drawn (the page is rebuilt on every navigation, so changes made
-        // on the Mods page show up the next time Home is opened)
         private void ApplyHomeBackground()
         {
             var prop = App.Settings.Prop;

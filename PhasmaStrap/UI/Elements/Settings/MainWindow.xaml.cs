@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,9 +15,6 @@ using NavigationItem = Wpf.Ui.Controls.NavigationItem;
 
 namespace PhasmaStrap.UI.Elements.Settings
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : INavigationWindow
     {
         private Models.Persistable.WindowState _state => App.State.Prop.SettingsWindow;
@@ -34,7 +31,7 @@ namespace PhasmaStrap.UI.Elements.Settings
             viewModel.RequestCloseWindowEvent += (_, _) => Close();
 
             DataContext = viewModel;
-            
+
             InitializeComponent();
 
             App.Logger.WriteLine("MainWindow", "Initializing settings window");
@@ -44,13 +41,13 @@ namespace PhasmaStrap.UI.Elements.Settings
 
             LoadState();
 
-            // gamepad navigation only makes sense while this window is open, so it's
-            // started/stopped here rather than from App::OnStartup
             if (App.Settings.Prop.ControllerNavigationEnabled)
                 ControllerService.Initialize();
 
             InitializeSettingsSearch();
             InitializePinning();
+            ApplySidebar(App.Settings.Prop.SettingsSidebarCollapsed, false);
+            InitializeAccountButton();
         }
 
         #region Settings search
@@ -67,7 +64,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                 RunSettingsSearch();
             };
 
-            // warm the index on a background thread so the first keystroke is instant
             _ = Task.Run(() => Search.SettingsSearchIndex.Entries);
 
             PreviewKeyDown += MainWindow_SearchShortcut;
@@ -78,7 +74,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void MainWindow_SearchShortcut(object sender, KeyEventArgs e)
         {
-            // a hotkey capture box on the Hotkeys page must see every key, including Ctrl+F
             if (Keyboard.FocusedElement is FrameworkElement focused && focused.Tag is HotkeyRow)
                 return;
 
@@ -95,8 +90,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                 e.Handled = true;
             }
         }
-
-        // --- recently opened results: shown when the box is focused while empty, and boosted in ranking ---
 
         private static string RecentKey(Search.SettingsSearchEntry entry) => $"{entry.Kind}|{entry.PageType.Name}|{entry.Tab}|{entry.Section}|{entry.Group}|{entry.Header}";
 
@@ -122,8 +115,6 @@ namespace PhasmaStrap.UI.Elements.Settings
         {
             var results = new List<Search.SettingsSearchResult>();
 
-            // two entries can legitimately share a key (e.g. identical action buttons in
-            // different rows) - first one wins, never throw
             var byKey = new Dictionary<string, Search.SettingsSearchEntry>(StringComparer.Ordinal);
             foreach (Search.SettingsSearchEntry entry in Search.SettingsSearchIndex.Entries)
                 byKey.TryAdd(RecentKey(entry), entry);
@@ -135,6 +126,193 @@ namespace PhasmaStrap.UI.Elements.Settings
             }
 
             return results;
+        }
+
+        private bool _accountBusy;
+
+        private void InitializeAccountButton()
+        {
+            PhasmaStrap.Utility.PhasmaAccount.Changed += (_, _) => Dispatcher.Invoke(RefreshAccountButton);
+            RefreshAccountButton();
+
+            if (PhasmaStrap.Utility.PhasmaAccount.SignedIn)
+                _ = PhasmaStrap.Utility.PhasmaAccount.RefreshAsync();
+        }
+
+        private void RefreshAccountButton()
+        {
+            bool signedIn = PhasmaStrap.Utility.PhasmaAccount.SignedIn;
+
+            AccountLabel.Text = _accountBusy ? "Signing in..."
+                : signedIn ? PhasmaStrap.Utility.PhasmaAccount.DisplayName
+                : "Log in";
+
+            AccountChevron.Visibility = signedIn && !_accountBusy ? Visibility.Visible : Visibility.Collapsed;
+            AccountButton.ToolTip = signedIn ? "Your PhasmaStrap account" : "Sign in to PhasmaStrap";
+            AccountWhoItem.Header = signedIn ? $"Signed in as {PhasmaStrap.Utility.PhasmaAccount.DisplayName}" : "Not signed in";
+
+            string avatar = App.State.Prop.AccountAvatar;
+            bool hasAvatar = signedIn && !string.IsNullOrEmpty(avatar);
+
+            if (hasAvatar)
+            {
+                try
+                {
+                    AccountAvatarBrush.ImageSource = new System.Windows.Media.Imaging.BitmapImage(new Uri(avatar, UriKind.Absolute));
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.WriteException("MainWindow::RefreshAccountButton", ex);
+                    hasAvatar = false;
+                }
+            }
+
+            AccountAvatar.Visibility = hasAvatar ? Visibility.Visible : Visibility.Collapsed;
+            AccountIcon.Visibility = hasAvatar ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private async void AccountButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_accountBusy)
+                return;
+
+            if (PhasmaStrap.Utility.PhasmaAccount.SignedIn)
+            {
+                AccountMenu.PlacementTarget = AccountButton;
+                AccountMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                AccountMenu.IsOpen = true;
+                return;
+            }
+
+            _accountBusy = true;
+            RefreshAccountButton();
+
+            try
+            {
+                using var cancel = new CancellationTokenSource(TimeSpan.FromMinutes(11));
+                await PhasmaStrap.Utility.PhasmaAccount.SignInAsync(null, cancel.Token);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteException("MainWindow::AccountButton_Click", ex);
+            }
+            finally
+            {
+                _accountBusy = false;
+                RefreshAccountButton();
+            }
+        }
+
+        private void AccountSettings_Click(object sender, RoutedEventArgs e) => RootNavigation.Navigate("phasmastrap");
+
+        private void AccountWebsite_Click(object sender, RoutedEventArgs e) => Utilities.ShellExecute("https://phasmastrap.com/account");
+
+        private async void AccountSignOut_Click(object sender, RoutedEventArgs e)
+        {
+            await PhasmaStrap.Utility.PhasmaAccount.SignOutAsync();
+            RefreshAccountButton();
+        }
+
+        private const double SidebarExpandedWidth = 206;
+        private const double SidebarCollapsedWidth = 52;
+
+        private readonly Dictionary<NavigationItem, object?> _navigationLabels = new();
+        private bool _sidebarCollapsed;
+
+        private void SidebarToggle_Click(object sender, RoutedEventArgs e) => ApplySidebar(!_sidebarCollapsed, true);
+
+        private void ApplyNavigationLabels(bool collapsed)
+        {
+            foreach (var control in RootNavigation.Items.Concat(RootNavigation.Footer))
+            {
+                if (control is NavigationHeader header)
+                {
+                    if (header != PinnedHeader || PinnedHeader.Visibility != Visibility.Collapsed)
+                        header.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
+
+                    continue;
+                }
+
+                if (control is not NavigationItem item)
+                    continue;
+
+                if (!_navigationLabels.ContainsKey(item))
+                    _navigationLabels[item] = item.Content;
+
+                object? label = _navigationLabels[item];
+
+                item.Content = collapsed ? null : label;
+                item.ToolTip = collapsed ? label : null;
+                item.HorizontalContentAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+            }
+
+            if (RootNavigation.Current is NavigationItem current
+                && _navigationLabels.TryGetValue(current, out object? currentLabel)
+                && currentLabel is string title)
+                RootBreadcrumb.Current = title;
+        }
+
+        private void ApplySidebar(bool collapsed, bool save)
+        {
+            _sidebarCollapsed = collapsed;
+
+            string? openPage = RootNavigation.Current?.PageTag;
+
+            if (!collapsed || !save)
+                ApplyNavigationLabels(collapsed);
+
+            SidebarToggle.Margin = collapsed ? new Thickness(0) : new Thickness(0, 0, 8, 0);
+            SidebarToggle.HorizontalAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+            if (collapsed)
+                SettingsSearchPopup.IsOpen = false;
+
+            double target = collapsed ? SidebarCollapsedWidth : SidebarExpandedWidth;
+
+            if (save)
+            {
+                var slide = new DoubleAnimation(target, TimeSpan.FromMilliseconds(260))
+                {
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+                };
+
+                if (collapsed)
+                    slide.Completed += (_, _) =>
+                    {
+                        if (_sidebarCollapsed)
+                            ApplyNavigationLabels(true);
+                    };
+
+                RootNavigation.BeginAnimation(WidthProperty, slide);
+
+                if (collapsed)
+                {
+                    var hide = new DoubleAnimation(0, TimeSpan.FromMilliseconds(110));
+                    hide.Completed += (_, _) => SettingsSearchBox.Visibility = Visibility.Collapsed;
+                    SettingsSearchBox.BeginAnimation(OpacityProperty, hide);
+                }
+                else
+                {
+                    SettingsSearchBox.Visibility = Visibility.Visible;
+                    SettingsSearchBox.BeginAnimation(OpacityProperty, new DoubleAnimation(1, TimeSpan.FromMilliseconds(220)) { BeginTime = TimeSpan.FromMilliseconds(80) });
+                }
+            }
+            else
+            {
+                RootNavigation.Width = target;
+                SettingsSearchBox.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
+                SettingsSearchBox.Opacity = collapsed ? 0 : 1;
+            }
+
+            if (!string.IsNullOrEmpty(openPage) && RootNavigation.Current?.PageTag != openPage)
+                RootNavigation.Navigate(openPage);
+            SidebarToggle.Icon = collapsed ? SymbolRegular.PanelLeftExpand24 : SymbolRegular.PanelLeftContract24;
+            SidebarToggle.ToolTip = collapsed ? "Show the sidebar" : "Collapse the sidebar";
+
+            if (!save)
+                return;
+
+            App.Settings.Prop.SettingsSidebarCollapsed = collapsed;
+            App.Settings.SaveDeferred();
         }
 
         private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -155,7 +333,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
             List<Search.SettingsSearchResult> results = Search.SettingsSearchEngine.Search(query);
 
-            // things you've opened before float up a little
             if (results.Count > 1 && App.State.Prop.RecentSettingsSearches.Count > 0)
             {
                 var recent = new HashSet<string>(App.State.Prop.RecentSettingsSearches, StringComparer.Ordinal);
@@ -210,7 +387,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void SettingsSearchBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            // focus moving into the popup (clicking a result) must not close it before the click lands
             if (e.NewFocus is DependencyObject target && IsInsidePopup(target))
                 return;
 
@@ -330,8 +506,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void InitializePinning()
         {
-            // Attach a right-click "pin"/"unpin" menu to every real page item declared in XAML.
-            // The dynamically-created pinned duplicates get the same menu attached as they're built.
             foreach (var control in RootNavigation.Items)
             {
                 if (control is not NavigationItem navItem || string.IsNullOrEmpty(navItem.PageTag) || navItem.PageTag == "fastflageditor")
@@ -371,8 +545,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void RebuildPinnedGroup()
         {
-            // Only ever remove the NavigationItem duplicates here, never PinnedHeader itself - see the
-            // comment on PinnedHeader in MainWindow.xaml for why removing a header is unsafe.
             foreach (var item in _pinnedNavItems)
                 RootNavigation.Items.Remove(item);
 
@@ -417,12 +589,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         #endregion Pinned nav items
 
-        // ---- window placement. It lives in its own file, written only by this window: State.json
-        // is also saved by the launcher and the background updater, which wrote back the size
-        // they had read at startup - so the window "sometimes" came back at an old size. It is
-        // saved as it changes (not only on a real close - closing to the tray, logging off or a
-        // crash used to lose it), and it remembers being maximized.
-
         private static string PlacementPath => Path.Combine(Paths.Base, "SettingsWindow.json");
 
         private static bool IsUiTest => Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1";
@@ -441,7 +607,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                 App.Logger.WriteLine("MainWindow", $"Window placement unreadable: {ex.Message}");
             }
 
-            // first run with this file: what State.json had
             return new Models.Persistable.WindowState { Width = _state.Width, Height = _state.Height, Left = _state.Left, Top = _state.Top };
         }
 
@@ -459,13 +624,10 @@ namespace PhasmaStrap.UI.Elements.Settings
             }
             else if (placement.Width >= MinWidth && placement.Height >= MinHeight)
             {
-                // the monitor it was on is gone: keep the size, centre it
                 Width = Math.Min(placement.Width, SystemParameters.WorkArea.Width);
                 Height = Math.Min(placement.Height, SystemParameters.WorkArea.Height);
             }
 
-            // maximized only once the window is up: made maximized before it's shown, WPF's
-            // custom window frame (WindowChrome) loses its resize edges after un-maximizing
             if (placement.Maximized)
             {
                 void MaximizeOnce(object? sender, EventArgs e)
@@ -499,7 +661,6 @@ namespace PhasmaStrap.UI.Elements.Settings
                 Application.Current.SessionEnding += (_, _) => SavePlacement();
         }
 
-        // at least 120 x 80 of it on one of the screens, in this window's units
         private static bool IsOnAScreen(double left, double top, double width, double height)
         {
             try
@@ -527,7 +688,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void SavePlacement()
         {
-            // UI tests run a second copy of this window - it must not move the real one
             if (IsUiTest || WindowState == System.Windows.WindowState.Minimized && !IsVisible)
                 return;
 
@@ -557,7 +717,7 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private async void ShowAlreadyRunningSnackbar()
         {
-            await Task.Delay(500); // wait for everything to finish loading
+            await Task.Delay(500);
             AlreadyRunningSnackbar.Show();
         }
 
@@ -567,7 +727,24 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         public INavigation GetNavigation() => RootNavigation;
 
-        public bool Navigate(Type pageType) => RootNavigation.Navigate(pageType);
+        public bool Navigate(Type pageType)
+        {
+            Type host = SectionHosts.Resolve(pageType);
+
+            if (!RootNavigation.Navigate(host))
+                return false;
+
+            if (host != pageType)
+                Dispatcher.BeginInvoke(() => ShowSection(pageType), System.Windows.Threading.DispatcherPriority.Loaded);
+
+            return true;
+        }
+
+        private void ShowSection(Type pageType)
+        {
+            if (RootFrame.Content is UI.Elements.Controls.ISectionHostPage host)
+                host.SectionHost.Show(pageType);
+        }
 
         public void SetPageService(IPageService pageService) => RootNavigation.PageService = pageService;
 
@@ -579,8 +756,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private Storyboard? _mist;
 
-        // the drifting mist is two large blurred ellipses animated forever - a real per-frame
-        // compositing cost, so it only runs while the window is actually the active one
         private void MainWindow_MistLoaded(object sender, RoutedEventArgs e)
         {
             _mist = (Storyboard)Resources["MistDrift"];
@@ -615,7 +790,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
             if (shouldMinimizeToTray)
             {
-                // nothing is discarded by hiding the window, so skip the unsaved-changes prompt below
                 e.Cancel = true;
                 MinimizeToTray();
                 return;
@@ -628,7 +802,7 @@ namespace PhasmaStrap.UI.Elements.Settings
                 if (result != MessageBoxResult.Yes)
                     e.Cancel = true;
             }
-            
+
             App.State.Save();
         }
 
@@ -658,7 +832,7 @@ namespace PhasmaStrap.UI.Elements.Settings
         private void RestoreFromTray()
         {
             Show();
-            // keep it maximized if it was
+
             if (WindowState == System.Windows.WindowState.Minimized)
                 WindowState = ReadPlacement().Maximized ? System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal;
             Activate();
@@ -679,6 +853,8 @@ namespace PhasmaStrap.UI.Elements.Settings
 
         private void WpfUiWindow_Closed(object sender, EventArgs e)
         {
+            _ = PhasmaStrap.Utility.PhasmaAccount.MaybeAutoBackUpAsync();
+
             try { _mist?.Stop(this); } catch (Exception) { }
             _searchDebounce.Stop();
             _trayIcon?.Dispose();
@@ -689,10 +865,6 @@ namespace PhasmaStrap.UI.Elements.Settings
 
             if (viewModel.RestartAfterClose)
             {
-                // spawn a detached helper that waits a moment before relaunching - LaunchHandler's
-                // "Settings" InterProcessLock is still held by this process until it fully exits,
-                // so starting the new instance immediately would just see the lock taken and back
-                // off instead of opening a fresh window
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "cmd.exe",

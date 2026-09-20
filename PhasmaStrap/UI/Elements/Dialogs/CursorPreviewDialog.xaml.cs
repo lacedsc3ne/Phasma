@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,12 +10,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Shows thumbnails of whatever recognized cursor image files (ArrowCursor.png,
-    /// ArrowFarCursor.png, IBeamCursor.png, MouseLockedCursor.png) exist directly inside a
-    /// user-chosen folder, so they can see what a "browse to custom cursor folder" pick will
-    /// apply before actually applying it via <see cref="CustomCursorModPresetTask"/>.
-    /// </summary>
     public partial class CursorPreviewDialog : WpfUiWindow
     {
         public CursorPreviewDialog(string folderPath)
@@ -30,9 +24,9 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
             foreach (string fileName in CustomCursorModPresetTask.RecognizedFileNames)
             {
-                string filePath = Path.Combine(folderPath, fileName);
+                string? filePath = CursorImages.FindSource(folderPath, fileName);
 
-                if (!File.Exists(filePath))
+                if (filePath is null)
                     continue;
 
                 foundAny = true;

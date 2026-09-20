@@ -13,9 +13,21 @@
       Scrollable="False">
     <ui:UiPage.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <Style x:Key="FriendGroupExpanderStyle" TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+            <Setter Property="IsExpanded" Value="True" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Name}" Value="Offline">
+                    <Setter Property="IsExpanded" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </ui:UiPage.Resources>
-    <!-- The list is a virtualized ListBox filling the page (not a StackPanel-hosted ItemsControl):
-         a few hundred friends only realise the rows that are on screen. -->
+
     <Grid Margin="0,0,14,14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -25,92 +37,208 @@
         <StackPanel Grid.Row="0">
             <TextBlock Text="{x:Static resources:Strings.Menu_Friends_Friends}" FontSize="20" FontWeight="Medium" />
             <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Friends_WhoSOnlineWhatTheyRe}" />
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_FriendActivityAlerts}" Description="{x:Static resources:Strings.Menu_Friends_ToastWhenFriendComesOnlineStarts}" x:Name="AlertsOption">
-                <ui:ToggleSwitch IsChecked="{Binding AlertsEnabled, Mode=TwoWay}" />
-            </controls:OptionControl>
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_CheckEvery}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
-                <StackPanel Orientation="Horizontal">
-                    <ui:NumberBox IntegersOnly="True" Width="100" Min="20" Max="600" Value="{Binding PollSeconds, Mode=TwoWay}" />
-                    <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{x:Static resources:Strings.Menu_Friends_Seconds}" />
-                </StackPanel>
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_OnlyAlertFavourites}" Description="{x:Static resources:Strings.Menu_Friends_ToastsOnlyFriendsYouStarredBelow}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
-                <ui:ToggleSwitch IsChecked="{Binding AlertFavouritesOnly, Mode=TwoWay}" />
-            </controls:OptionControl>
-
-            <Grid Margin="0,16,0,8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="260" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_Friends_SearchNamesNotes}" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <CheckBox Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Content="{x:Static resources:Strings.Menu_Friends_FavouritesOnly}" IsChecked="{Binding FavouritesOnly, Mode=TwoWay}" />
-                <TextBlock Grid.Column="2" Margin="12,0,12,0" FontSize="12" Opacity="0.7" VerticalAlignment="Center" TextAlignment="Right" TextTrimming="CharacterEllipsis" Text="{Binding Status}" />
-                <ui:Button Grid.Column="3" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
-            </Grid>
         </StackPanel>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding Friends, Mode=OneWay}" Background="Transparent" BorderThickness="0" Padding="0"
-                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True"
-                 HorizontalContentAlignment="Stretch">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="Focusable" Value="False" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <ContentPresenter />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border CornerRadius="8" Padding="10" Margin="0,0,0,6" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="320" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
 
-                            <ToggleButton Grid.Column="0" Margin="0,0,8,0" Padding="4" Width="32" Height="32" VerticalAlignment="Center" Focusable="False"
-                                          Background="Transparent" BorderThickness="0" IsChecked="{Binding IsFavourite, Mode=TwoWay}"
-                                          ToolTip="{x:Static resources:Strings.Menu_Friends_FavouriteKeepsFriendTopList}" AutomationProperties.Name="Favourite">
-                                <ui:SymbolIcon Symbol="Star24" Filled="{Binding StarFilled}" FontSize="18">
-                                    <ui:SymbolIcon.Style>
-                                        <Style TargetType="ui:SymbolIcon" BasedOn="{StaticResource {x:Type ui:SymbolIcon}}">
-                                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorTertiaryBrush}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding StarFilled}" Value="True">
-                                                    <Setter Property="Foreground" Value="#F5B301" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:SymbolIcon.Style>
-                                </ui:SymbolIcon>
-                            </ToggleButton>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                            <Grid Grid.Column="1" Width="38" Height="38" VerticalAlignment="Center">
+                <ui:CardExpander Grid.Row="0" Icon="Alert24">
+                    <ui:CardExpander.Header>
+                        <StackPanel>
+                            <TextBlock FontSize="14" Text="{x:Static resources:Strings.Menu_Friends_FriendActivityAlerts}" />
+                            <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Whether to be told, how often to check, and who counts." />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_FriendActivityAlerts}" Description="{x:Static resources:Strings.Menu_Friends_ToastWhenFriendComesOnlineStarts}" x:Name="AlertsOption">
+                            <ui:ToggleSwitch IsChecked="{Binding AlertsEnabled, Mode=TwoWay}" />
+                        </controls:OptionControl>
+                        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_CheckEvery}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:NumberBox IntegersOnly="True" Width="100" Min="20" Max="600" Value="{Binding PollSeconds, Mode=TwoWay}" />
+                                <TextBlock VerticalAlignment="Center" Margin="8,0,0,0" Text="{x:Static resources:Strings.Menu_Friends_Seconds}" />
+                            </StackPanel>
+                        </controls:OptionControl>
+                        <controls:OptionControl Header="{x:Static resources:Strings.Menu_Friends_OnlyAlertFavourites}" Description="{x:Static resources:Strings.Menu_Friends_ToastsOnlyFriendsYouStarredBelow}" IsEnabled="{Binding InnerContent.IsChecked, ElementName=AlertsOption, Mode=OneWay}">
+                            <ui:ToggleSwitch IsChecked="{Binding AlertFavouritesOnly, Mode=TwoWay}" />
+                        </controls:OptionControl>
+                    </StackPanel>
+                </ui:CardExpander>
+
+                <StackPanel Grid.Row="1" Margin="0,12,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox Grid.Column="0" Icon="Search24" PlaceholderText="{x:Static resources:Strings.Menu_Friends_SearchNamesNotes}" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Appearance="Secondary" Command="{Binding RefreshCommand, Mode=OneTime}" />
+                    </Grid>
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0" VerticalAlignment="Center" Content="{x:Static resources:Strings.Menu_Friends_FavouritesOnly}" IsChecked="{Binding FavouritesOnly, Mode=TwoWay}" />
+                        <TextBlock Grid.Column="1" Margin="12,0,0,0" FontSize="12" Opacity="0.7" VerticalAlignment="Center" TextAlignment="Right" TextTrimming="CharacterEllipsis" Text="{Binding Status}" />
+                    </Grid>
+                </StackPanel>
+
+                <ListBox Grid.Row="2" ItemsSource="{Binding Friends, Mode=OneWay}" SelectedItem="{Binding SelectedFriend, Mode=TwoWay}" Background="Transparent" BorderThickness="0" Padding="0"
+                         VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True"
+                         HorizontalContentAlignment="Stretch">
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="GroupItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GroupItem">
+                                                <Expander Style="{StaticResource FriendGroupExpanderStyle}">
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Text="{Binding Name}" />
+                                                            <Border Margin="8,0,0,0" Padding="6,1" CornerRadius="9" VerticalAlignment="Center" Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                                                <TextBlock FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding ItemCount}" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </Expander.Header>
+                                                    <ItemsPresenter />
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="8" Padding="10" Margin="0,0,0,6" BorderThickness="1" Cursor="Hand">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                                        <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorSecondaryBrush}" />
+                                                <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ToggleButton Grid.Column="0" Margin="0,0,8,0" Padding="4" Width="32" Height="32" VerticalAlignment="Center" Focusable="False"
+                                                  Background="Transparent" BorderThickness="0" IsChecked="{Binding IsFavourite, Mode=TwoWay}"
+                                                  ToolTip="{x:Static resources:Strings.Menu_Friends_FavouriteKeepsFriendTopList}" AutomationProperties.Name="Favourite">
+                                        <ui:SymbolIcon Symbol="Star24" Filled="{Binding StarFilled}" FontSize="18">
+                                            <ui:SymbolIcon.Style>
+                                                <Style TargetType="ui:SymbolIcon" BasedOn="{StaticResource {x:Type ui:SymbolIcon}}">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorTertiaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding StarFilled}" Value="True">
+                                                            <Setter Property="Foreground" Value="#F5B301" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:SymbolIcon.Style>
+                                        </ui:SymbolIcon>
+                                    </ToggleButton>
+
+                                    <Grid Grid.Column="1" Width="38" Height="38" VerticalAlignment="Center">
+                                        <Ellipse Fill="{DynamicResource ControlFillColorSecondaryBrush}" />
+                                        <Image Source="{Binding AvatarUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
+                                            <Image.Clip>
+                                                <EllipseGeometry Center="19,19" RadiusX="19" RadiusY="19" />
+                                            </Image.Clip>
+                                        </Image>
+                                        <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" StrokeThickness="2" Stroke="{DynamicResource ControlFillColorDefaultBrush}">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="Gray" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Type}" Value="Online">
+                                                            <Setter Property="Fill" Value="#2ECC71" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="InGame">
+                                                            <Setter Property="Fill" Value="#2ECC71" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="InStudio">
+                                                            <Setter Property="Fill" Value="#3498DB" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                    </Grid>
+
+                                    <StackPanel Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock FontSize="11" Opacity="0.7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,24,0,24" Visibility="{Binding EmptyStateVisibility}">
+                    <ui:SymbolIcon Symbol="People24" FontSize="40" Opacity="0.25" HorizontalAlignment="Center" />
+                    <TextBlock Text="{x:Static resources:Strings.Menu_Friends_NoFriendsShowYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Column="1" Margin="14,0,0,0" Padding="16" CornerRadius="8" BorderThickness="1" VerticalAlignment="Stretch"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <Grid>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding NoSelectionVisibility}">
+                        <ui:SymbolIcon Symbol="PersonCircle24" FontSize="38" Opacity="0.25" HorizontalAlignment="Center" />
+                        <TextBlock Margin="0,10,0,0" FontSize="13" Opacity="0.6" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center"
+                                   Text="Pick a friend on the left to see their details." />
+                    </StackPanel>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Visibility="{Binding SelectionVisibility}">
+                        <StackPanel DataContext="{Binding SelectedFriend}">
+                            <Grid Width="76" Height="76" HorizontalAlignment="Center">
                                 <Ellipse Fill="{DynamicResource ControlFillColorSecondaryBrush}" />
                                 <Image Source="{Binding AvatarUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
                                     <Image.Clip>
-                                        <EllipseGeometry Center="19,19" RadiusX="19" RadiusY="19" />
+                                        <EllipseGeometry Center="38,38" RadiusX="38" RadiusY="38" />
                                     </Image.Clip>
                                 </Image>
-                                <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Bottom" StrokeThickness="2" Stroke="{DynamicResource ControlFillColorDefaultBrush}">
+                                <Ellipse Width="18" Height="18" HorizontalAlignment="Right" VerticalAlignment="Bottom" StrokeThickness="3" Stroke="{DynamicResource ControlFillColorDefaultBrush}">
                                     <Ellipse.Style>
                                         <Style TargetType="Ellipse">
                                             <Setter Property="Fill" Value="Gray" />
@@ -130,27 +258,42 @@
                                 </Ellipse>
                             </Grid>
 
-                            <StackPanel Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">
-                                <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" />
-                                <TextBlock FontSize="11" Opacity="0.7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
+                            <TextBlock Margin="0,12,0,0" FontSize="16" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding Name}" />
+                            <TextBlock FontSize="12" Opacity="0.6" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding Username}" />
+                            <TextBlock Margin="0,8,0,0" FontSize="12" TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding StatusText}" />
 
-                            <ui:TextBox Grid.Column="3" Width="240" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="12" MaxLength="200"
+                            <ui:Button Margin="0,14,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                       Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Icon="ArrowRight24" Appearance="Primary"
+                                       Visibility="{Binding Joinable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ui:UiPage}}" CommandParameter="{Binding}" />
+
+                            <ToggleButton Margin="0,8,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="8,6"
+                                          IsChecked="{Binding IsFavourite, Mode=TwoWay}" ToolTip="{x:Static resources:Strings.Menu_Friends_FavouriteKeepsFriendTopList}">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="Star24" Filled="{Binding StarFilled}" FontSize="16" VerticalAlignment="Center">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon" BasedOn="{StaticResource {x:Type ui:SymbolIcon}}">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorTertiaryBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding StarFilled}" Value="True">
+                                                        <Setter Property="Foreground" Value="#F5B301" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" FontSize="12" Text="Favourite" />
+                                </StackPanel>
+                            </ToggleButton>
+
+                            <TextBlock Margin="0,16,0,4" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{x:Static resources:Strings.Menu_Accounts_AddNote}" />
+                            <ui:TextBox FontSize="12" MaxLength="200" AcceptsReturn="True" TextWrapping="Wrap" MinLines="3" MaxLines="6"
                                         PlaceholderText="{x:Static resources:Strings.Menu_Accounts_AddNote}" ClearButtonEnabled="False" ToolTip="{x:Static resources:Strings.Menu_Friends_OwnNoteAboutFriendOnlyStored}"
                                         Text="{Binding Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=350}" />
-
-                            <ui:Button Grid.Column="4" Margin="10,0,0,0" Content="{x:Static resources:Strings.Menu_ServerBrowser_Join}" Icon="ArrowRight24" Appearance="Primary" VerticalAlignment="Center"
-                                       Visibility="{Binding Joinable, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                       Command="{Binding DataContext.JoinCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,24,0,24" Visibility="{Binding EmptyStateVisibility}">
-            <ui:SymbolIcon Symbol="People24" FontSize="40" Opacity="0.25" HorizontalAlignment="Center" />
-            <TextBlock Text="{x:Static resources:Strings.Menu_Friends_NoFriendsShowYet}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="14" Opacity="0.5" Margin="0,10,0,0" HorizontalAlignment="Center" />
-        </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </ui:UiPage>

@@ -2,8 +2,6 @@ using System.Xml.Linq;
 
 namespace PhasmaStrap;
 
-// direct editor for Roblox's GlobalBasicSettings_13.xml, letting users change game quality/behaviour
-// settings without needing a matching FastFlag. Ported from Voidstrap.
 public sealed record GBSProperty(string Tag, double Minimum, double Maximum);
 
 public class GBSEditor

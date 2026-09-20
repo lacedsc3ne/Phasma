@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +8,8 @@ namespace PhasmaStrap.Exceptions
 {
     internal class ChecksumFailedException : Exception
     {
-        public ChecksumFailedException(string message) : base(message) 
-        { 
+        public ChecksumFailedException(string message) : base(message)
+        {
         }
     }
 }

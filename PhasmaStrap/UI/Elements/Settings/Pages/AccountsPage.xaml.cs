@@ -1,4 +1,4 @@
-using PhasmaStrap.UI.ViewModels.ContextMenu;
+﻿using PhasmaStrap.UI.ViewModels.ContextMenu;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
@@ -9,7 +9,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
             DataContext = new AccountSwitcherViewModel();
             InitializeComponent();
 
-            // the account guard section has its own view model
             GuardRoot.DataContext = new ViewModels.Settings.AccountGuardViewModel();
         }
 

@@ -9,7 +9,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class ChannelViewModel : NotifyPropertyChangedViewModel
     {
-        // known public Roblox deployment channels people commonly switch to
         public IEnumerable<string> KnownChannels { get; } = new[]
         {
             "production",
@@ -41,7 +40,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public record MirrorChoice(string Display, string Url);
 
-        // "" represents auto-selecting the fastest responding mirror
         public IEnumerable<MirrorChoice> MirrorChoices { get; } =
             new[] { "" }.Concat(Deployment.Mirrors).Select(url => new MirrorChoice(Describe(url), url));
 
@@ -53,10 +51,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private static string Describe(string url) =>
             String.IsNullOrEmpty(url) ? "Auto (fastest responding server)" : new Uri(url).Host;
-
-        // ---- Download tuning (Utility.DownloadConfiguration, read by Bootstrapper.DownloadPackage;
-        // ported from Voidstrap's Installer tab). Defaults reproduce PhasmaStrap's original
-        // single-connection, unsegmented, 4KB-buffer download behaviour exactly - see Settings.cs ----
 
         public IReadOnlyList<int> DownloadBufferOptions => DownloadConfiguration.BufferKbChoices;
 
@@ -108,10 +102,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(MaxDownloadSegments));
             }
         }
-
-        // ---- Live channel info lookup (ported from Voidstrap's Roblox tab "Channels - [Roblox
-        // Build]" card): looks up the version/build GUID currently deployed on whatever channel is
-        // typed into the channel box above, without needing to actually switch to it first ----
 
         private ClientVersion? _channelDeployInfo;
         public ClientVersion? ChannelDeployInfo
@@ -172,8 +162,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 IsChannelInfoLoading = false;
             }
         }
-
-        // ---- Update heatmap (Integrations.RobloxUpdateHeatmapService, ported from Voidstrap) ----
 
         public sealed class DayBarItem
         {

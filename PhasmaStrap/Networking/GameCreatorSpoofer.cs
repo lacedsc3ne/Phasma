@@ -2,14 +2,6 @@ using System.Text.Json.Nodes;
 
 namespace PhasmaStrap.Networking
 {
-    // "Make yourself game creator" (AssetWarp's Client Spoofer section) - the in-game client
-    // learns who owns the experience from the JOIN response (gamejoin.roblox.com's
-    // join-game / join-game-instance / join-reserved-game), which carries CreatorId /
-    // CreatorType (and camelCase variants) nested inside the join script. Rewriting those to
-    // your own account is what makes the client treat you as the creator (developer console,
-    // creator-only UI states). The earlier version of this file rewrote games.roblox.com's
-    // game-details listing instead, which the running client never even asks for.
-    // Shares UsernameSpoofer's identity-caching approach rather than duplicating it.
     public static class GameCreatorSpoofer
     {
         private const string LOG_IDENT = "GameCreatorSpoofer";
@@ -112,8 +104,6 @@ namespace PhasmaStrap.Networking
                 }
             }
 
-            // the join script is itself nested JSON under "joinScript"/"jobScript" etc., and some
-            // fields are string-encoded JSON; walk every object so all of them get rewritten
             foreach ((string key, JsonNode? child) in obj.ToList())
             {
                 if (child is JsonObject or JsonArray)
@@ -137,7 +127,6 @@ namespace PhasmaStrap.Networking
                     }
                     catch (Exception)
                     {
-                        // not JSON after all - leave it
                     }
                 }
             }

@@ -1,25 +1,35 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace PhasmaStrap.UI.ViewModels.Settings
 {
     public class BehaviourViewModel : NotifyPropertyChangedViewModel
     {
+        public BehaviourViewModel()
+        {
+            Matchmaker.PropertyChanged += (_, _) => RefreshSummaries();
+        }
+
         public bool ConfirmLaunches
         {
             get => App.Settings.Prop.ConfirmLaunches;
-            set => App.Settings.Prop.ConfirmLaunches = value;
+            set
+            {
+                App.Settings.Prop.ConfirmLaunches = value;
+                RefreshSummaries();
+            }
         }
-
-        // --- cleanup (moved here from PerformancePage - "what to delete after Roblox closes" is a
-        // deployment/launch-behavior concern, not a live-performance tweak) ---
 
         public IEnumerable<CleanerOptions> CleanerScheduleOptions { get; } = Enum.GetValues(typeof(CleanerOptions)).Cast<CleanerOptions>();
 
         public CleanerOptions CleanerSchedule
         {
             get => App.Settings.Prop.CleanerOptions;
-            set => App.Settings.Prop.CleanerOptions = value;
+            set
+            {
+                App.Settings.Prop.CleanerOptions = value;
+                RefreshSummaries();
+            }
         }
 
         public IEnumerable<string> CleanerAvailableDirectories { get; } = Cleaner.Directories.Keys;
@@ -58,25 +68,34 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 directories.Remove(key);
         }
 
-        // --- Roblox process optimizer (moved here from PerformancePage - ported from Voidstrap
-        // RobloxProcessOptimizer) ---
-
         public bool OptimizeRoblox
         {
             get => App.Settings.Prop.OptimizeRoblox;
-            set => App.Settings.Prop.OptimizeRoblox = value;
+            set
+            {
+                App.Settings.Prop.OptimizeRoblox = value;
+                RefreshSummaries();
+            }
         }
 
         public bool RobloxEfficiencyMode
         {
             get => App.Settings.Prop.RobloxEfficiencyMode;
-            set => App.Settings.Prop.RobloxEfficiencyMode = value;
+            set
+            {
+                App.Settings.Prop.RobloxEfficiencyMode = value;
+                RefreshSummaries();
+            }
         }
 
         public bool ReduceMemoryOutOfFocus
         {
             get => App.Settings.Prop.ReduceMemoryOutOfFocus;
-            set => App.Settings.Prop.ReduceMemoryOutOfFocus = value;
+            set
+            {
+                App.Settings.Prop.ReduceMemoryOutOfFocus = value;
+                RefreshSummaries();
+            }
         }
 
         public IEnumerable<string> CpuPriorityOptions => BuildCpuPriorityOptions();
@@ -84,7 +103,11 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string SelectedCpuPriority
         {
             get => App.Settings.Prop.SelectedCpuPriority;
-            set => App.Settings.Prop.SelectedCpuPriority = value;
+            set
+            {
+                App.Settings.Prop.SelectedCpuPriority = value;
+                RefreshSummaries();
+            }
         }
 
         public string[] RobloxPriorityLimitOptions { get; } = { "Idle", "Below Normal", "Normal", "Above Normal", "High", "Realtime" };
@@ -94,14 +117,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             get => App.Settings.Prop.RobloxPriorityLimit;
             set
             {
-                // Showing a modal confirmation dialog synchronously from inside a ComboBox.SelectedItem
-                // binding update is unreliable in WPF - the ComboBox can re-push its already-committed
-                // value back to the source once the nested dispatcher frame from ShowDialog() unwinds,
-                // silently overwriting any revert attempted from within this same call. Instead, accept
-                // the value immediately (letting the binding update finish cleanly), then defer the
-                // confirmation to run afterward as its own, non-nested dispatcher operation.
                 string previous = App.Settings.Prop.RobloxPriorityLimit;
                 App.Settings.Prop.RobloxPriorityLimit = value;
+                RefreshSummaries();
 
                 if (value.Equals("Realtime", StringComparison.OrdinalIgnoreCase))
                 {
@@ -117,13 +135,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                         {
                             App.Settings.Prop.RobloxPriorityLimit = previous;
                             OnPropertyChanged(nameof(RobloxPriorityLimit));
+                            RefreshSummaries();
                         }
                     }), DispatcherPriority.Background);
                 }
             }
         }
-
-        // --- launcher memory manager (ported from Voidstrap MemoryManager) ---
 
         public bool LauncherMemoryManagerEnabled
         {
@@ -137,8 +154,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     MemoryManager.Shutdown();
             }
         }
-
-        // --- render acceleration (reuses the existing WPFSoftwareRender setting) ---
 
         public bool SoftwareRenderingEnabled
         {
@@ -162,8 +177,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             return options;
         }
 
-        // one-time apply action, like RiShadeViewModel.SelectedPreset - not a persisted selection,
-        // since the individual toggles above may not match any named preset once hand-tweaked
         public string[] EnginePresetNames => Integrations.EnginePresets.PresetNames;
 
         public string SelectedEnginePreset
@@ -181,21 +194,28 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(ReduceMemoryOutOfFocus));
                 OnPropertyChanged(nameof(SelectedCpuPriority));
                 OnPropertyChanged(nameof(RobloxPriorityLimit));
+                RefreshSummaries();
             }
         }
 
-        // disables the RobloxCrashHandler.exe process Roblox spawns alongside the game client -
-        // see Bootstrapper.DisableCrashHandlerIfNeeded. Ported from Voidstrap's DisableCrash.
         public bool DisableRobloxCrashHandler
         {
             get => App.Settings.Prop.DisableRobloxCrashHandler;
-            set => App.Settings.Prop.DisableRobloxCrashHandler = value;
+            set
+            {
+                App.Settings.Prop.DisableRobloxCrashHandler = value;
+                RefreshSummaries();
+            }
         }
 
         public bool BackgroundUpdates
         {
             get => App.Settings.Prop.BackgroundUpdatesEnabled;
-            set => App.Settings.Prop.BackgroundUpdatesEnabled = value;
+            set
+            {
+                App.Settings.Prop.BackgroundUpdatesEnabled = value;
+                RefreshSummaries();
+            }
         }
 
         public bool IsRobloxInstallationMissing => !App.IsPlayerInstalled && !App.IsStudioInstalled;
@@ -203,22 +223,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public bool ForceRobloxReinstallation
         {
             get => App.State.Prop.ForceReinstall || IsRobloxInstallationMissing;
-            set => App.State.Prop.ForceReinstall = value;
+            set
+            {
+                App.State.Prop.ForceReinstall = value;
+                RefreshSummaries();
+            }
         }
 
-        // the Matchmaker tab reuses ServerBrowserViewModel's existing matchmaker properties
-        // (enable/prefer-empty/preferred-datacenter/candidate-count/datacenter grid/excluded
-        // games) rather than duplicating that logic here - see ServerBrowserPage's own
-        // "Browser" (manual server search/join) section, which is the only part that stayed
-        // on that page.
         public ServerBrowserViewModel Matchmaker { get; } = new();
-
-        // --- Roblox tab: live game-window customization (Integrations/RobloxWindowCustomizer) ---
 
         public string RobloxTitle
         {
             get => App.Settings.Prop.RobloxTitle;
-            set => App.Settings.Prop.RobloxTitle = value ?? "";
+            set
+            {
+                App.Settings.Prop.RobloxTitle = value ?? "";
+                RefreshSummaries();
+            }
         }
 
         public bool CycleTitleWithGameName
@@ -237,6 +258,102 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             get => App.Settings.Prop.UseGameIconForRobloxWindow;
             set => App.Settings.Prop.UseGameIconForRobloxWindow = value;
+        }
+
+        public string CurrentEnginePresetName
+        {
+            get
+            {
+                Integrations.EnginePresetValues current = Integrations.EnginePresets.FromSettings(App.Settings.Prop);
+
+                foreach (KeyValuePair<string, Integrations.EnginePresetValues> preset in Integrations.EnginePresets.Presets)
+                {
+                    if (preset.Value == current)
+                        return preset.Key;
+                }
+
+                return "Custom";
+            }
+        }
+
+        public string LaunchSummaryConfirm => ConfirmLaunches
+            ? "You will be asked to confirm before each launch."
+            : "Launches start straight away, with no confirmation prompt.";
+
+        public string LaunchSummaryUpdates
+        {
+            get
+            {
+                if (ForceRobloxReinstallation)
+                    return "Roblox will be reinstalled from scratch before the game opens.";
+
+                return BackgroundUpdates
+                    ? "Roblox will start on the version you already have, and a newer one is fetched in the background."
+                    : "Roblox will be brought up to date first if a newer version is out.";
+            }
+        }
+
+        public string LaunchSummaryMatchmaker
+        {
+            get
+            {
+                if (!Matchmaker.MatchmakerEnabled)
+                    return "The matchmaker is off, so Roblox picks the server for you.";
+
+                string key = Matchmaker.PreferredDatacenter;
+                string region = String.IsNullOrEmpty(key)
+                    ? "closest to you"
+                    : $"in {Matchmaker.DatacenterChoices.FirstOrDefault(choice => choice.Key == key)?.Display ?? key}";
+
+                string candidates = Matchmaker.MatchmakerAutoCandidates
+                    ? "as many candidates as it needs"
+                    : $"up to {Matchmaker.MatchmakerMaxCandidates} candidates";
+
+                string empty = Matchmaker.MatchmakerPreferEmpty ? ", preferring emptier ones" : "";
+
+                return $"The matchmaker will pick a server {region}, looking at {candidates}{empty}.";
+            }
+        }
+
+        public string LaunchSummaryProcess =>
+            $"Roblox will run with the {CurrentEnginePresetName.ToLowerInvariant()} process preset, at {RobloxPriorityLimit.ToLowerInvariant()} priority.";
+
+        public string LaunchSummaryRejoin => Matchmaker.AutoRejoinOnCrash
+            ? $"If Roblox crashes, PhasmaStrap will rejoin up to {Matchmaker.AutoRejoinMaxAttempts} times, {Matchmaker.AutoRejoinDelaySeconds} seconds apart."
+            : "If Roblox crashes, PhasmaStrap will not rejoin for you.";
+
+        public string LaunchingGroupSummary =>
+            $"Launch confirmation and the Roblox crash handler. Confirmation is {(ConfirmLaunches ? "on" : "off")}, the crash handler is {(DisableRobloxCrashHandler ? "disabled" : "left alone")}.";
+
+        public string UpdatesGroupSummary =>
+            $"Background updates, forced reinstalls, the install location, installed versions and the update channel. Background updates are {(BackgroundUpdates ? "on" : "off")}.";
+
+        public string CleanupGroupSummary =>
+            $"Which logs and caches are deleted, and how often. {(CleanerSchedule == CleanerOptions.Never ? "Nothing is cleaned automatically" : "Cleaning runs on a schedule")}.";
+
+        public string ProcessGroupSummary =>
+            $"Process preset, CPU priority, memory handling and software rendering. Currently {CurrentEnginePresetName.ToLowerInvariant()}, at {RobloxPriorityLimit.ToLowerInvariant()} priority.";
+
+        public string MatchmakerGroupSummary =>
+            $"Server picking, excluded datacenters and places, and rejoining after a crash. The matchmaker is {(Matchmaker.MatchmakerEnabled ? "on" : "off")}.";
+
+        public string WindowTitleGroupSummary =>
+            $"The Roblox window title, game name cycling, server info and the window icon. Title: {(String.IsNullOrWhiteSpace(RobloxTitle) ? "Roblox" : RobloxTitle)}.";
+
+        private void RefreshSummaries()
+        {
+            OnPropertyChanged(nameof(CurrentEnginePresetName));
+            OnPropertyChanged(nameof(LaunchSummaryConfirm));
+            OnPropertyChanged(nameof(LaunchSummaryUpdates));
+            OnPropertyChanged(nameof(LaunchSummaryMatchmaker));
+            OnPropertyChanged(nameof(LaunchSummaryProcess));
+            OnPropertyChanged(nameof(LaunchSummaryRejoin));
+            OnPropertyChanged(nameof(LaunchingGroupSummary));
+            OnPropertyChanged(nameof(UpdatesGroupSummary));
+            OnPropertyChanged(nameof(CleanupGroupSummary));
+            OnPropertyChanged(nameof(ProcessGroupSummary));
+            OnPropertyChanged(nameof(MatchmakerGroupSummary));
+            OnPropertyChanged(nameof(WindowTitleGroupSummary));
         }
     }
 }

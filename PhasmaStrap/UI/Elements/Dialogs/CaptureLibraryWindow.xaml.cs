@@ -6,11 +6,9 @@ using PhasmaStrap.UI.ViewModels.Dialogs;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Every screenshot and clip in one place, with search and filters (Capture page > Open all).
-    // One window at a time: opening it again brings the open one forward on the asked-for tab.
     public partial class CaptureLibraryWindow
     {
-        private const double CardWidth = 262; // 250 + the gap after it
+        private const double CardWidth = 262;
 
         private static CaptureLibraryWindow? _open;
 
@@ -47,11 +45,9 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         private void CardRows_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // room for the scroll bar
             _viewModel.SetColumns((int)((CardRows.ActualWidth - 18) / CardWidth));
         }
 
-        // the "..." button opens the card's own menu under it
         private void More_Click(object sender, RoutedEventArgs e)
         {
             DependencyObject? node = sender as DependencyObject;

@@ -1,9 +1,5 @@
 namespace PhasmaStrap.Networking
 {
-    // What actually happened on the wire, shared between PhasmaStrap processes: the proxy is
-    // hosted by whichever process bound port 443 first (often the game watcher), while the status
-    // texts are read in the settings window. Without this, the settings window could only say
-    // whether files were in place - not whether Roblox really accepted the proxy.
     public static class ProxyHealth
     {
         public sealed class State
@@ -36,7 +32,6 @@ namespace PhasmaStrap.Networking
                 change(_mine);
                 _mine.HostPid = Environment.ProcessId;
 
-                // an accepted handshake happens for every API call; a few seconds' lag is fine
                 if (!force && (DateTime.UtcNow - _lastWriteUtc).TotalSeconds < 5)
                     return;
 
@@ -49,7 +44,6 @@ namespace PhasmaStrap.Networking
                 }
                 catch (Exception)
                 {
-                    // another process is writing it; the next event will
                 }
             }
         }
@@ -75,7 +69,6 @@ namespace PhasmaStrap.Networking
             }
         }
 
-        // the proxy listener is up in this process or another PhasmaStrap one
         public static bool IsHostedAnywhere()
         {
             if (AssetProxyServer.IsRunning)
@@ -100,8 +93,6 @@ namespace PhasmaStrap.Networking
                 .Any(e => e.Port == AssetProxyServer.Port && System.Net.IPAddress.IsLoopback(e.Address));
         }
 
-        // One honest line on whether Roblox is really going through the proxy, or null when
-        // nothing points either way yet (no Roblox open, nothing intercepted yet).
         public static string? RobloxVerdict()
         {
             bool? trusts = AssetProxyCA.RunningRobloxTrustsProxy();

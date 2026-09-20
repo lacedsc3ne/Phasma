@@ -2,10 +2,6 @@ using System.ComponentModel;
 
 namespace PhasmaStrap.Integrations
 {
-    // blackholes Roblox's own telemetry/crash-upload domains via the hosts file - a
-    // separate, disjoint block from the one Networking.HostsFileManager writes for the
-    // local MITM proxy, so the two coexist safely on the same physical hosts file.
-    // Ported from Voidstrap.
     public static class TelemetryBlocker
     {
         private const string LOG_IDENT = "TelemetryBlocker";
@@ -53,8 +49,6 @@ namespace PhasmaStrap.Integrations
                 RequestRemove();
         }
 
-        // both hosts-file blocks are written by one elevated run so this never stacks a second
-        // UAC prompt on top of the proxy's
         public static bool RequestApply() => Networking.HostsElevation.Apply(App.Settings.Prop.NetworkingProxyEnabled && Networking.HostsFileManager.IsBlockPresent(), true);
 
         public static bool RequestRemove() => Networking.HostsElevation.Apply(App.Settings.Prop.NetworkingProxyEnabled && Networking.HostsFileManager.IsBlockPresent(), false);
@@ -90,8 +84,6 @@ namespace PhasmaStrap.Integrations
             }
         }
 
-        // called only from within the short-lived elevated relaunch, never from the normal
-        // app process
         public static bool ApplyElevated()
         {
             try

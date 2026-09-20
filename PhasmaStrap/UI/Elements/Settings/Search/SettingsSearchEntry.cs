@@ -4,27 +4,17 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 {
     internal enum SettingsSearchEntryKind
     {
-        /// <summary>A single option (OptionControl, standalone toggle/checkbox).</summary>
         Option,
 
-        /// <summary>A collapsible group of options (CardExpander).</summary>
         Group,
 
-        /// <summary>A tab on a tabbed page.</summary>
         Tab,
 
-        /// <summary>A titled section of a page.</summary>
         Section,
 
-        /// <summary>A one-off button that does something (open folder, take screenshot...).</summary>
         Action,
     }
 
-    /// <summary>
-    /// One thing a user can search for in the settings window. Instances come from the generated
-    /// <see cref="SettingsSearchIndex"/>; the normalized fields are precomputed once so searching
-    /// 500+ entries on every keystroke stays instant.
-    /// </summary>
     internal sealed class SettingsSearchEntry
     {
         public SettingsSearchEntryKind Kind { get; }
@@ -33,33 +23,18 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
 
         public string Description { get; }
 
-        /// <summary>The sidebar page to navigate to.</summary>
         public Type PageType { get; }
 
-        /// <summary>The sidebar label of <see cref="PageType"/>.</summary>
         public string PageName { get; }
 
-        /// <summary>Header text of the tab the entry lives on (empty when the page has no tabs).</summary>
         public string Tab { get; }
 
-        /// <summary>Title of the section the entry lives under (empty if none).</summary>
         public string Section { get; }
 
-        /// <summary>Header of the CardExpander the entry lives in (empty if none).</summary>
         public string Group { get; }
 
-        /// <summary>
-        /// When the entry lives on a page that's embedded inside <see cref="PageType"/> via a Frame
-        /// (Engine Settings hosts FastFlagsPage/NvidiaPage/FastFlagEditorPage that way), the embedded
-        /// page's type - the navigator waits for that frame to load before looking for the control.
-        /// </summary>
         public Type? NestedPageType { get; }
 
-        /// <summary>
-        /// When the entry lives on an embedded page, the tab of the HOST page that holds the
-        /// frame (e.g. "Roblox channel" on the PhasmaStrap page); <see cref="Tab"/> is then the
-        /// tab inside the embedded page itself.
-        /// </summary>
         public string HostTab { get; }
 
         public string Breadcrumb { get; }
@@ -101,7 +76,6 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             BreadcrumbWords = NormalizedBreadcrumb.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         }
 
-        /// <summary>Lowercase, diacritics stripped, punctuation turned into spaces, whitespace collapsed.</summary>
         public static string Normalize(string value)
         {
             if (string.IsNullOrEmpty(value))

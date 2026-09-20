@@ -1,11 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-// Ported (adapted to PhasmaStrap's dialog conventions - a WpfUiWindow subclass with a plain XAML
-// counterpart, a public Result field, shown via ShowDialog()) from Voidstrap's
-// UI/Elements/Controls/ExternalEditorPickerDialog.cs, which built its UI purely in code.
 namespace PhasmaStrap.UI.Elements.Controls
 {
     public sealed class EditorChoice

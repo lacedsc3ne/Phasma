@@ -5,7 +5,6 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    // Pick one or more flags out of a list (the FastFlag editor's "Turn off one of your flags")
     public partial class FlagPickerDialog : WpfUiWindow
     {
         public sealed record Item(string Name, string Value);

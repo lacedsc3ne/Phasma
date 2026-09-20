@@ -4,29 +4,6 @@ using System.Windows.Threading;
 
 namespace PhasmaStrap.Utility
 {
-    /// <summary>
-    /// Runtime machine translation for user-facing text (GameChat overlay messages, Discord Rich
-    /// Presence strings), ported from Voidstrap's TranslationService.
-    ///
-    /// Translation calls hit Google's own unofficial "gtx" translate endpoint
-    /// (translate.googleapis.com) - the same undocumented endpoint the well-known Python
-    /// `googletrans` library talks to. It isn't Voidstrap-owned infrastructure, so it's ported
-    /// unchanged, URLs and all.
-    ///
-    /// Voidstrap's original also pushed/pulled translated strings to/from a Voidstrap-owned
-    /// "shared translation cache" web service (App.WebsiteBaseUrl + "/api/translations", see
-    /// RemoteApi/EnsureRemoteFetched/FetchLanguageAsync/PushRemoteAsync/LoadRemoteMeta/
-    /// SaveRemoteMeta/_remoteSeen/_remoteFetchStarted/RemoteMetaPath in the source). That whole
-    /// mechanism has been removed here - PhasmaStrap has no such backend and shouldn't depend on
-    /// one. Only the local on-disk JSON cache remains, so every install builds up its own cache
-    /// locally over time instead of pulling a community-shared one.
-    ///
-    /// Voidstrap also called `Voidstrap.UI.LiveLanguageRefresher.TranslateOpenWindows()` after new
-    /// translations landed, to live-refresh already-open windows. PhasmaStrap has no equivalent
-    /// UI-refresh subsystem, so that call is replaced with a lightweight <see cref="CacheUpdated"/>
-    /// event that anything interested (e.g. the GameChat overlay) can subscribe to instead of this
-    /// class reaching into UI code directly.
-    /// </summary>
     public static class TranslationService
     {
         private const int BatchCount = 48;
@@ -47,12 +24,6 @@ namespace PhasmaStrap.Utility
         private static int _processing;
         private static DispatcherTimer? _saveTimer;
 
-        /// <summary>
-        /// Raised (off the UI thread) whenever newly-arrived background translations were merged
-        /// into the cache. Anything that renders already-translated text (e.g. the GameChat
-        /// overlay) can subscribe and re-render on the dispatcher thread if it wants live updates;
-        /// nothing subscribes by default.
-        /// </summary>
         public static event Action? CacheUpdated;
 
         public static void Initialize()
@@ -97,11 +68,6 @@ namespace PhasmaStrap.Utility
 
         private static string Key(string lang, string text) => lang + "\x01" + text;
 
-        /// <summary>
-        /// Non-blocking lookup - returns the original text immediately if no cached translation
-        /// exists yet, and kicks off a background translation for next time. Safe to call from the
-        /// UI thread (e.g. while rendering a chat message).
-        /// </summary>
         public static string Translate(string text, string targetLanguage)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
@@ -127,11 +93,6 @@ namespace PhasmaStrap.Utility
             return text;
         }
 
-        /// <summary>
-        /// Awaits a translation (with a bounded timeout, falling back to the original text on
-        /// failure/timeout). Only call this from a background/async context that's fine waiting -
-        /// never from a path that must not stall the UI thread.
-        /// </summary>
         public static async Task<string> TranslateAsync(string text, string targetLanguage)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
@@ -554,8 +515,6 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        // atomic-ish write: serialize to a temp file in the same directory, then replace the real
-        // file in one filesystem operation so a crash mid-write can't leave a truncated cache
         private static void WriteCacheFile(Dictionary<string, Dictionary<string, string>> snapshot)
         {
             if (!Directory.Exists(CacheDirectory))

@@ -4,8 +4,6 @@ using PhasmaStrap.UI.Elements.Bootstrapper.Base;
 
 namespace PhasmaStrap.UI.Elements.Bootstrapper
 {
-    // https://youtu.be/3K9oCEMHj2s?t=35
-
     public partial class LegacyDialog2011 : WinFormsDialogBase
     {
         protected override string _message

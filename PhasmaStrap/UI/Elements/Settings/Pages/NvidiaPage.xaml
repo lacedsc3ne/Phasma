@@ -21,8 +21,6 @@
             </StackPanel>
         </Border>
 
-        <!-- Collapsed-card view: curated toggles + custom settings list. Swapped in place for
-             EditorView below (same page/DataContext) whenever NvidiaEditorViewMode is false. -->
         <StackPanel Visibility="{Binding AvailableVisibility}">
             <StackPanel>
                 <StackPanel.Style>
@@ -196,10 +194,6 @@
             <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
-            <!-- Advanced Editor (raw grid) view: same DataContext, swapped in place of the card
-                 view above whenever NvidiaEditorViewMode is true. Mirrors FastFlagEditorPage's
-                 search box + DataGrid + add/delete toolbar idiom, adapted to NVIDIA's
-                 Type/Name/Setting ID/Value columns and multi-row selection. -->
             <Grid Margin="0,16,0,0">
                 <Grid.Style>
                     <Style TargetType="Grid">

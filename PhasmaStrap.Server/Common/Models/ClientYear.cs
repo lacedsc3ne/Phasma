@@ -75,10 +75,10 @@ public class ClientYear : IComparable<ClientYear>
 	{
 		return Era switch
 		{
-			YearQuarter.Early => 'E', 
-			YearQuarter.Mid => 'M', 
-			YearQuarter.Late => 'L', 
-			_ => 'E', 
+			YearQuarter.Early => 'E',
+			YearQuarter.Mid => 'M',
+			YearQuarter.Late => 'L',
+			_ => 'E',
 		};
 	}
 

@@ -1,7 +1,3 @@
-﻿// Ported from Voidstrap's Utility/ExternalEditor.cs.
-// Detects locally installed text editors (VS Code, Cursor, Sublime, Notepad++, etc.) and
-// launches one of them against a file - used by BootstrapperEditorWindow's
-// "Open in External Editor" button.
 namespace PhasmaStrap.Utility
 {
     public sealed class ExternalEditorInfo

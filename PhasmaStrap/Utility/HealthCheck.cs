@@ -12,14 +12,10 @@ namespace PhasmaStrap.Utility
         public HealthStatus Status { get; init; }
         public string Detail { get; init; } = "";
 
-        // optional one-click repair; null = nothing PhasmaStrap can (or should) do by itself
         public string? FixLabel { get; init; }
         public Action? Fix { get; init; }
     }
 
-    // The Diagnostics page's health check: the things that, when wrong, make "Roblox won't
-    // start" or "clicking Play does nothing" - each looked at directly and reported in plain
-    // words. Everything is read-only; the only thing that changes anything is a Fix the user clicks.
     internal static class HealthCheck
     {
         private const string LOG_IDENT = "HealthCheck";
@@ -46,6 +42,7 @@ namespace PhasmaStrap.Utility
                 () => Sync(CheckHosts),
                 () => Sync(CheckProxy),
                 () => Sync(CheckWebView2),
+                () => Sync(CheckMods),
                 CheckInternetAsync,
             };
 
@@ -68,8 +65,6 @@ namespace PhasmaStrap.Utility
         }
 
         private static Task<IEnumerable<HealthResult>> Sync(Func<IEnumerable<HealthResult>> check) => Task.Run(() => (IEnumerable<HealthResult>)check().ToList());
-
-        // ------------------------------------------------------------------ the launch chain
 
         private static IEnumerable<HealthResult> CheckProtocols()
         {
@@ -127,7 +122,6 @@ namespace PhasmaStrap.Utility
                 yield break;
             }
 
-            // can the data folder be written? (OneDrive "known folder move", read-only attributes, security tools)
             string probe = Path.Combine(Paths.Base, $".healthcheck-{Guid.NewGuid():N}");
             string? writeError = null;
             try
@@ -180,7 +174,6 @@ namespace PhasmaStrap.Utility
 
             yield return new HealthResult { Title = "Roblox installation", Status = HealthStatus.Ok, Detail = $"{version}: {files} files, {bytes / 1048576.0:0} MB." };
 
-            // compatibility shims on the game's exe are a classic source of odd behaviour
             foreach (RegistryKey root in new[] { Registry.CurrentUser, Registry.LocalMachine })
             {
                 using RegistryKey? layers = root.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
@@ -236,8 +229,6 @@ namespace PhasmaStrap.Utility
             if (result is not null)
                 yield return result;
         }
-
-        // ------------------------------------------------------------------ the PC
 
         private static IEnumerable<HealthResult> CheckGraphics()
         {
@@ -301,7 +292,6 @@ namespace PhasmaStrap.Utility
             }
             catch
             {
-                // not available on server / LTSC editions without Security Center
             }
 
             bool controlledFolders = false;
@@ -335,7 +325,6 @@ namespace PhasmaStrap.Utility
             {
                 foreach (string raw in File.ReadAllLines(hosts))
                 {
-                    // PhasmaStrap marks the lines it writes itself (telemetry block, proxy)
                     if (raw.Contains("# PHASMASTRAP-", StringComparison.OrdinalIgnoreCase))
                     {
                         own++;
@@ -403,6 +392,57 @@ namespace PhasmaStrap.Utility
                 yield return result;
         }
 
+        private static IEnumerable<HealthResult> CheckMods()
+        {
+            if (!Directory.Exists(Paths.Modifications))
+                yield break;
+
+            string[] files = Array.Empty<string>();
+            string? readError = null;
+
+            try
+            {
+                files = Directory.GetFiles(Paths.Modifications, "*", SearchOption.AllDirectories);
+            }
+            catch (Exception ex)
+            {
+                readError = ex.Message;
+            }
+
+            if (readError is not null)
+            {
+                yield return new HealthResult { Title = "Mods", Status = HealthStatus.Warning, Detail = $"The mods folder could not be read: {readError}" };
+                yield break;
+            }
+
+            if (files.Length == 0)
+                yield break;
+
+            string blankApp = Path.Combine(Paths.Modifications, "ExtraContent", "places", "Mobile.rbxl");
+
+            if (File.Exists(blankApp))
+                yield return new HealthResult
+                {
+                    Title = "Mods",
+                    Status = HealthStatus.Problem,
+                    Detail = $@"ExtraContent\places\Mobile.rbxl is in your mods folder. That file is the old ""don't exit to desktop app"" patch, and with it the Roblox app opens as an empty white window. Delete it from {Paths.Modifications} if that is happening."
+                };
+
+            long bytes = 0;
+
+            foreach (string file in files)
+            {
+                try { bytes += new FileInfo(file).Length; } catch (Exception) { }
+            }
+
+            yield return new HealthResult
+            {
+                Title = "Mods",
+                Status = HealthStatus.Info,
+                Detail = $"{files.Length} file(s), {bytes / 1048576.0:0.0} MB, copied into Roblox on every launch. If the game looks wrong or will not start after a Roblox update, these are worth turning off first."
+            };
+        }
+
         private static IEnumerable<HealthResult> CheckWebView2()
         {
             string? version = null;
@@ -426,8 +466,6 @@ namespace PhasmaStrap.Utility
                 ? new HealthResult { Title = "WebView2 runtime", Status = HealthStatus.Ok, Detail = $"Installed ({version}). Roblox's own menus and PhasmaStrap's browser login use it." }
                 : new HealthResult { Title = "WebView2 runtime", Status = HealthStatus.Warning, Detail = "Not found. Roblox needs it for parts of its interface (a blank in-game menu or login window is the symptom), and PhasmaStrap's \"log in with browser\" cannot open without it. Roblox installs it on first launch; it can also be downloaded from Microsoft." };
         }
-
-        // ------------------------------------------------------------------ the network
 
         private static async Task<IEnumerable<HealthResult>> CheckInternetAsync()
         {
@@ -467,7 +505,6 @@ namespace PhasmaStrap.Utility
                 }
             }
 
-            // a wrong clock makes every secure connection fail with a confusing certificate error
             if (serverTime is not null)
             {
                 double skew = Math.Abs((DateTimeOffset.UtcNow - serverTime.Value).TotalMinutes);

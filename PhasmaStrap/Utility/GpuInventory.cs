@@ -4,11 +4,6 @@ using System.Linq;
 
 namespace PhasmaStrap.Utility
 {
-    // Enumerates the system's graphics adapters (DXGI first, WMI as a fallback), mainly so other
-    // features can gate themselves on "is there an NVIDIA card present" without spinning up a full
-    // NVML/driver probe. Ported from Voidstrap, trimmed to the Windows-only paths since PhasmaStrap
-    // doesn't target Linux/macOS - the DXGI enumeration is normally sufficient on its own, and the
-    // WMI query only runs if that comes back empty.
     public sealed class GpuAdapterInfo
     {
         public GpuAdapterInfo(string name, uint vendorId, string source)

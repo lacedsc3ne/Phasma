@@ -10,11 +10,6 @@ using PhasmaStrap.AppData;
 
 namespace PhasmaStrap.UI.ViewModels.Installer
 {
-    // Bootstrapper.Run() drives its progress purely through an IBootstrapperDialog, and mutates
-    // some process-wide static state along the way (RobloxInterfaces.Deployment.BinaryType chief
-    // among them), so only one Bootstrapper should ever be mid-flight per process at a time. This
-    // small gate is shared between the Player and Studio cards below so their Install buttons
-    // can't both kick off a real install run concurrently.
     internal class InstallCoordinator
     {
         public bool Busy { get; private set; }
@@ -38,19 +33,12 @@ namespace PhasmaStrap.UI.ViewModels.Installer
         }
     }
 
-    // Minimal, headless IBootstrapperDialog - this is the same contract the real bootstrapper
-    // dialog windows (Fluent/Classic/etc) implement, just without any actual window. It lets us
-    // drive a genuine Bootstrapper install run from inside the installer wizard and surface its
-    // status text back onto a card instead of faking a progress bar.
     internal class SilentBootstrapperDialog : IBootstrapperDialog
     {
         private readonly Action<string> _onMessage;
 
         public SilentBootstrapperDialog(Action<string> onMessage) => _onMessage = onMessage;
 
-        // fully-qualified since this namespace (PhasmaStrap.UI.ViewModels.Installer) is a sibling
-        // of PhasmaStrap.UI.ViewModels.Bootstrapper, which would otherwise shadow the actual
-        // PhasmaStrap.Bootstrapper class for an unqualified "Bootstrapper" here
         public PhasmaStrap.Bootstrapper? Bootstrapper { get; set; }
 
         public string Message
@@ -72,10 +60,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
         public void ShowSuccess(string message, Action? callback = null) => callback?.Invoke();
     }
 
-    // Drives one "Roblox Player" / "Roblox Studio" card on the Manager step. Everything here reads
-    // real install state off the same IAppData/DistributionState plumbing Bootstrapper itself uses
-    // (see AppData/RobloxPlayerData.cs, AppData/RobloxStudioData.cs, AppData/CommonAppData.cs), and
-    // "Install" runs an actual Bootstrapper pass rather than simulating one.
     public class RobloxProductViewModel : NotifyPropertyChangedViewModel
     {
         private readonly IAppData _appData;
@@ -125,8 +109,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
 
         public ICommand DeleteCommand => new RelayCommand(Delete);
 
-        // internal, not public: IAppData is an internal interface (see AppData/IAppData.cs), so this
-        // constructor's accessibility can't exceed that of its parameter type
         internal RobloxProductViewModel(IAppData appData, LaunchMode launchMode, string displayName, string description, InstallCoordinator coordinator)
         {
             _appData = appData;
@@ -151,9 +133,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
             IsBusy = true;
             ProgressText = Strings.Installer_Manager_Status_Installing;
 
-            // the installer wizard already offered the user a self-update earlier on the Welcome
-            // step, and NoLaunch keeps this from dropping the user into a running game mid-wizard -
-            // both flags are restored afterwards so they don't leak into the rest of the process
             bool originalNoLaunch = App.LaunchSettings.NoLaunchFlag.Active;
             bool originalUpgrade = App.LaunchSettings.UpgradeFlag.Active;
             bool originalQuiet = App.LaunchSettings.QuietFlag.Active;
@@ -257,9 +236,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
             .Select(x => x.Name)
             .ToList();
 
-        // the drive can only be remapped before either product has actually been installed - once
-        // Roblox itself lives under Paths.Versions, moving it would mean relocating real install
-        // data instead of just the still-empty scaffolding Installer.DoInstall() laid down
         public bool CanChangeMapLocation => !Player.IsInstalled && !Studio.IsInstalled;
 
         public string SelectedDrive
@@ -311,8 +287,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
             {
                 Directory.CreateDirectory(newBase);
 
-                // reuses the same write-test approach Installer.CheckInstallLocation() uses for the
-                // main install location picker on the Install step
                 string testFile = Path.Combine(newBase, $"{App.ProjectName}WriteTest.txt");
                 File.WriteAllText(testFile, "");
                 File.Delete(testFile);
@@ -347,8 +321,6 @@ namespace PhasmaStrap.UI.ViewModels.Installer
 
         private static void RefreshShortcut(string lnkPath)
         {
-            // Shortcut.Create() is create-only (it no-ops if the .lnk already exists), so to point
-            // an existing shortcut at the new executable path we need to delete it first
             if (!File.Exists(lnkPath))
                 return;
 

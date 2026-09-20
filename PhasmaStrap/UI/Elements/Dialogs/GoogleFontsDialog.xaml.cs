@@ -7,17 +7,8 @@ using PhasmaStrap.UI.Elements.Base;
 
 namespace PhasmaStrap.UI.Elements.Dialogs
 {
-    /// <summary>
-    /// Lets the user search the Google Fonts catalog, preview a font (rendered live once
-    /// downloaded), and apply it as the Roblox client font mod and/or PhasmaStrap's own app
-    /// font. See GoogleFontsService for the catalog source and download/cache logic.
-    /// </summary>
     public partial class GoogleFontsDialog : WpfUiWindow
     {
-        /// <summary>
-        /// Absolute path to the downloaded/cached .ttf that was applied, set once the dialog
-        /// closes with a successful Apply. Null if the dialog was cancelled.
-        /// </summary>
         public string? SelectedFontPath { get; private set; }
 
         private IReadOnlyList<GoogleFontOption> _allFonts = Array.Empty<GoogleFontOption>();

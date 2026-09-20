@@ -1,47 +1,56 @@
+using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 
-using PhasmaStrap.UI.ViewModels.Settings;
+using PhasmaStrap.UI.Elements.Controls;
 
 namespace PhasmaStrap.UI.Elements.Settings.Pages
 {
-    /// <summary>
-    /// Interaction logic for FastFlagSettingsPage.xaml - the FastFlag tab host: Roblox FFlags,
-    /// Fast Flag Editor, Per-game flags, NVIDIA FFlags, Asset Warp and Asset Engine. Most tabs
-    /// embed their own page via Frame, each constructing and owning its own ViewModel; only the
-    /// Asset Warp tab's content is bound directly against this page's own DataContext.
-    /// </summary>
-    public partial class FastFlagSettingsPage
+    public partial class FastFlagSettingsPage : ISectionHostPage
     {
         public FastFlagSettingsPage()
         {
-            DataContext = new AssetWarpViewModel();
             InitializeComponent();
         }
 
-        // Switches the tab host that `from` sits in to the tab whose Frame shows `pageName`
-        // (for example "FastFlagEditorPage") - lets the tabs link to each other.
+        public SectionHost SectionHost => Host;
+
         public static void SelectTab(DependencyObject from, string pageName)
         {
+            Type? target = SectionFor(pageName);
+
+            if (target is null)
+                return;
+
             DependencyObject? node = from;
 
             while (node is not null)
             {
-                if (node is TabControl tabs)
+                if (node is SectionHost host)
                 {
-                    foreach (TabItem item in tabs.Items.OfType<TabItem>())
-                    {
-                        if (item.Content is Frame frame && frame.Source?.OriginalString.Contains(pageName, StringComparison.OrdinalIgnoreCase) == true)
-                        {
-                            tabs.SelectedItem = item;
-                            return;
-                        }
-                    }
+                    host.Show(target);
+                    return;
                 }
 
                 node = (node is Visual ? VisualTreeHelper.GetParent(node) : null) ?? LogicalTreeHelper.GetParent(node);
             }
+        }
+
+        private static Type? SectionFor(string pageName)
+        {
+            if (pageName.Contains(nameof(FastFlagEditorPage), StringComparison.OrdinalIgnoreCase))
+                return typeof(FastFlagEditorPage);
+
+            if (pageName.Contains(nameof(FastFlagGamesPage), StringComparison.OrdinalIgnoreCase))
+                return typeof(FastFlagGamesPage);
+
+            if (pageName.Contains(nameof(AssetWarpPage), StringComparison.OrdinalIgnoreCase))
+                return typeof(AssetWarpPage);
+
+            if (pageName.Contains(nameof(FastFlagsPage), StringComparison.OrdinalIgnoreCase))
+                return typeof(FastFlagsPage);
+
+            return null;
         }
     }
 }

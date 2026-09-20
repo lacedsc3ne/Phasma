@@ -59,7 +59,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(CrashesEmptyVisibility));
         }
 
-        // looks at the newest Roblox log right now, whatever ended it
         private async Task AnalyzeLastSessionAsync()
         {
             string? log = CrashReports.NewestLog();
@@ -75,7 +74,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 CrashReport report = await Task.Run(() => CrashReports.Analyze(log));
 
-                // shown on top, but only kept when it really was a crash
                 if (!(report.CleanExit && report.Confidence.Length == 0))
                     CrashReports.Save(report);
 
@@ -100,7 +98,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             InitialisePerformance();
         }
 
-        // the stutter / auto-tuner tabs hook in here
         partial void InitialisePerformance();
     }
 }
