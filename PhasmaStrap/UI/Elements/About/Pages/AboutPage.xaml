@@ -1,4 +1,4 @@
-<ui:UiPage x:Class="PhasmaStrap.UI.Elements.About.Pages.AboutPage"
+﻿<ui:UiPage x:Class="PhasmaStrap.UI.Elements.About.Pages.AboutPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -47,7 +47,7 @@
         </Grid>
 
         <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal">
-            <ui:Anchor Margin="0,0,0,8" Content="{x:Static resources:Strings.Menu_About_GithubRepository}" Icon="Code24" NavigateUri="https://github.com/lacedsc3ne/Phasma" />
+            <ui:Anchor Margin="0,0,0,8" Content="{x:Static resources:Strings.Menu_About_GithubRepository}" Icon="Code24" NavigateUri="https://github.com/lacedsc3ne/PhasmaStrap" />
             <ui:Anchor Margin="8,0,0,8" Content="Discord" Icon="ChatMultiple24" NavigateUri="https://discord.gg/x4M4cZS4p7" />
             <ui:Anchor Margin="8,0,0,8" Content="Support on Ko-fi" Icon="Heart24" NavigateUri="https://ko-fi.com/lacedscene" />
         </WrapPanel>

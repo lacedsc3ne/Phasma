@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Shell;
@@ -16,11 +16,11 @@ namespace PhasmaStrap
         public const string ProjectName = "PhasmaStrap";
 #endif
         public const string ProjectOwner = "lacedsc3ne";
-        public const string ProjectRepository = "lacedsc3ne/Phasma";
+        public const string ProjectRepository = "lacedsc3ne/PhasmaStrap";
 
         public const string ServerBase = "https://api.phasmastrap.com";
-        public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/Phasma";
-        public const string ProjectHelpLink = "https://github.com/lacedsc3ne/Phasma/wiki";
+        public const string ProjectDownloadLink = "https://github.com/lacedsc3ne/PhasmaStrap";
+        public const string ProjectHelpLink = "https://github.com/lacedsc3ne/PhasmaStrap/wiki";
         public const string ProjectDiscordLink = "https://discord.gg/x4M4cZS4p7";
         public const string ProjectDonateLink = "https://ko-fi.com/lacedscene";
         public const string ProjectSupportLink = ProjectDiscordLink;

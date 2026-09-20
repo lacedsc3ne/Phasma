@@ -1,6 +1,6 @@
-<p align="center">
-    <img src="https://github.com/lacedsc3ne/Phasma/raw/main/Images/PhasmaStrap-full-dark.png#gh-dark-mode-only" width="380">
-    <img src="https://github.com/lacedsc3ne/Phasma/raw/main/Images/PhasmaStrap-full-light.png#gh-light-mode-only" width="380">
+﻿<p align="center">
+    <img src="https://github.com/lacedsc3ne/PhasmaStrap/raw/main/Images/PhasmaStrap-full-dark.png#gh-dark-mode-only" width="380">
+    <img src="https://github.com/lacedsc3ne/PhasmaStrap/raw/main/Images/PhasmaStrap-full-light.png#gh-light-mode-only" width="380">
 </p>
 
 <div align="center">
@@ -56,7 +56,7 @@ PhasmaStrap keeps itself up to date after that. Questions are answered in the [F
 ## Building
 
 ```
-git clone --recursive https://github.com/lacedsc3ne/Phasma.git
+git clone --recursive https://github.com/lacedsc3ne/PhasmaStrap.git
 cd Phasma
 dotnet build PhasmaStrap/PhasmaStrap.csproj -c Release
 ```
@@ -69,13 +69,13 @@ Built on [Bloxstrap](https://github.com/bloxstraplabs/bloxstrap), with features 
 
 PhasmaStrap is not affiliated with Roblox Corporation. See [LICENSE][repo-license].
 
-[shield-repo-license]:  https://img.shields.io/github/license/lacedsc3ne/Phasma
-[shield-repo-releases]: https://img.shields.io/github/downloads/lacedsc3ne/Phasma/total?color=981bfe
-[shield-repo-latest]:   https://img.shields.io/github/v/release/lacedsc3ne/Phasma?color=7a39fb
+[shield-repo-license]:  https://img.shields.io/github/license/lacedsc3ne/PhasmaStrap
+[shield-repo-releases]: https://img.shields.io/github/downloads/lacedsc3ne/PhasmaStrap/total?color=981bfe
+[shield-repo-latest]:   https://img.shields.io/github/v/release/lacedsc3ne/PhasmaStrap?color=7a39fb
 
-[repo-license]:  https://github.com/lacedsc3ne/Phasma/blob/main/LICENSE
-[repo-releases]: https://github.com/lacedsc3ne/Phasma/releases
-[repo-latest]:   https://github.com/lacedsc3ne/Phasma/releases/latest
+[repo-license]:  https://github.com/lacedsc3ne/PhasmaStrap/blob/main/LICENSE
+[repo-releases]: https://github.com/lacedsc3ne/PhasmaStrap/releases
+[repo-latest]:   https://github.com/lacedsc3ne/PhasmaStrap/releases/latest
 
 [website]:           https://phasmastrap.com
 [website-download]:  https://phasmastrap.com/download

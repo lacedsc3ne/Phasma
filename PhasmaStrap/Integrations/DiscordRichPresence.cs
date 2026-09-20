@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using PhasmaStrap.Models.RobloxApi;
 using DiscordRPC;
 
@@ -25,7 +25,7 @@ namespace PhasmaStrap.Integrations
 
         public const string RobloxApplicationId = "1005469189907173486";
 
-        public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/Phasma/main/PhasmaStrap/Resources/PhasmaStrapLogo.png";
+        public const string PhasmaStrapLogoUrl = "https://raw.githubusercontent.com/lacedsc3ne/PhasmaStrap/main/PhasmaStrap/Resources/PhasmaStrapLogo.png";
 
         public static string ResolveApplicationId() =>
             App.Settings.Prop.DiscordShowAsPhasmaStrap ? PhasmaStrapApplicationId : RobloxApplicationId;
