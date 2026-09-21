@@ -701,7 +701,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             var editor = new PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow(item.Path)
             {
-                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault()
+                Owner = System.Windows.Application.Current.Windows.OfType<PhasmaStrap.UI.Elements.Settings.MainWindow>().FirstOrDefault(),
+                Modal = true
             };
 
             editor.ShowDialog();

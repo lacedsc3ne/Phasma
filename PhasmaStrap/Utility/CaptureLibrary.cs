@@ -157,7 +157,7 @@ namespace PhasmaStrap.Utility
 
                 System.Windows.Window editor = path.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase)
                     ? new PhasmaStrap.UI.Elements.Dialogs.ClipEditorWindow(path)
-                    : new PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow(path);
+                    : new PhasmaStrap.UI.Elements.Dialogs.ScreenshotEditorWindow(path) { Modal = owner is not null };
 
                 if (owner is not null)
                 {

@@ -32,6 +32,8 @@ namespace PhasmaStrap.UI.Elements.Dialogs
 
         public bool Saved { get; private set; }
 
+        public bool Modal { get; set; }
+
         public ScreenshotEditorWindow(string path)
         {
             _path = path;
@@ -719,8 +721,7 @@ namespace PhasmaStrap.UI.Elements.Dialogs
                 WritePng(result, temp);
                 File.Move(temp, _path, true);
                 Saved = true;
-                DialogResult = true;
-                Close();
+                Finish(true);
             }
             catch (Exception ex)
             {
@@ -729,9 +730,13 @@ namespace PhasmaStrap.UI.Elements.Dialogs
             }
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e)
+        private void Close_Click(object sender, RoutedEventArgs e) => Finish(Saved);
+
+        private void Finish(bool result)
         {
-            DialogResult = Saved;
+            if (Modal)
+                DialogResult = result;
+
             Close();
         }
 
