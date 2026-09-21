@@ -340,7 +340,7 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
 
             Frontend.ShowMessageBox(
                 problem is null
-                    ? $"\"{profile.Name}\" is in the gallery at phasmastrap.com/gallery.\n\nIts link, {url}, is on your clipboard."
+                    ? $"\"{profile.Name}\" has been sent to the gallery and is under review. It shows up at phasmastrap.com/gallery once an admin has looked at it.\n\nIts link, {url}, is on your clipboard and works right now."
                     : $"It was not published: {problem}",
                 problem is null ? MessageBoxImage.Information : MessageBoxImage.Warning);
         }

@@ -522,8 +522,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             string? problem = await ScreenshotShare.ShareAsync(item.Path, Path.GetFileNameWithoutExtension(item.Path), "");
 
             NotificationCenter.Notify(
-                problem is null ? "Screenshot shared" : "Could not share that screenshot",
-                problem ?? "It is on phasmastrap.com/shots now.",
+                problem is null ? "Screenshot sent for review" : "Could not share that screenshot",
+                problem ?? "It shows on phasmastrap.com/shots once an admin has looked at it.",
                 NotificationCategory.General,
                 kind: NotificationKindId.Screenshot);
         });
