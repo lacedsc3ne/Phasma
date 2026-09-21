@@ -34,8 +34,9 @@
 
             string mode = App.Settings.Prop.PartyJoinMode ?? "AskWhenInGame";
             bool inGame = RobloxRunning();
+            bool withParty = inGame && AlreadyFollowing();
 
-            if (mode == "Always" || (mode == "AskWhenInGame" && !inGame))
+            if (mode == "Always" || !inGame || withParty)
             {
                 Join(placeId, join.JobId, inGame);
                 return;
@@ -52,9 +53,28 @@
                 kind: NotificationKindId.Party);
         }
 
+        private static long _followedPlace;
+        private static string _followedJob = "";
+
+        private static bool AlreadyFollowing()
+        {
+            if (_followedPlace <= 0)
+                return false;
+
+            (long place, string job) = PartyService.WhereYouAre();
+
+            if (place != _followedPlace)
+                return false;
+
+            return string.IsNullOrEmpty(_followedJob) || string.IsNullOrEmpty(job) || job == _followedJob;
+        }
+
         private static void Join(long placeId, string jobId, bool closeFirst)
         {
             App.Logger.WriteLine(LOG_IDENT, $"Following the party into {placeId}/{jobId}");
+
+            _followedPlace = placeId;
+            _followedJob = jobId ?? "";
 
             if (closeFirst)
             {

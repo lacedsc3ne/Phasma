@@ -187,6 +187,26 @@ namespace PhasmaStrap.Utility
             }
         }
 
+        public static (long Place, string Job) WhereYouAre()
+        {
+            try
+            {
+                if (!File.Exists(PresencePath))
+                    return (0, "");
+
+                using JsonDocument document = JsonDocument.Parse(File.ReadAllText(PresencePath));
+                JsonElement root = document.RootElement;
+
+                string Read(string key) => root.TryGetProperty(key, out JsonElement value) ? value.GetString() ?? "" : "";
+
+                return (long.TryParse(Read("place"), out long place) ? place : 0, Read("job"));
+            }
+            catch
+            {
+                return (0, "");
+            }
+        }
+
         private static string PresenceQuery()
         {
             try
@@ -268,8 +288,21 @@ namespace PhasmaStrap.Utility
         private static CancellationTokenSource? _cts;
         private static Task? _loop;
 
+        private static bool _following;
+
+        public static void FollowJoins()
+        {
+            if (_following)
+                return;
+
+            _following = true;
+            JoinRequested += (_, join) => PartyLauncher.Follow(join);
+        }
+
         public static void Start()
         {
+            FollowJoins();
+
             if (_cts is not null)
                 return;
 

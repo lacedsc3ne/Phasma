@@ -61,7 +61,6 @@ namespace PhasmaStrap.Utility
 
             ProcessName.Set("PhasmaStrap Party Watcher");
 
-            PartyService.JoinRequested += (_, join) => PartyLauncher.Follow(join);
             PartyService.Start();
 
             Task.Run(async () =>
