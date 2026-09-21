@@ -60,20 +60,39 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <StackPanel Visibility="{Binding NoPartyVisibility, Mode=OneWay}">
-            <TextBlock Margin="0,16,0,0" FontSize="16" FontWeight="SemiBold" Text="Start or join" />
+        <Border Visibility="{Binding NoPartyVisibility, Mode=OneWay}" Margin="0,16,0,0" CornerRadius="10" Padding="24,22"
+                Background="{DynamicResource ControlFillColorDefaultBrush}" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <controls:OptionControl Header="Start a party" Description="You become the leader and get a code to share.">
-                <ui:Button Icon="PeopleTeam24" Content="Start a party" Appearance="Primary" Command="{Binding StartPartyCommand}" IsEnabled="{Binding PartyEnabled, Mode=OneWay}" />
-            </controls:OptionControl>
-
-            <controls:OptionControl Header="Join with a code" Description="Type the six character code someone shared with you.">
-                <StackPanel Orientation="Horizontal">
-                    <ui:TextBox Width="140" MaxLength="6" CharacterCasing="Upper" Text="{Binding JoinCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:Button Margin="8,0,0,0" Content="Join" Command="{Binding JoinPartyCommand}" IsEnabled="{Binding PartyEnabled, Mode=OneWay}" />
+                <StackPanel Grid.Column="0">
+                    <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource SystemAccentColorSecondaryBrush}" Text="START ONE" />
+                    <TextBlock Margin="0,6,0,0" FontSize="15" Text="Lead a party" />
+                    <TextBlock Margin="0,4,0,0" FontSize="12.5" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="You get a six character code to share. Everyone who joins follows you into whatever you launch." />
+                    <ui:Button Margin="0,14,0,0" HorizontalAlignment="Left" Icon="PeopleTeam24" Appearance="Primary" Content="Start a party"
+                               Command="{Binding StartPartyCommand}" IsEnabled="{Binding PartyEnabled, Mode=OneWay}" />
                 </StackPanel>
-            </controls:OptionControl>
-        </StackPanel>
+
+                <Border Grid.Column="1" Width="1" Margin="28,4" Background="{DynamicResource ControlStrokeColorDefaultBrush}" />
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="OR JOIN ONE" />
+                    <TextBlock Margin="0,6,0,0" FontSize="15" Text="Someone gave you a code" />
+                    <TextBlock Margin="0,4,0,0" FontSize="12.5" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Text="Type it in and you are in. You can leave at any time." />
+                    <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
+                        <ui:TextBox Width="150" MaxLength="6" CharacterCasing="Upper" FontFamily="Consolas" FontSize="16"
+                                    PlaceholderText="QK7MRD" Text="{Binding JoinCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:Button Margin="8,0,0,0" Content="Join" Command="{Binding JoinPartyCommand}" IsEnabled="{Binding PartyEnabled, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
 
         <Border Visibility="{Binding InPartyVisibility, Mode=OneWay}" Margin="0,16,0,0" CornerRadius="10" Padding="24,22"
                 Background="{DynamicResource ControlFillColorDefaultBrush}" BorderThickness="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
