@@ -147,25 +147,37 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
             else
             {
-                using var dialog = new System.Windows.Forms.FolderBrowserDialog
+                var dialog = new OpenFileDialog
                 {
-                    Description = "Select a folder containing your custom cursor images, named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + "."
+                    Title = "Pick any cursor image in the folder you want to use",
+                    Filter = CursorImages.PickerFilter,
+                    CheckFileExists = true
                 };
 
-                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (Directory.Exists(CustomCursorSetTask.NewState))
+                    dialog.InitialDirectory = CustomCursorSetTask.NewState;
+
+                if (dialog.ShowDialog() != true)
                     return;
 
-                bool foundAny = CursorImages.AnyIn(dialog.SelectedPath, CustomCursorModPresetTask.RecognizedFileNames);
+                string? folder = Path.GetDirectoryName(dialog.FileName);
+
+                if (string.IsNullOrEmpty(folder))
+                    return;
+
+                bool foundAny = CursorImages.AnyIn(folder, CustomCursorModPresetTask.RecognizedFileNames);
 
                 if (!foundAny)
                 {
                     Frontend.ShowMessageBox(
-                        "The selected folder doesn't contain any recognized cursor images. It needs at least one file named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + ".",
+                        $"Nothing in \"{Path.GetFileName(folder)}\" is named like a Roblox cursor, so none of it would be used.\n\n" +
+                        "That folder needs at least one image named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + ".\n\n" +
+                        "To build a set out of pictures with any name, make one under Cursor sets below and use the Browse button next to each cursor.",
                         MessageBoxImage.Error);
                     return;
                 }
 
-                CustomCursorSetTask.NewState = dialog.SelectedPath;
+                CustomCursorSetTask.NewState = folder;
 
                 if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))
                     CursorTypeTask.NewState = default;
