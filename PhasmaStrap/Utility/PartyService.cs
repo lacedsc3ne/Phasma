@@ -12,6 +12,12 @@ namespace PhasmaStrap.Utility
 
         [JsonPropertyName("avatar")]
         public string Avatar { get; set; } = "";
+
+        [JsonPropertyName("game")]
+        public string Game { get; set; } = "";
+
+        [JsonPropertyName("together")]
+        public bool Together { get; set; }
     }
 
     public sealed class PartyInvite
@@ -159,7 +165,49 @@ namespace PhasmaStrap.Utility
             }
         }
 
-        public static async Task RefreshAsync() => Adopt(await SendAsync(HttpMethod.Get, "/v1/party"));
+        private static string PresencePath => Path.Combine(Paths.Base, "PartyPresence.json");
+
+        public static void RecordPresence(long placeId, string jobId, string game)
+        {
+            try
+            {
+                if (placeId <= 0)
+                {
+                    if (File.Exists(PresencePath))
+                        File.Delete(PresencePath);
+
+                    return;
+                }
+
+                File.WriteAllText(PresencePath, JsonSerializer.Serialize(new { place = placeId.ToString(), job = jobId ?? "", game = game ?? "" }));
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not record where you are: {ex.Message}");
+            }
+        }
+
+        private static string PresenceQuery()
+        {
+            try
+            {
+                if (!File.Exists(PresencePath))
+                    return "";
+
+                using JsonDocument document = JsonDocument.Parse(File.ReadAllText(PresencePath));
+                JsonElement root = document.RootElement;
+
+                string Read(string key) => root.TryGetProperty(key, out JsonElement value) ? value.GetString() ?? "" : "";
+
+                return $"?place={Uri.EscapeDataString(Read("place"))}&job={Uri.EscapeDataString(Read("job"))}&game={Uri.EscapeDataString(Read("game"))}";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public static async Task RefreshAsync() => Adopt(await SendAsync(HttpMethod.Get, "/v1/party" + PresenceQuery()));
 
         public static async Task CreateAsync() => Adopt(await SendAsync(HttpMethod.Post, "/v1/party/create"));
 

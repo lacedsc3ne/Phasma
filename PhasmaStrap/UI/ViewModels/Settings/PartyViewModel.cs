@@ -25,6 +25,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public Visibility InitialVisibility => string.IsNullOrEmpty(Avatar) ? Visibility.Visible : Visibility.Collapsed;
 
         public Thickness Ring => Leader ? new Thickness(2) : new Thickness(0);
+
+        public string Game { get; init; } = "";
+
+        public bool Together { get; init; }
+
+        public string Where => string.IsNullOrEmpty(Game)
+            ? "Not in a game"
+            : Together ? Game + ", same server" : Game;
     }
 
     public sealed class PartyInviteRow
@@ -189,6 +197,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 JoinCode = "";
         });
 
+        public ICommand InviteFriendCommand => new RelayCommand(() =>
+        {
+            var dialog = new Elements.Dialogs.PartyInviteDialog();
+            dialog.ShowDialog();
+        });
+
         public ICommand LeavePartyCommand => new AsyncRelayCommand(async () => await PartyService.LeaveAsync());
 
         public ICommand CopyCodeCommand => new RelayCommand(() =>
@@ -230,7 +244,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Members.Clear();
 
             foreach (PartyMember member in PartyService.Current.Members)
-                Members.Add(new PartyMemberRow { Name = member.Name, Role = member.Leader ? "Leader" : "Member", Leader = member.Leader, Avatar = member.Avatar });
+                Members.Add(new PartyMemberRow { Name = member.Name, Role = member.Leader ? "Leader" : "Member", Leader = member.Leader, Avatar = member.Avatar, Game = member.Game, Together = member.Together });
 
             Invites.Clear();
 

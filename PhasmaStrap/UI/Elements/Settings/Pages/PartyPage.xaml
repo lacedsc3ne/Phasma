@@ -126,13 +126,21 @@
                                             </Border>
                                         </Grid>
                                     </Border>
-                                    <TextBlock Margin="0,5,0,0" FontSize="12" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="64" Text="{Binding Name}" />
+                                    <TextBlock Margin="0,5,0,0" FontSize="12" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="78" Text="{Binding Name}" />
+                                    <TextBlock FontSize="11" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="78"
+                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding Where}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding MemberCount, Mode=OneWay}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Margin="0,0,18,0">
+                            <ui:Button Width="46" Height="46" Padding="0" Icon="Add24" ToolTip="Invite a friend" Command="{Binding InviteFriendCommand}" />
+                            <TextBlock Margin="0,5,0,0" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Invite" />
+                        </StackPanel>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{Binding MemberCount, Mode=OneWay}" />
+                    </StackPanel>
                 </Grid>
             </StackPanel>
         </Border>
