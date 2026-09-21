@@ -113,6 +113,54 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
+        public bool FrameLimiterAvailable => Integrations.Nvidia.FrameLimiter.Available;
+
+        private int _driverFrameLimit = -1;
+
+        public int DriverFrameLimit
+        {
+            get
+            {
+                if (_driverFrameLimit < 0)
+                    _driverFrameLimit = Integrations.Nvidia.FrameLimiter.Current();
+
+                return _driverFrameLimit;
+            }
+            set
+            {
+                _driverFrameLimit = Math.Clamp(value, 0, 1000);
+                OnPropertyChanged(nameof(DriverFrameLimit));
+            }
+        }
+
+        public string FrameLimitStatus
+        {
+            get
+            {
+                if (!Integrations.Nvidia.FrameLimiter.Available)
+                    return Integrations.Nvidia.FrameLimiter.UnavailableReason;
+
+                return $"The driver is set to {Integrations.Nvidia.FrameLimiter.Describe(Integrations.Nvidia.FrameLimiter.Current())}. Roblox reads it when it starts, so a change applies on the next launch.";
+            }
+        }
+
+        public ICommand ApplyFrameLimitCommand => new RelayCommand(() =>
+        {
+            Integrations.Nvidia.FrameLimiter.Set(DriverFrameLimit);
+
+            _driverFrameLimit = Integrations.Nvidia.FrameLimiter.Current();
+            OnPropertyChanged(nameof(DriverFrameLimit));
+            OnPropertyChanged(nameof(FrameLimitStatus));
+        });
+
+        public ICommand RefreshFrameLimitCommand => new RelayCommand(() =>
+        {
+            _driverFrameLimit = Integrations.Nvidia.FrameLimiter.Current();
+            OnPropertyChanged(nameof(DriverFrameLimit));
+            OnPropertyChanged(nameof(FrameLimitStatus));
+            OnPropertyChanged(nameof(FrameLimiterAvailable));
+        });
+
         public int FrameGenQuality
         {
             get => FrameGenSettings.QualityIndex;

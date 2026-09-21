@@ -38,5 +38,19 @@
             </StackPanel>
         </controls:OptionControl>
 
+        <TextBlock Text="Driver frame rate limit" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="The NVIDIA driver's own frame rate limiter for Roblox, set on the driver profile that owns RobloxPlayerBeta.exe. It is a driver setting rather than a Roblox one, so nothing here is written to your flags." />
+
+        <controls:OptionControl Header="Frames per second" Description="{Binding FrameLimitStatus, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal">
+                <ui:NumberBox IntegersOnly="True" Width="120" Min="0" Max="1000" Value="{Binding DriverFrameLimit, Mode=TwoWay}" IsEnabled="{Binding FrameLimiterAvailable, Mode=OneWay}" />
+                <ui:Button Margin="8,0,0,0" Icon="Checkmark24" Content="Apply" Command="{Binding ApplyFrameLimitCommand}" IsEnabled="{Binding FrameLimiterAvailable, Mode=OneWay}" />
+                <ui:Button Margin="8,0,0,0" Icon="ArrowClockwise24" Content="{x:Static resources:Strings.Menu_ClassicClient_Refresh}" Command="{Binding RefreshFrameLimitCommand}" IsEnabled="{Binding FrameLimiterAvailable, Mode=OneWay}" />
+            </StackPanel>
+        </controls:OptionControl>
+
+        <TextBlock FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                   Text="Zero means no limit. This is the same driver setting as Frame rate limit on the NVIDIA page." />
     </StackPanel>
 </ui:UiPage>

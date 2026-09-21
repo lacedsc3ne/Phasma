@@ -582,6 +582,8 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
             new(SettingsSearchEntryKind.Section, Strings.Menu_Rendering_FrameGeneration, "", typeof(RenderingFrameRatePage), "Performance", "", "", "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Rendering_EnableFrameGeneration, Strings.Menu_Rendering_InterpolatesExtraFrameBetweenRealCaptured, typeof(RenderingFrameRatePage), "Performance", "", Strings.Menu_Rendering_FrameGeneration, "", null, ""),
             new(SettingsSearchEntryKind.Option, Strings.Menu_Rendering_FrameGenerationQuality, Strings.Menu_Rendering_HigherQualityCostsMoreGPUTime, typeof(RenderingFrameRatePage), "Performance", "", Strings.Menu_Rendering_FrameGeneration, "", null, ""),
+            new(SettingsSearchEntryKind.Section, "Driver frame rate limit", "", typeof(RenderingFrameRatePage), "Performance", "", "", "", null, ""),
+            new(SettingsSearchEntryKind.Option, "Frames per second", "", typeof(RenderingFrameRatePage), "Performance", "", "Driver frame rate limit", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Enums_Theme_Light, "", typeof(RenderingLowEndPage), "Performance", "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Rendering_Strong, "", typeof(RenderingLowEndPage), "Performance", "", "", "", null, ""),
             new(SettingsSearchEntryKind.Action, Strings.Menu_Rendering_TurnOff, "", typeof(RenderingLowEndPage), "Performance", "", "", "", null, ""),
