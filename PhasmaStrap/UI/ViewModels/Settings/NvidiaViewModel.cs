@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 
 using PhasmaStrap.Integrations.Nvidia;
@@ -9,7 +9,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
     {
         private const uint IdLowLatencyMode = 390467;
         private const uint IdFrlLowLatencyMode = 277041152;
-        private const uint IdFrameRateLimit = 277041154;
         private const uint IdBackgroundFrameRateLimit = 277041157;
         private const uint IdResizableBar = 549198379;
         private const uint IdDlssSuperResolution = 283385345;
@@ -28,7 +27,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private static readonly uint[] AllTrackedIds = new[]
         {
-            IdLowLatencyMode, IdFrlLowLatencyMode, IdFrameRateLimit, IdBackgroundFrameRateLimit,
+            IdLowLatencyMode, IdFrlLowLatencyMode, IdBackgroundFrameRateLimit,
             IdResizableBar, IdDlssSuperResolution, IdDlssFrameGeneration, IdMfaa,
             IdFxaaEnable, IdAntialiasingMode, IdGammaCorrection, IdLineGamma,
             IdSilkSmoothness, IdTextureLodBias, IdTextureFilteringQuality,
@@ -48,7 +47,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         private string _lowLatencyMode = Strings.Menu_Nvidia_Mode_Off;
         private string _frlLowLatencyMode = Strings.Menu_Nvidia_Mode_Off;
-        private int _frameRateLimit;
         private int _backgroundFrameRateLimit;
         private bool _resizableBar;
         private bool _dlssSuperResolution;
@@ -139,12 +137,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             get => _frlLowLatencyMode;
             set { _frlLowLatencyMode = value; OnPropertyChanged(nameof(FrlLowLatencyMode)); }
-        }
-
-        public int FrameRateLimit
-        {
-            get => _frameRateLimit;
-            set { _frameRateLimit = Math.Clamp(value, 0, 1000); OnPropertyChanged(nameof(FrameRateLimit)); }
         }
 
         public int BackgroundFrameRateLimit
@@ -240,7 +232,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
             LowLatencyMode = ReadEnum(live, IdLowLatencyMode, LowLatencyModes);
             FrlLowLatencyMode = ReadEnum(live, IdFrlLowLatencyMode, FrlLowLatencyModes);
-            FrameRateLimit = ReadInt(live, IdFrameRateLimit);
             BackgroundFrameRateLimit = ReadInt(live, IdBackgroundFrameRateLimit);
             ResizableBar = ReadBool(live, IdResizableBar);
             DlssSuperResolution = ReadBool(live, IdDlssSuperResolution);
@@ -362,7 +353,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 [IdLowLatencyMode] = (uint)LowLatencyModes.IndexOf(LowLatencyMode),
                 [IdFrlLowLatencyMode] = (uint)FrlLowLatencyModes.IndexOf(FrlLowLatencyMode),
-                [IdFrameRateLimit] = (uint)FrameRateLimit,
                 [IdBackgroundFrameRateLimit] = (uint)BackgroundFrameRateLimit,
                 [IdResizableBar] = ResizableBar ? 1u : 0u,
                 [IdDlssSuperResolution] = DlssSuperResolution ? 1u : 0u,
@@ -407,7 +397,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             [IdLowLatencyMode] = "Low Latency Mode",
             [IdFrlLowLatencyMode] = "FRL Low Latency Mode",
-            [IdFrameRateLimit] = "Frame Rate Limiter",
             [IdBackgroundFrameRateLimit] = "Background Frame Rate Limiter",
             [IdResizableBar] = "Resizable BAR",
             [IdDlssSuperResolution] = "DLSS Super Resolution",

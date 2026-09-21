@@ -107,6 +107,90 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             _ => $"{DiffEntries.Count} difference(s): {DiffEntries.Count(e => e.ChangeType == "Added")} added, {DiffEntries.Count(e => e.ChangeType == "Removed")} removed, {DiffEntries.Count(e => e.ChangeType == "Changed")} changed.",
         };
 
+        public ICommand CompareWithDefaultsCommand => new AsyncRelayCommand(CompareWithDefaultsAsync);
+
+        public ICommand ApplyACommand => new RelayCommand(() => SwapTo(SelectedSnapshotA, "A"));
+
+        public ICommand ApplyBCommand => new RelayCommand(() => SwapTo(SelectedSnapshotB, "B"));
+
+        public ICommand BundleDiagnosticsCommand => new RelayCommand(BundleDiagnostics);
+
+        private async Task CompareWithDefaultsAsync()
+        {
+            SnapshotStatus = "Asking Roblox what it ships with.";
+
+            Dictionary<string, string>? defaults = await RobloxDefaultFlags.GetAsync();
+
+            if (defaults is null)
+            {
+                SnapshotStatus = "Could not read Roblox's flags. The log has the reason.";
+                return;
+            }
+
+            DiffEntries.Clear();
+
+            foreach (FastFlagDiffEntry entry in RobloxDefaultFlags.CompareWithYours(defaults, App.FastFlags.Prop))
+                DiffEntries.Add(entry);
+
+            OnPropertyChanged(nameof(DiffSummary));
+
+            int changed = DiffEntries.Count(e => e.ChangeType == "Changed");
+            int added = DiffEntries.Count(e => e.ChangeType == "Added");
+
+            SnapshotStatus = DiffEntries.Count == 0
+                ? $"Every flag you have set matches what Roblox ships, out of {defaults.Count} it knows about."
+                : $"{changed} of your flags differ from Roblox's value, and {added} are not in Roblox's list at all.";
+        }
+
+        private void SwapTo(SnapshotRow? row, string slot)
+        {
+            if (row is null)
+            {
+                SnapshotStatus = $"Pick a snapshot for {slot} first.";
+                return;
+            }
+
+            try
+            {
+                FastFlagSnapshotManager.Apply(row.Snapshot);
+                SnapshotStatus = $"{slot} is live: '{row.Name}', {App.FastFlags.Prop.Count} flag(s). Restart Roblox to play on it.";
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Swapping to '{row.Name}' failed: {ex.Message}");
+                SnapshotStatus = $"Could not switch to that snapshot: {ex.Message}";
+            }
+        }
+
+        private void BundleDiagnostics()
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "Zip archive|*.zip",
+                FileName = CrashBundle.SuggestedName,
+            };
+
+            if (dialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                int files = CrashBundle.Write(dialog.FileName);
+
+                LogStatus = $"Bundled {files} file(s).";
+                NotificationCenter.Notify(
+                    "Diagnostics bundled",
+                    Path.GetFileName(dialog.FileName),
+                    NotificationCategory.General,
+                    onClick: NotificationCenter.RevealFile(dialog.FileName));
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine("DeveloperToolsViewModel", $"Bundling failed: {ex.Message}");
+                LogStatus = "Could not write that bundle: " + ex.Message;
+            }
+        }
+
         public ICommand SaveSnapshotCommand => new RelayCommand(SaveSnapshot);
         public ICommand ApplySnapshotCommand => new RelayCommand<SnapshotRow>(ApplySnapshot);
         public ICommand DeleteSnapshotCommand => new RelayCommand<SnapshotRow>(DeleteSnapshot);
@@ -230,7 +314,12 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         private void RefreshProxyTraffic()
         {
             ProxyTraffic.Clear();
-            foreach (ProxyTrafficEntry entry in ProxyTrafficLog.Recent)
+
+            IReadOnlyList<ProxyTrafficEntry> entries = AssetProxyServer.IsRunning
+                ? ProxyTrafficLog.Recent
+                : ProxyTrafficLog.FromHostingProcess();
+
+            foreach (ProxyTrafficEntry entry in entries)
                 ProxyTraffic.Add(entry);
 
             RefreshProxyStatus();
@@ -255,7 +344,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 }
 
                 ProxyStatus = ProxyHealth.IsHostedAnywhere()
-                    ? "Another PhasmaStrap process is hosting the proxy, so its requests cannot be read from this window."
+                    ? ProxyTraffic.Count == 0
+                        ? "Another PhasmaStrap process is hosting the proxy. Nothing has gone through it yet."
+                        : $"Another PhasmaStrap process is hosting the proxy. {ProxyTraffic.Count} request(s) read from it."
                     : "The proxy is turned on but is not listening at the moment.";
             }
             catch (Exception ex)

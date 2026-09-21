@@ -128,6 +128,14 @@
                             <TextBlock Text="{x:Static resources:Strings.Menu_DeveloperTools_Vs}" VerticalAlignment="Center" Margin="8,0" />
                             <ComboBox Width="180" ItemsSource="{Binding Snapshots, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedSnapshotB, Mode=TwoWay}" />
                         </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <ui:Button Content="Make A live" Command="{Binding ApplyACommand}" />
+                            <ui:Button Margin="8,0,0,0" Content="Make B live" Command="{Binding ApplyBCommand}" />
+                            <ui:Button Margin="16,0,0,0" Icon="ArrowSwap24" Content="Compare with Roblox's defaults" Command="{Binding CompareWithDefaultsCommand}" />
+                        </StackPanel>
+                        <TextBlock Margin="0,6,0,0" FontSize="11.5" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   Text="Making one live writes it to your flags. Roblox reads flags when it starts, so restart it to play on the other set." />
                         <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{Binding DiffSummary, Mode=OneWay}" />
 
                         <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding DiffEntries, Mode=OneWay}">
@@ -222,6 +230,7 @@
                             <TextBlock Grid.Column="0" FontSize="20" FontWeight="Medium" VerticalAlignment="Center" Text="{x:Static resources:Strings.Menu_DeveloperTools_LogViewer}" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <ui:Button Content="{x:Static resources:Strings.Common_Copy}" Icon="Copy24" Appearance="Secondary" Command="{Binding CopyLogsCommand, Mode=OneTime}" />
+                                <ui:Button Margin="8,0,0,0" Content="Bundle for a bug report" Icon="ArrowDownload24" Appearance="Secondary" Command="{Binding BundleDiagnosticsCommand, Mode=OneTime}" />
                                 <ui:Button Margin="8,0,0,0" Content="{x:Static resources:Strings.Dialog_ChannelLists_Refresh}" Icon="ArrowClockwise24" Command="{Binding RefreshLogsCommand, Mode=OneTime}" />
                             </StackPanel>
                         </Grid>
