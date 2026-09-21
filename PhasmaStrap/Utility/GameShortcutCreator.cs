@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
@@ -42,7 +42,7 @@ namespace PhasmaStrap.Utility
 
                 string sanitizedName = string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
                 string lnkPath = Path.Combine(folder, $"{sanitizedName}.lnk");
-                string exeArgs = $"roblox://experiences/start?placeId={placeId}";
+                string exeArgs = RobloxLaunch.DeepLink(placeId);
 
                 ShellLink.Shortcut.CreateShortcut(Paths.Application, exeArgs, icoPath, 0).WriteToFile(lnkPath);
 

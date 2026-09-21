@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -55,7 +55,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (entry is null || entry.PlaceId <= 0)
                 return;
 
-            string uri = $"roblox://experiences/start?placeId={PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId)}";
+            string uri = PhasmaStrap.Utility.RobloxLaunch.DeepLink(PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId));
             Process.Start(Paths.Process, $"-player \"{uri}\"");
         }
 

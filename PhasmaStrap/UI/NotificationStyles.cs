@@ -16,6 +16,7 @@ namespace PhasmaStrap.UI
             [NotificationKindId.ServerLeft] = new(SymbolRegular.DoorArrowRight20, Hex("#C98A2E"), "Session"),
             [NotificationKindId.ServerRegion] = new(SymbolRegular.GlobeLocation24, Hex("#3E8ED0"), "Session"),
             [NotificationKindId.Party] = new(SymbolRegular.PeopleTeam24, Hex("#7C6BD8"), "Party"),
+            [NotificationKindId.GalleryReview] = new(SymbolRegular.CheckmarkCircle24, Hex("#3FA45B"), "Gallery"),
             [NotificationKindId.RobloxClosed] = new(SymbolRegular.Warning24, Hex("#D9534F"), "Crash"),
             [NotificationKindId.AutoRejoin] = new(SymbolRegular.ArrowClockwise24, Hex("#E0873A"), "Rejoin"),
             [NotificationKindId.FastFlagProfile] = new(SymbolRegular.Flag24, Hex("#9A6BD8"), "FastFlags"),

@@ -1,4 +1,4 @@
-using System.Web;
+﻿using System.Web;
 
 namespace PhasmaStrap.Utility
 {
@@ -26,9 +26,7 @@ namespace PhasmaStrap.Utility
             switch (Kind)
             {
                 case RobloxLinkKind.Place:
-                    return string.IsNullOrEmpty(LinkCode)
-                        ? $"roblox://experiences/start?placeId={PlaceId}"
-                        : $"roblox://experiences/start?placeId={PlaceId}&linkCode={Uri.EscapeDataString(LinkCode)}";
+                    return RobloxLaunch.DeepLink(PlaceId, linkCode: LinkCode);
                 case RobloxLinkKind.ShareLink:
                     return $"roblox://navigation/share_links?code={Uri.EscapeDataString(ShareCode ?? "")}&type={Uri.EscapeDataString(ShareType ?? "Server")}";
                 case RobloxLinkKind.DeepLink:

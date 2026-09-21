@@ -1,4 +1,4 @@
-namespace PhasmaStrap.Utility
+﻿namespace PhasmaStrap.Utility
 {
     public static class PartyLauncher
     {
@@ -74,11 +74,7 @@ namespace PhasmaStrap.Utility
         {
             try
             {
-                string uri = string.IsNullOrEmpty(jobId)
-                    ? $"roblox://experiences/start?placeId={placeId}"
-                    : $"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}";
-
-                Process.Start(Paths.Process, $"-player \"{uri}\"");
+                RobloxLaunch.Join(placeId, jobId);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Headers;
 
 namespace PhasmaStrap.Integrations
@@ -190,7 +190,7 @@ namespace PhasmaStrap.Integrations
                 return false;
 
             App.Logger.WriteLine(LOG_IDENT, $"Joining private server {server.Id} in place {server.PlaceId}");
-            Process.Start(Paths.Application, $"-player \"roblox://experiences/start?placeId={server.PlaceId}&accessCode={Uri.EscapeDataString(accessCode)}\"");
+            Process.Start(Paths.Application, $"-player \"{PhasmaStrap.Utility.RobloxLaunch.DeepLink(server.PlaceId, accessCode: accessCode)}\"");
             return true;
         }
 

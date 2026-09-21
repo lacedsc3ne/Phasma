@@ -263,6 +263,7 @@ namespace PhasmaStrap.Models.Persistable
 
         public bool NotificationServerRegionEnabled { get; set; } = true;
         public bool NotificationPartyEnabled { get; set; } = true;
+        public bool NotificationGalleryReviewEnabled { get; set; } = true;
         public bool NotificationRobloxClosedEnabled { get; set; } = true;
         public bool NotificationAutoRejoinEnabled { get; set; } = true;
         public bool NotificationFastFlagProfileEnabled { get; set; } = true;

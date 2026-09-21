@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 
 namespace PhasmaStrap.Integrations
@@ -234,7 +234,7 @@ namespace PhasmaStrap.Integrations
         }
 
         public static string GetJoinDeeplink(FriendPresence presence) =>
-            $"roblox://experiences/start?placeId={presence.RootPlaceId}&gameInstanceId={presence.GameId}";
+            PhasmaStrap.Utility.RobloxLaunch.DeepLink(presence.RootPlaceId, presence.GameId);
 
         private static HttpRequestMessage BuildRequest(HttpMethod method, string url, string? cookie)
         {

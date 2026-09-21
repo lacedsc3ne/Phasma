@@ -631,9 +631,7 @@ namespace PhasmaStrap
             int maxAttempts = Math.Max(1, App.Settings.Prop.AutoRejoinMaxAttempts);
             int delaySeconds = Math.Max(1, App.Settings.Prop.AutoRejoinDelaySeconds);
 
-            string uri = string.IsNullOrEmpty(jobId)
-                ? $"roblox://experiences/start?placeId={placeId}"
-                : $"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}";
+            string uri = Utility.RobloxLaunch.DeepLink(placeId, jobId);
 
             for (int attempt = 1; attempt <= maxAttempts; attempt++)
             {

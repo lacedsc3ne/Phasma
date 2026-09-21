@@ -27,7 +27,7 @@ namespace PhasmaStrap.UI
             _notifyIcon = new(new System.ComponentModel.Container())
             {
                 Icon = Properties.Resources.IconPhasmaStrap,
-                Text = App.ProjectName,
+                Text = $"{App.ProjectName} - watching Roblox",
                 Visible = true
             };
 

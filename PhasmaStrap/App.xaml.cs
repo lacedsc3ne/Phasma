@@ -540,6 +540,8 @@ namespace PhasmaStrap
 
                 if (Settings.Prop.PartyEnabled)
                     Utility.PartyBackground.StartIfWanted();
+
+                Utility.AccountNotices.Start();
                 }
                 catch (Exception ex)
                 {

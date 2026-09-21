@@ -1,4 +1,4 @@
-using System.Web;
+﻿using System.Web;
 using System.Windows;
 using System.Windows.Input;
 using PhasmaStrap.AppData;
@@ -72,17 +72,11 @@ namespace PhasmaStrap.Models.Entities
 
         public string GetInviteDeeplink(bool launchData = true)
         {
-            string deeplink = $"roblox://experiences/start?placeId={PlaceId}";
-
-            if (ServerType == ServerType.Private)
-                deeplink += "&accessCode=" + AccessCode;
-            else
-                deeplink += "&gameInstanceId=" + JobId;
-
-            if (launchData && !string.IsNullOrEmpty(RPCLaunchData))
-                deeplink += "&launchData=" + HttpUtility.UrlEncode(RPCLaunchData);
-
-            return deeplink;
+            return PhasmaStrap.Utility.RobloxLaunch.DeepLink(
+                PlaceId,
+                jobId: JobId,
+                accessCode: ServerType == ServerType.Private ? AccessCode : null,
+                launchData: launchData ? RPCLaunchData : null);
         }
 
         public async Task<string?> QueryServerLocation()

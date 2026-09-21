@@ -1,4 +1,4 @@
-using PhasmaStrap.Models;
+﻿using PhasmaStrap.Models;
 
 namespace PhasmaStrap.Integrations
 {
@@ -88,7 +88,7 @@ namespace PhasmaStrap.Integrations
 
         public static void JoinServer(long placeId, string jobId)
         {
-            string uri = $"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}";
+            string uri = PhasmaStrap.Utility.RobloxLaunch.DeepLink(placeId, jobId);
             Process.Start(Paths.Process, $"-player \"{uri}\"");
         }
     }

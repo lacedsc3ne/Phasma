@@ -1,4 +1,4 @@
-using DiscordRPC;
+﻿using DiscordRPC;
 
 using Microsoft.Win32;
 
@@ -68,7 +68,7 @@ namespace PhasmaStrap.Integrations
             }
 
             App.Logger.WriteLine(LOG_IDENT, $"Joining place {placeId}, server {jobId} from Discord");
-            Process.Start(Paths.Application, $"-player \"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}\"");
+            Process.Start(Paths.Application, $"-player \"{PhasmaStrap.Utility.RobloxLaunch.DeepLink(placeId, jobId)}\"");
             return true;
         }
 

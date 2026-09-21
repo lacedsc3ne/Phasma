@@ -242,7 +242,7 @@ namespace PhasmaStrap.Utility
                     MarkIntentionalRestart();
                     await CloseRobloxAsync();
 
-                    Process.Start(Paths.Process, $"-player \"roblox://experiences/start?placeId={placeId}&gameInstanceId={jobId}\"");
+                    RobloxLaunch.Join(placeId, jobId);
                 }
                 catch (Exception ex)
                 {

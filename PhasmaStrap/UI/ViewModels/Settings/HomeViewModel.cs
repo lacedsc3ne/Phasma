@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -412,7 +412,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (entry is null || entry.PlaceId <= 0)
                 return;
 
-            LaunchDeepLink($"roblox://experiences/start?placeId={PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId)}");
+            LaunchDeepLink(PhasmaStrap.Utility.RobloxLaunch.DeepLink(PhasmaStrap.Utility.PlaceNames.StartPlaceOf(entry.PlaceId)));
         }
 
         private static void CopyLink(PlayTimeEntry? entry)
@@ -535,7 +535,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             if (place is null || place.PlaceId <= 0)
                 return;
 
-            LaunchDeepLink($"roblox://experiences/start?placeId={place.PlaceId}");
+            LaunchDeepLink(PhasmaStrap.Utility.RobloxLaunch.DeepLink(place.PlaceId));
         }
     }
 }

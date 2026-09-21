@@ -497,6 +497,8 @@ namespace PhasmaStrap.Utility
 
             App.Logger.WriteLine(LOG_IDENT, "Background guard started");
 
+            ProcessName.Set("PhasmaStrap Account Guard");
+
             var stop = new CancellationTokenSource();
 
             var watcher = new Thread(() => WatchSignInFile(stop.Token)) { IsBackground = true, Name = "AccountGuard.SignInFile" };

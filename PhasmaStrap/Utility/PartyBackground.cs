@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 
 namespace PhasmaStrap.Utility
 {
@@ -46,7 +46,6 @@ namespace PhasmaStrap.Utility
         }
 
         private static Mutex? _mutex;
-
         public static void RunBackground()
         {
             _mutex = new Mutex(true, MutexName, out bool createdNew);
@@ -59,6 +58,8 @@ namespace PhasmaStrap.Utility
             }
 
             App.Logger.WriteLine(LOG_IDENT, "Background party watcher started");
+
+            ProcessName.Set("PhasmaStrap Party Watcher");
 
             PartyService.JoinRequested += (_, join) => PartyLauncher.Follow(join);
             PartyService.Start();

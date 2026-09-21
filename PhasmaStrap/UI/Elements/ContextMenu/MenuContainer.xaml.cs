@@ -293,7 +293,7 @@ namespace PhasmaStrap.UI.Elements.ContextMenu
                     return;
                 }
 
-                Process.Start(Paths.Process, $"-player \"roblox://experiences/start?placeId={data.PlaceId}&gameInstanceId={best.JobId}\"");
+                PhasmaStrap.Utility.RobloxLaunch.Join(data.PlaceId, best.JobId);
             }
             catch (Exception ex)
             {

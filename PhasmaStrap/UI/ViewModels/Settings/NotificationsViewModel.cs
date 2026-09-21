@@ -258,6 +258,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             play.Kinds.Add(Kind(NotificationKindId.ServerLeft, "Server left", "You leave a server."));
             play.Kinds.Add(Kind(NotificationKindId.ServerRegion, "Server region", "The datacenter your server runs in is worked out after you join, with the ping if it is known yet."));
             play.Kinds.Add(Kind(NotificationKindId.Party, "Party started a game", "Your party leader launches a game and you are asked whether to follow them into it."));
+            play.Kinds.Add(Kind(NotificationKindId.GalleryReview, "Gallery review finished", "Something you shared to the gallery is approved, or was taken down."));
             play.Kinds.Add(Kind(NotificationKindId.RobloxClosed, "Roblox closed unexpectedly", "Roblox exits on its own and the crash looks real enough to report."));
             play.Kinds.Add(Kind(NotificationKindId.AutoRejoin, "Auto Rejoin progress", "Auto Rejoin starts a retry after a crash, and again when it succeeds or runs out of attempts."));
             play.Kinds.Add(Kind(NotificationKindId.FastFlagProfile, "FastFlag profile not active", "You join a game with its own flag profile while Roblox is running someone else's flags."));
