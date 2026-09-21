@@ -41,18 +41,45 @@ namespace PhasmaStrap.Utility
         public static bool AnyIn(string folder, IEnumerable<string> canonicalNames) =>
             canonicalNames.Any(name => FindSource(folder, name) is not null);
 
-        public static byte[] ToPng(string sourcePath)
+        private static readonly Dictionary<string, int> CursorSizes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "MouseLockedCursor.png", 32 },
+            { "ArrowCursor.png", 64 },
+            { "ArrowFarCursor.png", 64 },
+            { "IBeamCursor.png", 64 }
+        };
+
+        public static int SizeFor(string fileName) =>
+            CursorSizes.TryGetValue(Path.GetFileName(fileName), out int size) ? size : 64;
+
+        private static BitmapSource Read(string sourcePath)
         {
             using FileStream stream = File.OpenRead(sourcePath);
 
             BitmapDecoder decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
 
-            BitmapFrame frame = decoder.Frames
+            return decoder.Frames
                 .OrderByDescending(candidate => (long)candidate.PixelWidth * candidate.PixelHeight)
                 .First();
+        }
 
+        private static BitmapSource FitTo(BitmapSource source, int box)
+        {
+            if (source.PixelWidth <= box && source.PixelHeight <= box)
+                return source;
+
+            double scale = Math.Min((double)box / source.PixelWidth, (double)box / source.PixelHeight);
+
+            var scaled = new TransformedBitmap(source, new System.Windows.Media.ScaleTransform(scale, scale));
+            scaled.Freeze();
+
+            return scaled;
+        }
+
+        private static byte[] Encode(BitmapSource image)
+        {
             var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(frame));
+            encoder.Frames.Add(BitmapFrame.Create(image));
 
             using var output = new MemoryStream();
             encoder.Save(output);
@@ -60,21 +87,29 @@ namespace PhasmaStrap.Utility
             return output.ToArray();
         }
 
+        public static byte[] ToPng(string sourcePath) => Encode(Read(sourcePath));
+
         public static void WritePng(string sourcePath, string destinationPath)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
             Filesystem.AssertReadOnly(destinationPath);
 
-            if (Path.GetExtension(sourcePath).Equals(".png", StringComparison.OrdinalIgnoreCase))
+            BitmapSource source = Read(sourcePath);
+            int box = SizeFor(destinationPath);
+            BitmapSource fitted = FitTo(source, box);
+
+            if (ReferenceEquals(fitted, source) && Path.GetExtension(sourcePath).Equals(".png", StringComparison.OrdinalIgnoreCase))
             {
                 File.Copy(sourcePath, destinationPath, true);
                 return;
             }
 
-            byte[] png = ToPng(sourcePath);
-            File.WriteAllBytes(destinationPath, png);
+            File.WriteAllBytes(destinationPath, Encode(fitted));
 
-            App.Logger.WriteLine(LOG_IDENT, $"Converted {Path.GetFileName(sourcePath)} to PNG for {Path.GetFileName(destinationPath)}");
+            if (!ReferenceEquals(fitted, source))
+                App.Logger.WriteLine(LOG_IDENT, $"Scaled {Path.GetFileName(sourcePath)} from {source.PixelWidth}x{source.PixelHeight} to {fitted.PixelWidth}x{fitted.PixelHeight} for {Path.GetFileName(destinationPath)}");
+            else
+                App.Logger.WriteLine(LOG_IDENT, $"Converted {Path.GetFileName(sourcePath)} to PNG for {Path.GetFileName(destinationPath)}");
         }
 
         public const string QuickPickFolderName = "QuickPick";
