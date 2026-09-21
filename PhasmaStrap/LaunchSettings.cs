@@ -1,4 +1,4 @@
-using PhasmaStrap.Enums;
+﻿using PhasmaStrap.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +51,7 @@ namespace PhasmaStrap
         public LaunchFlag DiscordJoinFlag           { get; } = new("discordjoin");
 
         public LaunchFlag GuardFlag                 { get; } = new("guard");
+        public LaunchFlag PartyFlag                 { get; } = new("party");
 
         public LaunchFlag WriteProxyHostsFlag       { get; } = new("writeproxyhosts");
 

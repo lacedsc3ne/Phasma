@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -56,6 +56,11 @@ namespace PhasmaStrap
             {
                 App.Logger.WriteLine(LOG_IDENT, "Starting the account guard");
                 Utility.AccountGuard.RunBackground();
+            }
+            else if (App.LaunchSettings.PartyFlag.Active)
+            {
+                App.Logger.WriteLine(LOG_IDENT, "Starting the party watcher");
+                Utility.PartyBackground.RunBackground();
             }
             else if (App.LaunchSettings.DiscordJoinFlag.Active)
             {

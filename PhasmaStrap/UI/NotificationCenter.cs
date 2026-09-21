@@ -15,6 +15,7 @@ namespace PhasmaStrap.UI
         ServerJoined,
         ServerLeft,
         ServerRegion,
+        Party,
         RobloxClosed,
         AutoRejoin,
         FastFlagProfile,
@@ -79,6 +80,7 @@ namespace PhasmaStrap.UI
             NotificationKindId.ServerJoined => App.Settings.Prop.NotificationsJoinToastEnabled,
             NotificationKindId.ServerLeft => App.Settings.Prop.NotificationsLeaveToastEnabled,
             NotificationKindId.ServerRegion => App.Settings.Prop.NotificationServerRegionEnabled,
+            NotificationKindId.Party => App.Settings.Prop.NotificationPartyEnabled,
             NotificationKindId.RobloxClosed => App.Settings.Prop.NotificationRobloxClosedEnabled,
             NotificationKindId.AutoRejoin => App.Settings.Prop.NotificationAutoRejoinEnabled,
             NotificationKindId.FastFlagProfile => App.Settings.Prop.NotificationFastFlagProfileEnabled,
@@ -104,6 +106,7 @@ namespace PhasmaStrap.UI
                 case NotificationKindId.ServerJoined: App.Settings.Prop.NotificationsJoinToastEnabled = enabled; break;
                 case NotificationKindId.ServerLeft: App.Settings.Prop.NotificationsLeaveToastEnabled = enabled; break;
                 case NotificationKindId.ServerRegion: App.Settings.Prop.NotificationServerRegionEnabled = enabled; break;
+                case NotificationKindId.Party: App.Settings.Prop.NotificationPartyEnabled = enabled; break;
                 case NotificationKindId.RobloxClosed: App.Settings.Prop.NotificationRobloxClosedEnabled = enabled; break;
                 case NotificationKindId.AutoRejoin: App.Settings.Prop.NotificationAutoRejoinEnabled = enabled; break;
                 case NotificationKindId.FastFlagProfile: App.Settings.Prop.NotificationFastFlagProfileEnabled = enabled; break;

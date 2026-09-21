@@ -85,6 +85,12 @@ namespace PhasmaStrap
                 };
                 ActivityWatcher.OnGameLeave += (_, _) => ServerPingMonitor.Stop();
 
+                ActivityWatcher.OnGameJoin += (sender, args) =>
+                {
+                    if (sender is ActivityWatcher joined && App.Settings.Prop.PartyEnabled)
+                        _ = Utility.PartyService.ReportLaunchAsync(joined.Data.PlaceId, joined.Data.JobId);
+                };
+
                 ActivityWatcher.OnGameJoin += (sender, _) => ServerRegion.OnGameJoin((sender as ActivityWatcher)?.Data.MachineAddress);
                 ActivityWatcher.OnGameLeave += (_, _) => ServerRegion.OnGameLeave();
 

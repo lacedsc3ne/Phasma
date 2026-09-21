@@ -207,6 +207,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ICommand RefreshCommand { get; }
         public ICommand JoinCommand { get; }
+        public ICommand InviteToPartyCommand { get; }
 
         public bool AlertsEnabled
         {
@@ -228,10 +229,29 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             set => App.Settings.Prop.FriendActivityPollSeconds = Math.Max(20, value);
         }
 
+        public Visibility PartyInviteVisibility => App.Settings.Prop.PartyEnabled ? Visibility.Visible : Visibility.Collapsed;
+
+        private static async Task InviteToPartyAsync(FriendRow? row)
+        {
+            if (row is null)
+                return;
+
+            bool sent = await PhasmaStrap.Utility.PartyService.InviteAsync(row.UserId);
+
+            NotificationCenter.Notify(
+                sent ? "Party invite sent" : "Could not invite them",
+                sent
+                    ? $"{row.Name} will see it in PhasmaStrap."
+                    : $"{row.Name} needs PhasmaStrap with a linked Roblox account, and you need to be in a party.",
+                NotificationCategory.General,
+                kind: NotificationKindId.Party);
+        }
+
         public FriendsViewModel()
         {
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             JoinCommand = new RelayCommand<FriendRow?>(Join);
+            InviteToPartyCommand = new AsyncRelayCommand<FriendRow?>(InviteToPartyAsync);
 
             var view = CollectionViewSource.GetDefaultView(Friends);
             view.GroupDescriptions.Clear();

@@ -74,6 +74,11 @@ namespace PhasmaStrap.Models.Persistable
 
         public bool RobloxCheckFlagsAfterUpdate { get; set; } = false;
 
+        public bool PartyEnabled { get; set; } = false;
+        public bool PartyBackgroundEnabled { get; set; } = true;
+        public int PartyPollSeconds { get; set; } = 4;
+        public string PartyJoinMode { get; set; } = "AskWhenInGame";
+
         public bool AccountGuardEnabled { get; set; } = false;
         public bool AccountGuardBackground { get; set; } = false;
 
@@ -257,6 +262,7 @@ namespace PhasmaStrap.Models.Persistable
         public bool NotificationsLeaveToastEnabled { get; set; } = false;
 
         public bool NotificationServerRegionEnabled { get; set; } = true;
+        public bool NotificationPartyEnabled { get; set; } = true;
         public bool NotificationRobloxClosedEnabled { get; set; } = true;
         public bool NotificationAutoRejoinEnabled { get; set; } = true;
         public bool NotificationFastFlagProfileEnabled { get; set; } = true;

@@ -537,6 +537,9 @@ namespace PhasmaStrap
                 {
                     if (Settings.Prop.FriendActivityAlertsEnabled)
                         Utility.FriendActivityMonitor.Start();
+
+                if (Settings.Prop.PartyEnabled)
+                    Utility.PartyBackground.StartIfWanted();
                 }
                 catch (Exception ex)
                 {

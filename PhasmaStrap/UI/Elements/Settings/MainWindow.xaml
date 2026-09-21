@@ -319,6 +319,7 @@
 
                     <ui:NavigationItem Content="Games" PageType="{x:Type pages:HomePage}" Icon="Games24" PageTag="games" />
                     <ui:NavigationItem Content="People" PageType="{x:Type pages:PeoplePage}" Icon="People24" PageTag="people" />
+                    <ui:NavigationItem Content="Party" PageType="{x:Type pages:PartyPage}" Icon="PeopleTeam24" PageTag="party" />
                     <ui:NavigationItem Content="Performance" PageType="{x:Type pages:PerformancePage}" Icon="Gauge24" PageTag="performance" />
                     <ui:NavigationItem Content="FastFlags" PageType="{x:Type pages:FastFlagSettingsPage}" Icon="Flag24" PageTag="fastflagsettings" />
                     <ui:NavigationItem Content="Capture" PageType="{x:Type pages:CapturePage}" Icon="Camera24" PageTag="capture" />
