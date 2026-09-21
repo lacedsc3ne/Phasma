@@ -192,6 +192,21 @@ namespace PhasmaStrap
             App.Terminate();
         }
 
+        private static bool RobloxIsOpen()
+        {
+            Process[] processes = Process.GetProcessesByName("RobloxPlayerBeta");
+
+            try
+            {
+                return processes.Length > 0;
+            }
+            finally
+            {
+                foreach (Process process in processes)
+                    process.Dispose();
+            }
+        }
+
         public static void LaunchSettings()
         {
             const string LOG_IDENT = "LaunchHandler::LaunchSettings";
@@ -202,7 +217,7 @@ namespace PhasmaStrap
 
             if (interlock.IsAcquired || uiTest)
             {
-                bool showAlreadyRunningWarning = Process.GetProcessesByName(App.ProjectName).Length > 1;
+                bool showAlreadyRunningWarning = RobloxIsOpen();
 
                 if (Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_BACKGROUND") == "1" && Environment.GetEnvironmentVariable("PHASMASTRAP_UITEST_PAGE") == "ColorThemeEditor")
                 {
