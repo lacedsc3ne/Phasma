@@ -135,12 +135,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             get
             {
-                if (String.IsNullOrEmpty(CustomCursorSetTask.NewState))
+                string state = CustomCursorSetTask.NewState;
+
+                if (String.IsNullOrEmpty(state))
                     return "Nothing chosen yet.";
 
-                string? source = CursorImages.SourceOf(CustomCursorSetTask.NewState);
+                if (CursorImages.ImageBehind(state) is string image)
+                    return Path.GetFileName(image) + ", as your arrow cursor";
 
-                return source is null ? CustomCursorSetTask.NewState : Path.GetFileName(source) + ", as your arrow cursor";
+                if (CursorImages.PackBehind(state) is string pack)
+                    return Path.GetFileName(pack.TrimEnd(Path.DirectorySeparatorChar)) + ", the whole set";
+
+                return state;
             }
         }
 
@@ -169,7 +175,8 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     CheckFileExists = true
                 };
 
-                string? current = CursorImages.SourceOf(CustomCursorSetTask.NewState) ?? CustomCursorSetTask.NewState;
+                string state = CustomCursorSetTask.NewState;
+                string? current = CursorImages.ImageBehind(state) ?? CursorImages.PackBehind(state) ?? state;
 
                 if (!string.IsNullOrEmpty(current))
                 {
@@ -188,23 +195,19 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                     return;
 
                 bool wholePack = IsCursorName(dialog.FileName)
+                    && !folder.Equals(CursorImages.ChosenFolder, StringComparison.OrdinalIgnoreCase)
                     && CursorImages.AnyIn(folder, CustomCursorModPresetTask.RecognizedFileNames);
 
-                if (wholePack)
+                try
                 {
-                    CustomCursorSetTask.NewState = folder;
+                    CustomCursorSetTask.NewState = wholePack
+                        ? CursorImages.BuildFromFolder(folder, CustomCursorModPresetTask.RecognizedFileNames)
+                        : CursorImages.BuildFromOneImage(dialog.FileName);
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        CustomCursorSetTask.NewState = CursorImages.BuildFromOneImage(dialog.FileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        Frontend.ShowMessageBox("That picture could not be used as a cursor:\n" + ex.Message, MessageBoxImage.Error);
-                        return;
-                    }
+                    Frontend.ShowMessageBox("That picture could not be used as a cursor:\n" + ex.Message, MessageBoxImage.Error);
+                    return;
                 }
 
                 if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))

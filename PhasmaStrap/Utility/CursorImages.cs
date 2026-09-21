@@ -112,40 +112,91 @@ namespace PhasmaStrap.Utility
                 App.Logger.WriteLine(LOG_IDENT, $"Converted {Path.GetFileName(sourcePath)} to PNG for {Path.GetFileName(destinationPath)}");
         }
 
-        public const string QuickPickFolderName = "QuickPick";
+        public const string ChosenFolderName = "Chosen";
 
-        public static string QuickPickFolder => Path.Combine(Paths.CursorSets, QuickPickFolderName);
+        private const string ImageNote = "from-image.txt";
+        private const string PackNote = "from-folder.txt";
 
-        public static string BuildFromOneImage(string imagePath)
+        public static string ChosenFolder => Path.Combine(Paths.CursorSets, ChosenFolderName);
+
+        private static string Reset()
         {
-            string folder = QuickPickFolder;
+            string folder = ChosenFolder;
 
             if (Directory.Exists(folder))
                 Directory.Delete(folder, true);
 
             Directory.CreateDirectory(folder);
 
+            return folder;
+        }
+
+        public static string BuildFromOneImage(string imagePath)
+        {
+            string folder = Reset();
+
             WritePng(imagePath, Path.Combine(folder, "ArrowCursor.png"));
             WritePng(imagePath, Path.Combine(folder, "ArrowFarCursor.png"));
 
-            File.WriteAllText(Path.Combine(folder, "source.txt"), imagePath);
+            File.WriteAllText(Path.Combine(folder, ImageNote), imagePath);
 
             App.Logger.WriteLine(LOG_IDENT, $"Built an arrow cursor from {Path.GetFileName(imagePath)}");
 
             return folder;
         }
 
-        public static string? SourceOf(string folder)
+        public static string BuildFromFolder(string sourceFolder, IEnumerable<string> canonicalNames)
+        {
+            string folder = Reset();
+            int taken = 0;
+
+            foreach (string name in canonicalNames)
+            {
+                string? source = FindSource(sourceFolder, name);
+
+                if (source is null)
+                    continue;
+
+                WritePng(source, Path.Combine(folder, name));
+                taken++;
+            }
+
+            File.WriteAllText(Path.Combine(folder, PackNote), sourceFolder);
+
+            App.Logger.WriteLine(LOG_IDENT, $"Took {taken} cursor image(s) from {sourceFolder}");
+
+            return folder;
+        }
+
+        public static void Forget()
         {
             try
             {
-                string note = Path.Combine(folder, "source.txt");
-                return File.Exists(note) ? File.ReadAllText(note).Trim() : null;
+                if (Directory.Exists(ChosenFolder))
+                    Directory.Delete(ChosenFolder, true);
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not clear the chosen cursor: {ex.Message}");
+            }
+        }
+
+        private static string? NoteIn(string folder, string name)
+        {
+            try
+            {
+                string note = Path.Combine(folder, name);
+                string? read = File.Exists(note) ? File.ReadAllText(note).Trim() : null;
+                return string.IsNullOrEmpty(read) ? null : read;
             }
             catch
             {
                 return null;
             }
         }
+
+        public static string? ImageBehind(string folder) => NoteIn(folder, ImageNote);
+
+        public static string? PackBehind(string folder) => NoteIn(folder, PackNote);
     }
 }

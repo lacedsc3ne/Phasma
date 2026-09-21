@@ -14,7 +14,11 @@ namespace PhasmaStrap.Models.SettingTasks
 
         public static IEnumerable<string> RecognizedFileNames => FileMap.Keys;
 
-        public CustomCursorModPresetTask() : base("ModPreset", "CustomCursorSet") { }
+        public CustomCursorModPresetTask() : base("ModPreset", "CustomCursorSet")
+        {
+            if (CursorImages.AnyIn(CursorImages.ChosenFolder, RecognizedFileNames))
+                OriginalState = CursorImages.ChosenFolder;
+        }
 
         public override void Execute()
         {
@@ -48,6 +52,8 @@ namespace PhasmaStrap.Models.SettingTasks
                         File.Delete(targetFile);
                     }
                 }
+
+                CursorImages.Forget();
             }
 
             OriginalState = NewState;
