@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,6 +13,18 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public string Name { get; init; } = "";
 
         public string Role { get; init; } = "";
+
+        public bool Leader { get; init; }
+
+        public string Avatar { get; init; } = "";
+
+        public string Initial => string.IsNullOrEmpty(Name) ? "?" : Name.Substring(0, 1).ToUpperInvariant();
+
+        public Visibility AvatarVisibility => string.IsNullOrEmpty(Avatar) ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility InitialVisibility => string.IsNullOrEmpty(Avatar) ? Visibility.Visible : Visibility.Collapsed;
+
+        public Thickness Ring => Leader ? new Thickness(2) : new Thickness(0);
     }
 
     public sealed class PartyInviteRow
@@ -121,6 +133,14 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public ObservableCollection<PartyInviteRow> Invites { get; } = new();
 
+        public string MemberCount => $"{Members.Count} of 12";
+
+        public string LeaderLine => PartyService.IsLeader ? "YOU ARE LEADING" : $"{PartyService.Current.LeaderName.ToUpperInvariant()} IS LEADING";
+
+        public string LeaderHint => PartyService.IsLeader
+            ? "Anyone with this code can join. When you launch a game, they come with you."
+            : "You follow the leader into whatever they launch.";
+
         public Visibility InvitesVisibility => Invites.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
         private string _joinCode = "";
@@ -210,7 +230,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             Members.Clear();
 
             foreach (PartyMember member in PartyService.Current.Members)
-                Members.Add(new PartyMemberRow { Name = member.Name, Role = member.Leader ? "Leader" : "Member" });
+                Members.Add(new PartyMemberRow { Name = member.Name, Role = member.Leader ? "Leader" : "Member", Leader = member.Leader, Avatar = member.Avatar });
 
             Invites.Clear();
 

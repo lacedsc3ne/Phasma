@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 
 namespace PhasmaStrap.Utility
 {
@@ -9,6 +9,9 @@ namespace PhasmaStrap.Utility
 
         [JsonPropertyName("leader")]
         public bool Leader { get; set; }
+
+        [JsonPropertyName("avatar")]
+        public string Avatar { get; set; } = "";
     }
 
     public sealed class PartyInvite
