@@ -537,15 +537,29 @@ namespace PhasmaStrap
                 {
                     if (Settings.Prop.FriendActivityAlertsEnabled)
                         Utility.FriendActivityMonitor.Start();
-
-                if (Settings.Prop.PartyEnabled)
-                    Utility.PartyBackground.StartIfWanted();
-
-                Utility.AccountNotices.Start();
                 }
                 catch (Exception ex)
                 {
                     Logger.WriteLine(LOG_IDENT, $"Friend activity monitor startup failed: {ex.Message}");
+                }
+
+                try
+                {
+                    if (Settings.Prop.PartyEnabled)
+                        Utility.PartyBackground.StartIfWanted();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Party watcher startup failed: {ex.Message}");
+                }
+
+                try
+                {
+                    Utility.AccountNotices.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Account notices startup failed: {ex.Message}");
                 }
 
                 _ = Task.Run(() =>

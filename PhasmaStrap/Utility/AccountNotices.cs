@@ -32,45 +32,89 @@ namespace PhasmaStrap.Utility
     public static class AccountNotices
     {
         private const string LOG_IDENT = "AccountNotices";
+        private const string MutexName = @"Local\PhasmaStrapNotices";
+
+        private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan ClaimInterval = TimeSpan.FromMinutes(1);
 
         private static CancellationTokenSource? _cts;
+        private static Thread? _thread;
 
         public static void Start()
         {
-            if (_cts is not null)
+            if (_thread is not null)
                 return;
 
             _cts = new CancellationTokenSource();
-            _ = Task.Run(() => LoopAsync(_cts.Token));
+
+            _thread = new Thread(() => Loop(_cts.Token))
+            {
+                IsBackground = true,
+                Name = "Account notices"
+            };
+
+            _thread.Start();
         }
 
         public static void Stop()
         {
             _cts?.Cancel();
             _cts = null;
+            _thread = null;
         }
 
-        private static async Task LoopAsync(CancellationToken token)
+        private static void Loop(CancellationToken token)
         {
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    if (PhasmaAccount.SignedIn)
-                        await CheckAsync();
-                }
-                catch (Exception ex)
-                {
-                    App.Logger.WriteLine(LOG_IDENT, $"Check failed: {ex.Message}");
-                }
+            using var mutex = new Mutex(false, MutexName);
+            bool watching = false;
 
-                try
+            try
+            {
+                while (!token.IsCancellationRequested)
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(5), token);
+                    if (!watching)
+                    {
+                        try
+                        {
+                            watching = mutex.WaitOne(0);
+                        }
+                        catch (AbandonedMutexException)
+                        {
+                            watching = true;
+                        }
+
+                        if (watching)
+                            App.Logger.WriteLine(LOG_IDENT, "This process is watching for notices");
+                    }
+
+                    if (watching && PhasmaAccount.SignedIn)
+                    {
+                        try
+                        {
+                            CheckAsync().GetAwaiter().GetResult();
+                        }
+                        catch (Exception ex)
+                        {
+                            App.Logger.WriteLine(LOG_IDENT, $"Check failed: {ex.Message}");
+                        }
+                    }
+
+                    if (token.WaitHandle.WaitOne(watching ? PollInterval : ClaimInterval))
+                        return;
                 }
-                catch (OperationCanceledException)
+            }
+            finally
+            {
+                if (watching)
                 {
-                    return;
+                    try
+                    {
+                        mutex.ReleaseMutex();
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Logger.WriteLine(LOG_IDENT, $"Could not hand over watching: {ex.Message}");
+                    }
                 }
             }
         }

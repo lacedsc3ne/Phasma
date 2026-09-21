@@ -381,8 +381,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        // Presence goes stale between refreshes, and Roblox turns a stale job id into
-        // "they left the experience", so ask again for this one person before launching.
         private static async Task<FriendPresence?> FreshPresenceAsync(FriendRow row)
         {
             try
