@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.Input;
@@ -506,6 +506,27 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ICommand CopyScreenshotCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) Copy(item.Path, image: true); });
         public ICommand CopyScreenshotPathCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) CopyPath(item.Path, image: true); });
         public ICommand RevealScreenshotCommand => new RelayCommand<ScreenshotItem>(item => { if (item is not null) NotificationCenter.RevealFile(item.Path)(); });
+
+        public ICommand ShareScreenshotCommand => new AsyncRelayCommand<ScreenshotItem?>(async item =>
+        {
+            if (item is null)
+                return;
+
+            System.Windows.MessageBoxResult confirm = Frontend.ShowMessageBox(
+                $"Share '{Path.GetFileName(item.Path)}' to the public gallery on phasmastrap.com? Anyone can see it, so check it for your username, chat or anything else you would rather not post.",
+                System.Windows.MessageBoxImage.Question, System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxResult.No);
+
+            if (confirm != System.Windows.MessageBoxResult.Yes)
+                return;
+
+            string? problem = await ScreenshotShare.ShareAsync(item.Path, Path.GetFileNameWithoutExtension(item.Path), "");
+
+            NotificationCenter.Notify(
+                problem is null ? "Screenshot shared" : "Could not share that screenshot",
+                problem ?? "It is on phasmastrap.com/shots now.",
+                NotificationCategory.General,
+                kind: NotificationKindId.Screenshot);
+        });
 
         public ICommand CopyReplayCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) Copy(item.Path, image: false); });
         public ICommand CopyReplayPathCommand => new RelayCommand<ReplayClipItem>(item => { if (item is not null) CopyPath(item.Path, image: false); });

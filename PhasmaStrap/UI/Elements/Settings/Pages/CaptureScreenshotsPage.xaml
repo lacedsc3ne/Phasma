@@ -1,4 +1,4 @@
-<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.CaptureScreenshotsPage"
+﻿<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.CaptureScreenshotsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -127,6 +127,10 @@
                                 </MenuItem>
                                 <MenuItem Header="{x:Static resources:Strings.Menu_Capture_ShowFolder}" Command="{Binding Tag.RevealScreenshotCommand}" CommandParameter="{Binding DataContext}">
                                     <MenuItem.Icon><ui:SymbolIcon Symbol="FolderOpen24" /></MenuItem.Icon>
+                                </MenuItem>
+                                <Separator />
+                                <MenuItem Header="Share to the gallery" Command="{Binding Tag.ShareScreenshotCommand}" CommandParameter="{Binding DataContext}">
+                                    <MenuItem.Icon><ui:SymbolIcon Symbol="Share24" /></MenuItem.Icon>
                                 </MenuItem>
                                 <Separator />
                                 <MenuItem Header="{x:Static resources:Strings.Common_Delete}" Command="{Binding Tag.DeleteScreenshotCommand}" CommandParameter="{Binding DataContext}">
