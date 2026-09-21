@@ -76,5 +76,41 @@ namespace PhasmaStrap.Utility
 
             App.Logger.WriteLine(LOG_IDENT, $"Converted {Path.GetFileName(sourcePath)} to PNG for {Path.GetFileName(destinationPath)}");
         }
+
+        public const string QuickPickFolderName = "QuickPick";
+
+        public static string QuickPickFolder => Path.Combine(Paths.CursorSets, QuickPickFolderName);
+
+        public static string BuildFromOneImage(string imagePath)
+        {
+            string folder = QuickPickFolder;
+
+            if (Directory.Exists(folder))
+                Directory.Delete(folder, true);
+
+            Directory.CreateDirectory(folder);
+
+            WritePng(imagePath, Path.Combine(folder, "ArrowCursor.png"));
+            WritePng(imagePath, Path.Combine(folder, "ArrowFarCursor.png"));
+
+            File.WriteAllText(Path.Combine(folder, "source.txt"), imagePath);
+
+            App.Logger.WriteLine(LOG_IDENT, $"Built an arrow cursor from {Path.GetFileName(imagePath)}");
+
+            return folder;
+        }
+
+        public static string? SourceOf(string folder)
+        {
+            try
+            {
+                string note = Path.Combine(folder, "source.txt");
+                return File.Exists(note) ? File.ReadAllText(note).Trim() : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

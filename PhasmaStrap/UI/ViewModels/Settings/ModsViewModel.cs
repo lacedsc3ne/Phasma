@@ -131,7 +131,22 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
         public CustomCursorModPresetTask CustomCursorSetTask { get; } = new();
 
-        public string CustomCursorSetFolderDisplay => String.IsNullOrEmpty(CustomCursorSetTask.NewState) ? "No folder selected." : CustomCursorSetTask.NewState;
+        public string CustomCursorSetFolderDisplay
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(CustomCursorSetTask.NewState))
+                    return "Nothing chosen yet.";
+
+                string? source = CursorImages.SourceOf(CustomCursorSetTask.NewState);
+
+                return source is null ? CustomCursorSetTask.NewState : Path.GetFileName(source) + ", as your arrow cursor";
+            }
+        }
+
+        private static bool IsCursorName(string path) =>
+            CustomCursorModPresetTask.RecognizedFileNames.Any(name =>
+                Path.GetFileNameWithoutExtension(name).Equals(Path.GetFileNameWithoutExtension(path), StringComparison.OrdinalIgnoreCase));
 
         public Visibility ChooseCustomCursorSetVisibility => String.IsNullOrEmpty(CustomCursorSetTask.NewState) ? Visibility.Visible : Visibility.Collapsed;
 
@@ -149,13 +164,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             {
                 var dialog = new OpenFileDialog
                 {
-                    Title = "Pick any cursor image in the folder you want to use",
+                    Title = "Pick the picture you want as your cursor",
                     Filter = CursorImages.PickerFilter,
                     CheckFileExists = true
                 };
 
-                if (Directory.Exists(CustomCursorSetTask.NewState))
-                    dialog.InitialDirectory = CustomCursorSetTask.NewState;
+                string? current = CursorImages.SourceOf(CustomCursorSetTask.NewState) ?? CustomCursorSetTask.NewState;
+
+                if (!string.IsNullOrEmpty(current))
+                {
+                    string? start = Directory.Exists(current) ? current : Path.GetDirectoryName(current);
+
+                    if (Directory.Exists(start))
+                        dialog.InitialDirectory = start;
+                }
 
                 if (dialog.ShowDialog() != true)
                     return;
@@ -165,19 +187,25 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 if (string.IsNullOrEmpty(folder))
                     return;
 
-                bool foundAny = CursorImages.AnyIn(folder, CustomCursorModPresetTask.RecognizedFileNames);
+                bool wholePack = IsCursorName(dialog.FileName)
+                    && CursorImages.AnyIn(folder, CustomCursorModPresetTask.RecognizedFileNames);
 
-                if (!foundAny)
+                if (wholePack)
                 {
-                    Frontend.ShowMessageBox(
-                        $"Nothing in \"{Path.GetFileName(folder)}\" is named like a Roblox cursor, so none of it would be used.\n\n" +
-                        "That folder needs at least one image named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, as " + CursorImages.ReadableList + ".\n\n" +
-                        "To build a set out of pictures with any name, make one under Cursor sets below and use the Browse button next to each cursor.",
-                        MessageBoxImage.Error);
-                    return;
+                    CustomCursorSetTask.NewState = folder;
                 }
-
-                CustomCursorSetTask.NewState = folder;
+                else
+                {
+                    try
+                    {
+                        CustomCursorSetTask.NewState = CursorImages.BuildFromOneImage(dialog.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Frontend.ShowMessageBox("That picture could not be used as a cursor:\n" + ex.Message, MessageBoxImage.Error);
+                        return;
+                    }
+                }
 
                 if (!CursorTypeTask.NewState.Equals(default(Enums.CursorType)))
                     CursorTypeTask.NewState = default;
