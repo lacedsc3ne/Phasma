@@ -8,6 +8,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Pages
         {
             DataContext = new DiagnosticsViewModel();
             InitializeComponent();
+
+            Loaded += (_, _) => (DataContext as DiagnosticsViewModel)?.ResumePolling();
+            Unloaded += (_, _) => (DataContext as DiagnosticsViewModel)?.StopPolling();
         }
     }
 }

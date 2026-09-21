@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -155,7 +155,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             try
             {
                 FastFlagSnapshotManager.Apply(row.Snapshot);
-                SnapshotStatus = $"Applied '{row.Name}'. {App.FastFlags.Prop.Count} flag(s) are set and saved to ClientAppSettings.json.";
+                SnapshotStatus = $"Applied '{row.Name}'. {App.FastFlags.Prop.Count} flag(s) written to ClientAppSettings.json. Roblox reads flags when it starts, so restart it for these to take effect.";
             }
             catch (Exception ex)
             {
@@ -250,7 +250,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
 
                 if (!App.Settings.Prop.NetworkingProxyEnabled)
                 {
-                    ProxyStatus = "The networking proxy is turned off, so no requests are being intercepted.";
+                    ProxyStatus = "The networking proxy is turned off, so no requests are being intercepted. Turn it on under Launching, Networking.";
                     return;
                 }
 

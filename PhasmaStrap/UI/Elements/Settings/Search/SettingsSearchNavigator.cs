@@ -117,6 +117,9 @@ namespace PhasmaStrap.UI.Elements.Settings.Search
         {
             try
             {
+                if (page is ISearchToolHost toolHost)
+                    toolHost.ShowToolFor(entry);
+
                 string tabName = TabOnHostPage(entry);
 
                 if (tabName.Length > 0)

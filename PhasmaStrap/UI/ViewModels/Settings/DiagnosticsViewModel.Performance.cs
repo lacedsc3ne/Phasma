@@ -63,6 +63,23 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             PollMeasurement();
         }
 
+        public void StopPolling()
+        {
+            _measureTimer?.Stop();
+            _measureTimer = null;
+        }
+
+        public void ResumePolling()
+        {
+            if (_measureTimer is not null)
+                return;
+
+            _measureTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+            _measureTimer.Tick += (_, _) => PollMeasurement();
+            _measureTimer.Start();
+            PollMeasurement();
+        }
+
         public ObservableCollection<RunRow> Runs { get; } = new();
         public Visibility RunsEmptyVisibility => Runs.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 

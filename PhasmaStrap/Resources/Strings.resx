@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -4328,7 +4328,7 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
     <value>FastFlag snapshots</value>
   </data>
   <data name="Menu.DeveloperTools.SaveCurrentFlagSetFlipBetween" xml:space="preserve">
-    <value>Save your current flag set, flip between two saved sets to A/B compare, or diff any two snapshots.</value>
+    <value>Save your current flag set, apply a saved one back, or diff any two snapshots.</value>
   </data>
   <data name="Menu.DeveloperTools.SnapshotName" xml:space="preserve">
     <value>Snapshot name</value>
