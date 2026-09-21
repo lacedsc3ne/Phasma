@@ -1,4 +1,4 @@
-namespace PhasmaStrap.Utility
+﻿namespace PhasmaStrap.Utility
 {
     public static class HotkeyActions
     {
@@ -7,8 +7,6 @@ namespace PhasmaStrap.Utility
         public const string TakeScreenshot = "TakeScreenshot";
         public const string SaveInstantReplay = "SaveInstantReplay";
         public const string ToggleOverlayFocusMode = "ToggleOverlayFocusMode";
-        public const string RaiseFrameLimit = "RaiseFrameLimit";
-        public const string LowerFrameLimit = "LowerFrameLimit";
 
         public static readonly (string Id, string DisplayName, string Description)[] All =
         {
@@ -17,8 +15,6 @@ namespace PhasmaStrap.Utility
             (TakeScreenshot, "Take Screenshot", "Captures the Roblox window and saves it to the Capture page's gallery."),
             (SaveInstantReplay, "Save Instant Replay", "Saves the last several seconds of gameplay as an MP4 clip - only does anything if Instant Replay is enabled on the Capture page."),
             (ToggleOverlayFocusMode, "Toggle Overlay Focus Mode", "Instantly hides the stats HUD and crosshair - useful right before a screenshot or clip so they don't end up in it."),
-            (RaiseFrameLimit, "Raise Frame Rate Limit", "Steps the NVIDIA driver's frame rate limit for Roblox up to the next value you have set, and past the top means no limit. This is the driver's own limiter, not a Roblox setting, so it needs an NVIDIA card."),
-            (LowerFrameLimit, "Lower Frame Rate Limit", "Steps the same limit down to the previous value you have set. From no limit it drops to your highest value."),
         };
     }
 }

@@ -18,7 +18,6 @@ namespace PhasmaStrap.UI
         RobloxClosed,
         AutoRejoin,
         FastFlagProfile,
-        FrameRateLimit,
         RamCleaned,
         OverlayFocusMode,
         PerformanceRun,
@@ -83,7 +82,6 @@ namespace PhasmaStrap.UI
             NotificationKindId.RobloxClosed => App.Settings.Prop.NotificationRobloxClosedEnabled,
             NotificationKindId.AutoRejoin => App.Settings.Prop.NotificationAutoRejoinEnabled,
             NotificationKindId.FastFlagProfile => App.Settings.Prop.NotificationFastFlagProfileEnabled,
-            NotificationKindId.FrameRateLimit => App.Settings.Prop.NotificationFrameRateLimitEnabled,
             NotificationKindId.RamCleaned => App.Settings.Prop.NotificationRamCleanedEnabled,
             NotificationKindId.OverlayFocusMode => App.Settings.Prop.NotificationOverlayFocusEnabled,
             NotificationKindId.PerformanceRun => App.Settings.Prop.NotificationPerformanceRunEnabled,
@@ -109,7 +107,6 @@ namespace PhasmaStrap.UI
                 case NotificationKindId.RobloxClosed: App.Settings.Prop.NotificationRobloxClosedEnabled = enabled; break;
                 case NotificationKindId.AutoRejoin: App.Settings.Prop.NotificationAutoRejoinEnabled = enabled; break;
                 case NotificationKindId.FastFlagProfile: App.Settings.Prop.NotificationFastFlagProfileEnabled = enabled; break;
-                case NotificationKindId.FrameRateLimit: App.Settings.Prop.NotificationFrameRateLimitEnabled = enabled; break;
                 case NotificationKindId.RamCleaned: App.Settings.Prop.NotificationRamCleanedEnabled = enabled; break;
                 case NotificationKindId.OverlayFocusMode: App.Settings.Prop.NotificationOverlayFocusEnabled = enabled; break;
                 case NotificationKindId.PerformanceRun: App.Settings.Prop.NotificationPerformanceRunEnabled = enabled; break;

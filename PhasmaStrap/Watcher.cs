@@ -219,8 +219,6 @@ namespace PhasmaStrap
             _hotkeys.RegisterAction(HotkeyActions.TakeScreenshot, TakeScreenshot);
             _hotkeys.RegisterAction(HotkeyActions.SaveInstantReplay, SaveInstantReplay);
             _hotkeys.RegisterAction(HotkeyActions.ToggleOverlayFocusMode, ToggleOverlayFocusMode);
-            _hotkeys.RegisterAction(HotkeyActions.RaiseFrameLimit, RaiseFrameLimit);
-            _hotkeys.RegisterAction(HotkeyActions.LowerFrameLimit, LowerFrameLimit);
             _hotkeys.ApplyBindings();
 
             _notifyIcon = new(this);
@@ -256,54 +254,6 @@ namespace PhasmaStrap
                 $"Trimmed {result.ProcessesTrimmed} processes (~{result.BytesFreed / 1048576.0:0.#} MB).",
                 NotificationCategory.General,
                 kind: NotificationKindId.RamCleaned);
-        }
-
-        public void RaiseFrameLimit() => StepFrameLimit(true);
-
-        public void LowerFrameLimit() => StepFrameLimit(false);
-
-        private void StepFrameLimit(bool up)
-        {
-            if (!Integrations.Nvidia.FrameLimiter.Available)
-            {
-                NotificationCenter.Notify(
-                    "Frame rate limit needs an NVIDIA card",
-                    Integrations.Nvidia.FrameLimiter.UnavailableReason,
-                    NotificationCategory.General,
-                    kind: NotificationKindId.FrameRateLimit);
-                return;
-            }
-
-            int current = Integrations.Nvidia.FrameLimiter.Current();
-            int wanted = up
-                ? Integrations.Nvidia.FrameLimiter.Raise(current)
-                : Integrations.Nvidia.FrameLimiter.Lower(current);
-
-            if (wanted == current)
-            {
-                NotificationCenter.Notify(
-                    $"Frame rate limit: {Integrations.Nvidia.FrameLimiter.Describe(current)}",
-                    up ? "Already at the top of your list." : "Already at the bottom of your list.",
-                    NotificationCategory.General,
-                    kind: NotificationKindId.FrameRateLimit);
-                return;
-            }
-
-            if (!Integrations.Nvidia.FrameLimiter.Set(wanted))
-            {
-                NotificationCenter.Notify(
-                    "Frame rate limit did not change",
-                    "The NVIDIA driver would not take the new limit. The log has the reason.",
-                    NotificationCategory.General,
-                    kind: NotificationKindId.FrameRateLimit);
-                return;
-            }
-
-            NotificationCenter.Notify(
-                $"Frame rate limit: {Integrations.Nvidia.FrameLimiter.Describe(wanted)}",
-                "This is the NVIDIA driver's limiter for Roblox. If the change does not show up straight away, it takes effect the next time Roblox starts.",
-                NotificationCategory.General,
-                kind: NotificationKindId.FrameRateLimit);
         }
 
         public void ToggleHeadsetAudio()

@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 using PhasmaStrap.Networking;
 
@@ -260,7 +260,6 @@ namespace PhasmaStrap.Models.Persistable
         public bool NotificationRobloxClosedEnabled { get; set; } = true;
         public bool NotificationAutoRejoinEnabled { get; set; } = true;
         public bool NotificationFastFlagProfileEnabled { get; set; } = true;
-        public bool NotificationFrameRateLimitEnabled { get; set; } = true;
         public bool NotificationRamCleanedEnabled { get; set; } = true;
         public bool NotificationOverlayFocusEnabled { get; set; } = true;
         public bool NotificationPerformanceRunEnabled { get; set; } = true;
@@ -338,7 +337,6 @@ namespace PhasmaStrap.Models.Persistable
 
         public bool FastFlagPresetCloseRunningRoblox { get; set; } = false;
 
-        public string FrameLimitSteps { get; set; } = "60,120,144,240";
 
         public string PreferredExternalEditorPath { get; set; } = "";
 

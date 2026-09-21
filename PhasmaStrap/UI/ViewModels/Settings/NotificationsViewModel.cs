@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.Input;
@@ -260,7 +260,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             play.Kinds.Add(Kind(NotificationKindId.RobloxClosed, "Roblox closed unexpectedly", "Roblox exits on its own and the crash looks real enough to report."));
             play.Kinds.Add(Kind(NotificationKindId.AutoRejoin, "Auto Rejoin progress", "Auto Rejoin starts a retry after a crash, and again when it succeeds or runs out of attempts."));
             play.Kinds.Add(Kind(NotificationKindId.FastFlagProfile, "FastFlag profile not active", "You join a game with its own flag profile while Roblox is running someone else's flags."));
-            play.Kinds.Add(Kind(NotificationKindId.FrameRateLimit, "Frame rate limit changed", "You press the Raise or Lower Frame Rate Limit hotkey, or the driver refuses the new limit."));
             play.Kinds.Add(Kind(NotificationKindId.RamCleaned, "RAM cleaned", "Clean RAM runs, from the Performance page or its hotkey."));
             play.Kinds.Add(Kind(NotificationKindId.OverlayFocusMode, "Overlay Focus Mode", "You toggle Focus Mode, so the HUD and crosshair hide or come back."));
             play.Kinds.Add(Kind(NotificationKindId.PerformanceRun, "Performance measurement", "A measurement run starts, finishes with a verdict, or ends with nothing to measure."));

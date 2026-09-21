@@ -1,4 +1,4 @@
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 using Wpf.Ui.Common;
 
@@ -18,7 +18,6 @@ namespace PhasmaStrap.UI
             [NotificationKindId.RobloxClosed] = new(SymbolRegular.Warning24, Hex("#D9534F"), "Crash"),
             [NotificationKindId.AutoRejoin] = new(SymbolRegular.ArrowClockwise24, Hex("#E0873A"), "Rejoin"),
             [NotificationKindId.FastFlagProfile] = new(SymbolRegular.Flag24, Hex("#9A6BD8"), "FastFlags"),
-            [NotificationKindId.FrameRateLimit] = new(SymbolRegular.TopSpeed24, Hex("#2FA7A0"), "Frame rate"),
             [NotificationKindId.RamCleaned] = new(SymbolRegular.Broom24, Hex("#4FB3A3"), "Memory"),
             [NotificationKindId.OverlayFocusMode] = new(SymbolRegular.EyeOff24, Hex("#7E8AA2"), "Overlays"),
             [NotificationKindId.PerformanceRun] = new(SymbolRegular.DataTrending24, Hex("#5C7CE0"), "Performance"),

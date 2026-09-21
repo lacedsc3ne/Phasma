@@ -1,4 +1,4 @@
-<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.RenderingFrameRatePage"
+﻿<ui:UiPage x:Class="PhasmaStrap.UI.Elements.Settings.Pages.RenderingFrameRatePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -38,16 +38,5 @@
             </StackPanel>
         </controls:OptionControl>
 
-        <TextBlock Text="Driver frame rate limit" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,0" />
-        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                   Text="The NVIDIA driver's own frame rate limiter for Roblox, set on the driver profile that owns RobloxPlayerBeta.exe. It is a driver setting rather than a Roblox one, so nothing here is written to your flags. Bind Raise and Lower Frame Rate Limit on the Hotkeys page to step through the values below." />
-
-        <controls:OptionControl Header="Values to step through" Description="Frame rates in order, separated by commas. Stepping up past the highest one means no limit at all.">
-            <ui:TextBox Width="220" Text="{Binding FrameLimitSteps, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding FrameLimiterAvailable, Mode=OneWay}" />
-        </controls:OptionControl>
-
-        <controls:OptionControl Header="Limit right now" Description="{Binding FrameLimitStatus, Mode=OneWay}">
-            <ui:Button Icon="ArrowClockwise24" Content="{x:Static resources:Strings.Menu_ClassicClient_Refresh}" Command="{Binding RefreshFrameLimitCommand}" IsEnabled="{Binding FrameLimiterAvailable, Mode=OneWay}" />
-        </controls:OptionControl>
     </StackPanel>
 </ui:UiPage>

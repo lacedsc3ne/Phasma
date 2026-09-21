@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -112,37 +112,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
                 OnPropertyChanged(nameof(FrameGenEnabled));
             }
         }
-
-        public bool FrameLimiterAvailable => Integrations.Nvidia.FrameLimiter.Available;
-
-        public string FrameLimitSteps
-        {
-            get => App.Settings.Prop.FrameLimitSteps;
-            set
-            {
-                App.Settings.Prop.FrameLimitSteps = value ?? "";
-                OnPropertyChanged(nameof(FrameLimitSteps));
-                OnPropertyChanged(nameof(FrameLimitStatus));
-            }
-        }
-
-        public string FrameLimitStatus
-        {
-            get
-            {
-                if (!Integrations.Nvidia.FrameLimiter.Available)
-                    return Integrations.Nvidia.FrameLimiter.UnavailableReason;
-
-                string order = string.Join(", ", Integrations.Nvidia.FrameLimiter.Steps);
-                return $"The driver is set to {Integrations.Nvidia.FrameLimiter.Describe(Integrations.Nvidia.FrameLimiter.Current())}. Stepping through {order}, then no limit.";
-            }
-        }
-
-        public ICommand RefreshFrameLimitCommand => new RelayCommand(() =>
-        {
-            OnPropertyChanged(nameof(FrameLimitStatus));
-            OnPropertyChanged(nameof(FrameLimiterAvailable));
-        });
 
         public int FrameGenQuality
         {

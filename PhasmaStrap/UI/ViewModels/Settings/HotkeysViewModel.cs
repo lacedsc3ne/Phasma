@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.Input;
@@ -110,7 +110,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             HotkeyActions.SaveInstantReplay => App.Settings.Prop.InstantReplayEnabled,
             HotkeyActions.ToggleOverlayFocusMode => App.Settings.Prop.OverlayHudEnabled || App.Settings.Prop.Crosshair,
             HotkeyActions.ToggleHeadsetAudio => App.Settings.Prop.HeadsetAudioEnabled,
-            HotkeyActions.RaiseFrameLimit or HotkeyActions.LowerFrameLimit => Integrations.Nvidia.FrameLimiter.Available,
             _ => true
         };
 
@@ -118,7 +117,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         {
             HotkeyActions.SaveInstantReplay => !App.Settings.Prop.InstantReplayEnabled,
             HotkeyActions.ToggleOverlayFocusMode => !App.Settings.Prop.OverlayHudEnabled && !App.Settings.Prop.Crosshair,
-            HotkeyActions.RaiseFrameLimit or HotkeyActions.LowerFrameLimit => !Integrations.Nvidia.FrameLimiter.Available,
             _ => false
         };
 
@@ -133,9 +131,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             HotkeyActions.ToggleHeadsetAudio => App.Settings.Prop.HeadsetAudioEnabled
                 ? "Headset boost is on"
                 : "Headset boost is off",
-            HotkeyActions.RaiseFrameLimit or HotkeyActions.LowerFrameLimit => Integrations.Nvidia.FrameLimiter.Available
-                ? $"Driver limit now {Integrations.Nvidia.FrameLimiter.Describe(Integrations.Nvidia.FrameLimiter.Current())}, stepping through {App.Settings.Prop.FrameLimitSteps}"
-                : "Needs an NVIDIA card, so this hotkey does nothing",
             _ => "Always available"
         };
 
@@ -225,45 +220,6 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public ObservableCollection<HotkeyGroup> Groups { get; } = new();
 
         public ObservableCollection<KeyCapRow> Keyboard { get; } = new();
-
-        public bool FrameLimiterAvailable => Integrations.Nvidia.FrameLimiter.Available;
-
-        public string FrameLimitSteps
-        {
-            get => App.Settings.Prop.FrameLimitSteps;
-            set
-            {
-                App.Settings.Prop.FrameLimitSteps = value ?? "";
-                App.Settings.Save();
-
-                OnPropertyChanged(nameof(FrameLimitSteps));
-                OnPropertyChanged(nameof(FrameLimitStatus));
-
-                foreach (HotkeyRow row in Hotkeys)
-                    row.RefreshFeature();
-            }
-        }
-
-        public string FrameLimitStatus
-        {
-            get
-            {
-                if (!Integrations.Nvidia.FrameLimiter.Available)
-                    return Integrations.Nvidia.FrameLimiter.UnavailableReason;
-
-                string order = string.Join(", ", Integrations.Nvidia.FrameLimiter.Steps);
-                return $"The driver is set to {Integrations.Nvidia.FrameLimiter.Describe(Integrations.Nvidia.FrameLimiter.Current())}. Stepping through {order}, then no limit.";
-            }
-        }
-
-        public ICommand RefreshFrameLimitCommand => new RelayCommand(() =>
-        {
-            OnPropertyChanged(nameof(FrameLimitStatus));
-            OnPropertyChanged(nameof(FrameLimiterAvailable));
-
-            foreach (HotkeyRow row in Hotkeys)
-                row.RefreshFeature();
-        });
 
         public void Refresh()
         {
