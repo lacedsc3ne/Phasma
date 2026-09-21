@@ -51,13 +51,32 @@ jobs:
       - name: Rename binaries
         run: mv "release/PhasmaStrap.exe" "release/PhasmaStrap-${{ github.ref_name }}.exe"
 
+      - name: Check out release notes
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/release-notes
+          sparse-checkout-cone-mode: false
+          path: notes
+
+      - name: Build the description
+        run: |
+          notes="notes/.github/release-notes/${{ github.ref_name }}.md"
+          if [ -f "$notes" ]; then
+            cat "$notes" >> body.md
+            printf '\n\n' >> body.md
+          else
+            echo "No notes file for ${{ github.ref_name }}, releasing with the standing notes only"
+          fi
+          cat >> body.md <<'BOILERPLATE'
+          **Note:** this build is unsigned (this fork does not have access to the SignPath code-signing service the upstream Bloxstrap project uses), so Windows SmartScreen will likely flag it on first run. Click "More info" then "Run anyway" to proceed.
+
+          **Requires the [.NET 6 Desktop Runtime](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win11-x64&apphost_version=6.0.36&gui=true).** If you don't already have it, install it *before* running PhasmaStrap.exe or clicking Play in the browser - if it's missing, launching straight from a browser link can fail silently instead of showing the usual "install the .NET Desktop Runtime?" prompt you'd get from double-clicking the exe directly.
+          BOILERPLATE
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: release/PhasmaStrap-${{ github.ref_name }}.exe
           name: PhasmaStrap ${{ github.ref_name }}
-          body: |
-            **Note:** this build is unsigned (this fork does not have access to the SignPath code-signing service the upstream Bloxstrap project uses), so Windows SmartScreen will likely flag it on first run. Click "More info" then "Run anyway" to proceed.
-
-            **Requires the [.NET 6 Desktop Runtime](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win11-x64&apphost_version=6.0.36&gui=true).** If you don't already have it, install it *before* running PhasmaStrap.exe or clicking Play in the browser - if it's missing, launching straight from a browser link can fail silently instead of showing the usual "install the .NET Desktop Runtime?" prompt you'd get from double-clicking the exe directly.
+          body_path: body.md
