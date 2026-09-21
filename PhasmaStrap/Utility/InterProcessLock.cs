@@ -14,6 +14,8 @@ namespace PhasmaStrap.Utility
 
         public InterProcessLock(string name) : this(name, TimeSpan.Zero) { }
 
+        private readonly int _ownerThread;
+
         public InterProcessLock(string name, TimeSpan timeout)
         {
             Mutex = new Mutex(false, "PhasmaStrap-" + name);
@@ -26,15 +28,29 @@ namespace PhasmaStrap.Utility
             {
                 IsAcquired = true;
             }
+
+            _ownerThread = Environment.CurrentManagedThreadId;
         }
 
         public void Dispose()
         {
             if (IsAcquired)
             {
-                Mutex.ReleaseMutex();
+                if (_ownerThread == Environment.CurrentManagedThreadId)
+                {
+                    try
+                    {
+                        Mutex.ReleaseMutex();
+                    }
+                    catch (ApplicationException)
+                    {
+                    }
+                }
+
                 IsAcquired = false;
             }
+
+            Mutex.Dispose();
 
             GC.SuppressFinalize(this);
         }

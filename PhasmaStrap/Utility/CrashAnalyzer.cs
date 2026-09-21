@@ -20,6 +20,7 @@ namespace PhasmaStrap.Utility
         public string ExceptionCode { get; set; } = "";
         public string DumpFile { get; set; } = "";
         public List<string> ForeignModules { get; set; } = new();
+        public List<string> BlockedModules { get; set; } = new();
     }
 
     public static class CrashAnalyzer
@@ -92,6 +93,19 @@ namespace PhasmaStrap.Utility
 
             report.CleanExit = tail.TakeLast(40).Any(l => l.Contains("handler was destroyed", StringComparison.OrdinalIgnoreCase));
 
+            foreach (string line in tail)
+            {
+                Match blocked = BlockedImage.Match(line);
+
+                if (!blocked.Success)
+                    continue;
+
+                string name = Path.GetFileName(blocked.Groups["path"].Value.Replace('/', '\\'));
+
+                if (name.Length > 0 && !report.BlockedModules.Contains(name, StringComparer.OrdinalIgnoreCase))
+                    report.BlockedModules.Add(name);
+            }
+
             var signs = new Dictionary<string, string>();
             foreach (string line in tail.TakeLast(1500))
             {
@@ -142,7 +156,12 @@ namespace PhasmaStrap.Utility
             ("graphics-hook", "OBS game capture"), ("medal", "Medal"), ("overwolf", "Overwolf"), ("ow-graphics", "Overwolf"),
             ("reshade", "ReShade"), ("bdcam", "Bandicam"), ("fraps", "Fraps"), ("nahimic", "Nahimic audio"), ("sonic", "Sonic audio software"),
             ("easyhook", "an injected hook library"), ("minhook", "an injected hook library"),
+            ("nvspcap", "the NVIDIA overlay (GeForce Experience / NVIDIA App)"), ("nvcamera", "the NVIDIA overlay"),
+            ("amf-capture", "the AMD overlay"), ("amdow", "the AMD overlay"), ("igoproxy", "the Intel overlay"),
+            ("xboxgamebar", "the Xbox Game Bar"), ("gameinput", "the Xbox Game Bar"),
         };
+
+        private static readonly Regex BlockedImage = new(@"Blocked DLL:\s*(?<path>\S+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static string? OverlayName(string module)
         {
@@ -254,6 +273,26 @@ namespace PhasmaStrap.Utility
                 report.Confidence = "Unclear";
                 report.Suggestions.Add("That is what it looks like when the process is ended from outside: Task Manager, a \"game booster\", antivirus, or Roblox's anti-cheat closing the game because it disliked another program.");
                 if (tweaks.Length > 0) report.Suggestions.Add(tweaks);
+            }
+
+            if (report.BlockedModules.Count > 0)
+            {
+                List<string> named = report.BlockedModules.Select(m => OverlayName(m) is string p ? $"{m} ({p})" : m).Take(10).ToList();
+                report.Evidence.Add($"Roblox blocked these from loading into the game: {string.Join(", ", named)}");
+
+                string? known = report.BlockedModules.Select(OverlayName).FirstOrDefault(n => n is not null);
+
+                if (report.Confidence != "Strong")
+                {
+                    report.Cause = known is null
+                        ? "Roblox's anti-cheat blocked another program from loading into the game."
+                        : $"Roblox's anti-cheat blocked {known} from loading into the game.";
+                    report.Confidence = "Likely";
+                }
+
+                report.Suggestions.Add(known is null
+                    ? "Turn off in-game overlays and capture software, then play a session to see if it stops."
+                    : $"Turn off {known} and play a session. That is what Roblox objected to, and it is not PhasmaStrap.");
             }
 
             if (report.ForeignModules.Count > 0)
