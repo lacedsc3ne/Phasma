@@ -250,7 +250,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public FriendsViewModel()
         {
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
-            JoinCommand = new RelayCommand<FriendRow?>(Join);
+            JoinCommand = new AsyncRelayCommand<FriendRow?>(JoinAsync);
             InviteToPartyCommand = new AsyncRelayCommand<FriendRow?>(InviteToPartyAsync);
 
             var view = CollectionViewSource.GetDefaultView(Friends);
@@ -349,19 +349,51 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             }
         }
 
-        private static void Join(FriendRow? row)
+        private static async Task JoinAsync(FriendRow? row)
         {
-            if (row?.Presence is null || !row.Joinable)
+            if (row is null)
                 return;
+
+            FriendPresence? now = await FreshPresenceAsync(row);
+
+            if (now is null || now.Type != FriendPresenceType.InGame)
+            {
+                Frontend.ShowMessageBox($"{row.Name} is not in a game any more.", MessageBoxImage.Information);
+                return;
+            }
+
+            if (!now.Joinable)
+            {
+                Frontend.ShowMessageBox(
+                    $"{row.Name} is in a game, but Roblox is not saying which server. That happens when their joins are set to friends only or off, or when the game blocks joining.",
+                    MessageBoxImage.Information);
+                return;
+            }
 
             try
             {
-                Process.Start(new ProcessStartInfo(FriendsService.GetJoinDeeplink(row.Presence)) { UseShellExecute = true });
+                Process.Start(Paths.Process, $"-player \"{FriendsService.GetJoinDeeplink(now)}\"");
             }
             catch (Exception ex)
             {
                 App.Logger.WriteLine(LOG_IDENT, $"Join failed: {ex.Message}");
                 Frontend.ShowMessageBox($"Could not start Roblox: {ex.Message}", MessageBoxImage.Error);
+            }
+        }
+
+        // Presence goes stale between refreshes, and Roblox turns a stale job id into
+        // "they left the experience", so ask again for this one person before launching.
+        private static async Task<FriendPresence?> FreshPresenceAsync(FriendRow row)
+        {
+            try
+            {
+                Dictionary<long, FriendPresence> presence = await FriendsService.GetPresenceAsync(new[] { row.UserId });
+                return presence.TryGetValue(row.UserId, out FriendPresence? found) ? found : row.Presence;
+            }
+            catch (Exception ex)
+            {
+                App.Logger.WriteLine(LOG_IDENT, $"Could not re-check where {row.Name} is: {ex.Message}");
+                return row.Presence;
             }
         }
     }
