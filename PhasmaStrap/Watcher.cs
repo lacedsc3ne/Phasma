@@ -94,6 +94,14 @@ namespace PhasmaStrap
                     }
                 };
 
+                NowPlaying.NameResolved += (_, _) =>
+                {
+                    if (!App.Settings.Prop.PartyEnabled || !ActivityWatcher.InGame)
+                        return;
+
+                    Utility.PartyService.RecordPresence(ActivityWatcher.Data.PlaceId, ActivityWatcher.Data.JobId, NowPlaying.GameName());
+                };
+
                 ActivityWatcher.OnGameJoin += (sender, _) => ServerRegion.OnGameJoin((sender as ActivityWatcher)?.Data.MachineAddress);
                 ActivityWatcher.OnGameLeave += (_, _) => ServerRegion.OnGameLeave();
                 ActivityWatcher.OnGameLeave += (_, _) => Utility.PartyService.RecordPresence(0, "", "");

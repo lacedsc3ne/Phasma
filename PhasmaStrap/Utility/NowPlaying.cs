@@ -63,6 +63,8 @@ namespace PhasmaStrap.Utility
             return watcher.Data.PlaceId > 0 ? $"Place {watcher.Data.PlaceId}" : "--";
         }
 
+        public static event EventHandler? NameResolved;
+
         private static async Task FetchAsync(long universeId)
         {
             try
@@ -70,7 +72,10 @@ namespace PhasmaStrap.Utility
                 await UniverseDetails.FetchSingle(universeId);
 
                 if (UniverseDetails.LoadFromCache(universeId)?.Data?.Name is string name && name.Length > 0)
+                {
                     _name = ServerRegion.Shorten(name, 22);
+                    NameResolved?.Invoke(null, EventArgs.Empty);
+                }
             }
             catch (Exception ex)
             {

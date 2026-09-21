@@ -239,6 +239,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(Refresh));
         }
 
+        private void OnAccountChanged(object? sender, EventArgs e)
+        {
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (App.Settings.Prop.PartyEnabled && PhasmaAccount.SignedIn)
+                {
+                    PartyService.Start();
+                    _ = PartyService.RefreshAsync();
+                }
+
+                Refresh();
+            }));
+        }
+
         public void Refresh()
         {
             Members.Clear();
@@ -259,6 +273,9 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             PartyService.Changed -= OnPartyChanged;
             PartyService.Changed += OnPartyChanged;
 
+            PhasmaAccount.Changed -= OnAccountChanged;
+            PhasmaAccount.Changed += OnAccountChanged;
+
             if (App.Settings.Prop.PartyEnabled)
                 PartyService.Start();
 
@@ -268,6 +285,7 @@ namespace PhasmaStrap.UI.ViewModels.Settings
         public void Detach()
         {
             PartyService.Changed -= OnPartyChanged;
+            PhasmaAccount.Changed -= OnAccountChanged;
         }
     }
 }
