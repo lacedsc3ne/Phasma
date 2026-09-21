@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 
 namespace PhasmaStrap.Utility
 {
@@ -34,7 +34,7 @@ namespace PhasmaStrap.Utility
         private const string LOG_IDENT = "AccountNotices";
         private const string MutexName = @"Local\PhasmaStrapNotices";
 
-        private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(60);
         private static readonly TimeSpan ClaimInterval = TimeSpan.FromMinutes(1);
 
         private static CancellationTokenSource? _cts;
