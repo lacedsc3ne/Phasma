@@ -4684,6 +4684,12 @@ Everything on this page (and the Advanced Editor) reads and writes a dedicated "
   <data name="Menu.Mods.ApplyOwnCursorImagesFromLocal" xml:space="preserve">
     <value>Apply your own cursor image instead of a bundled preset. Pick any picture, with any name, and it becomes your arrow cursor. PNG, JPG, BMP, GIF, TIFF and ICO all work, and anything that is not already a PNG is converted to one, since that is what Roblox reads. JPG has no transparency, so a JPG cursor shows as a solid block. If you pick a file already named ArrowCursor, ArrowFarCursor, IBeamCursor or MouseLockedCursor, the whole folder it sits in is used instead, so cursor packs still work in one click. For the text beam and the locked dot, make a set under Cursor sets below.</value>
   </data>
+  <data name="Menu.Integrations.WatchExternalLaunches.Title" xml:space="preserve">
+    <value>Watch games PhasmaStrap did not start</value>
+  </data>
+  <data name="Menu.Integrations.WatchExternalLaunches.Description" xml:space="preserve">
+    <value>Pick up a Roblox session started from the Roblox app or a browser link, so activity, the overlay, Discord presence and your party still see what you are playing. FastFlags and mods are not applied to a session PhasmaStrap did not launch, because Roblox only reads those when it starts.</value>
+  </data>
   <data name="Menu.Mods.Remove" xml:space="preserve">
     <value>Remove</value>
   </data>

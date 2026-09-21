@@ -562,6 +562,16 @@ namespace PhasmaStrap
                     Logger.WriteLine(LOG_IDENT, $"Account notices startup failed: {ex.Message}");
                 }
 
+                try
+                {
+                    if (Settings.Prop.EnableActivityTracking && Settings.Prop.WatchExternalLaunches && !LaunchSettings.WatcherFlag.Active)
+                        Utility.RobloxSessionWatch.Start();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine(LOG_IDENT, $"Roblox session watch startup failed: {ex.Message}");
+                }
+
                 _ = Task.Run(() =>
                 {
                     try

@@ -159,6 +159,13 @@
                 </controls:OptionControl>
 
                 <controls:OptionControl
+                    Header="{x:Static resources:Strings.Menu_Integrations_WatchExternalLaunches_Title}"
+                    Description="{x:Static resources:Strings.Menu_Integrations_WatchExternalLaunches_Description}"
+                    IsEnabled="{Binding InnerContent.IsChecked, ElementName=ActivityTrackingOption, Mode=OneWay}">
+                    <ui:ToggleSwitch IsChecked="{Binding WatchExternalLaunchesEnabled, Mode=TwoWay}" />
+                </controls:OptionControl>
+
+                <controls:OptionControl
                     Header="{x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Title}"
                     Description="{Binding Source={x:Static resources:Strings.Menu_Integrations_QueryServerLocation_Description}, Converter={StaticResource StringFormatConverter}, ConverterParameter='https://ipinfo.io'}"
                     HelpLink="https://bloxstraplabs.com/wiki/features/server-location-hints/"

@@ -90,14 +90,14 @@
 
         private static async Task CloseRobloxAsync()
         {
+            FlagProfileSession.MarkIntentionalRestart();
+
             foreach (Process process in Process.GetProcessesByName(App.RobloxPlayerAppName))
             {
                 try
                 {
-                    if (process.MainWindowHandle != IntPtr.Zero && process.CloseMainWindow() && process.WaitForExit(4000))
-                        continue;
-
                     process.Kill();
+                    process.WaitForExit(4000);
                 }
                 catch (Exception ex)
                 {

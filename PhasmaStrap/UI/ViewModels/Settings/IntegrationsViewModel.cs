@@ -128,6 +128,20 @@ namespace PhasmaStrap.UI.ViewModels.Settings
             OnPropertyChanged(nameof(SelectedCustomIntegration));
         }
 
+        public bool WatchExternalLaunchesEnabled
+        {
+            get => App.Settings.Prop.WatchExternalLaunches;
+            set
+            {
+                App.Settings.Prop.WatchExternalLaunches = value;
+
+                if (value)
+                    PhasmaStrap.Utility.RobloxSessionWatch.Start();
+
+                OnPropertyChanged(nameof(WatchExternalLaunchesEnabled));
+            }
+        }
+
         public bool ActivityTrackingEnabled
         {
             get => App.Settings.Prop.EnableActivityTracking;

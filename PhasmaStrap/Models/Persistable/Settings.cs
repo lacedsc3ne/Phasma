@@ -59,6 +59,8 @@ namespace PhasmaStrap.Models.Persistable
         public bool AssetWarpPreloadCrossGame { get; set; } = false;
 
         public bool EnableActivityTracking { get; set; } = true;
+
+        public bool WatchExternalLaunches { get; set; } = true;
         public bool UseDiscordRichPresence { get; set; } = true;
         public bool HideRPCButtons { get; set; } = true;
         public bool ShowAccountOnRichPresence { get; set; } = false;

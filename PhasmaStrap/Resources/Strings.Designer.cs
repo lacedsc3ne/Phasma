@@ -1,4 +1,4 @@
-namespace PhasmaStrap.Resources {
+﻿namespace PhasmaStrap.Resources {
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
@@ -3100,6 +3100,18 @@ namespace PhasmaStrap.Resources {
             }
         }
 
+        public static string Menu_Integrations_WatchExternalLaunches_Title {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.WatchExternalLaunches.Title", resourceCulture);
+            }
+        }
+        
+        public static string Menu_Integrations_WatchExternalLaunches_Description {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.WatchExternalLaunches.Description", resourceCulture);
+            }
+        }
+        
         public static string Menu_Integrations_EnableActivityTracking_Title {
             get {
                 return ResourceManager.GetString("Menu.Integrations.EnableActivityTracking.Title", resourceCulture);
