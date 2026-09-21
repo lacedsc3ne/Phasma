@@ -282,17 +282,20 @@ namespace PhasmaStrap.Utility
 
                 string? known = report.BlockedModules.Select(OverlayName).FirstOrDefault(n => n is not null);
 
-                if (report.Confidence != "Strong")
+                if (!report.CleanExit)
                 {
-                    report.Cause = known is null
-                        ? "Roblox's anti-cheat blocked another program from loading into the game."
-                        : $"Roblox's anti-cheat blocked {known} from loading into the game.";
-                    report.Confidence = "Likely";
-                }
+                    if (report.Confidence != "Strong")
+                    {
+                        report.Cause = known is null
+                            ? "Roblox's anti-cheat blocked another program from loading into the game."
+                            : $"Roblox's anti-cheat blocked {known} from loading into the game.";
+                        report.Confidence = "Likely";
+                    }
 
-                report.Suggestions.Add(known is null
-                    ? "Turn off in-game overlays and capture software, then play a session to see if it stops."
-                    : $"Turn off {known} and play a session. That is what Roblox objected to, and it is not PhasmaStrap.");
+                    report.Suggestions.Add(known is null
+                        ? "Turn off in-game overlays and capture software, then play a session to see if it stops."
+                        : $"Turn off {known} and play a session. That is what Roblox objected to, and it is not PhasmaStrap.");
+                }
             }
 
             if (report.ForeignModules.Count > 0)
@@ -405,6 +408,16 @@ namespace PhasmaStrap.Utility
             public List<string> ForeignModules = new();
         }
 
+        private static readonly Regex WerDumpName = new(@"^.+\.\d+\.dmp$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static bool CouldBeRoblox(string fileName)
+        {
+            if (fileName.StartsWith("Roblox", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return !WerDumpName.IsMatch(fileName);
+        }
+
         private static DumpInfo? FindDump(List<string> directories, DateTime crashUtc)
         {
             foreach (string directory in directories)
@@ -416,6 +429,7 @@ namespace PhasmaStrap.Utility
 
                     FileInfo? file = new DirectoryInfo(directory).EnumerateFiles("*.*dmp", SearchOption.AllDirectories)
                         .Where(f => Math.Abs((f.LastWriteTimeUtc - crashUtc).TotalMinutes) < 5)
+                        .Where(f => CouldBeRoblox(f.Name))
                         .OrderByDescending(f => f.LastWriteTimeUtc)
                         .FirstOrDefault();
 
